@@ -2,7 +2,7 @@ import Std.Data.List.Lemmas
 import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
-import Geo.orientations
+import Geo.Orientations
 
 -- Polygons are defined by a list of points
 -- no three of them on a same line
