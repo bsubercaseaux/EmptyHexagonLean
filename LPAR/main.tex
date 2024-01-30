@@ -1,0 +1,98 @@
+\PassOptionsToPackage{dvipsnames}{xcolor}
+
+\documentclass{easychair}
+\usepackage{doc}
+\usepackage{mathtools}
+\usepackage{pgfplots}
+\usepackage{pgfmath}
+\usepackage{float}
+\usepackage[misc]{ifsym}
+\usepackage[ruled]{algorithm2e}
+\usepackage{subcaption}
+\captionsetup{compatibility=false}
+\usepackage{graphicx}
+\usepackage{mathtools}
+\usepackage{amsthm}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{todonotes}
+\usepackage{nicefrac}
+\usepackage{cleveref}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{xpatch}
+\usepackage{appendix}
+\usepackage{adjustbox}
+
+\usepackage{tikz}
+\usetikzlibrary{shapes.geometric}
+\usetikzlibrary{fit}
+\usetikzlibrary{arrows}
+\usetikzlibrary{patterns}
+\usetikzlibrary{matrix}
+\usetikzlibrary{positioning}
+\usetikzlibrary{backgrounds}
+
+\makeatletter
+\def\orcidID#1{\href{http://orcid.org/#1}{\protect\raisebox{-1.25pt}{\protect\includegraphics{orcid_color.eps}}}}
+\makeatother
+
+
+
+\title{A Lean Verification of the Empty Hexagon Theorem}%
+% \thanks{Other people who contributed to this document include Maria Voronkov
+%   (Imperial College and EasyChair) and Graham Gough (The University of
+%   Manchester).}}
+
+% Authors are joined by \and. Their affiliations are given by \inst, which indexes
+% into the list defined using \institute
+%
+\author{ Cayden Codel \orcidID{0000-0003-2295-1299}
+   \and  James Gallicchio \orcidID{0000-0003-2295-1299}
+   \and  Wojciech Nawrocki \orcidID{0000-0003-2295-1299}
+  \and  \\ Bernardo Subercaseaux  \orcidID{0000-0003-2295-1299} }
+%
+\institute{
+  Carnegie Mellon University, Pittsburgh, PA 15213, USA\\
+  \email{\{ccodel, jcallicc, wnawrock, bsuberca\}@andrew.cmu.edu}
+ }
+
+
+%  \authorrunning{} has to be set for the shorter version of the authors' names;
+% otherwise a warning will be rendered in the running heads. When processed by
+% EasyChair, this command is mandatory: a document without \authorrunning
+% will be rejected by EasyChair
+
+\authorrunning{Codel, Gallicchio, Nawrocki, and Subercaseaux}
+
+% \titlerunning{} has to be set to either the main title or its shorter
+% version for the running heads. When processed by
+% EasyChair, this command is mandatory: a document without \titlerunning
+% will be rejected by EasyChair
+\titlerunning{A Lean Verification of the Empty Hexagon Theorem}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+  A recent breakthrough in computer assisted mathematics proved that every set of $30$ points contains an empty hexagon, 
+  thus closing a line of research opened by Erd\H{o}s and Szekeres in 1935. The proof combines geometric insights with automated resoning techniques, 
+ resulting in a sophisticated propositional encoding of the problem with $O(n^4)$ many clauses (where $n$ ends up being $30$) that is then solved using a SAT solver and parallel computation.
+ This paper presents a formalization of the proof in the Lean theorem prover, thus certifying its correctness. To achieve this we have formalized several ideas of both discrete computational geometry and SAT-encodings that have been successfully applied in different Erd\H{o}s-Szekeres type problems.
+We hope this work sets a new standard for verification when extensive computation is used for discrete geometry problems, and increases the trust of the community in the results obtained by these methods.
+
+\end{abstract}
+
+\section{Introduction}
+\label{sec:intro}
+\input{intro.tex}
+
+%------------------------------------------------------------------------------
+% Index
+%\printindex
+
+%------------------------------------------------------------------------------
+\end{document}
+
