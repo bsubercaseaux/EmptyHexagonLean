@@ -3,6 +3,8 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.Point
 
+namespace Geo
+
 noncomputable def slope (p1 p2 : Point) : Real :=
   (p2.y - p1.y) / (p2.x - p1.x)
 

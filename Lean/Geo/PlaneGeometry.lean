@@ -4,6 +4,8 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.Orientations
 
+namespace Geo
+
 -- Polygons are defined by a list of points
 -- no three of them on a same line
 -- Note: this allows for self-intersecting polygons
@@ -46,7 +48,7 @@ noncomputable def intersection (l1 l2 : LineSegment) : Option Point :=
   else if x_int < l2.p1.x || x_int > l2.p2.x then
     none
   else
-    some ⟨x_int, y_int⟩
+    some ![x_int, y_int]
 
 
 def is_simple_polygon (p : Polygon) : Prop :=
@@ -64,7 +66,7 @@ def pt_inside_pgon (p : Polygon) (pt : Point) : Prop :=
 noncomputable def is_convex_polygon (P : Polygon) : Prop :=
   ∀ α : Real, α ∈ [0, 1] →
     ∀ a b : Point, pt_inside_pgon P a ∧ pt_inside_pgon P b
-      → pt_inside_pgon P ⟨α * a.x + (1 - α) * b.x, α * a.y + (1 - α) * b.y⟩
+      → pt_inside_pgon P ![α * a.x + (1 - α) * b.x, α * a.y + (1 - α) * b.y]
 
 def is_convex_orientation_based (P : Polygon) : Prop :=
   ∀ i : (Fin (P.points.length)),

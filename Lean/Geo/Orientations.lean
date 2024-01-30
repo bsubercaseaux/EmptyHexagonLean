@@ -4,6 +4,8 @@ import Mathlib.Algebra.Algebra.Basic
 import Geo.Point
 import Geo.Slope
 
+namespace Geo
+
 inductive Orientation : Type
   | CW -- clockwise :=  -
   | CCW -- counter clockwise:= +
@@ -29,7 +31,7 @@ noncomputable def σ (p q r : Point) : Orientation :=
   else if matrix_det p q r < 0 then CW
   else Collinear
 
-theorem slope_iff_orientation {p q r : Point} (h : IsSortedPoints₃ p q r) :
+theorem slope_iff_orientation {p q r : Point} (h : IsSortedPoints₃ p q r) (hGp : GeneralPosition₃ p q r) :
     σ p q r = CCW ↔ slope p q < slope p r := by
   unfold σ slope
   have qp_dx_pos : 0 < q.x - p.x := by linarith [h.sorted₁]
@@ -60,15 +62,17 @@ theorem slope_iff_orientation {p q r : Point} (h : IsSortedPoints₃ p q r) :
           simp only [false_iff, not_lt]
           rw [matrix_det_eq_det_pts] at det_pqr_nonneg det_pqr_not_pos
           have det_pqr_zero : determinant_pts p q r = 0 := by linarith
-          have := h.det_ne_zero
+          have := hGp.det_ne_zero
           contradiction
       }
   }
 
 
-theorem σ_prop_1  (p q r s : Point) (h : IsSortedPoints₄ p q r s) :
+theorem σ_prop_1  (p q r s : Point) (h : IsSortedPoints₄ p q r s) (hGp : GeneralPosition₄ p q r s) :
     (σ p q r = CCW) ∧ (σ q r s = CCW) → (σ p r s = CCW) := by
-  rw [slope_iff_orientation h.sorted₁, slope_iff_orientation h.sorted₃, slope_iff_orientation h.sorted₄]
+  rw [slope_iff_orientation h.sorted₁ hGp.gp₁,
+    slope_iff_orientation h.sorted₃ hGp.gp₃,
+    slope_iff_orientation h.sorted₄ hGp.gp₄]
   rw [slope_lt_iff_lt h.sorted₃.sorted₁ h.sorted₃.sorted₂]
   intro h_land
 

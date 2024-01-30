@@ -4,17 +4,18 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.PlaneGeometry
 
+namespace Geo
 
 def pt_transform (p : Point) (M : Matrix (Fin 3) (Fin 3) Real) : Point :=
   let x' := (M 0 0) * p.x + (M 0 1) * p.y + (M 0 2) * 1
   let y' := (M 1 0) * p.x + (M 1 1) * p.y + (M 1 2) * 1
-  ⟨x', y'⟩
+  ![x', y']
 
 def pt_to_vec (p : Point) : Matrix (Fin 3) (Fin 1) Real :=
-  ![![p.x], ![p.y], ![1]]
+  !![p.x; p.y; 1]
 
 def vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real) : Point :=
-  ⟨v 0 0, v 1 1⟩
+  ![v 0 0, v 1 1]
 
 def pt_transform_2 (p : Point) (M : Matrix (Fin 3) (Fin 3) Real) : Point :=
   let A := M * (pt_to_vec p)
@@ -27,7 +28,6 @@ structure omega_equivalence (pts pts' : List Point) : Prop :=
         σ (pts'.get ⟨i, by rw [←same_length] ; exact hi⟩)
                       (pts'.get ⟨j, by rw [←same_length] ; exact hj⟩)
                       (pts'.get ⟨k, by rw [←same_length] ; exact hk⟩)
-
 
 theorem omega_equiv_transitivity
   {pts pts' pts'' : List Point}
@@ -153,12 +153,12 @@ def translation_transform (s t : Real) :
   exact ⟨by linarith, third_row⟩
 
 lemma translation_translates (p : Point) (s t : Real) :
-  pt_transform p (translation_matrix s t) = ⟨p.x + s, p.y + t⟩ := by
+  pt_transform p (translation_matrix s t) = ![p.x + s, p.y + t] := by
   unfold pt_transform translation_matrix
   simp
 
 lemma symmetry_breaking_1 (pts: List Point) :
-  ∃ (pts': List Point), (omega_equivalence pts pts')  ∧ (pts ≠ [] → (pts'.get? 0) = some ⟨0, 0⟩) := by
+  ∃ (pts': List Point), (omega_equivalence pts pts') ∧ (pts ≠ [] → (pts'.get? 0) = some ![0, 0]) := by
   by_cases h : pts = []
   {
     let pts' : List Point := []
@@ -178,8 +178,8 @@ lemma symmetry_breaking_1 (pts: List Point) :
     let MT := translation_matrix s t
     let pts' := transform_points pts T
     have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
-    have h2 : pts'.get? 0 = some ⟨0, 0⟩ := by
-      have h3 : pt_transform p1 MT = ⟨0, 0⟩ := by
+    have h2 : pts'.get? 0 = some ![0, 0] := by
+      have h3 : pt_transform p1 MT = ![0, 0] := by
         rw [translation_translates]
         simp
       simp
@@ -209,7 +209,7 @@ structure first_quadrant (pts : List Point) : Prop :=
   non_neg_coordinates : ∀ p ∈ pts, p.x ≥ 0 ∧ p.y ≥ 0
 
 structure origin_head (pts : List Point) : Prop :=
-  ohprop : pts ≠ [] → pts.get? 0 = some ⟨0, 0⟩
+  ohprop : pts ≠ [] → pts.get? 0 = some ![0, 0]
 
 lemma origin_head_empty (pts : List Point) (h : pts = []) : origin_head pts := by
   exact ⟨by intro; contradiction⟩
@@ -244,8 +244,8 @@ theorem to_origin_head (pts : List Point) :
     let MT := translation_matrix s t
     let pts' := transform_points pts T
     have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
-    have h2 : pts'.get? 0 = some ⟨0, 0⟩ := by
-      have h3 : pt_transform p1 MT = ⟨0, 0⟩ := by
+    have h2 : pts'.get? 0 = some ![0, 0] := by
+      have h3 : pt_transform p1 MT = ![0, 0] := by
         rw [translation_translates]
         simp
       simp
@@ -273,7 +273,7 @@ theorem first_trans (pts: List Point) (pts_sorted : IsSortedPoints pts) :
 
 
 theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
-  (pz : pts.get? 0 = some ⟨0, 0⟩) (pts_sorted : IsSortedPoints pts) :
+  (pz : pts.get? 0 = some ![0, 0]) (pts_sorted : IsSortedPoints pts) :
     ∃ (pts': List Point), (omega_equivalence pts pts') ∧ (∀ i : Fin pts'.length, (pts'.get i).x ≥ 0 ∧ (pts'.get i).y ≥ 0) := by
 
   let abs_y := pts.map (λ p => abs p.y)
