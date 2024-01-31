@@ -78,8 +78,7 @@ def encode(N, k):
     for k_tuple in k_tuples:
         Z.add_var(f"convex_k_hole_{k_tuple}")
         Z.constraint(f"-convex_k_hole_{k_tuple}")
-        
-        # as we want to FORBID k-holes, 
+        # as we want to FORBID k-holes,
         # we need that for every k_tuple there is a non-empty triangle
         triangles = list(itertools.combinations(list(k_tuple), 3))
         Z.add_clause([f"convex_k_hole_{k_tuple}"] + [f"-hole_{a, b, c}" for a,b,c in triangles])
