@@ -203,7 +203,7 @@ structure ccw_sorting (pts : List Point) : Prop :=
 
 structure fully_sorted (pts : List Point) : Prop :=
     ccw_sorting_head : ccw_sorting pts
-    sorted : IsSortedPoints pts
+    sorted : Point.PointListSorted pts
 
 structure first_quadrant (pts : List Point) : Prop :=
   non_neg_coordinates : ∀ p ∈ pts, p.x ≥ 0 ∧ p.y ≥ 0
@@ -215,10 +215,9 @@ lemma origin_head_empty (pts : List Point) (h : pts = []) : origin_head pts := b
   exact ⟨by intro; contradiction⟩
 
 structure good_positioning (pts : List Point) : Prop :=
-  sorted : IsSortedPoints pts
+  sorted : Point.PointListSorted pts
   first_q : first_quadrant pts
   oh : origin_head pts
-
 
 theorem to_origin_head (pts : List Point) :
     ∃ (pts': List Point), (omega_equivalence pts pts') ∧ origin_head pts' := by
@@ -265,15 +264,13 @@ theorem to_origin_head (pts : List Point) :
     exact ⟨pts', ⟨h1, oh⟩⟩
   }
 
-theorem first_trans (pts: List Point) (pts_sorted : IsSortedPoints pts) :
+theorem first_trans (pts: List Point) (pts_sorted : Point.PointListSorted pts) :
   ∃ (pts': List Point), (omega_equivalence pts pts') ∧ (good_positioning pts') := by
   sorry
 
 
-
-
 theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
-  (pz : pts.get? 0 = some ![0, 0]) (pts_sorted : IsSortedPoints pts) :
+  (pz : pts.get? 0 = some ![0, 0]) (pts_sorted : Point.PointListSorted pts) :
     ∃ (pts': List Point), (omega_equivalence pts pts') ∧ (∀ i : Fin pts'.length, (pts'.get i).x ≥ 0 ∧ (pts'.get i).y ≥ 0) := by
 
   let abs_y := pts.map (λ p => abs p.y)
