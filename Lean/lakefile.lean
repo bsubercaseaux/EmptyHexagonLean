@@ -9,8 +9,8 @@ package «geo» where
   ]
   -- add any additional package configuration options here
 
-require mathlib from git
-  "https://github.com/leanprover-community/mathlib4.git"
+require «lean-sat» from git
+  "https://github.com/JamesGallicchio/LeanSAT.git" @ "dev"
 
 @[default_target]
 lean_lib «Geo» where
