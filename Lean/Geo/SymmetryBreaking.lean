@@ -35,34 +35,23 @@ theorem omega_equiv_transitivity
   (eq2 : omega_equivalence pts' pts'')
   : omega_equivalence pts pts'' := by sorry
 
+/-- `M` is an affine transformaition matrix. -/
 structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop :=
   det_pos : Matrix.det M > 0
   third_row : M 2 0 = 0 ∧ M 2 1 = 0 ∧ M 2 2 = 1
-
-lemma mat_expansion (M : Matrix (Fin 3) (Fin 3) Real) :
-  M = Matrix.of (![![M 0 0, M 0 1, M 0 2], ![M 1 0, M 1 1, M 1 2], ![M 2 0, M 2 1, M 2 2]]) := by
-  ext i j
-  fin_cases i
-  repeat {
-    fin_cases j
-    rfl
-    rfl
-    rfl
-  }
 
 theorem transform_equivalence (p q r : Point) (T : TMatrix M) :
     pts_to_matrix (pt_transform p M) (pt_transform q M) (pt_transform r M)
   = M * pts_to_matrix p q r := by
     have eq : M * pts_to_matrix p q r = Matrix.of (![![M 0 0, M 0 1, M 0 2], ![M 1 0, M 1 1, M 1 2], ![M 2 0, M 2 1, M 2 2]]) * (Matrix.of ![![p.x, q.x, r.x], ![p.y, q.y, r.y], ![1, 1, 1]]) := by
       unfold pts_to_matrix
-      rw [← mat_expansion]
+      rw [← Matrix.eta_fin_three]
 
     rw [eq]
     unfold pts_to_matrix pt_transform
     rw [T.third_row.1, T.third_row.2.1, T.third_row.2.2]
     simp
     ring_nf
-
 
 theorem transform_preserve_omega (p q r : Point) (T : TMatrix M) :
   σ p q r = σ (pt_transform p M) (pt_transform q M) (pt_transform r M) := by
@@ -101,12 +90,12 @@ theorem transform_preserve_omega (p q r : Point) (T : TMatrix M) :
       }
   }
 
-def transform_points (pts: List Point) (T : TMatrix M) : List Point :=
+def transform_points (pts: List Point) (M : Matrix (Fin 3) (Fin 3) Real) : List Point :=
   pts.map (λ p => pt_transform p M)
 
 theorem transform_returns_omega_equivalent (pts: List Point) (T: TMatrix M) :
-  omega_equivalence pts (transform_points pts T) := by
-    set resulting_pts := transform_points pts T
+  omega_equivalence pts (transform_points pts M) := by
+    set resulting_pts := transform_points pts M
     have same_length : pts.length = resulting_pts.length := by
       simp
       unfold transform_points
@@ -176,7 +165,7 @@ lemma symmetry_breaking_1 (pts: List Point) :
     let t := -p1.y
     let T := translation_transform s t
     let MT := translation_matrix s t
-    let pts' := transform_points pts T
+    let pts' := transform_points pts MT
     have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
     have h2 : pts'.get? 0 = some ![0, 0] := by
       have h3 : pt_transform p1 MT = ![0, 0] := by
@@ -241,7 +230,7 @@ theorem to_origin_head (pts : List Point) :
     let t := -p1.y
     let T := translation_transform s t
     let MT := translation_matrix s t
-    let pts' := transform_points pts T
+    let pts' := transform_points pts MT
     have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
     have h2 : pts'.get? 0 = some ![0, 0] := by
       have h3 : pt_transform p1 MT = ![0, 0] := by
@@ -309,7 +298,7 @@ theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
     exact ⟨det_scaling_y_band_pos, by simp [Matrix.vecHead, Matrix.vecTail]⟩
 
 
-  let pts' := transform_points pts scaling_y_band_transform
+  let pts' := transform_points pts scaling_y_band
   have band_effect : ∀ p ∈ pts', p.y ≥ -1 ∧ p.y ≤ 1 := by
     intros p hp
     have pts'_eq : pts' = pts.map (λ p => pt_transform p scaling_y_band) := by

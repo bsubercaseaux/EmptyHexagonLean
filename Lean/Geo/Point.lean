@@ -71,6 +71,8 @@ theorem Sorted₃_of_Sorted₄' : Sorted₄ p q r s → Sorted₃ q r s :=
   fun h => ⟨h.1.h₂, h.2⟩
 
 -- Cayden says: TODO better names. And should h₁ and h₂ be names of Sorted₃/Sorted₄?
+-- WN: I'd put all this in the Sorted₃ namespace as projections,
+-- so we have `h.sorted₃124 : Sorted₃ p q s` etc for `h : Sorted₄ p q r s`,
 theorem Sorted₃124_of_Sorted₄ : Sorted₄ p q r s → Sorted₃ p q s :=
   fun h => ⟨h.1.h₁, lt_trans h.1.h₂ h.2⟩
 
@@ -99,9 +101,6 @@ structure Points where
 namespace Points
 
 open List Finset
-#check List.insertionSort
-#check List.Pairwise.sublist
-#check List.Sorted
 
 def toFinset (P : Points) : Finset Point := P.points.toFinset
 
