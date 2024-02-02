@@ -67,7 +67,7 @@
   {"url": "https://github.com/JamesGallicchio/LeanSAT.git",
    "type": "git",
    "subDir": null,
-   "rev": "243fa7ea1590c8a05de814f80ee572bcd50106e6",
+   "rev": "3457640240995d0163cced10e29b4853d905b5d9",
    "name": "«lean-sat»",
    "manifestFile": "lake-manifest.json",
    "inputRev": "dev",
