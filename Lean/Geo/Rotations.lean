@@ -38,9 +38,6 @@ def Matrix.rotateBy (θ : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
 def rotationMap (θ : ℝ) : Point →ₗ[ℝ] Point :=
   Matrix.toEuclideanLin (Matrix.rotateBy θ)
 
-theorem injective_rotationMap (θ : ℝ) : Function.Injective (rotationMap θ) :=
-  sorry
-
 @[simp]
 lemma rotationMap_x (θ : ℝ) (P : Point) : (rotationMap θ P).x = cos θ * P.x - sin θ * P.y := by
   -- such beautiful formal proofs
@@ -52,6 +49,15 @@ lemma rotationMap_x (θ : ℝ) (P : Point) : (rotationMap θ P).x = cos θ * P.x
 lemma rotationMap_y (θ : ℝ) (P : Point) : (rotationMap θ P).y = sin θ * P.x + cos θ * P.y := by
   simp [Matrix.vecHead, Matrix.vecTail, rotationMap, Matrix.toEuclideanLin,
     Matrix.toLin', Matrix.rotateBy, Point.x, Point.y]
+
+theorem injective_rotationMap (θ : ℝ) : Function.Injective (rotationMap θ) := by
+  apply LinearMap.injective_iff_surjective.mpr
+  intro P
+  use (rotationMap (-θ)) P
+  have := sin_sq_add_cos_sq θ
+  ext <;> simp only [rotationMap_x, rotationMap_y, cos_neg, sin_neg]
+  linear_combination Point.x P * this
+  linear_combination Point.y P * this
 
 /-- `Matrix.rotateBy` as an affine transformation matrix. -/
 def Matrix.rotateByAffine (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℝ :=

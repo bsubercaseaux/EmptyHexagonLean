@@ -10,6 +10,7 @@
         packages = with pkgs; [ 
           bashInteractive
           elan
+          python311Packages.requests
         ];
       };
     });
