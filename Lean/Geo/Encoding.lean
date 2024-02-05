@@ -4,6 +4,75 @@ import Mathlib.Data.List.Range
 
 open LeanSAT Encode VEncCNF
 
+/-
+
+Overall, we have three sets of variables:
+
+∀ 1 ≤ a < b < c ≤ n:
+
+  s{a, b, c}       === signotope of points a b c
+  I{x, a, b, c}    === x is "Inside" triangle a b c
+  H{a, b, c}       === triangle a b c is a hole (i.e. no other points strictly inside)
+
+  Notably, while the I variables can be defined for any four distinct {x, a, b, c},
+  they only really matter when
+
+      a < b < c (which we may assume generally throughout)
+      a < x < c
+
+  because otherwise, x cannot be inside the triangle anyway, and so its variable
+  would automatically be set to false (via logic, not by the SAT solver).
+
+The contraints are:
+
+  ∀ 1 ≤ a < b < c ≤ n:
+
+  Signotope axioms:
+
+    !s{a, b, c} ∨ !s{a, c, d} ∨ s{a, b, d}  ≃  (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
+    !s{a, b, c} ∨ !s{b, c d}  ∨ s{a, c, d}  ≃  (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
+
+    (We take the top grouping and do them again, except negating the actual variables)
+
+     s{a, b, c} ∨  s{a, c, d} ∨ !s{a, b, d}  ≃  (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
+     s{a, b, c} ∨  s{b, c d}  ∨ !s{a, c, d}  ≃  (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
+
+
+  The "inside triangles" constraints:
+
+    (We split on whether the candidate point "x" to be inside is before or after "b")
+
+    ∀ {x}, a < x < b:
+      I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))
+
+    ∀ {x}, b < x < c:
+      I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{b, x, c} ↔ s{a, b, c}))
+
+    (Notably, the only difference is the third "s" variable, noting which two triangle points "x" lies between.)
+
+    The way the constraints work is as follows:
+      - The first pair places "x" and "b" on the same side of the line segment "ac"
+      - The second pair places "x" below the line segment coming from "a" to "b", or going from "b" to "c"
+
+    In addition to "x" being between "a" and "c", this places "x" to be inside the triangle.
+
+  The "hole" constraints:
+
+    ∀ {x}, a < x < c, with x ≠ b:
+      I{x, a, b, c} → !H{a, b, c}           (If "x" is inside triangle abc, then triangle abc isn't a hole)
+
+  Finally, the UNSAT constraints to look for non-holes:
+    !H{a, b, c}                             (To satisfy the formula, every triangle cannot be a hole, i.e. it contains a point.)
+
+
+
+  The proof skeleton looks like:
+    ∃ {pts : Finset Point}, NoHoles pts → ∃ {τ : Assignment}, F(τ) = SAT
+
+  The contrapositive then gives us
+    ∀ {τ : Assignment}, F(τ) = UNSAT → ∀ {pts : Finset Point}, ∃ a hole.
+-/
+
 inductive Var (n : Nat)
 | sigma  (a b c : Fin n) (hab : a < b) (hbc : b < c)
 | inside (x a b c : Fin n) (hab : a < b) (hbc : b < c) (hax : a < x) (hxc : x < c)
@@ -59,7 +128,7 @@ def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :
               -- a < x < b
               ( for_all (Array.finRange n) (fun x =>
                   guard (a < x ∧ x < b) (fun haxb =>
-                    -- Ix → Habc
+                    -- Ix → ¬ Habc
                     -- Cayden asks: Have a simple .impl operation?
                     addClause (#[
                       LitVar.mkNeg <| Var.inside x a b c hab hbc haxb.1 (lt_trans haxb.2 hbc),
@@ -71,7 +140,7 @@ def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :
               -- b < x < c
               ( for_all (Array.finRange n) (fun x =>
                   guard (b < x ∧ x < c) (fun hbxc =>
-                    -- Ix → Habc
+                    -- Ix → ¬ Habc
                     -- Cayden asks: Have a simple .impl operation?
                     addClause (#[
                       LitVar.mkNeg <| Var.inside x a b c hab hbc (lt_trans hab hbxc.1) hbxc.2,
