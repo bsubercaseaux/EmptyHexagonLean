@@ -41,6 +41,7 @@ The contraints are:
   The "inside triangles" constraints:
 
     (We split on whether the candidate point "x" to be inside is before or after "b")
+    (Note(WN): the new pt_in_triangle doesn't need a split, can we backport that to encoding?)
 
     ∀ {x}, a < x < b:
       I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))

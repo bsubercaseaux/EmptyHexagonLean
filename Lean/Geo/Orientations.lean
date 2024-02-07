@@ -10,6 +10,7 @@ inductive Orientation : Type
   | CW -- clockwise :=  -
   | CCW -- counter clockwise:= +
   | Collinear -- := 0
+  deriving DecidableEq
 
 open Orientation Point
 
@@ -67,21 +68,6 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGen
       }
   }
 
-
-theorem σ_prop_1  (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    (σ p q r = CCW) ∧ (σ q r s = CCW) → (σ p r s = CCW) := by
-  rw [slope_iff_orientation h.sorted₁ hGp.gp₁,
-    slope_iff_orientation h.sorted₃ hGp.gp₃,
-    slope_iff_orientation h.sorted₄ hGp.gp₄]
-  rw [slope_lt_iff_lt h.sorted₃.sorted₁ h.sorted₃.sorted₂]
-  intro h_land
-
-  rw [slope_lt_iff_lt h.sorted₁.sorted₁ h.sorted₁.sorted₂] at h_land
-  rw [←slope_lt_iff_lt' h.sorted₁.sorted₁ h.sorted₁.sorted₂] at h_land
-  rw [slope_lt_iff_lt h.sorted₄.sorted₁ h.sorted₄.sorted₂] at h_land
-  linarith
-
-
 structure σ_equivalence (pts pts' : List Point) : Prop :=
     same_length : pts.length = pts'.length
     same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
@@ -89,3 +75,28 @@ structure σ_equivalence (pts pts' : List Point) : Prop :=
         σ (pts'.get ⟨i, by rw [←same_length] ; exact hi⟩)
                       (pts'.get ⟨j, by rw [←same_length] ; exact hj⟩)
                       (pts'.get ⟨k, by rw [←same_length] ; exact hk⟩)
+
+theorem σ_prop_1 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    (σ p q r = CCW) ∧ (σ q r s = CCW) → (σ p r s = CCW) := by
+  rw [slope_iff_orientation h.h₁ hGp.gp₁,
+    slope_iff_orientation (Sorted₃134_of_Sorted₄ h) hGp.gp₃,
+    slope_iff_orientation (Sorted₃_of_Sorted₄' h) hGp.gp₄]
+  rw [slope_lt_iff_lt (Sorted₃_of_Sorted₄ h)]
+  rintro ⟨h₁, h₂⟩
+  rw [← slope_lt_iff_lt' (Sorted₃_of_Sorted₄ h)] at h₁
+  rw [slope_lt_iff_lt (Sorted₃_of_Sorted₄' h)] at h₂
+  have := lt_trans h₁ h₂
+  rw [← slope_lt_iff_lt (Sorted₃134_of_Sorted₄ h)] at this
+  exact this
+
+theorem σ_prop_2 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    (σ p q r = CCW) ∧ (σ p r s = CCW) → (σ p q s = CCW) := by
+  sorry
+
+theorem σ_prop_3 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    (σ p q r = CW) ∧ (σ q r s = CW) → (σ p r s = CW) := by
+  sorry
+
+theorem σ_prop_4 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    (σ p q r = CW) ∧ (σ p r s = CW) → (σ p q s = CW) := by
+  sorry
