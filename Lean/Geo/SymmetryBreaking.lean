@@ -21,19 +21,12 @@ def pt_transform_2 (p : Point) (M : Matrix (Fin 3) (Fin 3) Real) : Point :=
   let A := M * (pt_to_vec p)
   vec_to_pt A
 
-structure omega_equivalence (pts pts' : List Point) : Prop :=
-    same_length : pts.length = pts'.length
-    same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
-        σ (pts.get ⟨i, hi⟩) (pts.get ⟨j, hj⟩) (pts.get ⟨k, hk⟩) =
-        σ (pts'.get ⟨i, by rw [←same_length] ; exact hi⟩)
-                      (pts'.get ⟨j, by rw [←same_length] ; exact hj⟩)
-                      (pts'.get ⟨k, by rw [←same_length] ; exact hk⟩)
 
-theorem omega_equiv_transitivity
+theorem σ_equiv_transitivity
   {pts pts' pts'' : List Point}
-  (eq1 : omega_equivalence pts pts')
-  (eq2 : omega_equivalence pts' pts'')
-  : omega_equivalence pts pts'' := by sorry
+  (eq1 : σ_equivalence pts pts')
+  (eq2 : σ_equivalence pts' pts'')
+  : σ_equivalence pts pts'' := by sorry
 
 /-- `M` is an affine transformaition matrix. -/
 structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop :=
@@ -93,9 +86,15 @@ theorem transform_preserve_omega (p q r : Point) (T : TMatrix M) :
 def transform_points (pts: List Point) (M : Matrix (Fin 3) (Fin 3) Real) : List Point :=
   pts.map (λ p => pt_transform p M)
 
+<<<<<<< HEAD
 theorem transform_returns_omega_equivalent (pts: List Point) (T: TMatrix M) :
   omega_equivalence pts (transform_points pts M) := by
     set resulting_pts := transform_points pts M
+=======
+theorem transform_returns_σ_equivalent (pts: List Point) (T: TMatrix M) :
+  σ_equivalence pts (transform_points pts T) := by
+    set resulting_pts := transform_points pts T
+>>>>>>> 2710d36 (small updates)
     have same_length : pts.length = resulting_pts.length := by
       simp
       unfold transform_points
@@ -147,7 +146,7 @@ lemma translation_translates (p : Point) (s t : Real) :
   simp
 
 lemma symmetry_breaking_1 (pts: List Point) :
-  ∃ (pts': List Point), (omega_equivalence pts pts') ∧ (pts ≠ [] → (pts'.get? 0) = some ![0, 0]) := by
+  ∃ (pts': List Point), (σ_equivalence pts pts') ∧ (pts ≠ [] → (pts'.get? 0) = some ![0, 0]) := by
   by_cases h : pts = []
   {
     let pts' : List Point := []
@@ -155,7 +154,7 @@ lemma symmetry_breaking_1 (pts: List Point) :
       simp
       simp [h]
 
-    have h1: omega_equivalence pts pts' := by
+    have h1: σ_equivalence pts pts' := by
         exact ⟨hle, by intros i j k hi hj hk; rw [h] at hi; contradiction⟩
     exact ⟨[], ⟨h1, by intro; contradiction ⟩⟩
   }
@@ -165,8 +164,13 @@ lemma symmetry_breaking_1 (pts: List Point) :
     let t := -p1.y
     let T := translation_transform s t
     let MT := translation_matrix s t
+<<<<<<< HEAD
     let pts' := transform_points pts MT
     have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
+=======
+    let pts' := transform_points pts T
+    have h1 : σ_equivalence pts pts' := transform_returns_σ_equivalent pts T
+>>>>>>> 2710d36 (small updates)
     have h2 : pts'.get? 0 = some ![0, 0] := by
       have h3 : pt_transform p1 MT = ![0, 0] := by
         rw [translation_translates]
@@ -209,7 +213,7 @@ structure good_positioning (pts : List Point) : Prop :=
   oh : origin_head pts
 
 theorem to_origin_head (pts : List Point) :
-    ∃ (pts': List Point), (omega_equivalence pts pts') ∧ origin_head pts' := by
+    ∃ (pts': List Point), (σ_equivalence pts pts') ∧ origin_head pts' := by
   by_cases h : pts = []
   {
     let pts' : List Point := []
@@ -217,7 +221,7 @@ theorem to_origin_head (pts : List Point) :
       simp
       simp [h]
 
-    have h1: omega_equivalence pts pts' := by
+    have h1: σ_equivalence pts pts' := by
         exact ⟨hle, by intros i j k hi hj hk; rw [h] at hi; contradiction⟩
     let e : List Point := []
     have ohe : origin_head e := by
@@ -230,8 +234,13 @@ theorem to_origin_head (pts : List Point) :
     let t := -p1.y
     let T := translation_transform s t
     let MT := translation_matrix s t
+<<<<<<< HEAD
     let pts' := transform_points pts MT
     have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
+=======
+    let pts' := transform_points pts T
+    have h1 : σ_equivalence pts pts' := transform_returns_σ_equivalent pts T
+>>>>>>> 2710d36 (small updates)
     have h2 : pts'.get? 0 = some ![0, 0] := by
       have h3 : pt_transform p1 MT = ![0, 0] := by
         rw [translation_translates]
@@ -253,14 +262,14 @@ theorem to_origin_head (pts : List Point) :
     exact ⟨pts', ⟨h1, oh⟩⟩
   }
 
-theorem first_trans (pts: List Point) (pts_sorted : Point.PointListSorted pts) :
-  ∃ (pts': List Point), (omega_equivalence pts pts') ∧ (good_positioning pts') := by
+theorem first_trans (pts: List Point) (pts_sorted : IsSortedPoints pts) :
+  ∃ (pts': List Point), (σ_equivalence pts pts') ∧ (good_positioning pts') := by
   sorry
 
 
 theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
-  (pz : pts.get? 0 = some ![0, 0]) (pts_sorted : Point.PointListSorted pts) :
-    ∃ (pts': List Point), (omega_equivalence pts pts') ∧ (∀ i : Fin pts'.length, (pts'.get i).x ≥ 0 ∧ (pts'.get i).y ≥ 0) := by
+  (pz : pts.get? 0 = some ![0, 0]) (pts_sorted : IsSortedPoints pts) :
+    ∃ (pts': List Point), (σ_equivalence pts pts') ∧ (∀ i : Fin pts'.length, (pts'.get i).x ≥ 0 ∧ (pts'.get i).y ≥ 0) := by
 
   let abs_y := pts.map (λ p => abs p.y)
   have h2 : abs_y ≠ [] := by
@@ -409,7 +418,7 @@ theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
     --- if there's a single pt, we're ready
   by_cases h : pts.length = 1
   {
-  exact Exists.intro pts' ⟨transform_returns_omega_equivalent pts scaling_y_band_transform, by
+  exact Exists.intro pts' ⟨transform_returns_σ_equivalent pts scaling_y_band_transform, by
     intros i
     have : List.length pts' = 1 := by
       simp
@@ -437,20 +446,20 @@ theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
   }
 
 theorem symmetry_breaking (pts: List Point)  : ---  fully_sorted pts' h' ∧
-    ∃ (pts': List Point), omega_equivalence pts pts' ∧ fully_sorted pts' := by
+    ∃ (pts': List Point), σ_equivalence pts pts' ∧ fully_sorted pts' := by
 
-    have first_transformation:  ∃ pts'' : List Point, (omega_equivalence pts pts'') ∧ first_quadrant pts'' ∧ origin_head pts'' := by
+    have first_transformation:  ∃ pts'' : List Point, (σ_equivalence pts pts'') ∧ first_quadrant pts'' ∧ origin_head pts'' := by
       sorry
 
     apply Exists.elim first_transformation
     intro pts'' h
 
-    have second_transformation: ∃ pts' : List Point, (omega_equivalence pts'' pts') ∧ fully_sorted pts' := by
+    have second_transformation: ∃ pts' : List Point, (σ_equivalence pts'' pts') ∧ fully_sorted pts' := by
       sorry
 
     apply Exists.elim second_transformation
     intro pts' h'
 
-    have h1 : omega_equivalence pts pts' := by
-      exact omega_equiv_transitivity h.1 h'.1
+    have h1 : σ_equivalence pts pts' := by
+      exact σ_equiv_transitivity h.1 h'.1
     sorry

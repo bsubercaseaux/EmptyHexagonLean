@@ -63,6 +63,7 @@ structure GeneralPosition (pts: Finset Point) : Prop :=
   no_three_collinear: ∀ p1 p2 p3: Point, {p1, p2, p3} ⊆ pts
                         → σ p1 p2 p3 ≠ Orientation.Collinear
 
+
 theorem EmptyTriangle10Theorem (pts: Finset Point)
     (gp : GeneralPosition pts)
     (h: pts.card = 10) :
@@ -75,13 +76,13 @@ structure Has_K_Hole (S: Finset Point) (k: Nat) : Prop :=
 
 theorem HolesAreOrientationProperties
   (S₁ S₂ : Finset Point) (k : Nat) :
-    omega_equivalence S₁ S₂ →
+    σ_equivalence S₁ S₂ →
     (Has_K_Hole S₁ k ↔ Has_K_Hole S₂ k) := by sorry
 
 theorem NoSameX_WLOG (n k : Nat) :
   ∃ (S : Finset Point),
-    S.card = n ∧ Has_K_Hole S k
+    S.card = n ∧ ¬ Has_K_Hole S k
    →
   ∃ (S' : Finset Point),
-    S'.card = n ∧ Has_K_Hole S' k ∧
+    S'.card = n ∧ ¬ Has_K_Hole S' k ∧
       (NoSameX S') := by sorry

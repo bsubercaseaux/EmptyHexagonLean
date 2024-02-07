@@ -13,12 +13,12 @@ def encode(N):
         a, b, c = triple
         Z.add_var(f's_{a, b, c}', description=f"signotope of points {a}, {b}, {c}")
         
-    for quadruple in quadruples:
-        a, b, c, d = quadruple
-        Z.constraint(f'-s_{a, b, c} or -s_{a, c, d} or s_{a, b, d}')
-        Z.constraint(f'-s_{a, b, c} or -s_{b, c, d} or s_{a, c, d}')
-        Z.constraint(f's_{a, b, c} or s_{a, c, d} or -s_{a, b, d}')
-        Z.constraint(f's_{a, b, c} or s_{b, c, d} or -s_{a, c, d}')
+#    for quadruple in quadruples:
+#        a, b, c, d = quadruple
+#        Z.constraint(f'-s_{a, b, c} or -s_{a, c, d} or s_{a, b, d}')
+#        Z.constraint(f'-s_{a, b, c} or -s_{b, c, d} or s_{a, c, d}')
+#        Z.constraint(f's_{a, b, c} or s_{a, c, d} or -s_{a, b, d}')
+#        Z.constraint(f's_{a, b, c} or s_{b, c, d} or -s_{a, c, d}')
 
     for triple in triples:
         a, b, c = triple
