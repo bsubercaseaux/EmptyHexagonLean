@@ -89,47 +89,6 @@ theorem ne_last_of_Sorted₃ : Sorted₃ p q r → q ≠ r := by
 
 end Point
 
-open Point
-
--- Cayden says: "Points" is too general a name. Maybe "WBPoints", for well-behaved points?
-structure Points where
-  points : List Point
-  nodup : points.Nodup
-  sorted : PointListSorted points
-  gp : PointListInGeneralPosition points
-
-namespace Points
-
-open List Finset
-
-def toFinset (P : Points) : Finset Point := P.points.toFinset
-
-def fromFinset {S : Finset Point} (hS : PointFinsetInGeneralPosition S)
-    (hX : Set.Pairwise S.toSet (·.x ≠ ·.x)) : Points :=
-  { points := S.toList.insertionSort (·.x ≤ ·.x)
-    nodup := (Perm.nodup_iff (perm_insertionSort _ _)).mpr (Finset.nodup_toList S)
-    sorted := by
-      unfold PointListSorted Sorted
-      rw [List.Pairwise.imp_mem]
-      have := List.sorted_insertionSort (·.x ≤ ·.x) (toList S)
-      unfold Sorted at this
-      sorry
-      done
-    gp := by
-      sorry
-      done}
-
-theorem x_ne (P : Points) : P.points.Pairwise (·.x ≠ ·.x) :=
-  Pairwise.imp ne_of_lt P.sorted
-
-end Points
-
-def finset_sort (S : Finset Point) : List Point :=
-  S.toList.insertionSort (·.x <= ·.x)
-
-theorem finset_sort_sorted (S : Finset Point) : (finset_sort S).Sorted (·.x <= ·.x) :=
-  List.sorted_insertionSort (·.x <= ·.x) (S.toList)
-
 -- Cayden says: Below is "dead code" for previous definitions of sorting, etc.
 #exit
 

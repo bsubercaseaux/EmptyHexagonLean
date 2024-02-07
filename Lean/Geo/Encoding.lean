@@ -74,11 +74,12 @@ The contraints are:
     ∀ {τ : Assignment}, F(τ) = UNSAT → ∀ {pts : Finset Point}, ∃ a hole.
 -/
 
+-- Q(WN): why do we need the constraints on indices in the variable type?
 inductive Var (n : Nat)
-| sigma  (a b c : Fin n) (hab : a < b) (hbc : b < c)
-| inside (x a b c : Fin n) (hab : a < b) (hbc : b < c) (hax : a < x) (hxc : x < c)
-| hole   (a b c : Fin n) (hab : a < b) (hbc : b < c)
-deriving DecidableEq
+  | sigma  (a b c : Fin n) (hab : a < b) (hbc : b < c)
+  | inside (x a b c : Fin n) (hab : a < b) (hbc : b < c) (hax : a < x) (hxc : x < c)
+  | hole   (a b c : Fin n) (hab : a < b) (hbc : b < c)
+  deriving DecidableEq
 
 instance : Fintype (Var n) := by sorry
 
