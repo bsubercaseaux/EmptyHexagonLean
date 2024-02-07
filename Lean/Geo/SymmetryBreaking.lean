@@ -86,15 +86,9 @@ theorem transform_preserve_omega (p q r : Point) (T : TMatrix M) :
 def transform_points (pts: List Point) (M : Matrix (Fin 3) (Fin 3) Real) : List Point :=
   pts.map (λ p => pt_transform p M)
 
-<<<<<<< HEAD
-theorem transform_returns_omega_equivalent (pts: List Point) (T: TMatrix M) :
-  omega_equivalence pts (transform_points pts M) := by
-    set resulting_pts := transform_points pts M
-=======
 theorem transform_returns_σ_equivalent (pts: List Point) (T: TMatrix M) :
-  σ_equivalence pts (transform_points pts T) := by
-    set resulting_pts := transform_points pts T
->>>>>>> 2710d36 (small updates)
+  σ_equivalence pts (transform_points pts M) := by
+    set resulting_pts := transform_points pts M
     have same_length : pts.length = resulting_pts.length := by
       simp
       unfold transform_points
@@ -164,13 +158,8 @@ lemma symmetry_breaking_1 (pts: List Point) :
     let t := -p1.y
     let T := translation_transform s t
     let MT := translation_matrix s t
-<<<<<<< HEAD
     let pts' := transform_points pts MT
-    have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
-=======
-    let pts' := transform_points pts T
     have h1 : σ_equivalence pts pts' := transform_returns_σ_equivalent pts T
->>>>>>> 2710d36 (small updates)
     have h2 : pts'.get? 0 = some ![0, 0] := by
       have h3 : pt_transform p1 MT = ![0, 0] := by
         rw [translation_translates]
@@ -234,13 +223,8 @@ theorem to_origin_head (pts : List Point) :
     let t := -p1.y
     let T := translation_transform s t
     let MT := translation_matrix s t
-<<<<<<< HEAD
     let pts' := transform_points pts MT
-    have h1 : omega_equivalence pts pts' := transform_returns_omega_equivalent pts T
-=======
-    let pts' := transform_points pts T
     have h1 : σ_equivalence pts pts' := transform_returns_σ_equivalent pts T
->>>>>>> 2710d36 (small updates)
     have h2 : pts'.get? 0 = some ![0, 0] := by
       have h3 : pt_transform p1 MT = ![0, 0] := by
         rw [translation_translates]
@@ -262,13 +246,13 @@ theorem to_origin_head (pts : List Point) :
     exact ⟨pts', ⟨h1, oh⟩⟩
   }
 
-theorem first_trans (pts: List Point) (pts_sorted : IsSortedPoints pts) :
+theorem first_trans (pts: List Point) (pts_sorted : Point.PointListSorted pts) :
   ∃ (pts': List Point), (σ_equivalence pts pts') ∧ (good_positioning pts') := by
   sorry
 
 
 theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
-  (pz : pts.get? 0 = some ![0, 0]) (pts_sorted : IsSortedPoints pts) :
+  (pz : pts.get? 0 = some ![0, 0]) (pts_sorted : Point.PointListSorted pts) :
     ∃ (pts': List Point), (σ_equivalence pts pts') ∧ (∀ i : Fin pts'.length, (pts'.get i).x ≥ 0 ∧ (pts'.get i).y ≥ 0) := by
 
   let abs_y := pts.map (λ p => abs p.y)
