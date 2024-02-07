@@ -27,15 +27,15 @@ The contraints are:
 
   ∀ 1 ≤ a < b < c ≤ n:
 
-  Signotope axioms:
+  Orientation constraints:
+    ∀ {d}, c < d:
+      !s{a, b, c} ∨ !s{a, c, d} ∨  s{a, b, d} ≃  (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
+      !s{a, b, c} ∨ !s{b, c d}  ∨  s{a, c, d} ≃  (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
 
-    !s{a, b, c} ∨ !s{a, c, d} ∨ s{a, b, d}  ≃  (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
-    !s{a, b, c} ∨ !s{b, c d}  ∨ s{a, c, d}  ≃  (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
+      (We take the top grouping and do them again, except negating the actual variables)
 
-    (We take the top grouping and do them again, except negating the actual variables)
-
-     s{a, b, c} ∨  s{a, c, d} ∨ !s{a, b, d}  ≃  (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
-     s{a, b, c} ∨  s{b, c d}  ∨ !s{a, c, d}  ≃  (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
+       s{a, b, c} ∨  s{a, c, d} ∨ !s{a, b, d} ≃  (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
+       s{a, b, c} ∨  s{b, c, d} ∨ !s{a, c, d} ≃  (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
 
 
   The "inside triangles" constraints:
@@ -76,83 +76,93 @@ The contraints are:
 
 -- Q(WN): why do we need the constraints on indices in the variable type?
 inductive Var (n : Nat)
-  | sigma  (a b c : Fin n) (hab : a < b) (hbc : b < c)
-  | inside (x a b c : Fin n) (hab : a < b) (hbc : b < c) (hax : a < x) (hxc : x < c)
-  | hole   (a b c : Fin n) (hab : a < b) (hbc : b < c)
+  | sigma  (a b c : Fin n)
+  | inside (x a b c : Fin n)
+  | hole   (a b c : Fin n)
   deriving DecidableEq
 
-instance : Fintype (Var n) := by sorry
+instance : Monad Multiset where
+  pure := ({·})
+  bind := Multiset.bind
+
+instance : Alternative Multiset where
+  failure := {}
+  orElse x f := if Multiset.card x = 0 then f () else x
+
+instance : FinEnum (Var n) := FinEnum.ofEquiv _ {
+    toFun := fun
+      | Var.sigma a b c => Sum.inl (a,b,c)
+      | Var.inside x a b c => Sum.inr (Sum.inl (x,a,b,c))
+      | Var.hole a b c => Sum.inr (Sum.inr (a,b,c))
+    invFun := fun
+      | Sum.inl (a,b,c) => Var.sigma a b c
+      | Sum.inr (Sum.inl (x,a,b,c)) => Var.inside x a b c
+      | Sum.inr (Sum.inr (a,b,c)) => Var.hole a b c
+    left_inv := by intro x; cases x <;> simp
+    right_inv := by intro x; rcases x with (_|_|_) <;> simp
+  }
 
 def Array.finRange (n : Nat) : Array (Fin n) :=
   List.finRange n |> List.toArray
 
--- Cayden says TODO: The ↔ axioms for inside are missing, too much work without biImpl VEnc op
+set_option maxHeartbeats 500000 in
+open Var in
 def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :=
+  -- for all `a`, `b`, `c` with `a < b < c`
   for_all (Array.finRange n) (fun a =>
-    for_all (Array.finRange n) (fun b =>
-      VEncCNF.guard (a < b) (fun hab =>
-        for_all (Array.finRange n) (fun c =>
-          VEncCNF.guard (b < c) (fun hbc =>
-            -- Cayden notes: For whatever reason, "let" notation isn't allowed in these funs
-            --let sabc := LitVar.mkPos <| Var.sigma a b c hab hbc
-            --let habc := LitVar.mkPos <| Var.hole  a b c hab hbc
-            seq
+  for_all (Array.finRange n) (fun b =>
+  VEncCNF.guard (a < b) (fun hab =>
+  for_all (Array.finRange n) (fun c =>
+  VEncCNF.guard (b < c) (fun hbc =>
+    -- Cayden notes: For whatever reason, "let" notation isn't allowed in these funs
+    --let sabc := LitVar.mkPos <| sigma a b c
+    --let habc := LitVar.mkPos <| hole  a b c
+    seq[
 
-            -- Signotope axioms
-            ( for_all (Array.finRange n) (fun d =>
-                VEncCNF.guard (c < d) (fun hcd =>
-                  tseitin
-                    (.conj
-                      (.impl (.conj (Var.sigma a b c hab hbc)
-                                    (Var.sigma a c d (lt_trans hab hbc) hcd))
-                             (Var.sigma a b d hab (lt_trans hbc hcd)) )
-                    (.conj
-                      (.impl (.conj (Var.sigma a b c hab hbc) (Var.sigma b c d hbc hcd))
-                             (.var <| Var.sigma a c d (lt_trans hab hbc) hcd) )
-                    (.conj
-                      (.impl (.conj (.neg <| Var.sigma a b c hab hbc)
-                                    (.neg <| Var.sigma b c d hbc hcd))
-                             (.neg <| Var.sigma a b d hab (lt_trans hbc hcd)) )
-                      (.impl (.conj (.neg <| Var.sigma a b c hab hbc)
-                                    (.neg <| Var.sigma b c d hbc hcd))
-                             (.neg <| Var.sigma a c d (lt_trans hab hbc) hcd) )
-                    ) ) )
-                )
-              )
-            )
+    -- Signotope axioms
+    -- for all `d` with `c < d`
+    for_all (Array.finRange n) (fun d =>
+      VEncCNF.guard (c < d) (fun hcd =>
+        seq[
+          -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
+          (tseitin (.impl (.conj (sigma a b c) (sigma a c d))
+                          (sigma a b d) ))
+        , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
+          (tseitin (.impl (.conj (sigma a b c) (sigma b c d))
+                          (sigma a c d) ))
+        , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
+          (tseitin (.impl  (.conj (.neg <| sigma a b c) (.neg <| sigma b c d))
+                          (.neg <| sigma a b d) ))
+        , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
+          (tseitin (.impl  (.conj (.neg <| sigma a b c) (.neg <| sigma b c d))
+                          (.neg <| sigma a c d) ))
+        ]
+      )
+    ),
 
-            ( seq
-
-            ( seq
-              -- a < x < b
-              ( for_all (Array.finRange n) (fun x =>
-                  guard (a < x ∧ x < b) (fun haxb =>
-                    -- Ix → ¬ Habc
-                    -- Cayden asks: Have a simple .impl operation?
-                    imply (LitVar.mkNeg <| Var.inside x a b c hab hbc haxb.1 (lt_trans haxb.2 hbc))
-                          (LitVar.mkNeg <| Var.hole a b c hab hbc)
-                  )
-                )
-              )
-
-              -- b < x < c
-              ( for_all (Array.finRange n) (fun x =>
-                  VEncCNF.guard (b < x ∧ x < c) (fun hbxc =>
-                    -- Ix → ¬ Habc
-                    -- Cayden asks: Have a simple .impl operation?
-                    imply (LitVar.mkPos <| Var.inside x a b c hab hbc (lt_trans hab hbxc.1) hbxc.2)
-                          (LitVar.mkNeg <| Var.hole a b c hab hbc)
-                  )
-                )
-              )
-            )
-
-            -- No holes
-            (addClause #[LitVar.mkNeg <| Var.hole a b c hab hbc]) )
+    for_all (Array.finRange n) (fun x =>
+      seq[
+        -- a < x < b
+        guard (a < x ∧ x < b) (fun haxb =>
+          -- Ix → ¬ Habc
+          -- Cayden asks: Have a simple .impl operation?
+          imply (LitVar.mkNeg <| inside x a b c)
+                (LitVar.mkNeg <| hole a b c)
+        )
+      , -- b < x < c
+        guard (b < x ∧ x < c) (fun hbxc =>
+          -- Ix → ¬ Habc
+          -- Cayden asks: Have a simple .impl operation?
+          tseitin (
+            .impl (inside x a b c) (.neg <| hole a b c)
           )
         )
-      )
-    )
-  )
+      ]
+    ),
+
+    -- No holes
+    (addClause #[LitVar.mkNeg <| hole a b c])
+    ]
+  )))))
   |> mapProp (by
     sorry)
