@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.28)  1 FEB 2024 17:08
+This is pdfTeX, Version 3.141592653-2.6-1.40.24 (TeX Live 2022) (preloaded format=pdflatex 2023.1.28)  8 FEB 2024 11:56
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -365,7 +365,13 @@ Package: fancyhdr 2021/01/28 v4.0.1 Extensive control of page headers and footer
 \f@nch@O@erf=\skip71
 \f@nch@O@olf=\skip72
 \f@nch@O@orf=\skip73
-)) (/usr/local/texlive/2022/texmf-dist/tex/latex/base/doc.sty
+)) (/usr/local/texlive/2022/texmf-dist/tex/latex/base/fontenc.sty
+Package: fontenc 2021/04/29 v2.0v Standard LaTeX package
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/base/inputenc.sty
+Package: inputenc 2021/02/14 v1.3d Input encoding file
+\inpenc@prehook=\toks31
+\inpenc@posthook=\toks32
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/base/doc.sty
 Package: doc 2021/10/04 v2.1n Standard LaTeX documentation package (FMi)
 \c@StandardModuleDepth=\count303
 \guard@level=\count304
@@ -373,7 +379,7 @@ Package: doc 2021/10/04 v2.1n Standard LaTeX documentation package (FMi)
 \MacroIndent=\dimen189
 \macro@cnt=\count305
 \MacroTopsep=\skip75
-\index@excludelist=\toks31
+\index@excludelist=\toks33
  (/usr/local/texlive/2022/texmf-dist/tex/latex/tools/multicol.sty
 Package: multicol 2021/10/28 v1.9b multicolumn formatting (FMi)
 \c@tracingmulticols=\count306
@@ -449,12 +455,12 @@ Package: multicol 2021/10/28 v1.9b multicolumn formatting (FMi)
 \c@GlossaryColumns=\count317
 \check@sum=\count318
 \bslash@cnt=\count319
-\wrong@table=\toks32
+\wrong@table=\toks34
 \c@CodelineNo=\count320
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/pgfplots/pgfplots.sty (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplots.revision.tex)
 Package: pgfplots 2021/05/15 v1.18.1 Data Visualization (1.18.1)
  (/usr/local/texlive/2022/texmf-dist/tex/latex/pgf/frontendlayer/tikz.sty (/usr/local/texlive/2022/texmf-dist/tex/latex/pgf/basiclayer/pgf.sty (/usr/local/texlive/2022/texmf-dist/tex/latex/pgf/utilities/pgfrcs.sty (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-common.tex
-\pgfutil@everybye=\toks33
+\pgfutil@everybye=\toks35
 \pgfutil@tempdima=\dimen257
 \pgfutil@tempdimb=\dimen258
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-common-lists.tex)) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/utilities/pgfutil-latex.def
@@ -466,10 +472,10 @@ Package: pgf 2021/05/15 v3.1.9a (3.1.9a)
  (/usr/local/texlive/2022/texmf-dist/tex/latex/pgf/basiclayer/pgfcore.sty (/usr/local/texlive/2022/texmf-dist/tex/latex/pgf/systemlayer/pgfsys.sty (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/systemlayer/pgfsys.code.tex
 Package: pgfsys 2021/05/15 v3.1.9a (3.1.9a)
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/utilities/pgfkeys.code.tex
-\pgfkeys@pathtoks=\toks34
-\pgfkeys@temptoks=\toks35
+\pgfkeys@pathtoks=\toks36
+\pgfkeys@temptoks=\toks37
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/utilities/pgfkeysfiltered.code.tex
-\pgfkeys@tmptoks=\toks36
+\pgfkeys@tmptoks=\toks38
 ))
 \pgf@x=\dimen259
 \pgf@y=\dimen260
@@ -487,9 +493,9 @@ Package: pgfsys 2021/05/15 v3.1.9a (3.1.9a)
 \c@pgf@countb=\count322
 \c@pgf@countc=\count323
 \c@pgf@countd=\count324
-\t@pgf@toka=\toks37
-\t@pgf@tokb=\toks38
-\t@pgf@tokc=\toks39
+\t@pgf@toka=\toks39
+\t@pgf@tokb=\toks40
+\t@pgf@tokc=\toks41
 \pgf@sys@id@count=\count325
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/systemlayer/pgf.cfg
 File: pgf.cfg 2021/05/15 v3.1.9a (3.1.9a)
@@ -511,9 +517,9 @@ Package: pgfcore 2021/05/15 v3.1.9a (3.1.9a)
 \pgfmath@dimen=\dimen269
 \pgfmath@count=\count328
 \pgfmath@box=\box103
-\pgfmath@toks=\toks40
-\pgfmath@stack@operand=\toks41
-\pgfmath@stack@operation=\toks42
+\pgfmath@toks=\toks42
+\pgfmath@stack@operand=\toks43
+\pgfmath@stack@operation=\toks44
 ) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.code.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.basic.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.trigonometric.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.random.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.comparison.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.base.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.round.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.misc.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfunctions.integerarithmetics.code.tex))) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmathfloat.code.tex
 \c@pgfmathroundto@lastzeros=\count329
 )) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfint.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/basiclayer/pgfcorepoints.code.tex
@@ -597,8 +603,8 @@ Package: pgffor 2021/05/15 v3.1.9a (3.1.9a)
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/math/pgfmath.code.tex)
 \pgffor@iter=\dimen296
 \pgffor@skip=\dimen297
-\pgffor@stack=\toks43
-\pgffor@toks=\toks44
+\pgffor@stack=\toks45
+\pgffor@toks=\toks46
 )) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/tikz.code.tex
 Package: tikz 2021/05/15 v3.1.9a (3.1.9a)
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/libraries/pgflibraryplothandlers.code.tex
@@ -632,9 +638,9 @@ File: pgfmodulematrix.code.tex 2021/05/15 v3.1.9a (3.1.9a)
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarytopaths.code.tex
 File: tikzlibrarytopaths.code.tex 2021/05/15 v3.1.9a (3.1.9a)
 ))) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplots.code.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplotscore.code.tex
-\t@pgfplots@toka=\toks45
-\t@pgfplots@tokb=\toks46
-\t@pgfplots@tokc=\toks47
+\t@pgfplots@toka=\toks47
+\t@pgfplots@tokb=\toks48
+\t@pgfplots@tokc=\toks49
 \pgfplots@tmpa=\dimen307
 \c@pgfplots@coordindex=\count342
 \c@pgfplots@scanlineindex=\count343
@@ -642,7 +648,7 @@ File: tikzlibrarytopaths.code.tex 2021/05/15 v3.1.9a (3.1.9a)
 \c@pgfplotsarray@tmp=\count344
 ) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/liststructure/pgfplotsmatrix.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/numtable/pgfplotstableshared.code.tex
 \c@pgfplotstable@counta=\count345
-\t@pgfplotstable@a=\toks48
+\t@pgfplotstable@a=\toks50
 ) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/liststructure/pgfplotsdeque.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/util/pgfplotsbinary.code.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/util/pgfplotsbinary.data.code.tex)) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/util/pgfplotsutil.verb.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/libs/pgflibrarypgfplots.surfshading.code.tex
 \c@pgfplotslibrarysurf@no=\count346
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/sys/pgflibrarypgfplots.surfshading.pgfsys-pdftex.def))) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/util/pgfplotscolormap.code.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/util/pgfplotscolor.code.tex)) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplotsstackedplots.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplotsplothandlers.code.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplotsmeshplothandler.code.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplotsmeshplotimage.code.tex))) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplots.scaling.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplotscoordprocessing.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplots.errorbars.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplots.markers.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplotsticks.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgfplots/pgfplots.paths.code.tex) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibrarydecorations.code.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/modules/pgfmoduledecorations.code.tex
@@ -668,18 +674,18 @@ File: tikzlibrarytopaths.code.tex 2021/05/15 v3.1.9a (3.1.9a)
 File: tikzlibraryplotmarks.code.tex 2021/05/15 v3.1.9a (3.1.9a)
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/libraries/pgflibraryplotmarks.code.tex
 File: pgflibraryplotmarks.code.tex 2021/05/15 v3.1.9a (3.1.9a)
-))) (/usr/local/texlive/2022/texmf-dist/tex/latex/float/float.sty
+)))
+(/usr/local/texlive/2022/texmf-dist/tex/latex/float/float.sty
 Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \c@float@type=\count349
-\float@exts=\toks49
+\float@exts=\toks51
 \float@box=\box114
-\@float@everytoks=\toks50
+\@float@everytoks=\toks52
 \@floatcapt=\box115
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/ifsym/ifsym.sty
 Package: ifsym 2000/04/18 I.Kloeckl
 \c@ifsymcnt=\count350
-)
-(/usr/local/texlive/2022/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
+) (/usr/local/texlive/2022/texmf-dist/tex/latex/algorithm2e/algorithm2e.sty
 Package: algorithm2e 2017/07/18 v5.2 algorithms environments
 \c@AlgoLine=\count351
  (/usr/local/texlive/2022/texmf-dist/tex/latex/base/ifthen.sty
@@ -768,8 +774,8 @@ Package: todonotes 2021/06/04
  (/usr/local/texlive/2022/texmf-dist/tex/latex/xkeyval/xkeyval.sty
 Package: xkeyval 2020/11/20 v2.8 package option processing (HA)
  (/usr/local/texlive/2022/texmf-dist/tex/generic/xkeyval/xkeyval.tex (/usr/local/texlive/2022/texmf-dist/tex/generic/xkeyval/xkvutils.tex
-\XKV@toks=\toks51
-\XKV@tempa@toks=\toks52
+\XKV@toks=\toks53
+\XKV@tempa@toks=\toks54
 )
 \XKV@depth=\count360
 File: xkeyval.tex 2014/12/03 v2.7a key=value parser (HA)
@@ -873,7 +879,9 @@ Package: varwidth 2009/03/30 ver 0.92;  Variable-width minipages
 \sift@deathcycles=\count372
 \@vwid@loff=\dimen361
 \@vwid@roff=\dimen362
-)) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.geometric.code.tex
+)) (/usr/local/texlive/2022/texmf-dist/tex/latex/interval/interval.sty
+Package: interval 2019/03/06 v0.4
+) (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/frontendlayer/tikz/libraries/tikzlibraryshapes.geometric.code.tex
 File: tikzlibraryshapes.geometric.code.tex 2021/05/15 v3.1.9a (3.1.9a)
  (/usr/local/texlive/2022/texmf-dist/tex/generic/pgf/libraries/shapes/pgflibraryshapes.geometric.code.tex
 File: pgflibraryshapes.geometric.code.tex 2021/05/15 v3.1.9a (3.1.9a)
@@ -894,47 +902,50 @@ File: tikzlibrarymatrix.code.tex 2021/05/15 v3.1.9a (3.1.9a)
 File: tikzlibrarybackgrounds.code.tex 2021/05/15 v3.1.9a (3.1.9a)
 \pgf@layerbox@background=\box127
 \pgf@layerboxsaved@background=\box128
-) (./main.aux)
+) (./lstlean.tex)
+\c@theorem=\count373
+\c@lemma=\count374
+ (./main.aux)
 \openout1 = `main.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
-LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 75.
-LaTeX Font Info:    ... okay on input line 75.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
+LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 93.
+LaTeX Font Info:    ... okay on input line 93.
  (/usr/local/texlive/2022/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
-\scratchcounter=\count373
+\scratchcounter=\count375
 \scratchdimen=\dimen364
 \scratchbox=\box129
-\nofMPsegments=\count374
-\nofMParguments=\count375
-\everyMPshowfont=\toks53
-\MPscratchCnt=\count376
+\nofMPsegments=\count376
+\nofMParguments=\count377
+\everyMPshowfont=\toks55
+\MPscratchCnt=\count378
 \MPscratchDim=\dimen365
-\MPnumerator=\count377
-\makeMPintoPDFobject=\count378
-\everyMPtoPDFconversion=\toks54
+\MPnumerator=\count379
+\makeMPintoPDFobject=\count380
+\everyMPtoPDFconversion=\toks56
 ) (/usr/local/texlive/2022/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 Package: epstopdf-base 2020-01-24 v2.11 Base part for package epstopdf
 Package epstopdf-base Info: Redefining graphics rule for `.eps' on input line 485.
  (/usr/local/texlive/2022/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg
 File: epstopdf-sys.cfg 2010/07/13 v1.3 Configuration of (r)epstopdf for TeX Live
 ))
-Package hyperref Info: Link coloring ON on input line 75.
+Package hyperref Info: Link coloring ON on input line 93.
  (/usr/local/texlive/2022/texmf-dist/tex/latex/hyperref/nameref.sty
 Package: nameref 2021-04-02 v2.47 Cross-referencing by name of section
  (/usr/local/texlive/2022/texmf-dist/tex/latex/refcount/refcount.sty
@@ -942,16 +953,16 @@ Package: refcount 2019/12/15 v3.6 Data extraction from label references (HO)
 ) (/usr/local/texlive/2022/texmf-dist/tex/generic/gettitlestring/gettitlestring.sty
 Package: gettitlestring 2019/12/15 v1.6 Cleanup title references (HO)
 )
-\c@section@level=\count379
+\c@section@level=\count381
 )
-LaTeX Info: Redefining \ref on input line 75.
-LaTeX Info: Redefining \pageref on input line 75.
-LaTeX Info: Redefining \nameref on input line 75.
+LaTeX Info: Redefining \ref on input line 93.
+LaTeX Info: Redefining \pageref on input line 93.
+LaTeX Info: Redefining \nameref on input line 93.
  (./main.out) (./main.out)
 \@outlinefile=\write4
 \openout4 = `main.out'.
 
-\c@lstlisting=\count380
+\c@lstlisting=\count382
 
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
@@ -991,10 +1002,10 @@ LaTeX Info: Redefining \nameref on input line 75.
 
 Package lastpage Info: Please have a look at the pageslts package at
 (lastpage)             https://www.ctan.org/pkg/pageslts
-(lastpage)             ! on input line 75.
+(lastpage)             ! on input line 93.
 
 Package pgfplots Warning: running in backwards compatibility mode (unsuitable tick labels; missing features). Consider writing \pgfplotsset{compat=1.18} into your preamble.
- on input line 75.
+ on input line 93.
 
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: End \AtBeginDocument code.
@@ -1005,12 +1016,12 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
-<orcid_color-eps-converted-to.pdf, id=12, 9.03375pt x 9.03375pt>
+<orcid_color-eps-converted-to.pdf, id=20, 9.03375pt x 9.03375pt>
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
 Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
@@ -1019,11 +1030,11 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
 Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
@@ -1032,11 +1043,11 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
 Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
@@ -1045,11 +1056,11 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
 Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
@@ -1058,11 +1069,11 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
 Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
@@ -1071,11 +1082,11 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
 Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
@@ -1084,11 +1095,11 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
 Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
@@ -1097,54 +1108,52 @@ Package epstopdf Info: Source file: <orcid_color.eps>
 (epstopdf)                    date: 2023-03-10 19:55:30
 (epstopdf)                    size: 12255 bytes
 (epstopdf)             Command: <repstopdf --outfile=orcid_color-eps-converted-to.pdf orcid_color.eps>
-(epstopdf)             \includegraphics on input line 77.
+(epstopdf)             \includegraphics on input line 95.
 Package epstopdf Info: Output file is already uptodate.
 File: orcid_color-eps-converted-to.pdf Graphic file (type pdf)
 <use orcid_color-eps-converted-to.pdf>
-Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 77.
+Package pdftex.def Info: orcid_color-eps-converted-to.pdf  used on input line 95.
 (pdftex.def)             Requested size: 9.0337pt x 9.0337pt.
-LaTeX Font Info:    Trying to load font information for OMS+cmtt on input line 77.
-LaTeX Font Info:    No file OMScmtt.fd. on input line 77.
-
-LaTeX Font Warning: Font shape `OMS/cmtt/m/n' undefined
-(Font)              using `OMS/cmsy/m/n' instead
-(Font)              for symbol `textbraceleft' on input line 77.
-
-LaTeX Font Info:    Trying to load font information for U+lasy on input line 80.
-(/usr/local/texlive/2022/texmf-dist/tex/latex/base/ulasy.fd
+LaTeX Font Info:    Trying to load font information for T1+cmtt on input line 95.
+(/usr/local/texlive/2022/texmf-dist/tex/latex/base/t1cmtt.fd
+File: t1cmtt.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)
+LaTeX Font Info:    Trying to load font information for U+lasy on input line 98.
+ (/usr/local/texlive/2022/texmf-dist/tex/latex/base/ulasy.fd
 File: ulasy.fd 1998/08/17 v2.2e LaTeX symbol font definitions
 )
-LaTeX Font Info:    Trying to load font information for U+msa on input line 80.
+LaTeX Font Info:    Trying to load font information for U+msa on input line 98.
  (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2013/01/14 v3.01 AMS symbols A
 )
-LaTeX Font Info:    Trying to load font information for U+msb on input line 80.
+LaTeX Font Info:    Trying to load font information for U+msb on input line 98.
  (/usr/local/texlive/2022/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
-) (./intro.tex) 
+) (./intro.tex
+LaTeX Font Info:    Trying to load font information for T1+cmss on input line 6.
+ (/usr/local/texlive/2022/texmf-dist/tex/latex/base/t1cmss.fd
+File: t1cmss.fd 2019/12/16 v2.5j Standard LaTeX font definitions
+)) (./symmetry-breaking.tex [1
+
+{/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./orcid_color-eps-converted-to.pdf>]) (./empty_triangle.tex [2]) 
 AED: lastpage setting LastPage
-[1
-
-{/usr/local/texlive/2022/texmf-var/fonts/map/pdftex/updmap/pdftex.map} <./orcid_color-eps-converted-to.pdf>] (./main.aux)
-
-LaTeX Font Warning: Some font shapes were not available, defaults substituted.
-
+[3] (./main.aux)
 Package rerunfilecheck Info: File `main.out' has not changed.
-(rerunfilecheck)             Checksum: 9814C2D956916ADB9290ECA4E25C967A;103.
+(rerunfilecheck)             Checksum: 1102EEA4F3932633D933AC8E3F8AF5FF;578.
  ) 
 Here is how much of TeX's memory you used:
- 41283 strings out of 478268
- 933662 string characters out of 5846347
- 1297494 words of memory out of 5000000
- 58825 multiletter control sequences out of 15000+600000
- 475001 words of font info for 52 fonts, out of 8000000 for 9000
+ 42229 strings out of 478268
+ 947046 string characters out of 5846347
+ 1447201 words of memory out of 5000000
+ 59694 multiletter control sequences out of 15000+600000
+ 485766 words of font info for 70 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 99i,11n,104p,767b,609s stack positions out of 10000i,1000n,20000p,200000b,200000s
-</usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx12.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr17.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmtt9.pfb>
-Output written on main.pdf (1 page, 123942 bytes).
+ 99i,12n,104p,767b,1252s stack positions out of 10000i,1000n,20000p,200000b,200000s
+{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-t1.enc}{/usr/local/texlive/2022/texmf-dist/fonts/enc/dvips/cm-super/cm-super-ts1.enc}</usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi5.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi7.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr6.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmr9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy7.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy9.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfbx0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfbx1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfbx1440.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfit0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm0800.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm1200.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfrm1728.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfss1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sfti1000.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sftt0900.pfb></usr/local/texlive/2022/texmf-dist/fonts/type1/public/cm-super/sftt1000.pfb>
+Output written on main.pdf (3 pages, 394789 bytes).
 PDF statistics:
- 84 PDF objects out of 1000 (max. 8388607)
- 54 compressed objects within 1 object stream
- 3 named destinations out of 1000 (max. 500000)
- 26 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 231 PDF objects out of 1000 (max. 8388607)
+ 166 compressed objects within 2 object streams
+ 43 named destinations out of 1000 (max. 500000)
+ 42 words of extra memory for PDF output out of 10000 (max. 10000000)
 

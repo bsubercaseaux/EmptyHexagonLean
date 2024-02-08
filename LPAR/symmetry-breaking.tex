@@ -1,0 +1,39 @@
+Both for computational efficiency and simplifying the formalization, it is convenient to assume \emph{without loss of generality}, that the lists of points we will be dealing with are in \emph{structured position}, meaning that any such list of points $L = (p_0,\ldots, p_{n-1})$ satisfies the following properties:
+\begin{itemize}
+    \item \textbf{($x$-order)} The points are sorted with respect to their $x$-coordinates, i.e., $x(p_i) < x(p_j)$ for all $i < j$.
+    \item \textbf{(General Position)} No three points are collinear, i.e., for all $i < j < k$, we have $\sigma(p_i, p_j, p_k) \neq 0$. 
+    \item \textbf{(CCW-order)} All orientations $\sigma(p_0, p_i, p_j)$, with $0 < i < j$, are counterclockwise.
+\end{itemize}
+    This assumption is by now a standard in computational results regarding Erd\H{o}s-Szekeres type problems, as for example in the work of Peters and Szekeres, or Scheuher.
+
+\begin{proof}[Sketch]
+Let $\pi$ be an \emph{orientation property} of a set of points. We want to show that if $\pi$ holds for a set of points $S$ in general position, then it holds for a list of points $L$ in \emph{structured} position.    
+Label the points so that $p_0$ is the leftmost point (i.e., $x_0 \leq x_i$ for all $i$), and define $\theta_i \in \left[0, \pi\right)$ as \emph{angle} of the line segment $\vec{p_0p_i}$ with respect to the projective segment from $(x(p_0), \infty)$ to $p_0$. 
+Then, we can sort the points by their angles, so that $0 < i < j$ implies $\theta_i < \theta_j$.
+As a result, we have that $\sigma(p_0, p_i, p_j) = \text{CCW}$, for all $0 < i < j$, by the slope-orientation equivalence. Then, through a series of transformations that preserve ortientations, we will ensure all coordinates $x(p_i), y(p_i)$ are non-negative and that $x(p_0) = y(p_0) = 0$. We can then apply a projective transformation 
+\[
+    (x, y) \mapsto \left(x' := \frac{y}{x}, \, y' := \frac{1}{x}\right),   
+\]
+and use the slope-orientation equivalence to show that  $\frac{y(p_i)}{x(p_i)}$ is now increasing over $i$, thus implying sortnedness along the $x$-axis. 
+
+\end{proof}
+
+
+\begin{lstlisting}
+  structure gp_point_list (pts: List Point) : Prop :=
+    no_three_collinear: ∀ p1 p2 p3: Point, List.Sublist [p1, p2, p3] pts
+                          → σ p1 p2 p3 ≠ Orientation.Collinear
+  
+  structure structured_point_list (pts: List Point) : Prop :=
+    x_order: ∀ i j: (Fin pts.length), i < j → (pts.get i).x < (pts.get j).x
+    general_position: gp_point_list pts
+    ccw_order: ∀ p1 p2 p3: Point, List.Sublist [p1, p2, p3] pts
+                          → σ (pts.get 0) p2 p3 = Orientation.CCW
+
+
+  theorem symmetry_breaking (π : OrientationProperty) :
+    ∃ (pts: List Point), GeneralPosition pts ∧ π pts
+    → ∃ (pts': List Point), structured_point_list pts' ∧ π pts' := by sorry
+
+
+\end{lstlisting}

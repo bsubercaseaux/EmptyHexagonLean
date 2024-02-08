@@ -1,6 +1,10 @@
 \PassOptionsToPackage{dvipsnames}{xcolor}
 
 \documentclass{easychair}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+
 \usepackage{doc}
 \usepackage{mathtools}
 \usepackage{pgfplots}
@@ -24,6 +28,7 @@
 \usepackage{xpatch}
 \usepackage{appendix}
 \usepackage{adjustbox}
+\usepackage{interval}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric}
@@ -34,11 +39,24 @@
 \usetikzlibrary{positioning}
 \usetikzlibrary{backgrounds}
 
+\usepackage{color}
+\definecolor{keywordcolor}{rgb}{0.7, 0.1, 0.1}   % red
+\definecolor{tacticcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{commentcolor}{rgb}{0.4, 0.4, 0.4}   % grey
+\definecolor{symbolcolor}{rgb}{0.0, 0.1, 0.6}    % blue
+\definecolor{sortcolor}{rgb}{0.1, 0.5, 0.1}      % green
+\definecolor{attributecolor}{rgb}{0.7, 0.1, 0.1} % red
+
+\def\lstlanguagefiles{lstlean.tex}
+% set default language
+\lstset{language=lean}
+
 \makeatletter
 \def\orcidID#1{\href{http://orcid.org/#1}{\protect\raisebox{-1.25pt}{\protect\includegraphics{orcid_color.eps}}}}
 \makeatother
 
-
+\newtheorem{theorem}{Theorem}
+\newtheorem{lemma}{Lemma}
 
 \title{A Lean Verification of the Empty Hexagon Theorem}%
 % \thanks{Other people who contributed to this document include Maria Voronkov
@@ -89,6 +107,15 @@ We hope this work sets a new standard for verification when extensive computatio
 \label{sec:intro}
 \input{intro.tex}
 
+
+\section{The Sortedness Assumption and Symmetry Breaking}
+\label{sec:symmetry-breaking}
+\input{symmetry-breaking.tex}
+
+
+\section{The Empty Triangle Theorem}
+\label{sec:empty-triangle}
+\input{empty_triangle.tex}
 %------------------------------------------------------------------------------
 % Index
 %\printindex
