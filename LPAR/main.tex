@@ -29,6 +29,7 @@
 \usepackage{appendix}
 \usepackage{adjustbox}
 \usepackage{interval}
+\usepackage{microtype}
 
 \usepackage{tikz}
 \usetikzlibrary{shapes.geometric}
@@ -58,6 +59,8 @@
 \newtheorem{theorem}{Theorem}
 \newtheorem{lemma}{Lemma}
 
+\newcommand{\leansat}{\texttt{LeanSAT}}
+
 \title{A Lean Verification of the Empty Hexagon Theorem}%
 % \thanks{Other people who contributed to this document include Maria Voronkov
 %   (Imperial College and EasyChair) and Graham Gough (The University of
@@ -66,15 +69,15 @@
 % Authors are joined by \and. Their affiliations are given by \inst, which indexes
 % into the list defined using \institute
 %
-\author{ Cayden Codel \orcidID{0000-0003-2295-1299}
-   \and  James Gallicchio \orcidID{0000-0003-2295-1299}
-   \and  Wojciech Nawrocki \orcidID{0000-0003-2295-1299}
+\author{ Cayden Codel \orcidID{0000-0003-3588-4873}
+  \and  James Gallicchio \orcidID{0000-0002-0838-3240}
+  \and  Wojciech Nawrocki \orcidID{0000-0002-8839-0618}
   \and  \\ Bernardo Subercaseaux  \orcidID{0000-0003-2295-1299} }
 %
 \institute{
   Carnegie Mellon University, Pittsburgh, PA 15213, USA\\
-  \email{\{ccodel, jcallicc, wnawrock, bsuberca\}@andrew.cmu.edu}
- }
+  \email{\{ccodel, jgallicc, wnawrock, bsuberca\}@andrew.cmu.edu}
+}
 
 
 %  \authorrunning{} has to be set for the shorter version of the authors' names;
@@ -95,12 +98,14 @@
 \maketitle
 
 \begin{abstract}
-  A recent breakthrough in computer-assisted mathematics proved that every set of $30$ points contains an empty hexagon, 
-  thus closing a line of research opened by Erd\H{o}s and Szekeres in 1935. The proof combines geometric insights with automated reasoning techniques, 
- resulting in a sophisticated propositional encoding of the problem with $O(n^4)$ many clauses (where $n$ ends up being $30$) that is then solved using a SAT solver and parallel computation.
- This paper presents a formalization of the proof in the Lean theorem prover, thus certifying its correctness. To achieve this we have formalized several ideas of both discrete computational geometry and SAT-encodings that have been successfully applied in different Erd\H{o}s-Szekeres type problems.
-We hope this work sets a new standard for verification when extensive computation is used for discrete geometry problems, and increases the trust of the community in the results obtained by these methods.
-
+  A recent breakthrough in computer-assisted mathematics proved that every set of $30$ points in general position in the plane contains an empty hexagon, thus closing a line of research opened by Erd\H{o}s and Szekeres in 1935.
+  The proof combines geometric insights with automated reasoning techniques to produce a sophisticated propositional encoding of the problem with $O(n^4)$ constraints.
+  The problem instance for $n = 30$ was solved with a SAT solver and extensive parallel computation.
+ 
+  In this paper, we formalize this breakthrough in the Lean theorem prover, thus certifying its correctness.
+  Our formalization covers concepts in discrete computational geometry and the theory of SAT encodings that have been successfully applied in similar Erd\H{o}s-Szekeres-type problems.
+  In particular, our framework provides tools to connect mathematical ideas to objects used in SAT encodings, a connection that is critical for verifying the reduction from a discrete problem to SAT.
+  Overall, we hope this work sets a new standard for verification when extensive computation is used for discrete geometry problems, and that it increases the trust the mathematical community has for computer-assisted proofs obtained via these methods.
 \end{abstract}
 
 \section{Introduction}
@@ -116,6 +121,11 @@ We hope this work sets a new standard for verification when extensive computatio
 \section{The Empty Triangle Theorem}
 \label{sec:empty-triangle}
 \input{empty_triangle.tex}
+
+\section{The LeanSAT Library}
+\label{sec:leansat}
+\input{leansat.tex}
+
 %------------------------------------------------------------------------------
 % Index
 %\printindex
