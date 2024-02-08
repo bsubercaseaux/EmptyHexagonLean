@@ -103,17 +103,17 @@ instance : FinEnum (Var n) := FinEnum.ofEquiv _ {
   }
 
 def Array.finRange (n : Nat) : Array (Fin n) :=
-  List.finRange n |> List.toArray
+  ⟨List.finRange n⟩
 
-set_option maxHeartbeats 500000 in
 open Var in
+set_option maxHeartbeats 300000 in
 def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :=
-  -- for all `a`, `b`, `c` with `a < b < c`
-  for_all (Array.finRange n) (fun a =>
-  for_all (Array.finRange n) (fun b =>
-  VEncCNF.guard (a < b) (fun hab =>
-  for_all (Array.finRange n) (fun c =>
-  VEncCNF.guard (b < c) (fun hbc =>
+  (-- for all `a`, `b`, `c` with `a < b < c`
+  for_all (Array.finRange n) fun a =>
+  for_all (Array.finRange n) fun b =>
+  VEncCNF.guard (a < b) fun hab =>
+  for_all (Array.finRange n) fun c =>
+  VEncCNF.guard (b < c) fun hbc =>
     -- Cayden notes: For whatever reason, "let" notation isn't allowed in these funs
     --let sabc := LitVar.mkPos <| sigma a b c
     --let habc := LitVar.mkPos <| hole  a b c
@@ -125,17 +125,17 @@ def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :
       VEncCNF.guard (c < d) (fun hcd =>
         seq[
           -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
-          (tseitin (.impl (.conj (sigma a b c) (sigma a c d))
+          (tseitin (Model.PropForm.impl (Model.PropForm.conj (sigma a b c) (sigma a c d))
                           (sigma a b d) ))
         , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
-          (tseitin (.impl (.conj (sigma a b c) (sigma b c d))
+          (tseitin (Model.PropForm.impl (Model.PropForm.conj (sigma a b c) (sigma b c d))
                           (sigma a c d) ))
         , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
-          (tseitin (.impl  (.conj (.neg <| sigma a b c) (.neg <| sigma b c d))
-                          (.neg <| sigma a b d) ))
+          (tseitin (Model.PropForm.impl  (Model.PropForm.conj (Model.PropForm.neg <| sigma a b c) (Model.PropForm.neg <| sigma b c d))
+                          (Model.PropForm.neg <| sigma a b d) ))
         , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
-          (tseitin (.impl  (.conj (.neg <| sigma a b c) (.neg <| sigma b c d))
-                          (.neg <| sigma a c d) ))
+          (tseitin (Model.PropForm.impl  (Model.PropForm.conj (Model.PropForm.neg <| sigma a b c) (Model.PropForm.neg <| sigma b c d))
+                          (Model.PropForm.neg <| sigma a c d) ))
         ]
       )
     ),
@@ -143,26 +143,30 @@ def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :
     for_all (Array.finRange n) (fun x =>
       seq[
         -- a < x < b
-        guard (a < x ∧ x < b) (fun haxb =>
-          -- Ix → ¬ Habc
-          -- Cayden asks: Have a simple .impl operation?
-          imply (LitVar.mkNeg <| inside x a b c)
-                (LitVar.mkNeg <| hole a b c)
+        VEncCNF.guard (a < x ∧ x < b) (fun haxb =>
+          -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))
+          tseitin (
+            Model.PropForm.biImpl (inside x a b c)
+              (Model.PropForm.conj  (Model.PropForm.biImpl (sigma a b c) (sigma a x c))
+                      (Model.PropForm.biImpl (Model.PropForm.neg <| sigma a x b) (sigma a b c)))
+          )
         )
       , -- b < x < c
-        guard (b < x ∧ x < c) (fun hbxc =>
-          -- Ix → ¬ Habc
-          -- Cayden asks: Have a simple .impl operation?
+        VEncCNF.guard (b < x ∧ x < c) (fun hbxc =>
+          -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{b, x, c} ↔ s{a, b, c}))
           tseitin (
-            .impl (inside x a b c) (.neg <| hole a b c)
+            Model.PropForm.biImpl (inside x a b c)
+              (Model.PropForm.conj  (Model.PropForm.biImpl (sigma a b c) (sigma a x c))
+                      (Model.PropForm.biImpl (Model.PropForm.neg <| sigma b x c) (sigma a b c)))
           )
         )
       ]
     ),
 
     -- No holes
-    (addClause #[LitVar.mkNeg <| hole a b c])
+    (tseitin (Model.PropForm.neg <| hole a b c))
     ]
-  )))))
-  |> mapProp (by
+  ).mapProp (by
+    ext τ
+    simp
     sorry)
