@@ -4,6 +4,9 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.Orientations
 
+-- not used atm
+#exit
+
 namespace Geo
 
 -- Polygons are defined by a list of points

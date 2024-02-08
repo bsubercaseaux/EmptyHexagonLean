@@ -1,8 +1,11 @@
 import LeanSAT
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.List.Range
+import Geo.Formula
 
-open LeanSAT Encode VEncCNF
+namespace Geo
+
+open LeanSAT Encode VEncCNF Model Var PropForm
 
 /-
 
@@ -74,12 +77,6 @@ The contraints are:
     ∀ {τ : Assignment}, F(τ) = UNSAT → ∀ {pts : Finset Point}, ∃ a hole.
 -/
 
--- Q(WN): why do we need the constraints on indices in the variable type?
-inductive Var (n : Nat)
-  | sigma  (a b c : Fin n)
-  | inside (x a b c : Fin n)
-  | hole   (a b c : Fin n)
-  deriving DecidableEq
 
 instance : Monad Multiset where
   pure := ({·})
@@ -105,8 +102,72 @@ instance : FinEnum (Var n) := FinEnum.ofEquiv _ {
 def Array.finRange (n : Nat) : Array (Fin n) :=
   ⟨List.finRange n⟩
 
-open Var in
-set_option maxHeartbeats 300000 in
+-- CC: For whatever reason, "let" notation isn't allowed in these funs
+def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) Unit (signotopeAxiom a b c d) :=
+  seq[
+    -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
+    (tseitin (impl (conj (sigma a b c) (sigma a c d)) (sigma a b d) ))
+  , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
+    (tseitin (impl (conj (sigma a b c) (sigma b c d)) (sigma a c d) ))
+  , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
+    (tseitin (impl  (conj (neg <| sigma a b c) (neg <| sigma b c d)) (neg <| sigma a b d) ))
+  , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
+    (tseitin (impl (conj (neg <| sigma a b c) (neg <| sigma b c d)) (neg <| sigma a c d) ))
+  ].mapProp (by
+    ext τ
+    simp
+    sorry)
+
+def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (signotopeAxioms n) :=
+  (-- for all `a`, `b`, `c` with `a < b < c`
+  for_all (Array.finRange n) fun a =>
+  for_all (Array.finRange n) fun b =>
+  VEncCNF.guard (a < b) fun _ =>
+  for_all (Array.finRange n) fun c =>
+  VEncCNF.guard (b < c) fun _ =>
+  for_all (Array.finRange n) fun d =>
+  VEncCNF.guard (c < d) fun _ =>
+    signotopeClause a b c d
+  ).mapProp (by
+    ext τ
+    simp
+    sorry)
+
+def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInside a b c x) :=
+  seq[
+    -- a < x < b
+    VEncCNF.guard (a < x ∧ x < b) (fun _ =>
+      -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))
+      tseitin ( biImpl (inside x a b c)
+          (conj (biImpl (sigma a b c) (sigma a x c))
+            (biImpl (neg <| sigma a x b) (sigma a b c)))))
+  , -- b < x < c
+    VEncCNF.guard (b < x ∧ x < c) (fun hbxc =>
+      -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{b, x, c} ↔ s{a, b, c}))
+      tseitin ( biImpl (inside x a b c)
+          (conj (biImpl (sigma a b c) (sigma a x c))
+                  (biImpl (neg <| sigma b x c) (sigma a b c)))))
+  ].mapProp (by
+    sorry)
+
+def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideConstraints n) :=
+  (-- for all `a`, `b`, `c` with `a < b < c`
+  for_all (Array.finRange n) fun a =>
+  for_all (Array.finRange n) fun b =>
+  VEncCNF.guard (a < b) fun _ =>
+  for_all (Array.finRange n) fun c =>
+  VEncCNF.guard (b < c) fun _ =>
+  for_all (Array.finRange n) fun x =>
+  VEncCNF.guard (a < x ∧ x < c) fun _ =>
+    xIsInsideClause a b c x
+  ).mapProp (by
+    ext τ
+    simp
+    sorry)
+
+#exit
+
+
 def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :=
   (-- for all `a`, `b`, `c` with `a < b < c`
   for_all (Array.finRange n) fun a =>
@@ -170,3 +231,5 @@ def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :
     ext τ
     simp
     sorry)
+
+axiom unsat : ¬∃τ, τ ⊨ trianglesss.toCnf.toPropFun

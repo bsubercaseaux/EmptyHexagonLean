@@ -5,6 +5,8 @@ import Geo.Point
 import Geo.Slope
 
 namespace Geo
+noncomputable section
+open Classical
 
 inductive Orientation : Type
   | CW -- clockwise :=  -
@@ -100,3 +102,22 @@ theorem σ_prop_3 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosi
 theorem σ_prop_4 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     (σ p q r = CW) ∧ (σ p r s = CW) → (σ p q s = CW) := by
   sorry
+
+/-- For distinct points in general position (`{a,p,q,r}.size = 4`),
+this means that `a` is strictly in the triangle `pqr`. --/
+def PtInTriangle (a : Point) (p q r : Point) : Prop :=
+  a ∈ convexHull ℝ {p, q, r}
+
+/-- The point `a` is strictly (not on the boundary) in the triangle `pqr`. -/
+def σPtInTriangle (a p q r : Point) : Prop :=
+  ∃ p' q' r', ({p', q', r'} : Set Point) = {p, q, r} ∧
+    Point.Sorted₃ p' q' r' ∧
+    Point.Sorted₃ p' a r' ∧
+    --a ≠ q' ∧ -- this isn't needed if a,p,q,r are in GP
+    σ p' q' r' = σ p' a r' ∧
+    σ p' a q' = σ p' r' q' ∧
+    σ q' a r' = σ q' p' r'
+
+theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.PointFinsetInGeneralPosition {a,p,q,r}) :
+    σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
+  sorry -- geometry and signotope stuff TODO(Bernardo)
