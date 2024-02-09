@@ -4,10 +4,15 @@ open LeanSAT
 
 instance : Solver IO := Solver.Impl.DimacsCommand "cadical"
 
-def main : IO Unit :=
-  let enc := Geo.theEncoding (by decide : 4 ≥ 3) |>.val.toICnf
+def main (args : List String) : IO Unit := do
+  match args with
+  | [] => IO.println "expected one argument (number of points)"
+  | n::_ =>
+  let some n := String.toNat? n
+    | throw (.userError "hi")
+  let enc := Geo.theEncoding n |>.val.toICnf
   Solver.Dimacs.printFormula (IO.print) enc
 
 open Model PropFun
 axiom cnfUnsat : ¬∃ τ : PropAssignment IVar,
-  τ ⊨ (Geo.theEncoding (by decide : 10 ≥ 3) |>.val.toICnf.toPropFun)
+  τ ⊨ (Geo.theEncoding 10 |>.val.toICnf.toPropFun)

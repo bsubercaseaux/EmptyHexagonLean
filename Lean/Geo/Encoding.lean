@@ -123,15 +123,15 @@ def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) Unit (signotop
   )
 
 def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (signotopeAxioms n) :=
-  (-- for all `a`, `b`, `c` with `a < b < c`
-  for_all (Array.finRange n) fun a =>
-  for_all (Array.finRange n) fun b =>
-  VEncCNF.guard (a < b) fun _ =>
-  for_all (Array.finRange n) fun c =>
-  VEncCNF.guard (b < c) fun _ =>
-  for_all (Array.finRange n) fun d =>
-  VEncCNF.guard (c < d) fun _ =>
-    signotopeClause a b c d
+  ( -- for all `a`, `b`, `c` with `a < b < c`
+    for_all (Array.finRange n) fun a =>
+    for_all (Array.finRange n) fun b =>
+    VEncCNF.guard (a < b) fun _ =>
+    for_all (Array.finRange n) fun c =>
+    VEncCNF.guard (b < c) fun _ =>
+    for_all (Array.finRange n) fun d =>
+    VEncCNF.guard (c < d) fun _ =>
+      signotopeClause a b c d
   ).mapProp (by
     ext τ
     simp [signotopeAxioms]
@@ -190,14 +190,14 @@ def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsid
     )
 
 def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideConstraints n) :=
-  (-- for all `a`, `b`, `c` with `a < b < c`
-  for_all (Array.finRange n) fun a =>
-  for_all (Array.finRange n) fun b =>
-  VEncCNF.guard (a < b) fun _ =>
-  for_all (Array.finRange n) fun c =>
-  VEncCNF.guard (b < c) fun _ =>
-  for_all (Array.finRange n) fun x =>
-  xIsInsideClause a b c x
+  ( -- for all `a`, `b`, `c` with `a < b < c`
+    for_all (Array.finRange n) fun a =>
+    for_all (Array.finRange n) fun b =>
+    VEncCNF.guard (a < b) fun _ =>
+    for_all (Array.finRange n) fun c =>
+    VEncCNF.guard (b < c) fun _ =>
+    for_all (Array.finRange n) fun x =>
+    xIsInsideClause a b c x
   ).mapProp (by
     ext τ
     simp [insideConstraints]
@@ -230,25 +230,58 @@ def isNotHole (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (pointInsideMeans
 def holeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeConstraints n) :=
   ( for_all (Array.finRange n) fun a =>
     for_all (Array.finRange n) fun b =>
+    VEncCNF.guard (a < b) fun _ =>
     for_all (Array.finRange n) fun c =>
-      VEncCNF.guard (a < b ∧ b < c) fun _ =>
-        isNotHole a b c
+    VEncCNF.guard (b < c) fun _ =>
+      isNotHole a b c
   ).mapProp (by
     ext τ
-    simp [holeConstraints])
+    simp [holeConstraints]
+    constructor
+    · intro h a b c
+      split
+      · specialize h a b; simp [*] at h
+        specialize h c; simp [*] at h
+        simp [h]
+      · trivial
+    · intro h a b
+      split
+      · simp; intro c
+        split
+        · specialize h a b c
+          simpa [*] using h
+        · trivial
+      · trivial)
 
 
 def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
   ( for_all (Array.finRange n) fun a =>
     for_all (Array.finRange n) fun b =>
+    VEncCNF.guard (a < b) fun _ =>
     for_all (Array.finRange n) fun c =>
-      VEncCNF.guard (a < b ∧ b < c) fun _ =>
-          tseitin[ ¬ {Var.hole a b c} ]
+    VEncCNF.guard (b < c) fun _ =>
+      tseitin[ ¬ {Var.hole a b c} ]
   ).mapProp (by
     ext τ
-    simp [noHoles])
+    simp [noHoles]
+    constructor
+    · intro h a b c
+      split
+      · specialize h a b; simp [*] at h
+        specialize h c; simp [*] at h
+        simp [h]
+      · trivial
+    · intro h a b
+      split
+      · simp; intro c
+        split
+        · specialize h a b c
+          simpa [*] using h
+        · trivial
+      · trivial
+  )
 
-def theEncoding {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit (theFormula n) :=
+def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (theFormula n) :=
   (seq[
     signotopeClauses n, insideClauses n, holeClauses n, noHoleClauses n
   ]).mapProp (by
