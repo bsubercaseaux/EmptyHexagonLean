@@ -34,6 +34,28 @@ noncomputable def σ (p q r : Point) : Orientation :=
   else if matrix_det p q r < 0 then CW
   else Collinear
 
+theorem Point.InGeneralPosition₃.σ_ne {p q r : Point} :
+    InGeneralPosition₃ p q r → σ p q r ≠ .Collinear := by
+  rw [InGeneralPosition₃, σ, matrix_det_eq_det_pts]
+  split <;> first | split; simp | simp
+  have : det p q r = 0 := by linarith
+  simpa
+
+theorem Point.InGeneralPosition₃.σ_cases {p q r : Point} :
+    InGeneralPosition₃ p q r → σ p q r = .CCW ∨ σ p q r = .CW := by
+  intro h
+  cases h' : σ p q r <;> try tauto
+  have := h.σ_ne
+  contradiction
+
+theorem Point.InGeneralPosition₃.σ_iff {p q r : Point} :
+    InGeneralPosition₃ p q r → (σ p q r ≠ .CCW ↔ σ p q r = .CW) := by
+  intro h; cases h.σ_cases <;> simp_all
+
+theorem Point.InGeneralPosition₃.σ_iff' {p q r : Point} :
+    InGeneralPosition₃ p q r → (σ p q r ≠ .CW ↔ σ p q r = .CCW) := by
+  intro h; cases h.σ_cases <;> simp_all
+
 theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
     σ p q r = CCW ↔ slope p q < slope p r := by
   unfold σ Point.slope
@@ -65,7 +87,6 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGen
           simp only [false_iff, not_lt]
           rw [matrix_det_eq_det_pts] at det_pqr_nonneg det_pqr_not_pos
           have det_pqr_zero : det p q r = 0 := by linarith
-          have := hGp.det_ne_zero
           contradiction
       }
   }
@@ -78,29 +99,29 @@ structure σ_equivalence (pts pts' : List Point) : Prop :=
                       (pts'.get ⟨j, by rw [←same_length] ; exact hj⟩)
                       (pts'.get ⟨k, by rw [←same_length] ; exact hk⟩)
 
-theorem σ_prop_1 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    (σ p q r = CCW) ∧ (σ q r s = CCW) → (σ p r s = CCW) := by
+theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    σ p q r = CCW → σ q r s = CCW → σ p r s = CCW := by
   rw [slope_iff_orientation h.h₁ hGp.gp₁,
-    slope_iff_orientation (Sorted₃134_of_Sorted₄ h) hGp.gp₃,
-    slope_iff_orientation (Sorted₃_of_Sorted₄' h) hGp.gp₄]
-  rw [slope_lt_iff_lt (Sorted₃_of_Sorted₄ h)]
-  rintro ⟨h₁, h₂⟩
-  rw [← slope_lt_iff_lt' (Sorted₃_of_Sorted₄ h)] at h₁
-  rw [slope_lt_iff_lt (Sorted₃_of_Sorted₄' h)] at h₂
+    slope_iff_orientation h.sorted₃ hGp.gp₃,
+    slope_iff_orientation h.sorted₄ hGp.gp₄]
+  rw [slope_lt_iff_lt h.sorted₁]
+  intro h₁ h₂
+  rw [← slope_lt_iff_lt' h.sorted₁] at h₁
+  rw [slope_lt_iff_lt h.sorted₄] at h₂
   have := lt_trans h₁ h₂
-  rw [← slope_lt_iff_lt (Sorted₃134_of_Sorted₄ h)] at this
+  rw [← slope_lt_iff_lt h.sorted₃] at this
   exact this
 
-theorem σ_prop_2 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    (σ p q r = CCW) ∧ (σ p r s = CCW) → (σ p q s = CCW) := by
+theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    σ p q r = CCW → σ p r s = CCW → σ p q s = CCW := by
   sorry
 
-theorem σ_prop_3 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    (σ p q r = CW) ∧ (σ q r s = CW) → (σ p r s = CW) := by
+theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    σ p q r = CW → σ q r s = CW → σ p r s = CW := by
   sorry
 
-theorem σ_prop_4 (p q r s : Point) (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    (σ p q r = CW) ∧ (σ p r s = CW) → (σ p q s = CW) := by
+theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    σ p q r = CW → σ p r s = CW → σ p q s = CW := by
   sorry
 
 /-- For distinct points in general position (`{a,p,q,r}.size = 4`),
