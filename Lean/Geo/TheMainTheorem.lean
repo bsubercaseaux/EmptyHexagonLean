@@ -56,7 +56,7 @@ theorem fundamentalTheoremOfSymmetryBreaking {P : List Point → Prop} {L : List
 
 theorem fromLeanSAT :
     ¬∃ (w : WBPoints), w.length = 10 ∧ ¬σHasEmptyTriangle w.points := by
-  sorry -- TODO(Wojciech/Cayden)
+  sorry -- TODO(Wojciech/Cayden/James)
 
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
     HasEmptyTriangle pts := by
