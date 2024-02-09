@@ -1,5 +1,6 @@
 import Geo.Point
 import Geo.WBPoints
+import Geo.RunEncoding
 
 namespace Geo
 open List
@@ -54,8 +55,12 @@ theorem fundamentalTheoremOfSymmetryBreaking {P : List Point → Prop} {L : List
     ∃ (w : WBPoints), w.length = L.length ∧ P w.points := by
   sorry -- TODO(Bernardo)
 
+open LeanSAT Encode in
 theorem fromLeanSAT :
     ¬∃ (w : WBPoints), w.length = 10 ∧ ¬σHasEmptyTriangle w.points := by
+  have := cnfUnsat
+  rw [VEncCNF.toICnf_equisatisfiable] at this
+  simp at this ⊢
   sorry -- TODO(Wojciech/Cayden/James)
 
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :

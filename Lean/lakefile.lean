@@ -15,3 +15,6 @@ require «lean-sat» from git
 @[default_target]
 lean_lib «Geo» where
   -- add any library configuration options here
+
+lean_exe run_geo where
+  root := `Geo

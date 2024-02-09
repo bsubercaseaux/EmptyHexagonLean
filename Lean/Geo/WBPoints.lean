@@ -99,6 +99,7 @@ theorem satisfies_signotopeAxiom (w : WBPoints) (i j k l : Fin w.length) :
     PointListInGeneralPosition.to₄ w.gp this
   simp only [signotopeAxiom, satisfies_conj, satisfies_impl, satisfies_var,
     toPropAssn, decide_eq_true_eq, and_imp, satisfies_neg]
+  stop
   repeat constructor
   . exact σ_prop₂ s gp
   . exact σ_prop₁ s gp
