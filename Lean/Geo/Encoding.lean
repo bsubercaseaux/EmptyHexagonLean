@@ -102,21 +102,25 @@ instance : FinEnum (Var n) := FinEnum.ofEquiv _ {
 def Array.finRange (n : Nat) : Array (Fin n) :=
   ⟨List.finRange n⟩
 
--- CC: For whatever reason, "let" notation isn't allowed in these funs
+@[simp] theorem Array.mem_finRange {n} (x : Fin n)
+  : x ∈ Array.finRange n := by simp [Array.finRange, Array.mem_def]
+
+@[simp] theorem Array.finRange_data (n)
+  : (Array.finRange n).data = List.finRange n := rfl
+
 def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) Unit (signotopeAxiom a b c d) :=
   seq[
     -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
-    (tseitin (impl (conj (sigma a b c) (sigma a c d)) (sigma a b d) ))
+    tseitin[ ({sigma a b c} ∧ {sigma a c d}) → {sigma a b d} ]
   , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
-    (tseitin (impl (conj (sigma a b c) (sigma b c d)) (sigma a c d) ))
+    tseitin[ ({sigma a b c} ∧ {sigma b c d}) → {sigma a c d} ]
   , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
-    (tseitin (impl  (conj (neg <| sigma a b c) (neg <| sigma b c d)) (neg <| sigma a b d) ))
+    tseitin[ (¬{sigma a b c} ∧ ¬{sigma a c d}) → ¬{sigma a b d} ]
   , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
-    (tseitin (impl (conj (neg <| sigma a b c) (neg <| sigma b c d)) (neg <| sigma a c d) ))
+    tseitin[ (¬{sigma a b c} ∧ ¬{sigma b c d}) → ¬{sigma a c d} ]
   ].mapProp (by
-    ext τ
-    simp
-    sorry)
+    simp [signotopeAxiom]
+  )
 
 def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (signotopeAxioms n) :=
   (-- for all `a`, `b`, `c` with `a < b < c`
@@ -130,25 +134,60 @@ def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (signotopeAxioms
     signotopeClause a b c d
   ).mapProp (by
     ext τ
-    simp
-    sorry)
+    simp [signotopeAxioms]
+    constructor
+    · intro h a b c d
+      split
+      next habcd =>
+        rcases habcd with ⟨hab,hbc,hcd⟩
+        specialize h a b; simp [hab] at h
+        specialize h c; simp [hbc] at h
+        specialize h d; simp [hcd] at h
+        exact h
+      · trivial
+    · intro h a b
+      split
+      next hab =>
+        simp; intro c
+        split
+        next hbc =>
+          simp; intro d
+          split
+          next hcd =>
+            specialize h a b c d
+            simp [*] at h
+            exact h
+          · trivial
+        · trivial
+      · trivial
+    )
+
+theorem Fin.lt_asymm {a b : Fin n} : a < b → ¬b < a := @Nat.lt_asymm a b
 
 def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInside a b c x) :=
   seq[
     -- a < x < b
-    VEncCNF.guard (a < x ∧ x < b) (fun _ =>
+    VEncCNF.guard (a < x ∧ x < b) fun _ =>
       -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))
-      tseitin ( biImpl (inside x a b c)
-          (conj (biImpl (sigma a b c) (sigma a x c))
-            (biImpl (neg <| sigma a x b) (sigma a b c)))))
+      tseitin[{inside x a b c} ↔ (
+        ({sigma a b c} ↔ {sigma a x c}) ∧ (¬{sigma a x b} ↔ {sigma a b c})
+      )]
   , -- b < x < c
-    VEncCNF.guard (b < x ∧ x < c) (fun hbxc =>
+    VEncCNF.guard (b < x ∧ x < c) fun _ =>
       -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{b, x, c} ↔ s{a, b, c}))
-      tseitin ( biImpl (inside x a b c)
-          (conj (biImpl (sigma a b c) (sigma a x c))
-                  (biImpl (neg <| sigma b x c) (sigma a b c)))))
+      tseitin[{inside x a b c} ↔ (
+        ({sigma a b c} ↔ {sigma a x c}) ∧ (¬{sigma b x c} ↔ {sigma a b c})
+      )]
   ].mapProp (by
-    sorry)
+    ext τ
+    simp [xIsInside]
+    split
+    next h =>
+      rcases h with ⟨-,h2⟩
+      have := Fin.lt_asymm h2
+      simp [this]
+    · simp
+    )
 
 def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideConstraints n) :=
   (-- for all `a`, `b`, `c` with `a < b < c`
@@ -158,78 +197,59 @@ def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideConstraints 
   for_all (Array.finRange n) fun c =>
   VEncCNF.guard (b < c) fun _ =>
   for_all (Array.finRange n) fun x =>
-  VEncCNF.guard (a < x ∧ x < c) fun _ =>
-    xIsInsideClause a b c x
+  xIsInsideClause a b c x
   ).mapProp (by
     ext τ
-    simp
-    sorry)
+    simp [insideConstraints]
+    constructor
+    · intro h a b c d
+      split
+      · specialize h a b; simp [*] at h
+        specialize h c; simp [*] at h
+        specialize h d; exact h
+      · trivial
+    · intro h a b
+      split
+      · simp; intro c
+        split
+        · simp; intro d
+          specialize h a b c d
+          simp [*] at h
+          exact h
+        · trivial
+      · trivial)
 
-#exit
-
-
-def trianglessss {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit ⊤ :=
-  (-- for all `a`, `b`, `c` with `a < b < c`
-  for_all (Array.finRange n) fun a =>
-  for_all (Array.finRange n) fun b =>
-  VEncCNF.guard (a < b) fun hab =>
-  for_all (Array.finRange n) fun c =>
-  VEncCNF.guard (b < c) fun hbc =>
-    -- Cayden notes: For whatever reason, "let" notation isn't allowed in these funs
-    --let sabc := LitVar.mkPos <| sigma a b c
-    --let habc := LitVar.mkPos <| hole  a b c
-    seq[
-
-    -- Signotope axioms
-    -- for all `d` with `c < d`
-    for_all (Array.finRange n) (fun d =>
-      VEncCNF.guard (c < d) (fun hcd =>
-        seq[
-          -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
-          (tseitin (Model.PropForm.impl (Model.PropForm.conj (sigma a b c) (sigma a c d))
-                          (sigma a b d) ))
-        , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
-          (tseitin (Model.PropForm.impl (Model.PropForm.conj (sigma a b c) (sigma b c d))
-                          (sigma a c d) ))
-        , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
-          (tseitin (Model.PropForm.impl  (Model.PropForm.conj (Model.PropForm.neg <| sigma a b c) (Model.PropForm.neg <| sigma b c d))
-                          (Model.PropForm.neg <| sigma a b d) ))
-        , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
-          (tseitin (Model.PropForm.impl  (Model.PropForm.conj (Model.PropForm.neg <| sigma a b c) (Model.PropForm.neg <| sigma b c d))
-                          (Model.PropForm.neg <| sigma a c d) ))
-        ]
-      )
-    ),
-
-    for_all (Array.finRange n) (fun x =>
-      seq[
-        -- a < x < b
-        VEncCNF.guard (a < x ∧ x < b) (fun haxb =>
-          -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))
-          tseitin (
-            Model.PropForm.biImpl (inside x a b c)
-              (Model.PropForm.conj  (Model.PropForm.biImpl (sigma a b c) (sigma a x c))
-                      (Model.PropForm.biImpl (Model.PropForm.neg <| sigma a x b) (sigma a b c)))
-          )
-        )
-      , -- b < x < c
-        VEncCNF.guard (b < x ∧ x < c) (fun hbxc =>
-          -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{b, x, c} ↔ s{a, b, c}))
-          tseitin (
-            Model.PropForm.biImpl (inside x a b c)
-              (Model.PropForm.conj  (Model.PropForm.biImpl (sigma a b c) (sigma a x c))
-                      (Model.PropForm.biImpl (Model.PropForm.neg <| sigma b x c) (sigma a b c)))
-          )
-        )
-      ]
-    ),
-
-    -- No holes
-    (tseitin (Model.PropForm.neg <| hole a b c))
-    ]
+def isNotHole (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (pointInsideMeansIsNotHole a b c) :=
+  ( for_all (Array.finRange n) fun x =>
+    VEncCNF.guard (a < x ∧ x < c ∧ x ≠ b) fun _ =>
+      tseitin[ {Var.inside x a b c} → ¬{Var.hole a b c} ]
   ).mapProp (by
     ext τ
-    simp
-    sorry)
+    simp [pointInsideMeansIsNotHole])
 
-axiom unsat : ¬∃τ, τ ⊨ trianglesss.toCnf.toPropFun
+def holeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeConstraints n) :=
+  ( for_all (Array.finRange n) fun a =>
+    for_all (Array.finRange n) fun b =>
+    for_all (Array.finRange n) fun c =>
+      VEncCNF.guard (a < b ∧ b < c) fun _ =>
+        isNotHole a b c
+  ).mapProp (by
+    ext τ
+    simp [holeConstraints])
+
+
+def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
+  ( for_all (Array.finRange n) fun a =>
+    for_all (Array.finRange n) fun b =>
+    for_all (Array.finRange n) fun c =>
+      VEncCNF.guard (a < b ∧ b < c) fun _ =>
+          tseitin[ ¬ {Var.hole a b c} ]
+  ).mapProp (by
+    ext τ
+    simp [noHoles])
+
+def theEncoding {n : Nat} (hn : n ≥ 3) : VEncCNF (Literal (Var n)) Unit (theFormula n) :=
+  (seq[
+    signotopeClauses n, insideClauses n, holeClauses n, noHoleClauses n
+  ]).mapProp (by
+    simp [theFormula]; aesop)
