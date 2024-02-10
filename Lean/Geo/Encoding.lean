@@ -86,7 +86,7 @@ instance : Alternative Multiset where
   failure := {}
   orElse x f := if Multiset.card x = 0 then f () else x
 
-instance : FinEnum (Var n) := FinEnum.ofEquiv _ {
+instance : FinEnum (Var n) := FinEnum.ofEquiv {
     toFun := fun
       | Var.sigma a b c => Sum.inl (a,b,c)
       | Var.inside x a b c => Sum.inr (Sum.inl (x,a,b,c))
@@ -123,13 +123,14 @@ def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) Unit (signotop
   )
 
 def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (signotopeAxioms n) :=
+  let U := (Array.finRange n)
   ( -- for all `a`, `b`, `c` with `a < b < c`
-    for_all (Array.finRange n) fun a =>
-    for_all (Array.finRange n) fun b =>
+    for_all U fun a =>
+    for_all U fun b =>
     VEncCNF.guard (a < b) fun _ =>
-    for_all (Array.finRange n) fun c =>
+    for_all U fun c =>
     VEncCNF.guard (b < c) fun _ =>
-    for_all (Array.finRange n) fun d =>
+    for_all U fun d =>
     VEncCNF.guard (c < d) fun _ =>
       signotopeClause a b c d
   ).mapProp (by
@@ -191,13 +192,14 @@ def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsid
     )
 
 def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideDefs n) :=
-  ( -- for all `a`, `b`, `c` with `a < b < c`
-    for_all (Array.finRange n) fun a =>
-    for_all (Array.finRange n) fun b =>
+  ( let U := (Array.finRange n)
+    -- for all `a`, `b`, `c` with `a < b < c`
+    for_all U fun a =>
+    for_all U fun b =>
     VEncCNF.guard (a < b) fun _ =>
-    for_all (Array.finRange n) fun c =>
+    for_all U fun c =>
     VEncCNF.guard (b < c) fun _ =>
-    for_all (Array.finRange n) fun x =>
+    for_all U fun x =>
     xIsInsideClause a b c x
   ).mapProp (by
     ext τ
@@ -238,10 +240,11 @@ def pointInsideOfNotHoleClauses (a b c : Fin n) :
     )
 
 def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeDefs n) :=
-  ( for_all (Array.finRange n) fun a =>
-    for_all (Array.finRange n) fun b =>
+  ( let U := (Array.finRange n)
+    for_all U fun a =>
+    for_all U fun b =>
     VEncCNF.guard (a < b) fun _ =>
-    for_all (Array.finRange n) fun c =>
+    for_all U fun c =>
     VEncCNF.guard (b < c) fun _ =>
       seq[
         notHoleOfPointInsideClauses a b c,
@@ -267,10 +270,11 @@ def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeDefs n) :=
       · trivial)
 
 def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
-  ( for_all (Array.finRange n) fun a =>
-    for_all (Array.finRange n) fun b =>
+  ( let U := (Array.finRange n)
+    for_all U fun a =>
+    for_all U fun b =>
     VEncCNF.guard (a < b) fun _ =>
-    for_all (Array.finRange n) fun c =>
+    for_all U fun c =>
     VEncCNF.guard (b < c) fun _ =>
       tseitin[ ¬ {Var.hole a b c} ]
   ).mapProp (by
