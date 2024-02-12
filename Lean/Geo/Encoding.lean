@@ -168,6 +168,7 @@ def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsid
   seq[
     -- a < x < b
     VEncCNF.guard (a < x ∧ x < b) fun _ =>
+      -- NOTE(Bernardo): Each of those should be expressible as 8 clauses or so
       -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))
       tseitin[{inside x a b c} ↔ (
         ({sigma a b c} ↔ {sigma a x c}) ∧ (¬{sigma a x b} ↔ {sigma a b c})
@@ -229,9 +230,9 @@ def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit
     simp [notHoleOfPointInside])
 
 def pointInsideOfNotHoleClauses (a b c : Fin n) :
-    VEncCNF (Literal (Var n)) Unit [propfun| ¬{Var.hole a b c} → {hasPointInside a b c} ]:=
+    VEncCNF (Literal (Var n)) Unit [propfun| ¬{Var.hole a b c} → {hasPointInside a b c} ] :=
   ( tseitin[ ¬{Var.hole a b c} →
-    {(((Array.finRange n).filter (fun x => a < x ∧ x < c ∧ x ≠ b)).map fun x => PropForm.var $ Var.inside x a b c).foldl (init := .tr) .disj} ]
+    {(((Array.finRange n).filter (fun x => a < x ∧ x < c ∧ x ≠ b)).map fun x => PropForm.var $ Var.inside x a b c).foldl (init := .fls) .disj} ]
   ).mapProp (by
     sorry
     )

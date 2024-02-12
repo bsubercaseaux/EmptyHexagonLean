@@ -131,13 +131,9 @@ def PtInTriangle (a : Point) (p q r : Point) : Prop :=
 
 /-- The point `a` is strictly (not on the boundary) in the triangle `pqr`. -/
 def σPtInTriangle (a p q r : Point) : Prop :=
-  ∃ p' q' r', ({p', q', r'} : Set Point) = {p, q, r} ∧
-    Point.Sorted₃ p' q' r' ∧
-    Point.Sorted₃ p' a r' ∧
-    --a ≠ q' ∧ -- this isn't needed if a,p,q,r are in GP
-    σ p' q' r' = σ p' a r' ∧
-    σ p' a q' = σ p' r' q' ∧
-    σ q' a r' = σ q' p' r'
+  σ p q r = σ p a r ∧
+  σ p a q = σ p r q ∧
+  σ q a r = σ q p r
 
 theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.PointFinsetInGeneralPosition {a,p,q,r}) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by

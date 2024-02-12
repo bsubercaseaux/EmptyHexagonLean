@@ -57,28 +57,6 @@ abbrev length (w : WBPoints) : Nat := w.points.length
 instance : GetElem WBPoints Nat Point (fun w i => i < w.length) where
   getElem w i h := w.points[i]'h
 
-/-
-/-- If `p < a,q < r` and `a ≠ q`, this means that
-the `a`-th point is contained in the triangle `pqr`.
-Otherwise it probably means something but we don't care what. -/
--- NOTE(WN): we may have to enforce the ordering restrictions,
--- but I am not currently seeing where that is needed
---  so I left the `def` without them for simplicity.
-def isInTriangle (w : WBPoints) (a p q r : Fin w.length) : Prop :=
-  σ w[p] w[q] w[r] = σ w[p] w[a] w[r] ∧
-  σ w[p] w[a] w[q] = σ w[p] w[r] w[q] ∧
-  σ w[p] w[a] w[r] = σ w[q] w[p] w[r]
-
-/-- Aka a 3-hole. -/
-def isEmptyTriangle (w : WBPoints) (p q r : Fin w.length) : Prop :=
-  ∀ (x : Fin w.length), ¬w.isInTriangle x p q r
-def σHasEmptyTriangle (pts : List Point) : Prop :=
-  ∃ p q r, Sublist [p, q, r] pts ∧ ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬σPtInTriangle a p q r
-
-def σIsEmptyTriangle (p q r : Point) (pts : List Point) : Prop :=
-  ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬σPtInTriangle a p q r
-  -/
-
 def toPropAssn (w : WBPoints) : PropAssignment (Var w.length)
   | .sigma a b c ..    => σ w[a] w[b] w[c] = .CCW
   | .inside x a b c .. => decide $ σPtInTriangle w[x] w[a] w[b] w[c]
