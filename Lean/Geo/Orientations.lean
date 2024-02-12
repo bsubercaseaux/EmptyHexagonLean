@@ -120,6 +120,43 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGen
       }
   }
 
+theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
+  slope p q ≠ slope p r := by
+  sorry
+
+
+theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
+    σ p q r = CW ↔ slope p q > slope p r := by
+    rw [←Point.InGeneralPosition₃.σ_iff]
+    apply Iff.intro
+    { intro hσ
+      have: ¬(σ p q r = CCW) :=  by
+        {aesop}
+      rw [slope_iff_orientation h hGp] at this
+      have: Point.slope p q ≥ Point.slope p r := by
+        {aesop}
+      have not_eq: Point.slope p q ≠ Point.slope p r := by
+        {
+          exact no_equal_slopes h hGp
+        }
+      have not_eq': Point.slope p r ≠ Point.slope p q := by
+        {
+          exact Ne.symm not_eq
+        }
+      apply lt_of_le_of_ne this not_eq'
+    }
+    {
+      intro hS
+      suffices: ¬(σ p q r = CCW)
+      { aesop }
+      {
+        rw [slope_iff_orientation h hGp]
+        linarith
+      }
+    }
+    exact hGp
+
+
 structure σ_equivalence (pts pts' : List Point) : Prop :=
     same_length : pts.length = pts'.length
     same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
@@ -143,15 +180,44 @@ theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
 
 theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     σ p q r = CCW → σ p r s = CCW → σ p q s = CCW := by
-  sorry
+  rw [slope_iff_orientation h.h₁ hGp.gp₁,
+    slope_iff_orientation h.sorted₃ hGp.gp₃,
+    slope_iff_orientation h.sorted₂ hGp.gp₂]
+  intro h₁ h₂
+  linarith
 
 theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     σ p q r = CW → σ q r s = CW → σ p r s = CW := by
-  sorry
+  intro h₁ h₂
+  -- rw [←Point.InGeneralPosition₃.σ_iff] at h₁ h₂ ⊢
+
+  rw [slope_iff_orientation' h.h₁ hGp.gp₁] at h₁
+  rw [slope_iff_orientation' h.sorted₄ hGp.gp₄] at h₂
+  rw [slope_iff_orientation' h.sorted₃ hGp.gp₃]
+  -- have rh : Point.slope p r < Point.slope p q := by
+  --   {aesop}
+  rw [slope_gt_iff_gt h.sorted₃]
+  rw [slope_gt_iff_gt h.sorted₁] at h₁
+  have hh: Point.slope p q > Point.slope q s := by
+    {linarith}
+  rw [slope_gt_iff_gt h.sorted₄] at h₂
+  have h2: Point.slope p r > Point.slope q r := by
+    {
+      rw [slope_gt_iff_gt' h.sorted₁]
+      exact h₁
+    }
+  linarith
+
+
 
 theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     σ p q r = CW → σ p r s = CW → σ p q s = CW := by
-  sorry
+  intro h₁ h₂
+  rw [slope_iff_orientation' h.h₁ hGp.gp₁] at h₁
+  rw [slope_iff_orientation' h.sorted₃ hGp.gp₃] at h₂
+  rw [slope_iff_orientation' h.sorted₂ hGp.gp₂]
+  linarith
+
 
 /-- For distinct points in general position (`{a,p,q,r}.size = 4`),
 this means that `a` is strictly in the triangle `pqr`. --/

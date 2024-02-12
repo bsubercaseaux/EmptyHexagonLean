@@ -60,4 +60,12 @@ theorem slope_lt_iff_lt' {a b c : Point} (hS : Sorted₃ a b c) :
       _ ↔ dy_ab * dx_bc < dy_bc * dx_ab := by simp
       _ ↔ dy_ab / dx_ab < dy_bc / dx_bc := by rw [div_lt_div_iff dx_ab_pos dx_bc_pos]
 
+  theorem slope_gt_iff_gt {a b c : Point} (hS : Sorted₃ a b c) :
+    slope a b > slope a c ↔ slope a b > slope b c := by
+    sorry
+
+  theorem slope_gt_iff_gt' {a b c : Point} (hS : Sorted₃ a b c) :
+    slope a c > slope b c ↔ slope a b > slope b c := by
+    sorry
+
 end Point

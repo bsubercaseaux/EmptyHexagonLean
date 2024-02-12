@@ -1,10 +1,9 @@
 Mathematicians are often skeptical of proofs backed by extensive computation.
 A landmark example is the \emph{four-color theorem}, which states that any planar graph can be colored with at most four colors. 
-In 1879, Alfred Kempe published a proof of the four-color theorem, which was discovered to be incorrect 11 years later by Headwood~\cite{Walters2004ItAT,Wilson2002GraphsCA}. 
-Nonetheless, the main idea of Kempe's proof was salvaged by Headwood to prove the weaker \emph{five-color theorem}, and it is still a building block in the theory of planar colorings~\cite{Walters2004ItAT}. 
+In 1879, Alfred Kempe published a proof of the four-color theorem, which was discovered to be incorrect 11 years later by Headwood~\cite{Walters2004ItAT,Wilson2002GraphsCA}.\footnote{The main idea of Kempe's proof was salvaged by Headwood to prove the weaker \emph{five-color theorem}, and it is still a building block in the theory of planar colorings~\cite{Walters2004ItAT}.} 
 A full proof of the four-color theorem was not found until 1976, when Kenneth Appel and Wolfgang Haken used a computer to verify the 1\,834 cases that provably could contain a counterexample~\cite{appelFourColorProblem1978}.
 Their proof was controversial, and indeed, small errors have been found in their initial calculations~\cite{Walters2004ItAT,Wilson2002GraphsCA}.
-Finally, in 2005, Georges Gonthier formalized a full proof of the four-color theorem in the \textsf{Coq} proof assistant~\cite{gonthierFourColourTheorem2008a}, thus laying to rest any lingering doubts about the correctness of a computational proof. To the best of our knowledge, all proofs known for this theorem require the assistance of computers.
+Finally, in 2005, Georges Gonthier formalized a full proof of the four-color theorem in the \textsf{Coq} proof assistant~\cite{gonthierFourColourTheorem2008a}, thus laying to rest any lingering doubts about the correctness of the result. To the best of our knowledge, all proofs known for this theorem require the assistance of computers.
 
 Nevertheless, the four-color theorem is far from the end of the story when it comes to computationally proven theorems.
 In particular, an emerging trend in computer-assisted mathematics is to use SAT solvers (or more in general, automated reasoning tools), to prove mathematical theorems by analyzing finite objects~\cite{avigad2023mathematics}. 
