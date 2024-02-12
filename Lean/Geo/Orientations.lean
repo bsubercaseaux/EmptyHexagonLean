@@ -14,6 +14,21 @@ inductive Orientation : Type
   | Collinear -- := 0
   deriving DecidableEq
 
+def Orientation.neg : Orientation → Orientation
+  | CW => CCW
+  | CCW => CW
+  | Collinear => Collinear
+
+instance : Neg Orientation := ⟨Orientation.neg⟩
+
+@[simp]
+theorem Orientation.neg_neg (o : Orientation) : -(-o) = o := by
+  cases o <;> simp [Neg.neg, neg]
+
+@[simp]
+theorem Orientation.neg_eq (o o' : Orientation) : (-o = -o') ↔ (o = o') := by
+  cases o <;> cases o' <;> simp [Neg.neg, neg]
+
 open Orientation Point
 
 def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=
@@ -33,6 +48,20 @@ noncomputable def σ (p q r : Point) : Orientation :=
   if matrix_det p q r > 0 then CCW
   else if matrix_det p q r < 0 then CW
   else Collinear
+
+theorem σ_perm₁ (p q r : Point) : σ p q r = -σ q p r := by
+  have : det p q r = -det q p r := by
+    unfold det
+    linarith
+  simp only [σ, matrix_det_eq_det_pts, this]
+  split_ifs <;> { first | rfl | exfalso; linarith }
+
+theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q := by
+  have : det p q r = -det p r q := by
+    unfold det
+    linarith
+  simp only [σ, matrix_det_eq_det_pts, this]
+  split_ifs <;> { first | rfl | exfalso; linarith }
 
 theorem Point.InGeneralPosition₃.σ_ne {p q r : Point} :
     InGeneralPosition₃ p q r → σ p q r ≠ .Collinear := by
@@ -135,6 +164,46 @@ def σPtInTriangle (a p q r : Point) : Prop :=
   σ p a q = σ p r q ∧
   σ q a r = σ q p r
 
+theorem PtInTriangle.perm₁ : PtInTriangle a p q r → PtInTriangle a q p r := by
+  unfold PtInTriangle
+  have : ({q, p, r} : Set Point) = {p, q, r} := Set.insert_comm q p {r}
+  rw [this]
+
+theorem PtInTriangle.perm₂ : PtInTriangle a p q r → PtInTriangle a p r q := by
+  unfold PtInTriangle
+  have : ({r, q} : Set Point) = {q, r} := Set.pair_comm r q
+  have : ({p, r, q} : Set Point) = {p, q, r} := congrArg (insert p) this
+  rw [this]
+
+theorem σPtInTriangle.perm₁ : σPtInTriangle a p q r → σPtInTriangle a q p r := by
+  unfold σPtInTriangle
+  intro ⟨h₁, h₂, h₃⟩
+  conv in σ q a p => rw [σ_perm₁, σ_perm₂, σ_perm₁]
+  conv in σ q r p => rw [σ_perm₁, σ_perm₂, σ_perm₁]
+  simp [*]
+
+theorem σPtInTriangle.perm₂ : σPtInTriangle a p q r → σPtInTriangle a p r q := by
+  unfold σPtInTriangle
+  intro ⟨h₁, h₂, h₃⟩
+  conv in σ r a q => rw [σ_perm₁, σ_perm₂, σ_perm₁]
+  conv in σ r p q => rw [σ_perm₁, σ_perm₂, σ_perm₁]
+  simp [*]
+
+-- TODO: bernardo is proving this, copy actual proof later
+theorem σPtInTriangle_iff'' {a p q r : Point} (gp : Point.PointFinsetInGeneralPosition {a,p,q,r}) :
+  σ p q r = .CCW → (σPtInTriangle a p q r ↔ PtInTriangle a p q r) := sorry
+
 theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.PointFinsetInGeneralPosition {a,p,q,r}) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
-  sorry -- geometry and signotope stuff TODO(Bernardo)
+  have : ({p,q,r} : Finset Point) ⊆ {a,p,q,r} := Finset.subset_insert a {p, q, r}
+  rcases (gp this).σ_cases with h | h
+  . exact σPtInTriangle_iff'' gp h
+  . have hccw : σ p r q = .CCW := by rw [σ_perm₂, h]; rfl
+    have : ({a,p,q,r} : Finset Point) = {a,p,r,q} := by ext; simp; tauto
+    have : Point.PointFinsetInGeneralPosition {a,p,r,q} := by rwa [this] at gp
+    have := σPtInTriangle_iff'' this hccw
+    constructor
+    . intro h
+      sorry
+    . intro h
+      sorry
