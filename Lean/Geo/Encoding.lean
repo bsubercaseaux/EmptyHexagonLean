@@ -164,7 +164,7 @@ def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (signotopeAxioms
 
 theorem Fin.lt_asymm {a b : Fin n} : a < b → ¬b < a := @Nat.lt_asymm a b
 
-def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInside a b c x) :=
+def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsideDef a b c x) :=
   seq[
     -- a < x < b
     VEncCNF.guard (a < x ∧ x < b) fun _ =>
@@ -180,7 +180,7 @@ def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsid
       )]
   ].mapProp (by
     ext τ
-    simp [xIsInside]
+    simp [xIsInsideDef]
     split
     next h =>
       rcases h with ⟨-,h2⟩
@@ -189,7 +189,7 @@ def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsid
     · simp
     )
 
-def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideConstraints n) :=
+def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideDefs n) :=
   ( -- for all `a`, `b`, `c` with `a < b < c`
     for_all (Array.finRange n) fun a =>
     for_all (Array.finRange n) fun b =>
@@ -200,7 +200,7 @@ def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideConstraints 
     xIsInsideClause a b c x
   ).mapProp (by
     ext τ
-    simp [insideConstraints]
+    simp [insideDefs]
     constructor
     · intro h a b c d
       split
@@ -219,30 +219,42 @@ def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideConstraints 
         · trivial
       · trivial)
 
-def isNotHole (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (pointInsideMeansIsNotHole a b c) :=
+def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (notHoleOfPointInside a b c) :=
   ( for_all (Array.finRange n) fun x =>
     VEncCNF.guard (a < x ∧ x < c ∧ x ≠ b) fun _ =>
+      -- Q(WN): this is just a clause, why do we need Tseitin? Also in `signotopeClause` above
       tseitin[ {Var.inside x a b c} → ¬{Var.hole a b c} ]
   ).mapProp (by
     ext τ
-    simp [pointInsideMeansIsNotHole])
+    simp [notHoleOfPointInside])
 
-def holeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeConstraints n) :=
+def pointInsideOfNotHoleClauses (a b c : Fin n) :
+    VEncCNF (Literal (Var n)) Unit [propfun| ¬{Var.hole a b c} → {hasPointInside a b c} ]:=
+  ( tseitin[ ¬{Var.hole a b c} →
+    {(((Array.finRange n).filter (fun x => a < x ∧ x < c ∧ x ≠ b)).map fun x => PropForm.var $ Var.inside x a b c).foldl (init := .tr) .disj} ]
+  ).mapProp (by
+    sorry
+    )
+
+def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeDefs n) :=
   ( for_all (Array.finRange n) fun a =>
     for_all (Array.finRange n) fun b =>
     VEncCNF.guard (a < b) fun _ =>
     for_all (Array.finRange n) fun c =>
     VEncCNF.guard (b < c) fun _ =>
-      isNotHole a b c
+      seq[
+        notHoleOfPointInsideClauses a b c,
+        pointInsideOfNotHoleClauses a b c
+      ]
   ).mapProp (by
     ext τ
-    simp [holeConstraints]
+    simp [holeDefs]
     constructor
     · intro h a b c
       split
       · specialize h a b; simp [*] at h
         specialize h c; simp [*] at h
-        simp [h]
+        simp_all [h]
       · trivial
     · intro h a b
       split
@@ -252,7 +264,6 @@ def holeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeConstraints n) :
           simpa [*] using h
         · trivial
       · trivial)
-
 
 def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
   ( for_all (Array.finRange n) fun a =>
@@ -283,6 +294,6 @@ def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
 
 def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (theFormula n) :=
   (seq[
-    signotopeClauses n, insideClauses n, holeClauses n, noHoleClauses n
+    signotopeClauses n, insideClauses n, holeDefClauses n, noHoleClauses n
   ]).mapProp (by
     simp [theFormula]; aesop)

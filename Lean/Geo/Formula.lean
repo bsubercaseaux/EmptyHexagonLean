@@ -24,7 +24,7 @@ def signotopeAxiom (a b c d : Fin n) : PropFun (Var n) :=
     (¬{sabc} ∧ ¬{sbcd} → ¬{sacd})
   ]
 
-/-- Orientation constraints.
+/-- Asserts that orientation constraints are satisfied.
 
   ∀ 1 ≤ a < b < c ≤ n:
     ∀ {d}, c < d:
@@ -43,7 +43,7 @@ def signotopeAxioms (n : Nat) : PropFun (Var n) :=
         PropFun.all (U.map fun d =>
           if a < b ∧ b < c ∧ c < d then signotopeAxiom a b c d else ⊤)))))
 
-def xIsInside (a b c x : Fin n) : PropFun (Var n) :=
+def xIsInsideDef (a b c x : Fin n) : PropFun (Var n) :=
   let sabc := Var.sigma a b c
   let saxc := Var.sigma a x c
   let saxb := Var.sigma a x b
@@ -56,7 +56,7 @@ def xIsInside (a b c x : Fin n) : PropFun (Var n) :=
   else
     ⊤
 
-/-- The "inside triangles" constraints.
+/-- Defines "is inside triangle" variables.
 
   (We split on whether the candidate point "x" to be inside is before or after "b")
 
@@ -65,14 +65,14 @@ def xIsInside (a b c x : Fin n) : PropFun (Var n) :=
 
   ∀ {x}, b < x < c:
     I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{b, x, c} ↔ s{a, b, c})) -/
-def insideConstraints (n : Nat) : PropFun (Var n) :=
+def insideDefs (n : Nat) : PropFun (Var n) :=
   let U : Multiset (Fin n) := Finset.univ.val
   PropFun.all (U.map (fun a =>
     PropFun.all (U.map fun b =>
       PropFun.all (U.map fun c =>
         PropFun.all (U.map fun x =>
           if a < b ∧ b < c then
-            xIsInside a b c x
+            xIsInsideDef a b c x
           else
             ⊤)))))
 
@@ -92,13 +92,15 @@ def hasPointInside (a b c : Fin n) : PropFun (Var n) :=
     else
       ⊥))
 
-/-- ∀ {x}, a < x < c, with x ≠ b:
+/-- Defines "is hole" variables.
+
+    ∀ {x}, a < x < c, with x ≠ b:
       I{x, a, b, c} → !H{a, b, c}
 
     !H{a, b, c} → ⋁_{a < x < c, x ≠ b} I{x, a, b, c}
 
   (Triangle abc is not a hole iff some x is inside triangle abc.) -/
-def holeConstraints (n : Nat) : PropFun (Var n) :=
+def holeDefs (n : Nat) : PropFun (Var n) :=
   let U : Multiset (Fin n) := Finset.univ.val
   PropFun.all (U.map (fun a =>
     PropFun.all (U.map fun b =>
@@ -111,6 +113,7 @@ def holeConstraints (n : Nat) : PropFun (Var n) :=
         else
           ⊤))))
 
+/-- Asserts that no holes exist. -/
 def noHoles (n : Nat) : PropFun (Var n) :=
   let U : Multiset (Fin n) := Finset.univ.val
   PropFun.all (U.map (fun a =>
@@ -121,4 +124,4 @@ def noHoles (n : Nat) : PropFun (Var n) :=
         else ⊤))))
 
 def theFormula (n : Nat) : PropFun (Var n) :=
-  signotopeAxioms n ⊓ insideConstraints n ⊓ holeConstraints n ⊓ noHoles n
+  signotopeAxioms n ⊓ insideDefs n ⊓ holeDefs n ⊓ noHoles n
