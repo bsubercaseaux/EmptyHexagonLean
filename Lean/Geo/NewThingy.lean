@@ -243,8 +243,20 @@ theorem HalfPlanesAreConvex {p q : Point} : Convex ℝ (halfPlaneCCW p q) := by
 
 example : True := by trivial
 
+theorem det_symmetry (a b c : Point) : matrix_det a b c = -matrix_det b a c := by
+  rw [matrix_det_eq_det_pts]
+  rw [matrix_det_eq_det_pts]
+  unfold Point.det
+  linarith
+
+theorem det_symmetry' (a b c : Point) : matrix_det a b c = matrix_det b c a := by
+  rw [matrix_det_eq_det_pts]
+  rw [matrix_det_eq_det_pts]
+  unfold Point.det
+  linarith
+
 -- σ p q r = .CCW
-theorem σPtInTriangle_iff2 {a p q r : Point} (gp : Point.PointListInGeneralPosition [a, p, q, r])
+theorem σPtInTriangle_iff2 {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
       (symm: σ p q r = Orientation.CCW) :
     σPtInTriangle2 a p q r ↔ PtInTriangle2 a p q r := by
     apply Iff.intro
@@ -436,35 +448,170 @@ theorem σPtInTriangle_iff2 {a p q r : Point} (gp : Point.PointListInGeneralPosi
      sorry
     }
     {
-     sorry
+      intro h
+      unfold PtInTriangle2 at h
+      unfold σPtInTriangle2
+      let halfPlanePQ := halfPlaneCCW p q
+      have h1: p ∈ halfPlanePQ := by
+        {
+          simp
+          rw [detIffHalfPlaneCCW]
+          rw [matrix_det_eq_det_pts]
+          unfold Point.det
+          linarith
+        }
+      have h2: q ∈ halfPlanePQ := by
+        {
+          simp
+          rw [detIffHalfPlaneCCW]
+          rw [matrix_det_eq_det_pts]
+          unfold Point.det
+          linarith
+        }
+      have h3: r ∈ halfPlanePQ := by
+        {
+          simp
+          rw [detIffHalfPlaneCCW]
+          rw [σ_CCW_iff_pos_det] at symm
+          linarith
+        }
+      have aInHalfPQ: a ∈ halfPlanePQ := by
+        {
+          unfold convexHull at h
+          simp at h
+          have := h halfPlanePQ
+          have sset: {p, q, r} ⊆ halfPlanePQ := by
+            {
+              simp_rw [Set.subset_def]
+              intro x
+              intro hx
+              simp at hx
+              by_cases h : x = p
+              {
+                rw [h]
+                exact h1
+              }
+              {
+                by_cases h' : x = q
+                {
+                  rw [h']
+                  exact h2
+                }
+                {
+                  by_cases h'': x = r
+                  {
+                    rw [h'']
+                    exact h3
+                  }
+                  {
+                    exfalso
+                    tauto
+                  }
+                }
+              }
+
+            }
+          apply this sset
+          exact HalfPlanesAreConvex
+      }
+      let halfPlaneQR := halfPlaneCCW q r
+      let halfPlaneRP := halfPlaneCCW r p
+      have aInHalfRP: a ∈ halfPlaneRP := by
+        {sorry}
+      have aInHalfQR: a ∈ halfPlaneQR := by
+        {sorry}
+
+      simp at aInHalfPQ
+      rw [detIffHalfPlaneCCW] at aInHalfPQ
+      simp at aInHalfPQ
+      apply lt_or_eq_of_le at aInHalfPQ
+      by_cases h : matrix_det p q a = 0
+      {
+        have := gp.1
+        unfold Point.InGeneralPosition₃ at this
+        exfalso
+        unfold Point.det at this
+        rw [matrix_det_eq_det_pts] at h
+        unfold Point.det at h
+        ring_nf at *
+        tauto
+      }
+      {
+        have h' : matrix_det p q a > 0 := by
+          {
+            apply lt_of_le_of_ne
+            apply le_of_lt_or_eq
+            exact aInHalfPQ
+            tauto
+          }
+        have g1: σ p q a = σ p q r := by
+          {
+            rw [←σ_CCW_iff_pos_det] at h'
+            apply Eq.trans h' (Eq.symm symm)
+          }
+        have g2: σ p r a = σ p r q := by
+          {
+            rw [detIffHalfPlaneCCW] at aInHalfRP
+            have hq3: q ∈ halfPlaneRP := by
+              {
+                simp
+                rw [detIffHalfPlaneCCW]
+                rw [det_symmetry']
+                rw [σ_CCW_iff_pos_det] at symm
+                linarith
+              }
+            rw [detIffHalfPlaneCCW] at hq3
+            rw [det_symmetry] at hq3
+            rw [det_symmetry] at aInHalfRP
+            simp at aInHalfRP
+            simp at hq3
+
+            apply lt_or_eq_of_le at aInHalfRP
+            by_cases hc : matrix_det p r a = 0
+            {
+              have := gp.2
+              unfold Point.InGeneralPosition₃ at this
+              rw [matrix_det_eq_det_pts] at hc
+              exfalso
+              unfold Point.det at this hc
+              simp at this
+              ring_nf at this hc
+              tauto
+            }
+            {
+              have hl : matrix_det p r a < 0 := by
+              {
+                apply lt_of_le_of_ne
+                apply le_of_lt_or_eq at aInHalfRP
+                exact aInHalfRP
+                tauto
+              }
+              have praCW : σ p r a = Orientation.CW := by
+              {
+                unfold σ
+                simp
+                split
+                linarith
+                rfl
+              }
+              have prqCW : σ p r q = Orientation.CW := by
+              {
+                sorry
+              }
+              exact Eq.trans praCW (Eq.symm prqCW)
+            }
+          }
+        have g3: σ q r a = σ q r p := by
+          {
+            sorry
+          }
+        exact ⟨g1, ⟨g2, g3⟩⟩
+      }
     }
-    ---
-    ----
-    /--
-     (-->)
-        Assume σPtInTriangle a p q r.
-        This means that a is on the same side that the lines
-        pq, qr, and rp are on.
-        Let α be the half plane to the right of pq
-        Let β be the half plane above/below the line pr
-        Let γ be the half plane to the left of qr
-        Then by the σ properties we should have
-        that a ∈ α ∩ β ∩ γ.
-        Now, each of this is convex. So ther intersection
-        is convex. Moreover, {p, q, r} ∈ α ∩ β ∩ γ.
-        which implies that a ∈ α ∩ β ∩ γ ⊆ convHull {p, q, r}.
-        and thus we have ptInTriangle a p q r.
-      (<---)
-        Assume ptInTriangle a p q r.
-        Then a ∈ convHull {p, q, r}.
-        This implies a is in every convex set that contains {p, q, r}.
-        This implies a is in the intersection of the half planes
-        and thus it signotopes work as expected.
 
 
 
-    -/
-  -- geometry and signotope stuff TODO(Bernardo)
+
 
 def HasEmptyTriangle (pts : List Point) : Prop :=
   ∃ p q r, Sublist [p, q, r] pts ∧ ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬PtInTriangle a p q r
@@ -509,7 +656,7 @@ theorem OrientationProperty.not : OrientationProperty P → OrientationProperty 
   aesop
 
 
-theorem OrientationProperty_σHas      EmptyTriangle : OrientationProperty σHasEmptyTriangle := by
+theorem OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle := by
   unfold OrientationProperty
   intro l₁ l₂ gps h
 

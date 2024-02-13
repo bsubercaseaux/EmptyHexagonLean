@@ -122,7 +122,22 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGen
 
 theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
   slope p q ≠ slope p r := by
-  sorry
+  by_contra slope_eq
+  have p_lt_q_x: p.x < q.x := by linarith [h.h₁]
+  have q_lt_r_x: q.x < r.x := by linarith [h.h₂]
+  have p_lt_r_x: p.x < r.x := by linarith
+  unfold Point.slope at slope_eq
+  rw [Commute.div_eq_div_iff] at slope_eq
+  have det_0: det p q r = 0 := by
+    unfold det
+    linarith
+  unfold InGeneralPosition₃ at hGp
+  tauto
+  unfold Commute
+  unfold SemiconjBy
+  linarith
+  linarith
+  linarith
 
 
 theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
