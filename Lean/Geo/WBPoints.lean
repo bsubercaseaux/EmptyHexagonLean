@@ -31,6 +31,7 @@ open LeanSAT Model PropFun
 
 def toFinset (w : WBPoints) : Finset Point := w.points.toFinset
 
+-- Q: are we using this ever?
 def fromFinset {S : Finset Point} (hS : PointFinsetInGeneralPosition S)
     (hX : Set.Pairwise S.toSet (·.x ≠ ·.x)) : WBPoints :=
   { points := finset_sort S
@@ -57,10 +58,14 @@ abbrev length (w : WBPoints) : Nat := w.points.length
 instance : GetElem WBPoints Nat Point (fun w i => i < w.length) where
   getElem w i h := w.points[i]'h
 
+-- TODO: use a definition from an earlier module
+def σIsEmptyTriangleFor (a b c : Point) (S : Finset Point) : Prop :=
+  ∀ s ∈ S \ {a,b,c}, ¬σPtInTriangle s a b c
+
 def toPropAssn (w : WBPoints) : PropAssignment (Var w.length)
   | .sigma a b c ..    => σ w[a] w[b] w[c] = .CCW
   | .inside x a b c .. => decide $ σPtInTriangle w[x] w[a] w[b] w[c]
-  | .hole a b c ..     => decide $ True -- TODO: σIsEmptyTriangle w[a] w[b] w[c] w.points
+  | .hole a b c ..     => decide $ σIsEmptyTriangleFor w[a] w[b] w[c] w.toFinset
 
 theorem satisfies_signotopeAxiom (w : WBPoints) (i j k l : Fin w.length) :
     i < j → j < k → k < l → w.toPropAssn ⊨ signotopeAxiom i j k l := by
@@ -96,15 +101,38 @@ theorem satisfies_signotopeAxioms (w : WBPoints) : w.toPropAssn ⊨ signotopeAxi
   . apply satisfies_signotopeAxiom <;> tauto
   exact satisfies_tr
 
-/-
-theorem insideTriangle_toPropAssn (σ : OrientationAssn n) :
-    σ.IsInside x a b c ↔ σ.toPropAssn ⊨ insideDefinitions n ⊓ inside x a b c
+theorem satisfies_insideDefs (w : WBPoints) : w.toPropAssn ⊨ insideDefs w.length := by
+  unfold insideDefs xIsInsideDef
+  simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff, mem_val, mem_univ, true_and]
+  intro a b c d
+  split_ifs <;> first | exact satisfies_tr | unfold toPropAssn σPtInTriangle
+  next h h' =>
+    simp [-getElem_fin]
+    sorry -- TODO: some signotope properties
+  next h h' h'' =>
+    simp [-getElem_fin]
+    sorry -- ditto
 
-theorem hasHole_toPropAssn :
-    ¬L.isEmptyTriangle a b c → L.toPropAssn ⊨ insideDefinitions n ⊓ holeConstraints n ⊓ (hole a b c)ᶜ
+theorem satisfies_holeDefs (w : WBPoints) : w.toPropAssn ⊨ holeDefs w.length := by
+  sorry -- TODO: we should agree on a defn of σIsEmptyTriangleFor globally first
 
-theorem satisfies_noHoles :
-    ∀ a b c, ¬w.isEmptyTriangle a b c → w.toPropAssn ⊨ theFormula
--/
+theorem satisfies_noHoles (w : WBPoints) :
+    (∀ (a b c : Point), {a,b,c} ⊆ w.toFinset → ¬σIsEmptyTriangleFor a b c w.toFinset) →
+    w.toPropAssn ⊨ theFormula w.length := by
+  unfold theFormula
+  intro noholes
+  simp only [noHoles, satisfies_conj, satisfies_signotopeAxioms, satisfies_insideDefs, and_self,
+    satisfies_holeDefs, satisfies_all, Multiset.mem_map, mem_val, mem_univ, true_and,
+    forall_exists_index, forall_apply_eq_imp_iff]
+  intro a b c
+  split_ifs
+  . unfold toPropAssn
+    simp only [satisfies_neg, satisfies_var, decide_eq_true_eq]
+    apply noholes
+    intro _ hx
+    apply List.mem_toFinset.mpr
+    simp only [mem_insert, Finset.mem_singleton] at hx
+    rcases hx with hx | hx | hx <;> { rw [hx]; apply List.get_mem }
+  . exact satisfies_tr
 
 end WBPoints
