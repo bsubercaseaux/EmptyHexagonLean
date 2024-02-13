@@ -69,7 +69,7 @@
 
 \newcommand{\leansat}{\texttt{LeanSAT}}
 
-\title{A Lean Verification of $h(6) = 30$,\\ the Empty Hexagon Number}%
+\title{A Formal Verification of $h(6) = 30$,\\ the Empty Hexagon Number}%
 % \thanks{Other people who contributed to this document include Maria Voronkov
 %   (Imperial College and EasyChair) and Graham Gough (The University of
 %   Manchester).}}
@@ -80,7 +80,7 @@
 \author{ Cayden Codel \orcidID{0000-0003-3588-4873}
   \and  James Gallicchio \orcidID{0000-0002-0838-3240}
   \and  Wojciech Nawrocki \orcidID{0000-0002-8839-0618}
-  \and  \\ Bernardo Subercaseaux  \orcidID{0000-0003-2295-1299} }
+  \and  \\ Bernardo Subercaseaux \orcidID{0000-0003-2295-1299} }
 %
 \institute{
   Carnegie Mellon University, Pittsburgh, PA 15213, USA\\
@@ -106,13 +106,13 @@
 \maketitle
 
 \begin{abstract}
-  A recent breakthrough in computer-assisted mathematics proved that every set of $30$ points in general position (i.e., without three on a common line) contains an empty hexagon, thus closing a line of research dating back to the 1930s.
-  The proof combines geometric insights with automated reasoning techniques to produce a sophisticated propositional encoding of the problem with $O(n^4)$ constraints.
+  A recent breakthrough in computer-assisted mathematics showed that every set of $30$ points in general position (i.e., without three on a common line) contains an empty hexagon, thus closing a line of research dating back to the 1930s.
+  The proof combines geometric insights with automated reasoning techniques to produce a sophisticated propositional encoding of the problem with $O(n^4)$ constraints, where $n$ is the number of points.
   The problem instance for $n = 30$ was solved with a SAT solver and extensive parallel computation, requiring roughly 16\,000 CPU hours.
   In this paper, we formalize this breakthrough in the Lean theorem prover, thus certifying its correctness.
-  Our formalization covers concepts in discrete computational geometry and the theory of SAT encodings that have been successfully applied in similar Erd\H{o}s-Szekeres-type problems.
+  Our formalization covers discrete computational geometry and SAT encoding ideas that have been successfully applied to similar Erd\H{o}s-Szekeres-type problems.
   In particular, our framework provides tools to connect mathematical ideas to objects used in SAT encodings, a connection that is critical for verifying the reduction from a discrete problem to SAT.
-  Overall, we hope this work sets a new standard for verification when extensive computation is used for discrete geometry problems, and that it increases the trust the mathematical community has for computer-assisted proofs obtained through these methods.
+  Overall, we hope this work sets a new standard for verification when extensive computation is used for discrete geometry problems, and that it increases the trust the mathematical community has for computer-assisted proofs obtained with these methods.
 \end{abstract}
 
 \section{Introduction}
