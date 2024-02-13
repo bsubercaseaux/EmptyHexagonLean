@@ -10,7 +10,7 @@ package «geo» where
   -- add any additional package configuration options here
 
 require «lean-sat» from git
-  "https://github.com/JamesGallicchio/LeanSAT.git" @ "enccnf-array"
+  "https://github.com/JamesGallicchio/LeanSAT.git" @ "dev"
 
 @[default_target]
 lean_lib «Geo» where
