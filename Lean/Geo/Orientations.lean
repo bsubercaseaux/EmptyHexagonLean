@@ -189,26 +189,17 @@ theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
 theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     σ p q r = CW → σ q r s = CW → σ p r s = CW := by
   intro h₁ h₂
-  -- rw [←Point.InGeneralPosition₃.σ_iff] at h₁ h₂ ⊢
-
   rw [slope_iff_orientation' h.h₁ hGp.gp₁] at h₁
   rw [slope_iff_orientation' h.sorted₄ hGp.gp₄] at h₂
   rw [slope_iff_orientation' h.sorted₃ hGp.gp₃]
-  -- have rh : Point.slope p r < Point.slope p q := by
-  --   {aesop}
   rw [slope_gt_iff_gt h.sorted₃]
   rw [slope_gt_iff_gt h.sorted₁] at h₁
-  have hh: Point.slope p q > Point.slope q s := by
-    {linarith}
+  have hh: Point.slope p q > Point.slope q s := by linarith
   rw [slope_gt_iff_gt h.sorted₄] at h₂
   have h2: Point.slope p r > Point.slope q r := by
-    {
-      rw [slope_gt_iff_gt' h.sorted₁]
-      exact h₁
-    }
+    rw [slope_gt_iff_gt' h.sorted₁]
+    exact h₁
   linarith
-
-
 
 theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     σ p q r = CW → σ p r s = CW → σ p q s = CW := by
@@ -217,7 +208,6 @@ theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   rw [slope_iff_orientation' h.sorted₃ hGp.gp₃] at h₂
   rw [slope_iff_orientation' h.sorted₂ hGp.gp₂]
   linarith
-
 
 /-- For distinct points in general position (`{a,p,q,r}.size = 4`),
 this means that `a` is strictly in the triangle `pqr`. --/
@@ -232,14 +222,16 @@ def σPtInTriangle (a p q r : Point) : Prop :=
 
 theorem PtInTriangle.perm₁ : PtInTriangle a p q r → PtInTriangle a q p r := by
   unfold PtInTriangle
+  intro
   have : ({q, p, r} : Set Point) = {p, q, r} := Set.insert_comm q p {r}
-  rw [this]
+  rwa [this]
 
 theorem PtInTriangle.perm₂ : PtInTriangle a p q r → PtInTriangle a p r q := by
   unfold PtInTriangle
+  intro
   have : ({r, q} : Set Point) = {q, r} := Set.pair_comm r q
   have : ({p, r, q} : Set Point) = {p, q, r} := congrArg (insert p) this
-  rw [this]
+  rwa [this]
 
 theorem σPtInTriangle.perm₁ : σPtInTriangle a p q r → σPtInTriangle a q p r := by
   unfold σPtInTriangle
@@ -268,8 +260,6 @@ theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.PointFinsetInGeneralPos
     have : ({a,p,q,r} : Finset Point) = {a,p,r,q} := by ext; simp; tauto
     have : Point.PointFinsetInGeneralPosition {a,p,r,q} := by rwa [this] at gp
     have := σPtInTriangle_iff'' this hccw
-    constructor
-    . intro h
-      sorry
-    . intro h
-      sorry
+    exact ⟨
+      fun h => PtInTriangle.perm₂ (this.mp (σPtInTriangle.perm₂ h)),
+      fun h => σPtInTriangle.perm₂ (this.mpr (PtInTriangle.perm₂ h))⟩

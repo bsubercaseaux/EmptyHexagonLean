@@ -2,7 +2,7 @@ import Std.Data.List.Lemmas
 import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
-import Geo.PlaneGeometry
+import Geo.Orientations
 
 namespace Geo
 

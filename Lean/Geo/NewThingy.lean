@@ -1,6 +1,5 @@
 import Geo.Point
 import Geo.WBPoints
-import Geo.toMathlib
 import Geo.Orientations
 
 namespace Geo
