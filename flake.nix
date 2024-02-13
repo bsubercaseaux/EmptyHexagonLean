@@ -10,7 +10,10 @@
         packages = with pkgs; [ 
           bashInteractive
           elan
-          python311Packages.requests
+          cadical
+          texlive.combined.scheme-full
+          texlab
+          fontconfig
         ];
       };
     });
