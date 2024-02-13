@@ -3,9 +3,25 @@ import Mathlib.Data.Fin.Basic
 import Mathlib.Data.List.Range
 import Geo.Formula
 
+-- CC: This is in my commit of LeanSAT, but not in the main branch/the branch this project pulls from
+-- Ah, it's because the underlying definition of .toPropFun changed to .any and not .foldr
+namespace LeanSAT
+
+variable {L : Type u} {ν : Type v} [LitVar L ν]
+
+@[simp]
+theorem Clause.toPropFun_empty : Clause.toPropFun (#[] : Clause L) = ⊥ := by
+  simp [toPropFun, Model.PropFun.any]
+
+@[simp]
+theorem Clause.toPropFun_singleton (l : L) : Clause.toPropFun #[l] = LitVar.toPropFun l := by
+  ext; simp [satisfies_iff]
+
+end LeanSAT
+
 namespace Geo
 
-open LeanSAT Encode VEncCNF Model Var PropFun
+open LeanSAT Encode VEncCNF Model Var PropFun LitVar
 
 /-
 
@@ -111,13 +127,13 @@ def Array.finRange (n : Nat) : Array (Fin n) :=
 def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) (ν := Var n) Unit (· ⊨ signotopeAxiom a b c d) :=
   seq[
     -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
-    tseitin[ ({sigma a b c} ∧ {sigma a c d}) → {sigma a b d} ]
+    andImply (#[ mkPos <| sigma a b c, mkPos <| sigma a c d ]) (mkPos <| sigma a b d)
   , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
-    tseitin[ ({sigma a b c} ∧ {sigma b c d}) → {sigma a c d} ]
+    andImply (#[ mkPos <| sigma a b c, mkPos <| sigma b c d ]) (mkPos <| sigma a c d)
   , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
-    tseitin[ (¬{sigma a b c} ∧ ¬{sigma a c d}) → ¬{sigma a b d} ]
+    andImply (#[ mkNeg <| sigma a b c, mkNeg <| sigma a c d ]) (mkNeg <| sigma a b d)
   , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
-    tseitin[ (¬{sigma a b c} ∧ ¬{sigma b c d}) → ¬{sigma a c d} ]
+    andImply (#[ mkNeg <| sigma a b c, mkNeg <| sigma b c d ]) (mkNeg <| sigma a c d)
   ].mapProp (by
     simp [signotopeAxiom]
   )
@@ -226,7 +242,10 @@ def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit
   ( for_all (Array.finRange n) fun x =>
     VEncCNF.guard (a < x ∧ x < c ∧ x ≠ b) fun _ =>
       -- Q(WN): this is just a clause, why do we need Tseitin? Also in `signotopeClause` above
-      tseitin[ {Var.inside x a b c} → ¬{Var.hole a b c} ]
+      -- A?(CC): Seems like Tseitin is doing the conversion from implication to CNF
+      --         I supplied the direct formula object instead here and in `signotopeClause`, and
+      --         the proofs remained the same (either simp or aesop)
+      imply (mkPos <| (Var.inside x a b c )) (mkNeg <| Var.hole a b c)
   ).mapProp (by
     ext τ
     simp [notHoleOfPointInside]
@@ -280,7 +299,7 @@ def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ noHoles n) 
     VEncCNF.guard (a < b) fun _ =>
     for_all U fun c =>
     VEncCNF.guard (b < c) fun _ =>
-      tseitin[ ¬ {Var.hole a b c} ]
+      addClause #[(mkNeg <| Var.hole a b c)]
   ).mapProp (by
     ext τ
     simp [noHoles]
