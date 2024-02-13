@@ -39,6 +39,19 @@ theorem σ_CCW_iff_pos_det (p q r: Point) : σ p q r = Orientation.CCW ↔ matri
   unfold σ
   aesop
 
+theorem σ_CW_iff_neg_det (p q r: Point) : σ p q r = Orientation.CW ↔ matrix_det p q r < 0 := by
+  apply Iff.intro
+  unfold σ
+  aesop
+  unfold σ
+  split
+  intro h; linarith
+  intro h2
+  split
+  tauto
+  tauto
+
+
 theorem σ_Co_iff_pos_0 (p q r: Point) : σ p q r = Orientation.Collinear ↔ matrix_det p q r = 0 := by
   apply Iff.intro
   unfold σ
@@ -255,361 +268,201 @@ theorem det_symmetry' (a b c : Point) : matrix_det a b c = matrix_det b c a := b
   unfold Point.det
   linarith
 
+theorem  det_antisymmetry (a b c : Point) : matrix_det a b c = -matrix_det b a c := by
+  rw [matrix_det_eq_det_pts]
+  rw [matrix_det_eq_det_pts]
+  unfold Point.det
+  linarith
+
+theorem  det_antisymmetry' (a b c : Point) : matrix_det a b c = -matrix_det a c b := by
+  rw [matrix_det_eq_det_pts]
+  rw [matrix_det_eq_det_pts]
+  unfold Point.det
+  linarith
+
+theorem PtInTriangle2_of_σPtInTriange2 {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
+      (symm: σ p q r = Orientation.CCW) :
+       σPtInTriangle2 a p q r → PtInTriangle2 a p q r  := by
+      sorry -- TODO BS
+
+theorem σPtInTriangle2_of_PtInTriange2 {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
+      (symm: σ p q r = Orientation.CCW) :
+      PtInTriangle2 a p q r → σPtInTriangle2 a p q r := by
+    intro h
+    unfold PtInTriangle2 at h
+    unfold σPtInTriangle2
+    let halfPlanePQ := halfPlaneCCW p q
+    let halfPlaneQR := halfPlaneCCW q r
+    let halfPlaneRP := halfPlaneCCW r p
+    have pInPQ: p ∈ halfPlanePQ := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [matrix_det_eq_det_pts]; unfold Point.det
+        linarith
+      }
+    have pInRP: p ∈ halfPlaneRP := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [matrix_det_eq_det_pts]; unfold Point.det
+        linarith
+      }
+    have pInQR: p ∈ halfPlaneQR := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [σ_CCW_iff_pos_det] at symm
+        rw [←det_symmetry']
+        linarith
+      }
+    have qInPQ: q ∈ halfPlanePQ := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [matrix_det_eq_det_pts]; unfold Point.det
+        linarith
+      }
+    have qInQR: q ∈ halfPlaneQR := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [matrix_det_eq_det_pts]; unfold Point.det
+        linarith
+      }
+    have qInRP: q ∈ halfPlaneRP := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [σ_CCW_iff_pos_det] at symm
+        rw [det_symmetry']
+        linarith
+      }
+
+    have rInPQ: r ∈ halfPlanePQ := by
+      {
+        simp
+        rw [detIffHalfPlaneCCW]
+        rw [σ_CCW_iff_pos_det] at symm
+        linarith
+      }
+    have rInQR: r ∈ halfPlaneQR := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [matrix_det_eq_det_pts]; unfold Point.det
+        linarith
+      }
+    have rInRP: r ∈ halfPlaneRP := by
+      {
+        simp; rw [detIffHalfPlaneCCW]
+        rw [matrix_det_eq_det_pts]; unfold Point.det
+        linarith
+      }
+
+    let inter := halfPlanePQ ∩ (halfPlaneQR ∩ halfPlaneRP)
+    have pInter: p ∈ inter := Set.mem_inter pInPQ (Set.mem_inter pInQR pInRP)
+    have qInter: q ∈ inter := Set.mem_inter qInPQ (Set.mem_inter qInQR qInRP)
+    have rInter: r ∈ inter := Set.mem_inter rInPQ (Set.mem_inter rInQR rInRP)
+
+    have cRP: Convex ℝ (halfPlaneRP) := by exact HalfPlanesAreConvex
+    have cPQ: Convex ℝ (halfPlanePQ) := by exact HalfPlanesAreConvex
+    have cQR: Convex ℝ (halfPlaneQR) := by exact HalfPlanesAreConvex
+    have interConvex : Convex ℝ inter := by exact Convex.inter cPQ (Convex.inter cQR cRP)
+
+    have sub_set_inter : {p, q, r} ⊆ inter := by
+    {
+        simp_rw [Set.subset_def]
+        simp; exact ⟨pInter, ⟨qInter, rInter⟩⟩
+    }
+
+    have aInInter: a ∈ inter := by
+      {
+        unfold convexHull at h
+        simp at h
+        apply h inter sub_set_inter interConvex
+      }
+
+
+    have aInHalfPQ: a ∈ halfPlanePQ := by aesop
+    have aInHalfRP: a ∈ halfPlaneRP := by aesop
+    have aInHalfQR: a ∈ halfPlaneQR := by aesop
+
+    have pqa_non_0 : matrix_det p q a ≠ 0 := by
+      {
+        have l := gp.1
+        unfold Point.InGeneralPosition₃ at l
+        rw [←matrix_det_eq_det_pts] at l
+        rw [det_symmetry'] at l
+        exact l
+      }
+    have pra_non_0 : matrix_det p r a ≠ 0 := by
+      {
+        have l := gp.2
+        unfold Point.InGeneralPosition₃ at l
+        rw [←matrix_det_eq_det_pts] at l
+        rw [det_symmetry'] at l
+        exact l
+      }
+    have qra_non_0 : matrix_det q r a ≠ 0 := by
+      {
+        have l := gp.3
+        unfold Point.InGeneralPosition₃ at l
+        rw [←matrix_det_eq_det_pts] at l
+        rw [det_symmetry'] at l
+        exact l
+      }
+
+    have pqr_pos : matrix_det p q r > 0 := by
+      {
+        rw [σ_CCW_iff_pos_det] at symm
+        linarith
+      }
+
+    have pqa_CCW : σ p q a = Orientation.CCW := by
+      {
+        rw [detIffHalfPlaneCCW] at aInHalfPQ
+        rw [σ_CCW_iff_pos_det]
+        apply lt_of_le_of_ne aInHalfPQ (Ne.symm pqa_non_0)
+      }
+    have goal1: σ p q a = σ p q r := Eq.trans pqa_CCW (Eq.symm symm)
+    use goal1
+
+    have pra_neg : matrix_det p r a < 0 := by
+        {
+          apply lt_of_le_of_ne
+          rw [detIffHalfPlaneCCW] at aInHalfRP
+          rw [det_antisymmetry] at aInHalfRP
+          linarith
+          exact pra_non_0
+        }
+    have prq_neg : matrix_det p r q < 0 := by
+        {
+          rw [det_antisymmetry'] at pqr_pos
+          linarith
+        }
+    have goal2: σ p r a = σ p r q := by
+      {
+        rw [←σ_CW_iff_neg_det] at pra_neg
+        rw [←σ_CW_iff_neg_det] at prq_neg
+        aesop
+      }
+    use goal2
+
+    have qrp_pos : matrix_det q r p > 0 := by
+      {
+        rw [←det_symmetry']; exact pqr_pos
+      }
+    have qra_pos : matrix_det q r a > 0 := by
+      {
+        rw [detIffHalfPlaneCCW] at aInHalfQR
+        apply lt_of_le_of_ne aInHalfQR (Ne.symm qra_non_0)
+      }
+    rw [←σ_CCW_iff_pos_det] at qrp_pos
+    rw [←σ_CCW_iff_pos_det] at qra_pos
+    exact Eq.trans qra_pos (Eq.symm qrp_pos)
+
+
 -- σ p q r = .CCW
 theorem σPtInTriangle_iff2 {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
       (symm: σ p q r = Orientation.CCW) :
     σPtInTriangle2 a p q r ↔ PtInTriangle2 a p q r := by
     apply Iff.intro
-    {
-     intro h
-     unfold σPtInTriangle2 at h
-     unfold PtInTriangle2
-     have h1 := h.1
-     have h2 := h.2.1
-     have h3 := h.2.2
-     let halfPlanePQ := halfPlaneCCW p q
-     unfold halfPlaneCCW at halfPlanePQ
-     have h4: σ p q a = Orientation.CCW := by
-        rw [←symm]
-        exact h1
-     have h5: a ∈ halfPlanePQ := by
-        {
-          rw [detIffHalfPlaneCCW]
-          rw [σ_CCW_iff_pos_det] at h4
-          linarith
-        }
-     let halfPlaneQR := halfPlaneCCW q r
-     have symm_conseq: σ q r p = Orientation.CCW := by
-        {sorry}
-     have qraCCW: σ q r a = Orientation.CCW := by
-        {
-          rw [←symm_conseq]
-          exact h3
-        }
-     have h6: a ∈ halfPlaneQR := by
-          {
-            rw [detIffHalfPlaneCCW]
-            rw [σ_CCW_iff_pos_det] at qraCCW
-            linarith
-          }
-     let halfPlaneRP := halfPlaneCCW r p
-     have symm_conseq2: σ r p q = Orientation.CCW := by
-          {sorry}
-     have rpaCCW: σ r p a = Orientation.CCW := by
-          {
-              rw [←symm_conseq2]
-              sorry
-          }
-     have h7: a ∈ halfPlaneRP := by
-            {
-              rw [detIffHalfPlaneCCW]
-              rw [σ_CCW_iff_pos_det] at rpaCCW
-              linarith
-            }
-     have cRP: Convex ℝ (halfPlaneCCW r p) := by
-        {
-          exact HalfPlanesAreConvex
-        }
-     have cPQ: Convex ℝ (halfPlaneCCW p q) := by
-          {
-            exact HalfPlanesAreConvex
-          }
-     have cQR: Convex ℝ (halfPlaneCCW q r) := by
-              {
-                exact HalfPlanesAreConvex
-              }
-     let inter := halfPlaneCCW p q ∩ (halfPlaneCCW q r ∩ halfPlaneCCW r p)
-     have interConvex : Convex ℝ inter := by
-        {
-          exact Convex.inter cPQ (Convex.inter cQR cRP)
-        }
-     have h8: a ∈ inter := Set.mem_inter h5 (Set.mem_inter h6 h7)
-     have pPQ: p ∈ halfPlaneCCW p q := by
-        {
-          unfold halfPlaneCCW
-          simp
-          unfold ptInsideHalfPlaneCCW
-          right
-          rw [σ_Co_iff_pos_0]
-          rw [matrix_det_eq_det_pts]
-          unfold Point.det
-          linarith
-        }
-     have pRP: p ∈ halfPlaneCCW r p := by
-        {
-          unfold halfPlaneCCW
-          simp
-          unfold ptInsideHalfPlaneCCW
-          right
-          rw [σ_Co_iff_pos_0]
-          rw [matrix_det_eq_det_pts]
-          unfold Point.det
-          linarith
-        }
-     have pQR: p ∈ halfPlaneCCW q r:= by
-        {
-          unfold halfPlaneCCW
-          simp
-          unfold ptInsideHalfPlaneCCW
-          left
-          exact symm_conseq
-        }
-     have pInter: p ∈ inter := Set.mem_inter pPQ (Set.mem_inter pQR pRP)
-     have qPQ: q ∈ halfPlaneCCW p q := by
-          {
-            unfold halfPlaneCCW
-            simp
-            unfold ptInsideHalfPlaneCCW
-            right
-            rw [σ_Co_iff_pos_0]
-            rw [matrix_det_eq_det_pts]
-            unfold Point.det
-            linarith
-          }
-     have qQR: q ∈ halfPlaneCCW q r := by
-          {
-            unfold halfPlaneCCW
-            simp
-            unfold ptInsideHalfPlaneCCW
-            right
-            rw [σ_Co_iff_pos_0]
-            rw [matrix_det_eq_det_pts]
-            unfold Point.det
-            linarith
-          }
-     have qRP: q ∈ halfPlaneCCW r p := by
-          {
-            unfold halfPlaneCCW
-            simp
-            unfold ptInsideHalfPlaneCCW
-            left
-            exact symm_conseq2
-          }
-     have qInter: q ∈ inter := Set.mem_inter qPQ (Set.mem_inter qQR qRP)
-     have rPQ: r ∈ halfPlaneCCW p q := by
-            {
-              unfold halfPlaneCCW
-              simp
-              unfold ptInsideHalfPlaneCCW
-              left
-              exact symm
-            }
-     have rQR: r ∈ halfPlaneCCW q r := by
-              {
-                unfold halfPlaneCCW
-                simp
-                unfold ptInsideHalfPlaneCCW
-                right
-                rw [σ_Co_iff_pos_0]
-                rw [matrix_det_eq_det_pts]
-                unfold Point.det
-                linarith
-              }
-     have rRP: r ∈ halfPlaneCCW r p := by
-                {
-                  unfold halfPlaneCCW
-                  simp
-                  unfold ptInsideHalfPlaneCCW
-                  right
-                  rw [σ_Co_iff_pos_0]
-                  rw [matrix_det_eq_det_pts]
-                  unfold Point.det
-                  linarith
-                }
-     have rInter: r ∈ inter := Set.mem_inter rPQ (Set.mem_inter rQR rRP)
-    --  unfold convexHull
-    -- inter : Set Point
-    -- interConvex
-    -- r, p, q, a ∈ inter
-    --
-     apply mem_convexHull_iff.mpr
-     intro S Spqr convexS
-
-     ---- Convexity implies:
-      ----- ∀ x, y ∈ S, ∀ α, β, α + β = 1, α, β ≥ 0
-        ----→ α • x + β • y ∈ S
-
-        -- By induction:
-          --- ∀ x₁, …, xₙ ∈ S, ∀ α₁, …, αₙ, α₁ + … + αₙ = 1, α₁, …, αₙ ≥ 0
-            ----→ α₁ • x₁ + … + αₙ • xₙ ∈ S
-      --- Claim: in a two dimensional space,
-        --- any point in a convex set L
-        --- can be written as a convex combination of any three points in L as long as those 3 points are not collinear
-
-
-     -- w.t.s. that inter ⊆ S
-      ----  let x ∈ inter
-        --- Claim: there are α, β, γ such that
-          ---  x = α • p + β • q + γ • r
-            -- with α + β + γ = 1, α, β, γ ≥ 0
-          --- Proof of Claim:
-             ---
-
-     sorry
-    }
-    {
-      intro h
-      unfold PtInTriangle2 at h
-      unfold σPtInTriangle2
-      let halfPlanePQ := halfPlaneCCW p q
-      have h1: p ∈ halfPlanePQ := by
-        {
-          simp
-          rw [detIffHalfPlaneCCW]
-          rw [matrix_det_eq_det_pts]
-          unfold Point.det
-          linarith
-        }
-      have h2: q ∈ halfPlanePQ := by
-        {
-          simp
-          rw [detIffHalfPlaneCCW]
-          rw [matrix_det_eq_det_pts]
-          unfold Point.det
-          linarith
-        }
-      have h3: r ∈ halfPlanePQ := by
-        {
-          simp
-          rw [detIffHalfPlaneCCW]
-          rw [σ_CCW_iff_pos_det] at symm
-          linarith
-        }
-      have aInHalfPQ: a ∈ halfPlanePQ := by
-        {
-          unfold convexHull at h
-          simp at h
-          have := h halfPlanePQ
-          have sset: {p, q, r} ⊆ halfPlanePQ := by
-            {
-              simp_rw [Set.subset_def]
-              intro x
-              intro hx
-              simp at hx
-              by_cases h : x = p
-              {
-                rw [h]
-                exact h1
-              }
-              {
-                by_cases h' : x = q
-                {
-                  rw [h']
-                  exact h2
-                }
-                {
-                  by_cases h'': x = r
-                  {
-                    rw [h'']
-                    exact h3
-                  }
-                  {
-                    exfalso
-                    tauto
-                  }
-                }
-              }
-
-            }
-          apply this sset
-          exact HalfPlanesAreConvex
-      }
-      let halfPlaneQR := halfPlaneCCW q r
-      let halfPlaneRP := halfPlaneCCW r p
-      have aInHalfRP: a ∈ halfPlaneRP := by
-        {sorry}
-      have aInHalfQR: a ∈ halfPlaneQR := by
-        {sorry}
-
-      simp at aInHalfPQ
-      rw [detIffHalfPlaneCCW] at aInHalfPQ
-      simp at aInHalfPQ
-      apply lt_or_eq_of_le at aInHalfPQ
-      by_cases h : matrix_det p q a = 0
-      {
-        have := gp.1
-        unfold Point.InGeneralPosition₃ at this
-        exfalso
-        unfold Point.det at this
-        rw [matrix_det_eq_det_pts] at h
-        unfold Point.det at h
-        ring_nf at *
-        tauto
-      }
-      {
-        have h' : matrix_det p q a > 0 := by
-          {
-            apply lt_of_le_of_ne
-            apply le_of_lt_or_eq
-            exact aInHalfPQ
-            tauto
-          }
-        have g1: σ p q a = σ p q r := by
-          {
-            rw [←σ_CCW_iff_pos_det] at h'
-            apply Eq.trans h' (Eq.symm symm)
-          }
-        have g2: σ p r a = σ p r q := by
-          {
-            rw [detIffHalfPlaneCCW] at aInHalfRP
-            have hq3: q ∈ halfPlaneRP := by
-              {
-                simp
-                rw [detIffHalfPlaneCCW]
-                rw [det_symmetry']
-                rw [σ_CCW_iff_pos_det] at symm
-                linarith
-              }
-            rw [detIffHalfPlaneCCW] at hq3
-            rw [det_symmetry] at hq3
-            rw [det_symmetry] at aInHalfRP
-            simp at aInHalfRP
-            simp at hq3
-
-            apply lt_or_eq_of_le at aInHalfRP
-            by_cases hc : matrix_det p r a = 0
-            {
-              have := gp.2
-              unfold Point.InGeneralPosition₃ at this
-              rw [matrix_det_eq_det_pts] at hc
-              exfalso
-              unfold Point.det at this hc
-              simp at this
-              ring_nf at this hc
-              tauto
-            }
-            {
-              have hl : matrix_det p r a < 0 := by
-              {
-                apply lt_of_le_of_ne
-                apply le_of_lt_or_eq at aInHalfRP
-                exact aInHalfRP
-                tauto
-              }
-              have praCW : σ p r a = Orientation.CW := by
-              {
-                unfold σ
-                simp
-                split
-                linarith
-                rfl
-              }
-              have prqCW : σ p r q = Orientation.CW := by
-              {
-                sorry
-              }
-              exact Eq.trans praCW (Eq.symm prqCW)
-            }
-          }
-        have g3: σ q r a = σ q r p := by
-          {
-            sorry
-          }
-        exact ⟨g1, ⟨g2, g3⟩⟩
-      }
-    }
-
-
+    exact PtInTriangle2_of_σPtInTriange2 gp symm
+    exact σPtInTriangle2_of_PtInTriange2 gp symm
 
 
 
