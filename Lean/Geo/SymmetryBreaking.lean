@@ -22,11 +22,15 @@ def pt_transform_2 (p : Point) (M : Matrix (Fin 3) (Fin 3) Real) : Point :=
   vec_to_pt A
 
 
-theorem σ_equiv_transitivity
-  {pts pts' pts'' : List Point}
-  (eq1 : σ_equivalence pts pts')
-  (eq2 : σ_equivalence pts' pts'')
-  : σ_equivalence pts pts'' := by sorry
+theorem σ_equiv_transitivity {pts pts' pts'' : List Point} :
+    σ_equivalence pts pts' → σ_equivalence pts' pts'' →  σ_equivalence pts pts'' := by
+  intro h₁ h₂
+  constructor
+  intro i j k hi hj hk
+  rw [h₁.2 hi hj hk]
+  rw [h₁.1] at hi hj hk
+  rw [h₂.2 hi hj hk]
+  rw [h₁.1, h₂.1]
 
 /-- `M` is an affine transformaition matrix. -/
 structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop :=
