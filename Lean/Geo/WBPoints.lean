@@ -17,7 +17,6 @@ structure WBPoints where
   points : List Point
   sorted : PointListSorted points
   gp : PointListInGeneralPosition points
-  -- ccw : SortedCCW
 
 def finset_sort (S : Finset Point) : List Point :=
   S.toList.insertionSort (·.x <= ·.x)
@@ -101,17 +100,53 @@ theorem satisfies_signotopeAxioms (w : WBPoints) : w.toPropAssn ⊨ signotopeAxi
   . apply satisfies_signotopeAxiom <;> tauto
   exact satisfies_tr
 
+theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPosition₄ a x b c →
+    (σPtInTriangle x a b c ↔
+      ((σ a b c = .CCW ↔ σ a x c = .CCW) ∧ (σ a x b ≠ .CCW ↔ σ a b c = .CCW))) := by
+  intro sorted gp
+  simp only [σPtInTriangle, σ_perm₁ b x c, σ_perm₂ a c b, σ_perm₁ b a c, gp.gp₁.σ_iff]
+  cases gp.gp₁.σ_cases <;> cases gp.gp₂.σ_cases <;> cases gp.gp₃.σ_cases <;> cases gp.gp₄.σ_cases <;> simp_all [-getElem_fin]
+  next h₁ h₂ h₃ h₄ =>
+    rw [σ_prop₁ sorted gp h₁ h₄] at h₃
+    contradiction
+  next h₁ h₂ h₃ h₄ =>
+    rw [σ_prop₃ sorted gp h₁ h₄] at h₃
+    contradiction
+
+theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPosition₄ a b x c →
+    (σPtInTriangle x a b c ↔
+      ((σ a b c = .CCW ↔ σ a x c = .CCW) ∧ (σ b x c ≠ .CCW ↔ σ a b c = .CCW))) := by
+  intro sorted gp
+  simp only [σPtInTriangle, σ_perm₂ a x b, σ_perm₂ a c b, σ_perm₁ b a c, gp.gp₄.σ_iff]
+  cases gp.gp₁.σ_cases <;> cases gp.gp₂.σ_cases <;> cases gp.gp₃.σ_cases <;> cases gp.gp₄.σ_cases <;> simp_all [-getElem_fin]
+  next h₁ h₂ h₃ h₄ =>
+    rw [σ_prop₁ sorted gp h₁ h₄] at h₃
+    contradiction
+  next h₁ h₂ h₃ h₄ =>
+    rw [σ_prop₃ sorted gp h₁ h₄] at h₃
+    contradiction
+
 theorem satisfies_insideDefs (w : WBPoints) : w.toPropAssn ⊨ insideDefs w.length := by
   unfold insideDefs xIsInsideDef
   simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff, mem_val, mem_univ, true_and]
-  intro a b c d
-  split_ifs <;> first | exact satisfies_tr | unfold toPropAssn σPtInTriangle
-  next h h' =>
-    simp [-getElem_fin]
-    sorry -- TODO: some signotope properties
-  next h h' h'' =>
-    simp [-getElem_fin]
-    sorry -- ditto
+  intro a b c x
+  split_ifs <;> first | exact satisfies_tr | unfold toPropAssn
+  next abc axb =>
+    have : [w[a], w[x], w[b], w[c]] <+ w.points := by
+      have : [w[a], w[x], w[b], w[c]] = [a,x,b,c].map w.points.get := by
+        simp [GetElem.getElem, List.getElem_eq_get]
+      rw [this]
+      apply map_get_sublist
+      simp [abc.left, axb.left, abc.left.trans abc.right, axb.right, axb.right.trans abc.right, abc.right]
+    simp [-getElem_fin, insideDefs_aux₁ (w.sorted.to₄ this) (PointListInGeneralPosition.to₄ w.gp this) ]
+  next abc _ bxc =>
+    have : [w[a], w[b], w[x], w[c]] <+ w.points := by
+      have : [w[a], w[b], w[x], w[c]] = [a,b,x,c].map w.points.get := by
+        simp [GetElem.getElem, List.getElem_eq_get]
+      rw [this]
+      apply map_get_sublist
+      simp [abc.left, abc.left.trans bxc.left, abc.left.trans abc.right, bxc.left, abc.right, bxc.right]
+    simp [-getElem_fin, insideDefs_aux₂ (w.sorted.to₄ this) (PointListInGeneralPosition.to₄ w.gp this)]
 
 theorem satisfies_holeDefs (w : WBPoints) : w.toPropAssn ⊨ holeDefs w.length := by
   sorry -- TODO: we should agree on a defn of σIsEmptyTriangleFor globally first

@@ -29,6 +29,15 @@ theorem Orientation.neg_neg (o : Orientation) : -(-o) = o := by
 theorem Orientation.neg_eq (o o' : Orientation) : (-o = -o') ↔ (o = o') := by
   cases o <;> cases o' <;> simp [Neg.neg, neg]
 
+@[simp]
+theorem Orientation.neg_cw : -CW = CCW := by rfl
+
+@[simp]
+theorem Orientation.neg_ccw : -CCW = CW := by rfl
+
+@[simp]
+theorem Orientation.neg_colliner : -Collinear = Collinear := by rfl
+
 open Orientation Point
 
 def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=
@@ -84,6 +93,18 @@ theorem Point.InGeneralPosition₃.σ_iff {p q r : Point} :
 theorem Point.InGeneralPosition₃.σ_iff' {p q r : Point} :
     InGeneralPosition₃ p q r → (σ p q r ≠ .CW ↔ σ p q r = .CCW) := by
   intro h; cases h.σ_cases <;> simp_all
+
+-- NOTE(WN): These lemmas are a bit upsetting.
+-- Ideally we'd redefine `σ : Point³ → Bool` by arbitrarily mapping `.Collinear` to `true`.
+theorem Point.InGeneralPosition₃.σ_iff₂ :
+    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r = .CCW ↔ σ s t u = .CCW) ↔ σ p q r = σ s t u) := by
+  intro h h'
+  cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
+
+theorem Point.InGeneralPosition₃.σ_iff₂' :
+    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r ≠ .CCW ↔ σ s t u = .CCW) ↔ σ p q r ≠ σ s t u) := by
+  intro h h'
+  cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
 
 theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
     σ p q r = CCW ↔ slope p q < slope p r := by
