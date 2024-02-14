@@ -3,6 +3,7 @@ import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.Orientations
+import Geo.ToMathlib
 
 namespace Geo
 
@@ -34,61 +35,32 @@ theorem σ_equiv_transitivity {pts pts' pts'' : List Point} :
 
 /-- `M` is an affine transformaition matrix. -/
 structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop :=
-  det_pos : Matrix.det M > 0
-  third_row : M 2 0 = 0 ∧ M 2 1 = 0 ∧ M 2 2 = 1
+  det_pos : (0 : ℝ) < Matrix.det M
+  third_row : M ⟨2, by trivial⟩ = ![0, 0, 1]
 
-theorem transform_equivalence (p q r : Point) (T : TMatrix M) :
-    pts_to_matrix (pt_transform p M) (pt_transform q M) (pt_transform r M)
-  = M * pts_to_matrix p q r := by
-    have eq : M * pts_to_matrix p q r = Matrix.of (![![M 0 0, M 0 1, M 0 2], ![M 1 0, M 1 1, M 1 2], ![M 2 0, M 2 1, M 2 2]]) * (Matrix.of ![![p.x, q.x, r.x], ![p.y, q.y, r.y], ![1, 1, 1]]) := by
-      unfold pts_to_matrix
-      rw [← Matrix.eta_fin_three]
-
-    rw [eq]
-    unfold pts_to_matrix pt_transform
-    rw [T.third_row.1, T.third_row.2.1, T.third_row.2.2]
-    simp
-    ring_nf
+theorem transform_equivalence (p q r : Point) {M : Matrix (Fin 3) (Fin 3) Real} (T : TMatrix M) :
+    pts_to_matrix (pt_transform_2 p M) (pt_transform_2 q M) (pt_transform_2 r M) = M * pts_to_matrix p q r := by
+  unfold pts_to_matrix
+  ext i j
+  fin_cases i
+  <;> simp [Matrix.mul_apply, pt_transform_2, vec_to_pt, pt_to_vec, T.third_row, Finset.univ, Fintype.elems, List.finRange]
+  <;> fin_cases j <;> simp
 
 theorem transform_preserve_omega (p q r : Point) (T : TMatrix M) :
-  σ p q r = σ (pt_transform p M) (pt_transform q M) (pt_transform r M) := by
-  unfold σ
-  have det_M_pos : Matrix.det M > 0 := by
-        exact T.det_pos
-  unfold matrix_det
-  rw [transform_equivalence p q r T]
-  rw [Matrix.det_mul]
-  split
-  {
-    next det_pqr_pos =>
-      split
-      { trivial }
-      {
-      split; nlinarith; nlinarith
-      }
-  }
-  {
-    next det_pqr_not_pos =>
-      split
-      {
-
-        split
-        {nlinarith}
-        {
-          split ; trivial ; nlinarith
-        }
-      }
-      {
-        split
-        {nlinarith}
-        {
-          split; nlinarith ; trivial
-        }
-      }
-  }
+    σ p q r = σ (pt_transform_2 p M) (pt_transform_2 q M) (pt_transform_2 r M) := by
+  unfold σ matrix_det
+  simp [transform_equivalence p q r T, Matrix.det_mul, mul_pos_iff_of_pos_left T.det_pos]
+  congr 2  -- Cayden TODO: There's a better way to do this through mul_neg_iff
+  rw [mul_neg_iff, eq_iff_iff]
+  constructor
+  · intro h
+    exact Or.inl ⟨T.det_pos, h⟩
+  · rintro (⟨_, h⟩ | ⟨h, _⟩)
+    · exact h
+    · exact absurd T.det_pos (lt_asymm h)
 
 def transform_points (pts: List Point) (M : Matrix (Fin 3) (Fin 3) Real) : List Point :=
-  pts.map (λ p => pt_transform p M)
+  pts.map (λ p => pt_transform_2 p M)
 
 theorem transform_returns_σ_equivalent (pts: List Point) (T: TMatrix M) :
   σ_equivalence pts (transform_points pts M) := by
@@ -104,18 +76,14 @@ theorem transform_returns_σ_equivalent (pts: List Point) (T: TMatrix M) :
                     (resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩)
                     (resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩) := by
         intros i j k hi hj hk
-        have ti : pt_transform (pts.get ⟨i, hi⟩) M = resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩ := by
-          simp
-          unfold transform_points
-          simp
-        have tj : pt_transform (pts.get ⟨j, hj⟩) M = resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩ := by
-          simp
-          unfold transform_points
-          simp
-        have tk : pt_transform (pts.get ⟨k, hk⟩) M = resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩ := by
-          simp
-          unfold transform_points
-          simp
+        have ti : pt_transform_2 (pts.get ⟨i, hi⟩) M = resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩ := by
+          simp [transform_points]
+
+        have tj : pt_transform_2 (pts.get ⟨j, hj⟩) M = resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩ := by
+          simp [transform_points]
+        have tk : pt_transform_2 (pts.get ⟨k, hk⟩) M = resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩ := by
+          simp [transform_points]
+
         rw [←ti, ←tj, ←tk]
         rw [transform_preserve_omega]
         exact T
@@ -139,8 +107,8 @@ def translation_transform (s t : Real) :
   exact ⟨by linarith, third_row⟩
 
 lemma translation_translates (p : Point) (s t : Real) :
-  pt_transform p (translation_matrix s t) = ![p.x + s, p.y + t] := by
-  unfold pt_transform translation_matrix
+  pt_transform_2 p (translation_matrix s t) = ![p.x + s, p.y + t] := by
+  unfold pt_transform_2 translation_matrix
   simp
 
 lemma symmetry_breaking_1 (pts: List Point) :
@@ -165,7 +133,7 @@ lemma symmetry_breaking_1 (pts: List Point) :
     let pts' := transform_points pts MT
     have h1 : σ_equivalence pts pts' := transform_returns_σ_equivalent pts T
     have h2 : pts'.get? 0 = some ![0, 0] := by
-      have h3 : pt_transform p1 MT = ![0, 0] := by
+      have h3 : pt_transform_2 p1 MT = ![0, 0] := by
         rw [translation_translates]
         simp
       simp
@@ -230,7 +198,7 @@ theorem to_origin_head (pts : List Point) :
     let pts' := transform_points pts MT
     have h1 : σ_equivalence pts pts' := transform_returns_σ_equivalent pts T
     have h2 : pts'.get? 0 = some ![0, 0] := by
-      have h3 : pt_transform p1 MT = ![0, 0] := by
+      have h3 : pt_transform_2 p1 MT = ![0, 0] := by
         rw [translation_translates]
         simp
       simp
@@ -298,10 +266,10 @@ theorem sb_1_rest (pts: List Point) (h: pts ≠ [])
   let pts' := transform_points pts scaling_y_band
   have band_effect : ∀ p ∈ pts', p.y ≥ -1 ∧ p.y ≤ 1 := by
     intros p hp
-    have pts'_eq : pts' = pts.map (λ p => pt_transform p scaling_y_band) := by
+    have pts'_eq : pts' = pts.map (λ p => pt_transform_2 p scaling_y_band) := by
       simp [transform_points]
     rw [pts'_eq] at hp
-    have: ∃ p1 ∈ pts, pt_transform p1 scaling_y_band = p := by
+    have: ∃ p1 ∈ pts, pt_transform_2 p1 scaling_y_band = p := by
       apply List.exists_of_mem_map hp
     apply Exists.elim this
     intro a1 a2

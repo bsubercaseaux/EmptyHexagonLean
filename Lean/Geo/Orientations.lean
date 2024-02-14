@@ -41,7 +41,7 @@ theorem Orientation.neg_colliner : -Collinear = Collinear := by rfl
 open Orientation Point
 
 def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=
-  Matrix.of ![![a.x, b.x, c.x], ![a.y, b.y, c.y], ![1, 1, 1]]
+  !![a.x, b.x, c.x ; a.y, b.y, c.y ; 1, 1, 1]
 
 def matrix_det (a b c : Point) : Real :=
   Matrix.det (pts_to_matrix a b c)
