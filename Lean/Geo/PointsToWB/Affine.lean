@@ -128,23 +128,12 @@ theorem distinct_rotate_list (l : List Point) (hDistinct : l.Pairwise (· ≠ ·
 /-! ## Translation -/
 
 def translation_matrix (s t : Real) : Matrix (Fin 3) (Fin 3) Real :=
-  Matrix.of ![![1, 0, s], ![0, 1, t], ![0, 0, 1]]
+  ![![1, 0, s], ![0, 1, t], ![0, 0, 1]]
 
-def translation_transform (s t : Real) :
-  TMatrix (translation_matrix s t) := by
-  have det_eq_one : Matrix.det (translation_matrix s t) = 1 := by
-    rw [Matrix.det_fin_three]
-    unfold translation_matrix
-    simp [Matrix.vecHead, Matrix.vecTail]
-  stop
-  have third_row : (translation_matrix s t) 2 0 = 0 ∧ (translation_matrix s t) 2 1 = 0 ∧ (translation_matrix s t) 2 2 = 1 := by
-    unfold translation_matrix
-    simp [Matrix.vecHead, Matrix.vecTail]
-
-  exact ⟨by linarith, third_row⟩
+def translation_transform (s t : Real) : TMatrix (translation_matrix s t) := by
+  exact ⟨by simp [Matrix.det_fin_three, translation_matrix, Matrix.vecHead, Matrix.vecTail], rfl⟩
 
 lemma translation_translates (p : Point) (s t : Real) :
   pt_transform p (translation_matrix s t) = ![p.x + s, p.y + t] := by
-  unfold pt_transform translation_matrix
-  simp
-  sorry
+  simp [pt_transform, translation_matrix, pt_to_vec, vec_to_pt, Matrix.mul_apply,
+      Finset.univ, Fintype.elems, List.finRange]
