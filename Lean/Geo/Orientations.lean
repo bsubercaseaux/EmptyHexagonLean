@@ -38,6 +38,12 @@ theorem Orientation.neg_ccw : -CCW = CW := by rfl
 @[simp]
 theorem Orientation.neg_colliner : -Collinear = Collinear := by rfl
 
+@[simp]
+def Orientation.ofReal (r : ℝ) : Orientation :=
+  if 0 < r then CCW
+  else if r < 0 then CW
+  else Collinear
+
 open Orientation Point
 
 def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=
@@ -54,27 +60,25 @@ lemma matrix_det_eq_det_pts (a b c : Point) :
     ring_nf
 
 noncomputable def σ (p q r : Point) : Orientation :=
-  if matrix_det p q r > 0 then CCW
-  else if matrix_det p q r < 0 then CW
-  else Collinear
+  .ofReal (matrix_det p q r)
 
 theorem σ_perm₁ (p q r : Point) : σ p q r = -σ q p r := by
   have : det p q r = -det q p r := by
     unfold det
     linarith
-  simp only [σ, matrix_det_eq_det_pts, this]
+  simp only [σ, matrix_det_eq_det_pts, this, ofReal]
   split_ifs <;> { first | rfl | exfalso; linarith }
 
 theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q := by
   have : det p q r = -det p r q := by
     unfold det
     linarith
-  simp only [σ, matrix_det_eq_det_pts, this]
+  simp only [σ, matrix_det_eq_det_pts, this, ofReal]
   split_ifs <;> { first | rfl | exfalso; linarith }
 
 theorem Point.InGeneralPosition₃.σ_ne {p q r : Point} :
     InGeneralPosition₃ p q r → σ p q r ≠ .Collinear := by
-  rw [InGeneralPosition₃, σ, matrix_det_eq_det_pts]
+  rw [InGeneralPosition₃, σ, matrix_det_eq_det_pts, ofReal]
   split <;> first | split; simp | simp
   have : det p q r = 0 := by linarith
   simpa
@@ -111,6 +115,7 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGen
   unfold σ Point.slope
   have qp_dx_pos : 0 < q.x - p.x := by linarith [h.h₁]
   have rp_dx_pos : 0 < r.x - p.x := by linarith [h.h₂]
+  simp only [ofReal]
   split
   {
     next det_pqr_pos =>

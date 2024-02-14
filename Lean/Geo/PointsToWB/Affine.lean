@@ -3,11 +3,13 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Data.Set.Intervals.IsoIoo
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
-import Geo.SymmetryBreaking
+import Geo.PointsToWB.TMatrix
 
 namespace Geo
 noncomputable section
 open Real Classical
+
+/-! ## Rotation -/
 
 /-- Matrix representing a counterclockwise rotation by `θ`. -/
 def Matrix.rotateBy (θ : ℝ) : Matrix (Fin 2) (Fin 2) ℝ :=
@@ -43,10 +45,10 @@ def Matrix.rotateByAffine (θ : ℝ) : Matrix (Fin 3) (Fin 3) ℝ :=
 
 lemma TMatrix.rotateByAffine (θ : ℝ) : TMatrix (Matrix.rotateByAffine θ) where
   det_pos := by simp [Matrix.det_fin_three, Matrix.rotateByAffine, ← Real.cos_sub]
-  third_row := by simp [Matrix.rotateByAffine]
+  third_row := by simp [Matrix.rotateByAffine]; rfl
 
 lemma pt_transform_rotateByAffine (p : Point) : pt_transform p (Matrix.rotateByAffine θ) = rotationMap θ p := by
-  ext <;> simp [pt_transform, Matrix.rotateByAffine]; ring
+  ext <;> simp [pt_transform, Matrix.rotateByAffine, Point.x, Point.y, vec_to_pt, pt_to_vec]; ring
 
 /-- Given two distinct points `P, Q`,
 if there is an angle `θ ∈ (-π/2, π/2)` rotating by which results
@@ -123,10 +125,26 @@ theorem distinct_rotate_list (l : List Point) (hDistinct : l.Pairwise (· ≠ ·
     exact injective_rotationMap θ hMap
   simpa using hθ
 
-theorem omega_equiv_rotate (l : List Point) (hDistinct : l.Pairwise (· ≠ ·)) :
-    ∃ (l' : List Point), omega_equivalence l l' ∧ l'.Pairwise (·.x ≠ ·.x) := by
-  have ⟨θ, hθ⟩ := distinct_rotate_list l hDistinct
-  refine ⟨_, ?_, hθ⟩
-  simp_rw [← funext pt_transform_rotateByAffine]
-  apply transform_returns_omega_equivalent
-  exact TMatrix.rotateByAffine θ
+/-! ## Translation -/
+
+def translation_matrix (s t : Real) : Matrix (Fin 3) (Fin 3) Real :=
+  Matrix.of ![![1, 0, s], ![0, 1, t], ![0, 0, 1]]
+
+def translation_transform (s t : Real) :
+  TMatrix (translation_matrix s t) := by
+  have det_eq_one : Matrix.det (translation_matrix s t) = 1 := by
+    rw [Matrix.det_fin_three]
+    unfold translation_matrix
+    simp [Matrix.vecHead, Matrix.vecTail]
+  stop
+  have third_row : (translation_matrix s t) 2 0 = 0 ∧ (translation_matrix s t) 2 1 = 0 ∧ (translation_matrix s t) 2 2 = 1 := by
+    unfold translation_matrix
+    simp [Matrix.vecHead, Matrix.vecTail]
+
+  exact ⟨by linarith, third_row⟩
+
+lemma translation_translates (p : Point) (s t : Real) :
+  pt_transform p (translation_matrix s t) = ![p.x + s, p.y + t] := by
+  unfold pt_transform translation_matrix
+  simp
+  sorry
