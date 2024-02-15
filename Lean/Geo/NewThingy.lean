@@ -43,7 +43,7 @@ theorem σ_CW_iff_neg_det (p q r: Point) : σ p q r = Orientation.CW ↔ matrix_
   apply Iff.intro
   unfold σ
   aesop
-  unfold σ
+  unfold σ Orientation.ofReal
   split
   intro h; linarith
   intro h2
@@ -54,14 +54,14 @@ theorem σ_CW_iff_neg_det (p q r: Point) : σ p q r = Orientation.CW ↔ matrix_
 
 theorem σ_Co_iff_pos_0 (p q r: Point) : σ p q r = Orientation.Collinear ↔ matrix_det p q r = 0 := by
   apply Iff.intro
-  unfold σ
+  unfold σ Orientation.ofReal
   split
   aesop
   split
   aesop
   intro
   linarith
-  unfold σ
+  unfold σ Orientation.ofReal
   intro
   split
   aesop

@@ -1,4 +1,4 @@
-import Geo.SymmetryBreaking
+import Geo.PointsToWB.SymmetryBreaking
 
 
 structure ConvexQuadrilateral (a b c d : Point) : Prop :=

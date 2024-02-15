@@ -1,12 +1,12 @@
 import Mathlib.Data.List.Sort
-import Geo.PlaneGeometry
-import Geo.SymmetryBreaking
+-- import Geo.PlaneGeometry
+import Geo.PointsToWB.SymmetryBreaking
 import Geo.Slope
 import Geo.Point
 
 namespace Geo
 noncomputable section
-open Classical
+open Classical Point
 open Orientation
 
 -- structure Triangle (S: Finset Point) : Prop :=
@@ -19,8 +19,8 @@ open Orientation
 -- NB: This is for points *strictly* in the triangle
 def pt_in_triangle (a : Point) (p q r : Point) : Prop :=
   ∃ p' q' r', ({p', q', r'} : Set Point) = {p, q, r} ∧
-    IsSortedPoints₃ p' q' r' ∧
-    IsSortedPoints₃ p' a r' ∧
+    Sorted₃ p' q' r' ∧
+    Sorted₃ p' a r' ∧
     a ≠ q' ∧ -- this isn't needed if p,q,r are in GP
     σ p' q' r' = σ p' a r' ∧
     σ p' a q' = σ p' r' q' ∧
@@ -28,7 +28,7 @@ def pt_in_triangle (a : Point) (p q r : Point) : Prop :=
 
 /-- S is an empty triangle relative to pts -/
 structure EmptyTriangleIn (p q r : Point) (pts : Finset Point) : Prop :=
-  gp : GeneralPosition₃ p q r
+  gp : InGeneralPosition₃ p q r
   empty: ∀ a ∈ pts, ¬(pt_in_triangle a p q r)
 
 
@@ -178,7 +178,7 @@ theorem existential_assignment_to_cnf (property: σ_property_A):
   --- P : σ_L_property
   ---- A_P : σ_A_property := get_σ_property_A_from_L P
   ----  Theorem: L ⊧_L P → get_σ_assignment L ⊧_A A_P
-  ------ Theorem: ¬∃ σ_assignment, σ_assignment ⊧_A A_P → ¬∃ L, L ⊧_L P
+  ----  Theorem: ¬∃ σ_assignment, σ_assignment ⊧_A A_P → ¬∃ L, L ⊧_L P
 
 ----- If no σ_A satisfies A_P, then
 
@@ -203,10 +203,7 @@ theorem EmptyTriangle10TheoremLists (pts : List Point)
   sorry
 
 theorem EmptyTriangle10Theorem (pts : Finset Point)
-    (gp : GeneralPosition pts)
+    (gp : PointFinsetInGeneralPosition pts)
     (h : pts.card = 10) :
     ∃ (p q r : Point), {p, q, r} ⊆ pts ∧ EmptyTriangleIn p q r pts := by
   sorry
-
-example (P Q R S : Prop) : (P ↔ Q) → (R ↔ S) → ((P ∧ R) ↔ (Q ∧ S)) := by
-  tauto

@@ -1,5 +1,5 @@
-import Geo.PlaneGeometry
-import Geo.SymmetryBreaking
+-- import Geo.PlaneGeometry
+import Geo.PointsToWB.SymmetryBreaking
 import Geo.Slope
 import Geo.Point
 import Mathlib.Data.Finset.Basic
