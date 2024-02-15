@@ -47,7 +47,7 @@ lemma TMatrix.rotateByAffine (θ : ℝ) : TMatrix (Matrix.rotateByAffine θ) whe
   det_pos := by simp [Matrix.det_fin_three, Matrix.rotateByAffine, ← Real.cos_sub]
   third_row := by simp [Matrix.rotateByAffine]; rfl
 
-lemma pt_transform_rotateByAffine (p : Point) : pt_transform p (Matrix.rotateByAffine θ) = rotationMap θ p := by
+lemma pt_transform_rotateByAffine (p : Point) : pt_transform (Matrix.rotateByAffine θ) p = rotationMap θ p := by
   ext <;> simp [pt_transform, Matrix.rotateByAffine, Point.x, Point.y, vec_to_pt, pt_to_vec]; ring
 
 /-- Given two distinct points `P, Q`,
@@ -121,6 +121,6 @@ def translation_transform (s t : Real) : TMatrix (translation_matrix s t) where
   third_row := rfl
 
 lemma translation_translates (p : Point) (s t : Real) :
-  pt_transform p (translation_matrix s t) = ![p.x + s, p.y + t] := by
+  pt_transform (translation_matrix s t) p = ![p.x + s, p.y + t] := by
   simp [pt_transform, translation_matrix, pt_to_vec, vec_to_pt, Matrix.mul_apply,
       Finset.univ, Fintype.elems, List.finRange]

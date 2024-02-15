@@ -54,6 +54,16 @@ theorem Orientation.ofReal_neg (r : ℝ) : ofReal (-r) = -ofReal r := by
   simp [ofReal]; split_ifs <;> try rfl
   cases lt_asymm ‹_› ‹_›
 
+theorem Orientation.ofReal_eq_ccw (r : ℝ) : ofReal r = .CCW ↔ 0 < r := by
+  simp [ofReal]; split_ifs <;> simp [*]
+
+theorem Orientation.ofReal_eq_collinear (r : ℝ) : ofReal r = .Collinear ↔ r = 0 := by
+  simp [ofReal]; split_ifs <;> simp [*, ne_of_lt, ne_of_gt]
+  exact le_antisymm (not_lt.1 ‹_›) (not_lt.1 ‹_›)
+
+theorem Orientation.ofReal_eq_cw (r : ℝ) : ofReal r = .CW ↔ r < 0 := by
+  simp [ofReal]; split_ifs <;> simp [*, le_of_lt]
+
 open Orientation Point
 
 def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=

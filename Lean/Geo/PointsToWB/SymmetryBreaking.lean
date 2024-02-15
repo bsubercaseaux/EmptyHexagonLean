@@ -81,18 +81,26 @@ def step4 : ∃ step4 : List Point,
 
 def step5 : ∃ w : WBPoints, Nonempty (l ≃σ w.toFinset)
   := by
-  have ⟨step4,sorted,step2,seqv_l_2,seqv_2_4,gp⟩ := step4 l gp
-  have ⟨a, b, hleft, horiented⟩ := exists_pt_st_orientations_preserved step4 sorted
-  use {
-    leftmost := ![a,b]
+  have ⟨step4, sorted, step2, seqv_l_2, seqv_2_4, gp⟩ := step4 l gp
+  have ⟨z, hleft, horiented⟩ := exists_pt_st_orientations_preserved step4 sorted
+  refine ⟨{
+    leftmost := z
     rest := step4
-    sorted := by
-      unfold Point.PointListSorted
-      rw [List.sorted_cons]
-      constructor
-      · sorry
-      · exact sorted
-    gp := sorry
-    oriented := sorry
-  }
-  sorry
+    sorted := List.sorted_cons.2 ⟨hleft, sorted⟩
+    gp := fun {p q r} h => ?_
+    oriented := ?_
+  }, ⟨seqv_l_2.trans ?_⟩⟩
+  · refine Point.InGeneralPosition₃.iff_ne_collinear.2 fun eq => ?_
+    rw [σ, Orientation.ofReal_eq_collinear, matrix_det_eq_det_pts] at eq
+    cases h <;> rename_i h
+    · exact gp (by simpa [Finset.subset_iff] using h.subset) eq
+    · have := h.subset; simp at this
+      have := horiented _ this.1 _ this.2
+      simp [σ, matrix_det_eq_det_pts, eq, Orientation.ofReal] at this
+      simp [orientWithInfty, Orientation.ofReal_eq_collinear, sub_eq_zero] at this
+      have := sorted.sublist h; simp at this
+      exact ne_of_gt this ‹_›
+  · refine sorted.imp_of_mem fun {a b} ha hb h => ?_
+    rwa [← horiented _ ha _ hb, orientWithInfty, Orientation.ofReal_eq_ccw, sub_pos]
+  · simp [WBPoints.toFinset, WBPoints.points]
+    sorry
