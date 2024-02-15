@@ -116,8 +116,9 @@ theorem distinct_rotate_finset (A : Set Point) (h : Set.Countable A) :
 def translation_matrix (s t : Real) : Matrix (Fin 3) (Fin 3) Real :=
   ![![1, 0, s], ![0, 1, t], ![0, 0, 1]]
 
-def translation_transform (s t : Real) : TMatrix (translation_matrix s t) := by
-  exact ⟨by simp [Matrix.det_fin_three, translation_matrix, Matrix.vecHead, Matrix.vecTail], rfl⟩
+def translation_transform (s t : Real) : TMatrix (translation_matrix s t) where
+  det_pos := by simp [Matrix.det_fin_three, translation_matrix, Matrix.vecHead, Matrix.vecTail]
+  third_row := rfl
 
 lemma translation_translates (p : Point) (s t : Real) :
   pt_transform p (translation_matrix s t) = ![p.x + s, p.y + t] := by

@@ -123,5 +123,15 @@ def noHoles (n : Nat) : PropFun (Var n) :=
           (Var.hole a b c)ᶜ
         else ⊤))))
 
+-- Symmetry breaking that the leftmost point is CCW with respect to any two other sorted points
+def pointsCCW (n : Nat) : PropFun (Var n) :=
+  let U : Multiset (Fin n) := Finset.univ.val
+  PropFun.all (U.map (fun a =>
+    PropFun.all (U.map fun b =>
+      if ⟨0, Fin.size_positive a⟩ < a ∧ a < b then
+        Var.sigma ⟨0, Fin.size_positive a⟩ a b
+      else
+        ⊤)))
+
 def theFormula (n : Nat) : PropFun (Var n) :=
-  signotopeAxioms n ⊓ insideDefs n ⊓ holeDefs n ⊓ noHoles n
+  signotopeAxioms n ⊓ insideDefs n ⊓ holeDefs n ⊓ noHoles n ⊓ pointsCCW n

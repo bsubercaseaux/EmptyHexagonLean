@@ -320,8 +320,38 @@ def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ noHoles n) 
       · trivial
   )
 
+def leftmostCCWClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ pointsCCW n) :=
+  ( let U := (Array.finRange n)
+    for_all U fun a =>
+    VEncCNF.guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
+    for_all U fun b =>
+    VEncCNF.guard (a < b) fun _ =>
+      addClause #[(mkPos <| Var.sigma ⟨0, Fin.size_positive a⟩ a b)]
+  ).mapProp (by
+    ext τ
+    simp [pointsCCW]
+    constructor
+    · rintro h ⟨a, ha⟩ b
+      match a with
+      | 0 => simp
+      | a + 1 =>
+        split
+        · specialize h ⟨a + 1, ha⟩; simp [*] at h
+          specialize h b; simp [*] at h
+          simp [h]
+        · trivial
+    · intro h a
+      split
+      · intro b
+        specialize h a b; simp [*] at h
+        split
+        · simp [*] at h
+          exact h
+        · trivial
+      · trivial)
+
 def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ theFormula n) :=
   (seq[
-    signotopeClauses n, insideClauses n, holeDefClauses n, noHoleClauses n
+    signotopeClauses n, insideClauses n, holeDefClauses n, noHoleClauses n, leftmostCCWClauses n
   ]).mapProp (by
     simp [theFormula]; aesop)
