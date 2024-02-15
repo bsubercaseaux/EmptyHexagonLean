@@ -15,7 +15,7 @@ noncomputable section
 
 namespace Geo
 
-variable (l : Finset Point) (gp : Point.PointFinsetInGeneralPosition l)
+variable (l : Finset Point) (hl : Finset.card l ≥ 3) (gp : Point.PointFinsetInGeneralPosition l)
 
 /-! ## STEP 1: ROTATE -/
 
@@ -81,4 +81,17 @@ def step4 : ∃ step4 : List Point,
 def step5 : ∃ w : WBPoints,
     σ_equivalence l.toList w.points
   := by
+  have ⟨step4,sorted,step2,seqv_l_2,seqv_2_4,gp⟩ := step4 l gp
+  have : step4.length > 0 := sorry
+  let leftmost_x := (
+      step4.toFinset.image (·.x)
+    ).min' (by simp; apply List.ne_nil_of_length_pos this) - 1
+  let biggest_intercept : ℝ := sorry
+  use {
+    leftmost := ![leftmost_x, biggest_intercept + 1]
+    rest := step4
+    sorted := sorry
+    gp := sorry
+    oriented := sorry
+  }
   sorry
