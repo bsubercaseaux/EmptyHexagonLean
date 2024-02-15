@@ -22,13 +22,8 @@ def Orientation.neg : Orientation → Orientation
 
 instance : Neg Orientation := ⟨Orientation.neg⟩
 
-@[simp]
-theorem Orientation.neg_neg (o : Orientation) : -(-o) = o := by
-  cases o <;> simp [Neg.neg, neg]
-
-@[simp]
-theorem Orientation.neg_eq (o o' : Orientation) : (-o = -o') ↔ (o = o') := by
-  cases o <;> cases o' <;> simp [Neg.neg, neg]
+instance : InvolutiveNeg Orientation :=
+  ⟨fun o => by cases o <;> simp [Neg.neg, Orientation.neg]⟩
 
 @[simp]
 theorem Orientation.neg_cw : -CW = CCW := by rfl
@@ -38,6 +33,14 @@ theorem Orientation.neg_ccw : -CCW = CW := by rfl
 
 @[simp]
 theorem Orientation.neg_collinear : -Collinear = Collinear := by rfl
+
+@[simp]
+theorem Orientation.eq_neg_self (o : Orientation) : (o = -o) ↔ (o = .Collinear) := by
+  cases o <;> simp [neg]
+
+@[simp]
+theorem Orientation.neg_self_eq (o : Orientation) : (-o = o) ↔ (o = .Collinear) := by
+  cases o <;> simp [neg]
 
 def Orientation.ofReal (r : ℝ) : Orientation :=
   if 0 < r then CCW
@@ -83,12 +86,50 @@ theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q := by
   simp only [σ, matrix_det_eq_det_pts, this, ofReal]
   split_ifs <;> { first | rfl | exfalso; linarith }
 
+-- NOTE(WN): This is annoying to have to prove.
+-- Does mathlib have a theory of antisymmetric functions, or tensors or something?
+theorem σ_self₁ (p q : Point) : σ p q q = .Collinear := by
+  have : σ p q q = -σ p q q := by conv => lhs; rw [σ_perm₂]
+  simpa using this
+
+theorem σ_self₂ (p q : Point) : σ q p q = .Collinear := by
+  have : σ q p q = -σ q p q := by conv =>
+    lhs; rw [σ_perm₁, σ_perm₂, σ_perm₁]; simp only [neg_neg]
+  simpa using this
+
+theorem σ_self₃ (p q : Point) : σ q q p = .Collinear := by
+  have : σ q q p = -σ q q p := by conv => lhs; rw [σ_perm₁]
+  simpa using this
+
+theorem Point.InGeneralPosition₃.iff_ne_collinear {p q r : Point} :
+    InGeneralPosition₃ p q r ↔ σ p q r ≠ .Collinear := by
+  rw [InGeneralPosition₃, σ, matrix_det_eq_det_pts, ofReal]
+  split
+  . simp; linarith
+  . split
+    . simp; linarith
+    . simp; linarith
+
 theorem Point.InGeneralPosition₃.σ_ne {p q r : Point} :
     InGeneralPosition₃ p q r → σ p q r ≠ .Collinear := by
-  rw [InGeneralPosition₃, σ, matrix_det_eq_det_pts, ofReal]
-  split <;> first | split; simp | simp
-  have : det p q r = 0 := by linarith
-  simpa
+  intro h
+  exact iff_ne_collinear.mp h
+
+theorem Point.InGeneralPosition₃.perm₁ {p q r : Point} :
+    InGeneralPosition₃ p q r → InGeneralPosition₃ q p r := by
+  simp_rw [iff_ne_collinear]
+  rw [σ_perm₁ p q r]
+  intro h h'
+  rw [h'] at h
+  contradiction
+
+theorem Point.InGeneralPosition₃.perm₂ {p q r : Point} :
+    InGeneralPosition₃ p q r → InGeneralPosition₃ p r q := by
+  simp_rw [iff_ne_collinear]
+  rw [σ_perm₂ p q r]
+  intro h h'
+  rw [h'] at h
+  contradiction
 
 theorem Point.InGeneralPosition₃.σ_cases {p q r : Point} :
     InGeneralPosition₃ p q r → σ p q r = .CCW ∨ σ p q r = .CW := by
@@ -172,7 +213,6 @@ theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPo
   linarith
   linarith
 
-
 theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
     σ p q r = CW ↔ slope p q > slope p r := by
     rw [←Point.InGeneralPosition₃.σ_iff]
@@ -203,7 +243,6 @@ theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGe
       }
     }
     exact hGp
-
 
 @[deprecated]
 structure σ_equivalence (pts pts' : List Point) : Prop :=
@@ -268,6 +307,15 @@ def σPtInTriangle (a p q r : Point) : Prop :=
   σ p q r = σ p a r ∧
   σ p a q = σ p r q ∧
   σ q a r = σ q p r
+
+theorem not_mem_σPtInTriangle₁ {p q r : Point} :
+    InGeneralPosition₃ p q r → ¬σPtInTriangle q p q r := by
+  intro h ⟨_, h', _⟩
+  rw [σ_self₁, σ_perm₂] at h'
+  have := congrArg (-·) h'
+  simp only [neg_neg, neg_collinear] at this
+  have := this ▸ h.σ_ne
+  contradiction
 
 theorem PtInTriangle.perm₁ : PtInTriangle a p q r → PtInTriangle a q p r := by
   unfold PtInTriangle

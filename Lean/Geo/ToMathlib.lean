@@ -11,11 +11,8 @@ import Mathlib.Tactic
 --       sorry
 
 open List in
-theorem List.mem_sublist {l l' : List α} : l <+ l' → a ∈ l → a ∈ l'
-  | .slnil, h => h
-  | .cons _ h, h' => mem_cons_of_mem _ (mem_sublist h h')
-  | .cons₂ .., .head _ => mem_cons_self ..
-  | .cons₂ _ h, .tail _ h' => mem_cons_of_mem _ (mem_sublist h h')
+theorem List.mem_sublist {l l' : List α} : l <+ l' → a ∈ l → a ∈ l' :=
+  fun h h' => h.subset h'
 
 theorem List.of_Pairwise_toFinset [DecidableEq α] (as : List α) (R : α → α → Prop) :
     (∀ i j : Fin as.length, i < j → as[i] = as[j] → R as[i] as[j]) →
