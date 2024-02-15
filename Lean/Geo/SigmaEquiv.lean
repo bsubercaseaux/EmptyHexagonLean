@@ -35,11 +35,6 @@ instance : EquivLike (S ≃σ T) S T where
 instance : FunLike (S ≃σ T) S T :=
   EmbeddingLike.toDFunLike
 
--- NOTE: We're not sure if Set.InjOn f S is actually a necessary assumption
-def σEquiv.ofInjectiveAffine (f : Point →ᵃ[ℝ] Point) (hInj : Set.InjOn f S)
-    (h : 0 < LinearMap.det f.linear) : S ≃σ f '' S :=
-  sorry
-
 def OrientationProperty (P : Set Point → Prop) :=
   ∀ S T, S ≃σ T → P S → P T
 

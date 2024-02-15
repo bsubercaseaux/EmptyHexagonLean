@@ -28,7 +28,7 @@ lemma rotationMap_x (θ : ℝ) (P : Point) : (rotationMap θ P).x = cos θ * P.x
 @[simp]
 lemma rotationMap_y (θ : ℝ) (P : Point) : (rotationMap θ P).y = sin θ * P.x + cos θ * P.y := by
   simp [Matrix.vecHead, Matrix.vecTail, rotationMap, Matrix.toEuclideanLin,
-    Matrix.toLin', Matrix.rotateBy, Point.x, Point.y]
+    Matrix.rotateBy, Point.x, Point.y]
 
 theorem injective_rotationMap (θ : ℝ) : Function.Injective (rotationMap θ) := by
   apply LinearMap.injective_iff_surjective.mpr

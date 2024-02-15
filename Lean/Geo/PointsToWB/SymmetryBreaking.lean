@@ -82,15 +82,16 @@ def step4 : ∃ step4 : List Point,
 def step5 : ∃ w : WBPoints, Nonempty (l ≃σ w.toFinset)
   := by
   have ⟨step4,sorted,step2,seqv_l_2,seqv_2_4,gp⟩ := step4 l gp
-  have : step4.length > 0 := sorry
-  let leftmost_x := (
-      step4.toFinset.image (·.x)
-    ).min' (by simp; apply List.ne_nil_of_length_pos this) - 1
-  let biggest_intercept : ℝ := sorry
+  have ⟨a, b, hleft, horiented⟩ := exists_pt_st_orientations_preserved step4 sorted
   use {
-    leftmost := ![leftmost_x, biggest_intercept + 1]
+    leftmost := ![a,b]
     rest := step4
-    sorted := sorry
+    sorted := by
+      unfold Point.PointListSorted
+      rw [List.sorted_cons]
+      constructor
+      · sorry
+      · exact sorted
     gp := sorry
     oriented := sorry
   }

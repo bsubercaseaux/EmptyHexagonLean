@@ -69,6 +69,7 @@ lemma matrix_det_eq_det_pts (a b c : Point) :
     simp [Matrix.vecHead, Matrix.vecTail]
     ring_nf
 
+
 noncomputable def σ (p q r : Point) : Orientation :=
   .ofReal (matrix_det p q r)
 
