@@ -309,7 +309,7 @@ def σPtInTriangle (a p q r : Point) : Prop :=
   σ p a q = σ p r q ∧
   σ q a r = σ q p r
 
-theorem not_mem_σPtInTriangle₁ {p q r : Point} :
+theorem not_mem_σPtInTriangle {p q r : Point} :
     InGeneralPosition₃ p q r → ¬σPtInTriangle q p q r := by
   intro h ⟨_, h', _⟩
   rw [σ_self₁, σ_perm₂] at h'

@@ -10,6 +10,10 @@ import Mathlib.Tactic
 --       ∧ List.Sorted (· < ·) indexList  := by
 --       sorry
 
+-- Q: Why are `List.get [i]` *and* `l[i.1]` both simp normal forms? Should we have `List.get i = l[i.1]`?
+-- There is also `List.getElem_eq_get : l[i] = l.get i` that never gets applied because `l[i]` is not simp-nf..
+-- Mario: can have a `simp` lemma for this in std4.
+
 open List in
 theorem List.mem_sublist {l l' : List α} : l <+ l' → a ∈ l → a ∈ l' :=
   fun h h' => h.subset h'
