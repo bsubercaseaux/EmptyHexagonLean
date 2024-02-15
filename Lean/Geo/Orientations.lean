@@ -3,6 +3,7 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.Point
 import Geo.Slope
+import Geo.ToMathlib
 
 namespace Geo
 noncomputable section
@@ -36,13 +37,15 @@ theorem Orientation.neg_cw : -CW = CCW := by rfl
 theorem Orientation.neg_ccw : -CCW = CW := by rfl
 
 @[simp]
-theorem Orientation.neg_colliner : -Collinear = Collinear := by rfl
+theorem Orientation.neg_collinear : -Collinear = Collinear := by rfl
 
-@[simp]
 def Orientation.ofReal (r : ℝ) : Orientation :=
   if 0 < r then CCW
   else if r < 0 then CW
   else Collinear
+
+theorem Orientation.ofReal_mul_left (r a : ℝ) (h : 0 < a) : ofReal (a * r) = ofReal r := by
+  simp [ofReal, mul_pos_iff_of_pos_left h, mul_neg_iff_of_pos_left h]
 
 open Orientation Point
 

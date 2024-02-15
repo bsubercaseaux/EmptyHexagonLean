@@ -31,3 +31,6 @@ theorem List.of_Pairwise_toFinset [DecidableEq α] (as : List α) (R : α → α
 theorem List.toFinset_map [DecidableEq α] [DecidableEq β] (l : List α) (f : α → β) :
     (l.map f).toFinset = f '' l.toFinset := by
   ext; simp
+
+theorem mul_neg_iff_of_pos_left {a b : ℝ} (h : 0 < a) : a * b < 0 ↔ b < 0 := by
+  rw [← not_le, ← not_le, mul_nonneg_iff_right_nonneg_of_pos h]

@@ -43,7 +43,7 @@ theorem transform_equivalence (p q r : Point) {M : Matrix (Fin 3) (Fin 3) Real} 
 theorem transform_preserve_sigma (p q r : Point) (T : TMatrix M) :
     σ p q r = σ (pt_transform p M) (pt_transform q M) (pt_transform r M) := by
   unfold σ matrix_det
-  simp [transform_equivalence p q r T, Matrix.det_mul, mul_pos_iff_of_pos_left T.det_pos]
+  simp [transform_equivalence p q r T, Matrix.det_mul, mul_pos_iff_of_pos_left T.det_pos, Orientation.ofReal]
   congr 2  -- Cayden TODO: There's a better way to do this through mul_neg_iff
   rw [mul_neg_iff, eq_iff_iff]
   constructor

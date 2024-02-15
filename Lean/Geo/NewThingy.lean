@@ -34,14 +34,14 @@ def halfPlaneCW (p q : Point) : Set Point :=
 
 theorem σ_CCW_iff_pos_det (p q r: Point) : σ p q r = Orientation.CCW ↔ matrix_det p q r > 0 := by
   apply Iff.intro
-  unfold σ
+  unfold σ Orientation.ofReal
   aesop
-  unfold σ
+  unfold σ Orientation.ofReal
   aesop
 
 theorem σ_CW_iff_neg_det (p q r: Point) : σ p q r = Orientation.CW ↔ matrix_det p q r < 0 := by
   apply Iff.intro
-  unfold σ
+  unfold σ Orientation.ofReal
   aesop
   unfold σ Orientation.ofReal
   split
