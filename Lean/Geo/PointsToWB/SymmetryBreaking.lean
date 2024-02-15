@@ -15,81 +15,70 @@ noncomputable section
 
 namespace Geo
 
-/-! ## STEP 1: ROTATE -/
-
 variable (l : Finset Point) (gp : Point.PointFinsetInGeneralPosition l)
 
-def step1 : Finset Point :=
+/-! ## STEP 1: ROTATE -/
+
+def step1 : ∃ step1 : Finset Point,
+    σ_equivalence l.toList step1.toList ∧
+    (∀ᵉ (x ∈ step1) (y ∈ step1), x.x = y.x → x = y) ∧
+    Point.PointFinsetInGeneralPosition step1
+  := by
   let _ := l
   let _ := gp
-  let _ := distinct_rotate_list l.toList sorry
-  sorry
-
-theorem step1.σ_equivalence : σ_equivalence l.toList (step1 l gp).toList := by
-  sorry
-
-theorem step1.no_same_x : ∀ᵉ (x ∈ step1 l gp) (y ∈ step1 l gp), x.x = y.x → x = y := by
-  sorry
-
-theorem step1.gen_pos : Point.PointFinsetInGeneralPosition (step1 l gp) := by
-  sorry
-
+  have ⟨θ,h⟩ := distinct_rotate_finset l l.countable_toSet
+  use l.image (rotationMap θ)
+  refine ⟨?seqv, ?xInj, ?gp⟩
+  case seqv =>
+    sorry
+  case xInj =>
+    sorry
+  case gp =>
+    sorry
 
 /-! ## STEP 2: TRANSLATE -/
 
-def step2 : Finset Point :=
-  let _ := l
-  let _ := gp
-  sorry
-
-theorem step2.σ_equivalence : σ_equivalence (step1 l gp).toList (insert ![0,0] (step2 l gp)).toList := by
-  sorry
-
-theorem step2.x_pos : ∀ x ∈ step2 l gp, x.x > 0 := by
-  sorry
-
-theorem step2.gen_pos : Point.PointFinsetInGeneralPosition (insert ![0,0] (step2 l gp)) := by
+def step2 : ∃ step2 : Finset Point,
+    σ_equivalence l.toList (insert ![0,0] step2).toList ∧
+    (∀ x ∈ step2, x.x > 0) ∧
+    Point.PointFinsetInGeneralPosition (insert ![0,0] step2)
+  := by
+  have ⟨step1, step1_seqv, step1_xInj, step1_gp⟩ := step1 l gp
   sorry
 
 
 /-! ## STEP 3: PROJECTION -/
 
-/-- Takes origin :: l to other stuff -/
-def step3 : Finset Point :=
-  let _ := l
-  let _ := gp
-  sorry
-
-theorem step3.eqv {l gp} : step2 l gp ≃ step3 l gp := by
-  sorry
-
-theorem step3.σ_eq_σ : ∀ x y z : step2 l gp, σ x y z = σ (eqv x) (eqv y) (eqv z) := by
-  sorry
-
-theorem step3.σ_eq_orientWithInfty : ∀ x y : step2 l gp, σ ![0,0] x y = orientWithInfty (eqv x) (eqv y) := by
-  sorry
-
-theorem step3.gen_pos : Point.PointFinsetInGeneralPosition (step3 l gp) := by
-  sorry
-
-theorem step3.gen_pos_with_infty : ∀ x ∈ step3 l gp, ∀ y ∈ step3 l gp, x.x = y.x → x = y := by
+def step3 : ∃ step3 : Finset Point,
+    ∃ step2 : Finset Point,
+    σ_equivalence l.toList (insert ![0,0] step2).toList ∧
+    ∃ eqv : step2 ≃ step3,
+      (∀ x y z : step2, σ x y z = σ (eqv x) (eqv y) (eqv z)) ∧
+      (∀ x y : step2, σ ![0,0] x y = orientWithInfty (eqv x) (eqv y)) ∧
+      (Point.PointFinsetInGeneralPosition step3) ∧
+      (∀ x ∈ step3, ∀ y ∈ step3, x.x = y.x → x = y)
+  := by
+  have ⟨step2, step2_seqv, step2_xInj, step2_gp⟩ := step2 l gp
   sorry
 
 
 /-! ## STEP 4: SORT -/
 
-def step4 : List Point :=
-  let _ := l
-  let _ := gp
+def step4 : ∃ step4 : List Point,
+    step4.Sorted (·.x < ·.x) ∧
+    ∃ step2 : Finset Point,
+    σ_equivalence l.toList (insert ![0,0] step2).toList ∧
+    σ_equivalence step2.toList step4 ∧
+    (Point.PointFinsetInGeneralPosition step4.toFinset)
+  := by
+  have ⟨step3,step2,seqv_l_2,eqv,seqv_2_3,seqv_2_3_infty,gp,gp_infty⟩ := step3 l gp
   sorry
 
 -- TODO: most of WB's properties?
 
 /-! ## STEP 5: CONSTRUCT -/
 
-def step5 : WBPoints := sorry
-
-theorem step5.equivalent (pts: Finset Point) :
-    ∃ L : List Point, L.Nodup ∧ pts = L.toFinset ∧
-    ∃ wbp : WBPoints, σ_equivalence L wbp.points := by
+def step5 : ∃ w : WBPoints,
+    σ_equivalence l.toList w.points
+  := by
   sorry

@@ -21,9 +21,6 @@ theorem orientations_preserved (p1 p2 p3 : Point) (h1 : p1.x > 0) (h2 : p2.x > 0
   : σ p1 p2 p3 = σ (projectiveMap p1) (projectiveMap p2) (projectiveMap p3)
   := by sorry
 
--- use this
-#check Finset.sort
-
 theorem exists_pt_st_orientations_preserved (pts : List Point) (h : pts.Sorted (·.x < ·.x))
   : ∃ z : Point, ∀ p1 ∈ pts, ∀ p2 ∈ pts, orientWithInfty p1 p2 = σ z p1 p2
   := by
