@@ -25,7 +25,12 @@ theorem orientations_preserved (p1 p2 p3 : Point) (h1 : p1.x > 0) (h2 : p2.x > 0
   convert Orientation.ofReal_mul_left _ _ (mul_pos h1 <| mul_pos h2 h3) using 2
   field_simp; ring
 
-theorem exists_pt_st_orientations_preserved (pts : List Point) (h : pts.Sorted (·.x < ·.x))
-  : ∃ z : Point, ∀ p1 ∈ pts, ∀ p2 ∈ pts, orientWithInfty p1 p2 = σ z p1 p2
-  := by
-  sorry
+theorem exists_pt_st_orientations_preserved (pts : List Point) (h : pts.Sorted (·.x < ·.x)) :
+    ∃ a b : ℝ,
+      (∀ p ∈ pts, a < p.x) ∧
+      (∀ p1 ∈ pts, ∀ p2 ∈ pts, orientWithInfty p1 p2 = σ z p1 p2) := by
+  obtain ⟨a, ha⟩ : Nonempty (⋂ p ∈ pts, Set.Ioi p.x) := by
+    sorry
+  refine ⟨a, sorry, sorry, sorry⟩
+  -- intro p1 h1 p2 h2
+  -- simp [σ, orientWithInfty, matrix_det_eq_det_pts, Point.det]
