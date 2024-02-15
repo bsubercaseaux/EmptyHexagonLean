@@ -251,7 +251,27 @@ theorem satisfies_holeDefs (w : WBPoints) : w.toPropAssn ⊨ holeDefs w.length :
       apply not_mem_σPtInTriangle (w.gp sub) tri
 
 theorem satisfies_leftmostCCWDefs (w : WBPoints) : w.toPropAssn ⊨ pointsCCW w.length := by
-  sorry
+  unfold pointsCCW
+  simp
+  intro i j
+  split <;> try exact satisfies_tr
+  next h =>
+    have ⟨k, hk⟩ : ∃ k, i.1 = k + 1 := by
+      apply Nat.exists_eq_succ_of_ne_zero
+      have : 0 < i.1 := h.left
+      linarith
+    have ⟨l, hl⟩ : ∃ l, j.1 = l + 1 := by
+      apply Nat.exists_eq_succ_of_ne_zero
+      have : 0 < j.1 := h.left.trans h.right
+      linarith
+    unfold toPropAssn
+    cases i
+    cases j
+    simp at hk hl
+    simp [GetElem.getElem, points, hk, hl]
+    apply List.pairwise_iff_get.mp w.oriented
+    simp at h ⊢
+    linarith
 
 theorem satisfies_noHoles (w : WBPoints) :
     (∀ (a b c : Point), {a,b,c} ⊆ w.toFinset → ¬σIsEmptyTriangleFor a b c w.toFinset) →
