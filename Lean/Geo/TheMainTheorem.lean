@@ -88,7 +88,7 @@ theorem fromLeanSAT :
   sorry -- TODO(Wojciech?)
 
 
-theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
+theorem EmptyTriangle10TheoremLists (pts : Finset Point) (gp : Point.PointFinsetInGeneralPosition pts) (h : pts.card = 10) :
     HasEmptyTriangle pts := by
   by_contra h'
   rw [← σHasEmptyTriangle_iff gp] at h'

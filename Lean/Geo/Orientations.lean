@@ -198,6 +198,7 @@ theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGe
     exact hGp
 
 
+@[deprecated]
 structure σ_equivalence (pts pts' : List Point) : Prop :=
     same_length : pts.length = pts'.length
     same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),

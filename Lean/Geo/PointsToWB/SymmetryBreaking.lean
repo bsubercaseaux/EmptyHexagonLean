@@ -8,6 +8,7 @@ import Geo.PointsToWB.TMatrix
 import Geo.WBPoints
 import Geo.PointsToWB.Affine
 import Geo.PointsToWB.Projective
+import Geo.SigmaEquiv
 
 open Classical
 
@@ -20,7 +21,7 @@ variable (l : Finset Point) (hl : Finset.card l ≥ 3) (gp : Point.PointFinsetIn
 /-! ## STEP 1: ROTATE -/
 
 def step1 : ∃ step1 : Finset Point,
-    σ_equivalence l.toList step1.toList ∧
+    ∃ _ : l ≃σ step1,
     (∀ᵉ (x ∈ step1) (y ∈ step1), x.x = y.x → x = y) ∧
     Point.PointFinsetInGeneralPosition step1
   := by
@@ -39,7 +40,7 @@ def step1 : ∃ step1 : Finset Point,
 /-! ## STEP 2: TRANSLATE -/
 
 def step2 : ∃ step2 : Finset Point,
-    σ_equivalence l.toList (insert ![0,0] step2).toList ∧
+    ∃ eqv : l ≃σ (insert ![0,0] step2),
     (∀ x ∈ step2, x.x > 0) ∧
     Point.PointFinsetInGeneralPosition (insert ![0,0] step2)
   := by
@@ -51,7 +52,7 @@ def step2 : ∃ step2 : Finset Point,
 
 def step3 : ∃ step3 : Finset Point,
     ∃ step2 : Finset Point,
-    σ_equivalence l.toList (insert ![0,0] step2).toList ∧
+    ∃ _ : l ≃σ (insert ![0,0] step2),
     ∃ eqv : step2 ≃ step3,
       (∀ x y z : step2, σ x y z = σ (eqv x) (eqv y) (eqv z)) ∧
       (∀ x y : step2, σ ![0,0] x y = orientWithInfty (eqv x) (eqv y)) ∧
@@ -67,8 +68,8 @@ def step3 : ∃ step3 : Finset Point,
 def step4 : ∃ step4 : List Point,
     step4.Sorted (·.x < ·.x) ∧
     ∃ step2 : Finset Point,
-    σ_equivalence l.toList (insert ![0,0] step2).toList ∧
-    σ_equivalence step2.toList step4 ∧
+    ∃ _ : l ≃σ (insert ![0,0] step2),
+    ∃ _ : step2 ≃σ step4.toFinset,
     (Point.PointFinsetInGeneralPosition step4.toFinset)
   := by
   have ⟨step3,step2,seqv_l_2,eqv,seqv_2_3,seqv_2_3_infty,gp,gp_infty⟩ := step3 l gp
@@ -78,8 +79,7 @@ def step4 : ∃ step4 : List Point,
 
 /-! ## STEP 5: CONSTRUCT -/
 
-def step5 : ∃ w : WBPoints,
-    σ_equivalence l.toList w.points
+def step5 : ∃ w : WBPoints, Nonempty (l ≃σ w.toFinset)
   := by
   have ⟨step4,sorted,step2,seqv_l_2,seqv_2_4,gp⟩ := step4 l gp
   have : step4.length > 0 := sorry
