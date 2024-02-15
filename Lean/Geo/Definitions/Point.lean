@@ -28,7 +28,14 @@ variable {p q r s t : Point}
   intros; ext i
   match i with | ⟨0, _⟩ | ⟨1, _⟩ => assumption
 
+<<<<<<< HEAD:Lean/Geo/Definitions/Point.lean
 instance : IsTotal Point fun P Q => P.x <= Q.x :=
+=======
+theorem eq_iff : p = q ↔ (p.x = q.x ∧ p.y = q.y) := by
+  aesop (add safe ext)
+
+instance : IsTotal Point (fun P Q => P.x <= Q.x) :=
+>>>>>>> 8112270 (NewThingy is ready):Lean/Geo/Point.lean
   ⟨fun _ _ => LE.isTotal.total _ _⟩
 
 instance : IsTrans Point fun P Q => P.x <= Q.x :=

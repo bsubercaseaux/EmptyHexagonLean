@@ -22,6 +22,42 @@ theorem pt_transform_eq (M : Matrix (Fin 3) (Fin 3) Real) (p : Point) :
     pt_transform M p = ![M 0 0 * p.x + M 0 1 * p.y + M 0 2, M 1 0 * p.x + M 1 1 * p.y + M 1 2] := by
   simp [pt_transform, pt_to_vec, vec_to_pt, Matrix.mul_apply, Finset.univ, Fintype.elems, List.finRange, add_assoc]
   rfl
+lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real)  (last1 : v 2 0 = 1 ): pt_to_vec (vec_to_pt v) = v := by
+  simp [pt_to_vec, vec_to_pt]
+  apply Matrix.ext ; intro i j
+  fin_cases i
+  simp ; fin_cases j ; simp
+  simp ; fin_cases j ; simp
+  simp ; fin_cases j ; simp
+  exact Eq.symm last1
+
+
+lemma pt_transform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
+  (third_row: M₂ ⟨2, by trivial⟩ = ![0, 0, 1]) :
+  pt_transform p (M₁ * M₂) = pt_transform (pt_transform p M₂) M₁ := by
+  unfold pt_transform
+  simp [Matrix.mul_assoc]
+  let v := M₂ * pt_to_vec p
+  have t : v 2 0 = 1 := by
+    dsimp
+    unfold pt_to_vec
+    rw [Matrix.mul_apply]
+    rw [Fin.sum_univ_three]
+    have : M₂ 2 = ![0,0,1] := third_row
+    rw [this]; simp
+  rw [pt_to_vec_inv_vec_to_pt v t]
+
+
+
+theorem σ_equiv_transitivity {pts pts' pts'' : List Point} :
+    σ_equivalence pts pts' → σ_equivalence pts' pts'' →  σ_equivalence pts pts'' := by
+  intro h₁ h₂
+  constructor
+  intro i j k hi hj hk
+  rw [h₁.2 hi hj hk]
+  rw [h₁.1] at hi hj hk
+  rw [h₂.2 hi hj hk]
+  rw [h₁.1, h₂.1]
 
 /-- `M` is an affine transformation matrix. -/
 structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop :=
@@ -83,7 +119,51 @@ theorem toEquivσ (S: Set Point) (T: TMatrix M) :
     replace eqv := eqv.injective
     simp [LinearMap.equivOfDetNeZero, LinearEquiv.ofIsUnitDet] at eqv
     exact Equiv.Set.image _ S eqv
-
   hσ := by
     intro p q r
     simp [pt_transform_preserves_sigma p q r T]
+
+
+theorem transform_returns_σ_equivalent (pts: List Point) (T: TMatrix M) :
+  σ_equivalence pts (transform_points pts M) := by
+    set resulting_pts := transform_points pts M
+    have same_length : pts.length = resulting_pts.length := by
+      simp
+      unfold transform_points
+      simp [List.map]
+
+    have same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
+      σ (pts.get ⟨i, hi⟩) (pts.get ⟨j, hj⟩) (pts.get ⟨k, hk⟩) =
+      σ (resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩)
+                    (resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩)
+                    (resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩) := by
+        intros i j k hi hj hk
+        have ti : pt_transform (pts.get ⟨i, hi⟩) M = resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩ := by
+          simp [transform_points]
+
+        have tj : pt_transform (pts.get ⟨j, hj⟩) M = resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩ := by
+          simp [transform_points]
+        have tk : pt_transform (pts.get ⟨k, hk⟩) M = resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩ := by
+          simp [transform_points]
+
+        rw [←ti, ←tj, ←tk]
+        rw [transform_preserve_sigma]
+        exact T
+    exact ⟨same_length, same_orientation⟩
+
+
+  def TMatrix.mul {M₁ M₂ : Matrix (Fin 3) (Fin 3) Real} (t1: TMatrix M₁) (t2: TMatrix M₂) :
+    TMatrix (M₁ * M₂) := by
+    have det_pos : Matrix.det (M₁ * M₂) > 0 := by
+      rw [Matrix.det_mul]
+      exact mul_pos t1.det_pos t2.det_pos
+    have third_row : (M₁ * M₂) ⟨2, by trivial⟩ = ![0, 0, 1] := by
+      ext i
+      simp [Matrix.mul_apply]
+      simp [t1.third_row, t2.third_row]
+      fin_cases i <;> simp
+      simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
+      simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
+      simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
+
+    exact ⟨det_pos, third_row⟩

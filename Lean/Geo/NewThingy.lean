@@ -1,8 +1,10 @@
 import Geo.Point
 import Geo.WBPoints
 import Geo.Orientations
+import Geo.PointsToWB.SymmetryBreaking
 
 namespace Geo
+noncomputable section
 open List
 
 open Classical
@@ -21,6 +23,7 @@ def σPtInTriangle2 (a p q r : Point) : Prop :=
 
 
 def ptInsideHalfPlaneCCW (p q a : Point) : Prop :=
+
   (σ p q a = Orientation.CCW) ∨ (σ p q a = Orientation.Collinear)
 
 def halfPlaneCCW (p q : Point) : Set Point :=
@@ -96,7 +99,7 @@ def determinant_pts (a b c : Point) : Real :=
   a.x * b.y + b.x * c.y + c.x * a.y - a.y * b.x - b.y * c.x - c.y * a.x
 
 
-theorem fix_mismatch_example (α : ℝ) (h1 : ¬α = 0) : 0 ≠ α := by
+theorem fix_mismatch_example {α : ℝ} (h1 : ¬α = 0) : 0 ≠ α := by
 
   -- Direct method to restate the hypothesis in the expected form
   intro h2 -- Assume α = 0 to derive a contradiction, given h1
@@ -160,20 +163,12 @@ theorem HalfPlanesAreConvex {p q : Point} : Convex ℝ (halfPlaneCCW p q) := by
   {
   simp at *
 
-  -- simp [collinar] at *
-  -- linarith
-
-
   have h3 : α > 0 := by {
     apply lt_of_le_of_ne
     exact hα
     apply fix_mismatch_example at h1
     exact h1
   }
-
-  -- have ss :(α * a 1 + β * b 1) * Point.x p = α * (Point.y a * Point.x p) + β * (Point.y b * Point.x p) := by ring
-
-  -- rw [ss]
 
   by_cases hb : β = 0
   {
@@ -323,15 +318,175 @@ theorem convex3combo (S : Set Point) (CS: Convex ℝ S) : ∀ (a b c : Point), a
       exact CS comboInS cS fSumNN γNN fSumγ
 
     have combo2Eq : combo2 = α • a + β • b + γ • c := by {
-      simp
-      sorry
+      simp only [smul_add, ← smul_assoc]
+      have neq := fix_mismatch_example case
+      field_simp
+      rw [mul_comm]
+      rw [mul_div_assoc]
+      rw [div_self]
+      field_simp
+      rw [mul_comm]
+      rw [mul_div_assoc]
+      rw [div_self]
+      field_simp
+
+      exact Ne.symm neq
+      exact Ne.symm neq
     }
     rw [←combo2Eq]
     exact combo2InS
   }
 
 
-theorem PtInTriangle2_of_σPtInTriange2 {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
+noncomputable def arProjX_p_q (a r : Point) : ℝ :=
+  (r.y * a.x - r.x * a.y) / (r.y - a.y)
+
+
+theorem arProjX_between_p_q {a p q r : Point}
+      (py0: p.y = 0) (qy0: q.y = 0)
+      (det_qar_neg : matrix_det q a r < 0) (det_par_pos : matrix_det p a r > 0)
+      (ar_y_order : r.y > a.y)
+      :
+      p.x <  (arProjX_p_q a r) ∧ (arProjX_p_q a r) < q.x := by
+
+       have order_aProjX_qX : (arProjX_p_q a r) < q.x := by {
+          unfold arProjX_p_q
+          suffices linearized: q.x * (r.y - a.y) > r.y * a.x - r.x * a.y by
+          {
+            simp at linearized
+            rw [div_lt_iff']
+            linarith
+            linarith only [ar_y_order]
+          }
+          rw [matrix_det_eq_det_pts] at det_qar_neg
+          unfold Point.det at det_qar_neg
+          rw [qy0] at det_qar_neg
+          simp at det_qar_neg
+          linarith
+       }
+
+       have order_aProjX_pX : p.x < (arProjX_p_q a r) := by {
+          unfold arProjX_p_q
+          suffices linearized: p.x * (r.y - a.y) < r.y * a.x - r.x * a.y by
+          {
+            rw [lt_div_iff']
+            linarith
+            linarith only [ar_y_order]
+          }
+          rw [matrix_det_eq_det_pts] at det_par_pos
+          unfold Point.det at det_par_pos
+          rw [py0] at det_par_pos
+          simp at det_par_pos
+          linarith
+       }
+       exact ⟨order_aProjX_pX, order_aProjX_qX⟩
+
+theorem convexComboOfCollinearAndXOrdered (p q x : Point) (collinear: matrix_det p q x = 0) (xOrder1: p.x < x.x) (xOrder2: x.x < q.x) :
+        ∃ (α β : ℝ), α + β = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ α • p + β • q = x := by {
+          -- because they're on the same line and a is between their y coordinates
+          let α := (q.x - x.x) / (q.x - p.x)
+          let β := (x.x - p.x) / (q.x - p.x)
+          use α
+          use β
+          have αβSum : α + β = 1 := by {
+            rw [div_add_div_same]
+            simp
+            rw [div_self]
+            linarith
+          }
+          use αβSum
+          have αNN : α ≥ 0 := by {
+            apply div_nonneg; linarith
+            linarith
+          }
+          have βNN : β ≥ 0 := by {
+            apply div_nonneg; linarith
+            linarith
+          }
+          use αNN
+          use βNN
+          simp
+          rw [matrix_det_eq_det_pts] at collinear
+          unfold Point.det at collinear
+          have : q.x - p.x ≠ 0 := by linarith
+          ext
+
+          field_simp [this]
+          linarith [collinear]
+
+          field_simp [this]
+          linarith [collinear]
+        }
+
+
+theorem convexComboOfCollinearAndYOrdered (p q x : Point) (collinear: matrix_det p q x = 0) (yOrder1: p.y < x.y) (yOrder2: x.y < q.y) :
+        ∃ (α β : ℝ), α + β = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ α • p + β • q = x := by {
+          -- because they're on the same line and a is between their y coordinates
+          let α := (q.y - x.y) / (q.y - p.y)
+          let β := (x.y - p.y) / (q.y - p.y)
+          use α
+          use β
+          have αβSum : α + β = 1 := by {
+            rw [div_add_div_same]
+            simp
+            rw [div_self]
+            linarith
+          }
+          use αβSum
+          have αNN : α ≥ 0 := by {
+            apply div_nonneg; linarith
+            linarith
+          }
+          have βNN : β ≥ 0 := by {
+            apply div_nonneg; linarith
+            linarith
+          }
+          use αNN
+          use βNN
+          simp
+          rw [matrix_det_eq_det_pts] at collinear
+          unfold Point.det at collinear
+          have : q.y - p.y ≠ 0 := by linarith
+          ext
+
+          field_simp [this]
+          linarith [collinear]
+
+          field_simp [this]
+          linarith [collinear]
+        }
+
+def IsConvexCombo₂ (x p q : Point) : Prop :=
+  ∃ (α β : ℝ), α + β = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ α • p + β • q = x
+
+def IsConvexCombo₃ (a p q r : Point) : Prop :=
+  ∃ (α β γ : ℝ), α + β + γ = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ γ ≥ 0 ∧ α • p + β • q + γ • r = a
+
+theorem convexComboTransitive {p q r a x: Point} :
+    IsConvexCombo₂ x p q → IsConvexCombo₂ a x r → IsConvexCombo₃ a p q r := by
+  intro h₁ h₂
+  unfold IsConvexCombo₂ at h₁ h₂
+  rcases h₁ with ⟨α₁, β₁, hαβ, hα₁, hβ₁, h_convex₁⟩
+  rcases h₂ with ⟨α₂, β₂, hαβ₂, hα₂, hβ₂, h_convex₂⟩
+  subst h_convex₁
+  simp at h_convex₂
+  unfold IsConvexCombo₃
+  use α₂ • α₁, α₂ • β₁, β₂
+  constructor
+  · have h₁ : α₂ * (α₁ + β₁) = α₂ * 1 := by
+      exact congrArg (HMul.hMul α₂) hαβ
+    rw [mul_one] at h₁
+    conv at h₁ => rhs; rw [eq_sub_of_add_eq hαβ₂]
+    replace h₁ := add_eq_of_eq_sub h₁
+    simp [mul_add] at h₁
+    simp [h₁]
+  · simp only [smul_eq_mul, ge_iff_le]
+    use smul_nonneg hα₂ hα₁, mul_nonneg hα₂ hβ₁, hβ₂
+    rwa [← smul_assoc, ← smul_assoc] at h_convex₂
+
+
+theorem PtInTriangle2_of_σPtInTriange2 {a p q r : Point}
+      (spq: p.x < q.x)
       (symm: σ p q r = Orientation.CCW) (py0: p.y = 0) (qy0: q.y = 0):
        σPtInTriangle2 a p q r → PtInTriangle2 a p q r  := by
       unfold PtInTriangle2
@@ -351,29 +506,10 @@ theorem PtInTriangle2_of_σPtInTriange2 {a p q r : Point} (gp : Point.InGeneralP
       have : σ p a r = σ p q r := by {
         rw [σ_perm₂]
         rw [anti]
-        sorry -- ask WN
+        simp [h2]
       }
 
-      have det_par_pos : matrix_det p a r > 0 := by {
-        rw [σ_perm₂] at h2
-        rw [←σ_CCW_iff_pos_det]
-        aesop
-      }
-      let aProjX := (r.y * a.x - r.x * a.y)/(r.y - a.y)
-      have order_aProjX_pX : p.x ≤ aProjX := by {
-        simp
-        suffices linearized: p.x * r.y - p.x * a.y ≤ r.y * a.x - r.x * a.y by
-        {
-          sorry -- ask WN
-        }
-        rw [matrix_det_eq_det_pts] at det_par_pos
-        unfold Point.det at det_par_pos
-        rw [py0] at det_par_pos
-        simp at det_par_pos
-        linarith
-      }
       have det_qar_neg : matrix_det q a r < 0 := by {
-
         rw [←σ_CW_iff_neg_det]
         rw [←σ_CW_iff_neg_det] at det_qpr_neg
         rw [σ_perm₂] at h3
@@ -381,48 +517,80 @@ theorem PtInTriangle2_of_σPtInTriange2 {a p q r : Point} (gp : Point.InGeneralP
           aesop
         }
         rw [σ_perm₂] at this
-        sorry -- ask WN
-      }
-      have order_aProjX_qX : aProjX ≤ q.x := by {
-        simp
-        suffices linearized: q.x * r.y - q.x * a.y ≥ r.y * a.x - r.x * a.y by
-        {
-          sorry -- ask WN
-        }
-        rw [matrix_det_eq_det_pts] at det_qar_neg
-        unfold Point.det at det_qar_neg
-        rw [qy0] at det_qar_neg
-        simp at det_qar_neg
-        linarith
+        simp at this
+        aesop
       }
 
-      let aProjXPt : Point := ![aProjX, 0]
+      have det_par_pos : matrix_det p a r > 0 := by {
+        rw [σ_perm₂] at h2
+        rw [←σ_CCW_iff_pos_det]
+        aesop
+      }
 
-      have aProjXPt_IsConvexCombOf_p_q :
-        ∃ (α β : ℝ), α + β = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ α • p + β • q = aProjXPt := by {
-          sorry -- ask WN
+      let aProjXPt : Point := ![(arProjX_p_q a r), 0]
+
+      have pqa_pos : matrix_det p q a > 0 := by {
+
+        have : σ p q a = Orientation.CCW := by {
+          rw [h1]
+          exact symm
         }
-      have aProjX_a_r_collinear : matrix_det aProjXPt a r = 0 := by {
+        rw [σ_CCW_iff_pos_det] at this
+        exact this
+      }
+      have y_order : aProjXPt.y = 0 ∧ a.y > 0 ∧ r.y > a.y := by {
+        use rfl
+        constructor
+        . rw [matrix_det_eq_det_pts] at pqa_pos
+          unfold Point.det at pqa_pos
+          rw [py0, qy0] at pqa_pos
+          simp at pqa_pos
+          nlinarith
+        . rw [matrix_det_eq_det_pts] at det_par_pos
+          rw [matrix_det_eq_det_pts] at det_qar_neg
+          unfold Point.det at det_par_pos
+          unfold Point.det at det_qar_neg
+          rw [py0] at det_par_pos
+          rw [qy0] at det_qar_neg
+          simp at det_par_pos
+          simp at det_qar_neg
+          nlinarith
+      }
+
+      have arProjX_bet_p_q := arProjX_between_p_q py0 qy0 det_qar_neg det_par_pos y_order.2.2
+
+      have arProjXPt_p_q_XOrdered : p.x < aProjXPt.x ∧ aProjXPt.x < q.x := by {
+        exact arProjX_bet_p_q
+      }
+
+      have p_q_arProjXPt_collinear : matrix_det p q aProjXPt = 0 := by {
         rw [matrix_det_eq_det_pts]
         unfold Point.det
+        rw [py0, qy0]
         simp
-        sorry -- ask WN
       }
 
-      have y_order : aProjXPt.y = 0 ∧ a.y > 0 ∧ r.y > a.y := by {
-        sorry -- ask WN
+      have aProjXPt_IsConvexCombOf_p_q :=
+        convexComboOfCollinearAndXOrdered p q aProjXPt p_q_arProjXPt_collinear arProjXPt_p_q_XOrdered.1 arProjXPt_p_q_XOrdered.2
+
+
+      have aProjX_r_a_collinear : matrix_det aProjXPt r a = 0 := by {
+        rw [matrix_det_eq_det_pts]
+        unfold Point.det
+        dsimp
+        unfold arProjX_p_q
+        have : r.y - a.y ≠ 0 := by linarith
+        apply mul_right_cancel₀ (b := r.y - a.y) this
+        field_simp [this]
+        ring
       }
 
-      have a_IsConvexCombOf_aProjXPt_r :
-        ∃ (α β : ℝ), α + β = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ α • aProjXPt + β • r = a := by {
-          -- because they're on the same line and a is between their y coordinates
-          sorry -- ask WN
-        }
+      have a_IsConvexCombOf_aProjXPt_r :=
+          convexComboOfCollinearAndYOrdered aProjXPt r a aProjX_r_a_collinear y_order.2.1 y_order.2.2
 
       have a_IsConvexCombOf_p_q_r :
         ∃ (α β γ : ℝ), α + β + γ = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ γ ≥ 0 ∧ α • p + β • q + γ • r = a := by {
-          -- transitivity of combexCombo
-          sorry -- ask WN
+          exact convexComboTransitive aProjXPt_IsConvexCombOf_p_q a_IsConvexCombOf_aProjXPt_r
         }
 
       have cHullIsConvex: Convex ℝ (convexHull ℝ {p , q, r}) := by {
@@ -546,7 +714,6 @@ theorem σPtInTriangle2_of_PtInTriange2 {a p q r : Point} (gp : Point.InGeneralP
         apply h inter sub_set_inter interConvex
       }
 
-
     have aInHalfPQ: a ∈ halfPlanePQ := by aesop
     have aInHalfRP: a ∈ halfPlaneRP := by aesop
     have aInHalfQR: a ∈ halfPlaneQR := by aesop
@@ -626,90 +793,340 @@ theorem σPtInTriangle2_of_PtInTriange2 {a p q r : Point} (gp : Point.InGeneralP
     exact Eq.trans qra_pos (Eq.symm qrp_pos)
 
 
-
 noncomputable def rotateTranslate (p : Point) (θ : ℝ) (tx ty : ℝ) : Point :=
   ![p 0 * (Real.cos θ) - p 1 * (Real.sin θ) + tx, p 0 * (Real.sin θ) + p 1 * (Real.cos θ) + ty]
+
+def translateMap (p : Point) : Point →ᵃ[ℝ] Point :=
+  AffineMap.const ℝ Point p + AffineMap.id ℝ Point
+
+theorem translateMap_apply (x : Point) : translateMap p x = p + x := by
+  simp [translateMap]
+
+def rotateTranslateMap (θ : ℝ) (p : Point) : Point →ᵃ[ℝ] Point :=
+  AffineMap.comp (translateMap p) (rotationMap θ).toAffineMap
+
+
+theorem injective_rotateTranslateMap (θ : ℝ) (p : Point) : Function.Injective (rotateTranslateMap θ p) := by
+  unfold rotateTranslateMap
+  apply Function.Injective.comp (g := translateMap p)
+  . exact fun x y h => add_left_cancel h
+  . simp [injective_rotationMap]
+
+lemma pt_transform_translateMap (p  t: Point)  : pt_transform p (translation_matrix t.x t.y) = translateMap t p := by
+  ext <;> simp [pt_transform, translation_matrix, Point.x, Point.y, vec_to_pt, pt_to_vec];
+  ring_nf
+  rw [translateMap_apply]
+  simp
+  rw [Matrix.mul_apply]
+  rw [Fin.sum_univ_three]
+  simp [add_comm]
+  rw [Matrix.mul_apply]
+  rw [Fin.sum_univ_three]
+  simp
+  rw [translateMap_apply]
+  simp [add_comm]
+
 
 noncomputable def rotate (θ : ℝ) (p : Point) : Point :=
   ![p 0 * (Real.cos θ) - p 1 * (Real.sin θ), p 0 * (Real.sin θ) + p 1 * (Real.cos θ)]
 
-theorem rotateTranslateIsoCC (p q: Point) (θ tx ty : ℝ) {α β : ℝ} (hα: α ≥ 0) (hβ: β ≥ 0) (hαβ: α + β = 1) :
-  rotateTranslate (α • p + β • q) θ tx ty = α • (rotateTranslate p θ tx ty) + β • (rotateTranslate q θ tx ty) := by
-  unfold rotateTranslate
-  ring_nf
-  simp
-  ring_nf
-  sorry
-
-
 noncomputable def rotateTranslateSet (S : Set Point) (θ : ℝ) (tx ty : ℝ) : Set Point :=
   {rotateTranslate p θ tx ty | p ∈ S}
 
-theorem rotateTranslateOfConvexIsConvex (S: Set Point) (CS: Convex ℝ S) (θ : ℝ) (tx ty : ℝ) : Convex ℝ (rotateTranslateSet S θ tx ty) := by
-  unfold Convex
-  intro x hx
-  unfold StarConvex
-  intro y hy
-  intro α β hα hβ hαβ
-  unfold Convex at CS
-  unfold rotateTranslateSet at hx
-  unfold rotateTranslateSet at hy
-  simp at hx hy
-  have ⟨preX, preXinS, x_post_preX⟩ := hx
-  have ⟨preY, preYinS, y_post_preY⟩ := hy
-  have CC := CS preXinS preYinS hα hβ hαβ
-  let CC_wit := α • preX + β • preY
-  have CC_wit_in_S : CC_wit ∈ S := by
-    exact CC
-  have rt : rotateTranslate CC_wit θ tx ty  = α • (rotateTranslate preX θ tx ty) + β • (rotateTranslate preY θ tx ty) := by
-      exact rotateTranslateIsoCC preX preY θ tx ty hα hβ hαβ
-  have rt2 : rotateTranslate CC_wit θ tx ty = α • x + β • y := by
-    rw [rt]
-    rw [x_post_preX]
-    rw [y_post_preY]
-  exact ⟨CC_wit, CC_wit_in_S, rt2⟩
+theorem PtInTriangle2InvariantUnderTransform {a p q r : Point}  (t : Point) (θ : ℝ) :
+      PtInTriangle2 a p q r ↔ PtInTriangle2 (rotateTranslateMap θ t a) (rotateTranslateMap θ t p) (rotateTranslateMap θ t q) (rotateTranslateMap θ t r) := by
+      unfold PtInTriangle2
+      have := AffineMap.image_convexHull {p,q,r} (rotateTranslateMap θ t)
+      simp [Set.image_insert_eq] at this
+      rw [← this]
+      set S := convexHull ℝ {p,q,r}
+      symm
+      apply Function.Injective.mem_set_image
+      exact injective_rotateTranslateMap θ t
+
+theorem rotateTranslateTransform (θ : ℝ) (t p : Point):
+(rotateTranslateMap θ t p) = pt_transform p ((translation_matrix t.x t.y)*(Matrix.rotateByAffine θ)) := by
+  rw [pt_transform_by_prod]
+  unfold rotateTranslateMap
+  simp
+  rw [←pt_transform_rotateByAffine]
+  rw [pt_transform_translateMap]
+  unfold Matrix.rotateByAffine
+  rfl
+
+lemma rotateTranslateTMatrix (θ : ℝ) (t : Point) :
+  TMatrix (translation_matrix t.x t.y * Matrix.rotateByAffine θ) := by
+  have : TMatrix (translation_matrix t.x t.y) := by {
+    exact translation_transform t.x t.y
+  }
+  exact TMatrix.mul this (TMatrix.rotateByAffine θ)
+
+theorem rotateTranslatePreserveσ (θ : ℝ) (t p q r : Point) :
+      σ p q r = σ (rotateTranslateMap θ t p) (rotateTranslateMap θ t q) (rotateTranslateMap θ t r) := by
+      rw [rotateTranslateTransform]
+      rw [rotateTranslateTransform]
+      rw [rotateTranslateTransform]
+      set T := (translation_matrix (Point.x t) (Point.y t) * Matrix.rotateByAffine θ)
+      have : TMatrix T := by exact rotateTranslateTMatrix θ t
+      apply transform_preserve_sigma p q r this
 
 
+theorem σPtInTriangle2InvariantUnderTransform {a p q r : Point}  (t : Point) (θ : ℝ) :
+      σPtInTriangle2 a p q r ↔ σPtInTriangle2 (rotateTranslateMap θ t a) (rotateTranslateMap θ t p) (rotateTranslateMap θ t q) (rotateTranslateMap θ t r) := by
+      unfold σPtInTriangle2
+      rw [←rotateTranslatePreserveσ]
+      rw [←rotateTranslatePreserveσ]
+      rw [←rotateTranslatePreserveσ]
+      rw [←rotateTranslatePreserveσ]
+      rw [←rotateTranslatePreserveσ]
+      rw [←rotateTranslatePreserveσ]
 
 
-theorem PtInTriangle2InvariantUnderTransform {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
-      (symm: σ p q r = Orientation.CCW) (tx ty : ℝ) (θ : ℝ) :
-      PtInTriangle2 a p q r ↔ PtInTriangle2 (rotateTranslate a θ tx ty) (rotateTranslate p θ tx ty) (rotateTranslate q θ tx ty) (rotateTranslate r θ tx ty) := by
+theorem extraPiDoesntChange0y (θ : ℝ)  (p : Point) :
+      (rotationMap θ p).y = 0 ↔ (rotationMap (θ + Real.pi) p).y = 0 := by
       apply Iff.intro
       {
-
         intro h
-        unfold PtInTriangle2 at h
-        unfold convexHull at h
-        simp at h
-
-
-        unfold PtInTriangle2
-        unfold convexHull
-        simp
-        intro postS hpostS cpostS
-        sorry
+        simp at *
+        linarith
       }
       {
         intro h
-        unfold PtInTriangle2 at h
-        unfold convexHull at h
-        simp at h
-
-        unfold PtInTriangle2
-        unfold convexHull
-        simp
-        intro postS hpostS cpostS
-        sorry
+        simp at *
+        linarith
       }
 
+
+lemma translate_to_0_change (p t: Point) : (translateMap t p).y = 0 ↔ p.y + t.y = 0 := by
+  rw [translateMap_apply]
+  simp
+  constructor
+  . intro h; linarith
+  . intro h; linarith
+
+
+theorem extraPiDoesntChange0y' (θ : ℝ)  (p : Point) :
+      (rotateTranslateMap θ ![0, -(rotationMap θ p).y] p).y = 0 ↔ ((rotateTranslateMap (θ + Real.pi) ![0, -(rotationMap (θ + Real.pi) p).y]) p).y = 0 := by
+      apply Iff.intro
+      {
+        unfold rotateTranslateMap
+        intro h
+        simp at *
+        rw [translate_to_0_change] at h
+        rw [translate_to_0_change]
+        simp
+        simp at h
+        linarith
+      }
+      {
+        unfold rotateTranslateMap
+        intro h
+        simp at *
+        rw [translate_to_0_change] at h
+        rw [translate_to_0_change]
+        simp
+        simp at h
+        linarith
+      }
+
+
+theorem existsNiceRotTrans {p q : Point} (diff: p ≠ q): ∃ (θ : ℝ) (t : Point),
+              (rotateTranslateMap θ t p).y = 0
+            ∧ (rotateTranslateMap θ t q).y = 0
+            ∧ (rotateTranslateMap θ t p).x < (rotateTranslateMap θ t q).x := by
+            by_cases same_x : p.x = q.x
+            {
+              by_cases p_above_q: p.y > q.y
+              {
+                use Real.pi/2
+                let p' := rotationMap (Real.pi/2) p
+                let q' := rotationMap (Real.pi/2) q
+                use ![0, -p'.y]
+                constructor
+                . unfold rotateTranslateMap
+                  simp
+                  rw [translateMap_apply]
+                  simp
+
+                . constructor
+                  . have same_y' : p'.y = q'.y := by {
+                      simp
+                      assumption
+                    }
+                    rw [same_y']
+                    unfold rotateTranslateMap
+                    simp
+                    rw [translateMap_apply]
+                    simp
+                  . unfold rotateTranslateMap
+                    simp
+                    rw [translateMap_apply]
+                    rw [translateMap_apply]
+                    simp
+                    ring_nf
+                    linarith
+              }
+              {
+                have p_below_q: p.y < q.y := by {
+                  by_contra C
+                  have same_y : p.y = q.y := by
+                  {
+                    exact _root_.le_antisymm (le_of_not_gt p_above_q) (le_of_not_gt C)
+                  }
+                  refine diff.elim ?_
+                  ext <;> assumption
+                }
+
+                use -(Real.pi/2)
+                let p' := rotationMap (-(Real.pi/2)) p
+                let q' := rotationMap (-(Real.pi/2)) q
+                use ![0, -p'.y]
+                constructor
+                . unfold rotateTranslateMap
+                  simp
+                  rw [translateMap_apply]
+                  simp
+                . constructor
+                  . have same_y' : p'.y = q'.y := by {
+                      simp
+                      assumption
+                    }
+                    rw [same_y']
+                    unfold rotateTranslateMap
+                    simp
+                    rw [translateMap_apply]
+                    simp
+                  . unfold rotateTranslateMap
+                    simp
+                    rw [translateMap_apply]
+                    rw [translateMap_apply]
+                    simp
+                    ring_nf
+                    linarith
+              }
+            }
+            {
+              obtain ⟨S, eq⟩: ∃ x, x = (q.y - p.y) / (q.x - p.x) := ⟨_, rfl⟩
+              let θ := -Real.arctan (S)
+              let p' := rotationMap θ p
+              let t := ![0, -p'.y]
+
+              have rpy0 : (rotateTranslateMap θ t p).y = 0 := by {
+                unfold rotateTranslateMap
+                simp
+                rw [translateMap_apply]
+                simp
+                ring_nf
+              }
+
+              have rqy0 : (rotateTranslateMap θ t q).y = 0 := by {
+                unfold rotateTranslateMap
+                simp
+                rw [translateMap_apply]
+                simp
+                rw [Real.sin_arctan]
+                rw [Real.cos_arctan]
+                calc -(1 / Real.sqrt (1 + S ^ 2) * Point.y p) + S / Real.sqrt (1 + S ^ 2) * Point.x p
+                    + (-(S / Real.sqrt (1 + S ^ 2) * Point.x q) + 1 / Real.sqrt (1 + S ^ 2) * Point.y q)
+                  _  = (1 / Real.sqrt (1 + S ^ 2))*(-Point.y p + Point.y q) + S / Real.sqrt (1 + S ^ 2) * Point.x p
+                    + (-(S / Real.sqrt (1 + S ^ 2) * Point.x q)) := by ring_nf
+                  _  =  (1 / Real.sqrt (1 + S ^ 2))*(-Point.y p + Point.y q) + (S / Real.sqrt (1 + S ^ 2) * (Point.x p - Point.x q)) := by ring_nf
+                  _  =  ((Point.y q - Point.y p)  - (S* (q.x - p.x))) / Real.sqrt (1 + S ^ 2) := by ring_nf
+                  _  =  ((Point.y q - Point.y p)  - ((q.y - p.y) / (q.x - p.x) * (q.x - p.x))) / Real.sqrt (1 + ((q.y - p.y) / (q.x - p.x) ) ^ 2) := by rw [eq]
+                  _  = 0 :=  by field_simp [(sub_ne_zero.2 same_x)]; rw [@mul_div_cancel _ _ _ _ (sub_ne_zero.2 (Ne.symm same_x))]; simp
+              }
+
+              have post_neq : (rotateTranslateMap θ t p).x ≠ (rotateTranslateMap θ t q).x := by {
+                have prev :  (rotateTranslateMap θ t p).y = (rotateTranslateMap θ t q).y := by linarith
+                have injc :  (rotateTranslateMap θ t p) ≠ (rotateTranslateMap θ t q) := by {
+                    intro pq
+                    apply diff
+                    apply injective_rotateTranslateMap _ _ pq
+                  }
+                intro pxqx
+                apply injc (Point.ext pxqx prev)
+              }
+
+              by_cases post_lt : (rotateTranslateMap θ t p).x < (rotateTranslateMap θ t q).x
+              {
+                use θ, t
+              }
+              {
+                rw [not_lt] at post_lt
+                have : (rotateTranslateMap θ t q).x < (rotateTranslateMap θ t p).x := by apply lt_of_le_of_ne; exact post_lt; exact (Ne.symm post_neq)
+                let θ' := θ + Real.pi
+                let p'' := rotationMap θ' p
+
+
+
+                let t'' := ![0, -p''.y]
+                use θ', t''
+                have g1: (rotateTranslateMap θ' t'' p).y = 0 := by {
+                  unfold rotateTranslateMap
+                  simp
+                  rw [translateMap_apply]
+                  simp
+                  ring_nf
+                }
+                have g2: (rotateTranslateMap θ' t'' q).y = 0 := by {
+                  unfold rotateTranslateMap
+                  simp
+                  rw [translateMap_apply]
+                  simp
+                  rw [Real.sin_arctan, Real.cos_arctan]
+                  field_simp
+                  calc Point.y p + -(S * Point.x p) + (S * Point.x q + -Point.y q)
+                    _ = Point.y p + -S * Point.x p + S * Point.x q + -Point.y q := by ring_nf
+                    _ = Point.y p + S * (Point.x q - Point.x p) + -Point.y q := by ring_nf
+                    _ = (Point.y p - Point.y q) + S * (Point.x q - Point.x p) := by ring_nf
+                    _ = (Point.y p - Point.y q) + ((Point.y q - Point.y p) / (Point.x q - Point.x p)) * (Point.x q - Point.x p) := by rw [eq]
+                    _ = 0 := by field_simp [(sub_ne_zero.2 same_x)]; rw [@mul_div_cancel _ _ _ _ (sub_ne_zero.2 (Ne.symm same_x))]; simp
+                }
+                have g3: (rotateTranslateMap θ' t'' p).x < (rotateTranslateMap θ' t'' q).x := by {
+                  unfold rotateTranslateMap
+                  simp
+                  rw [translateMap_apply, translateMap_apply]
+                  simp
+                  unfold rotateTranslateMap at this
+                  simp at this
+                  rw [translateMap_apply, translateMap_apply] at this
+                  simp at this
+                  nlinarith
+                }
+                exact ⟨g1, g2, g3⟩
+              }
+            }
 
 theorem PtInTriangle2_of_σPtInTriange2' {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
       (symm: σ p q r = Orientation.CCW):
        σPtInTriangle2 a p q r → PtInTriangle2 a p q r  := by
        intro h
+       have p_neq_q : p ≠ q := by {
+         have l := gp.4
+         unfold Point.InGeneralPosition₃ at l
+         unfold Point.det at l
+         by_contra C
+         simp [C] at l
+         ring_nf at l
+         tauto
+       }
 
-       sorry
+       have ⟨θ, t, h1, h2, h3⟩ := existsNiceRotTrans p_neq_q
+       set p' := rotateTranslateMap θ t p
+       set q' := rotateTranslateMap θ t q
+       set r' := rotateTranslateMap θ t r
+       set a' := rotateTranslateMap θ t a
+       have a'inTri : σPtInTriangle2 a' p' q' r' := by {
+         rw [←σPtInTriangle2InvariantUnderTransform]
+         exact h
+       }
+       have symm' : σ p' q' r' = Orientation.CCW := by {
+          rw [←rotateTranslatePreserveσ]
+          exact symm
+       }
+       have := PtInTriangle2_of_σPtInTriange2 h3 symm' h1 h2 a'inTri
+       rw [←PtInTriangle2InvariantUnderTransform] at this
+       exact this
 
 
 theorem σPtInTriangle_iff2 {a p q r : Point} (gp : Point.InGeneralPosition₄ a  p q r)
@@ -729,27 +1146,6 @@ def σHasEmptyTriangle2 (pts : List Point) : Prop :=
   ∃ i j k : (Fin pts.length),  (i < j ∧ j < k) ∧ ∀ a: (Fin pts.length), a ∉ ({i , j, k} : Set (Fin pts.length))  → ¬(σPtInTriangle2 pts[a] pts[i] pts[j] pts[k])
 
 
-theorem σHasEmptyTriangle_iff_σHasEmptyTriangle2 {pts : List Point} (gp : Point.PointListInGeneralPosition pts) :
-    σHasEmptyTriangle pts ↔ σHasEmptyTriangle2 pts := by
-  unfold σHasEmptyTriangle σHasEmptyTriangle2
-  sorry -- obvious, TODO WN
-
-theorem σHasEmptyTriangle_iff {pts : List Point} (gp : Point.PointListInGeneralPosition pts) :
-    σHasEmptyTriangle2 pts ↔ HasEmptyTriangle pts := by
-  unfold σHasEmptyTriangle2 HasEmptyTriangle
-  sorry -- obvious, TODO WN
-
-/-
-/-- The convex hull of `S` contains none of the points in `T`,
-except those that are already in `S`. -/
-def IsEmptyWrt (S T : Finset Point) :=
-  ∀ p ∈ T, p ∉ S → p ∉ convexHull ℝ S
---def σMathyHasEmptyTriangle (pts : List Point) : Prop :=
-  -- ∃ p q r, Sublist [p, q, r] pts ∧ MathyIsEmptyWrt {p, q, r} pts.toFinset
--- theorem HasEmptyTriangle_iff_Mathy (pts : List Point) (gp : Point.PointListInGeneralPosition pts) :
- --   HasEmptyTriangle pts ↔ MathyHasEmptyTriangle pts := by
- --  sorry
- -/
 infix:50 " ~_σ " => σ_equivalence
 def OrientationProperty (P : List Point → Prop) :=
   ∀ l₁ l₂, (Point.PointListInGeneralPosition l₁ ∧ Point.PointListInGeneralPosition l₂)  →  l₁ ~_σ l₂ → (P l₁ ↔ P l₂)
@@ -762,10 +1158,19 @@ theorem OrientationProperty.not : OrientationProperty P → OrientationProperty 
   aesop
 
 
+theorem σHasEmptyTriangle_iff_σHasEmptyTriangle2 {pts : List Point} (gp : Point.PointListInGeneralPosition pts) :
+    σHasEmptyTriangle pts ↔ σHasEmptyTriangle2 pts := by
+  unfold σHasEmptyTriangle σHasEmptyTriangle2
+  sorry -- obvious, TODO WN
+
+theorem σHasEmptyTriangle_iff {pts : List Point} (gp : Point.PointListInGeneralPosition pts) :
+    σHasEmptyTriangle2 pts ↔ HasEmptyTriangle pts := by
+  unfold σHasEmptyTriangle2 HasEmptyTriangle
+  sorry -- obvious, TODO WN
+
 theorem OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle := by
   unfold OrientationProperty
   intro l₁ l₂ gps h
-
 
   rw [σHasEmptyTriangle_iff_σHasEmptyTriangle2]
   rw [σHasEmptyTriangle_iff_σHasEmptyTriangle2]
@@ -860,23 +1265,3 @@ theorem OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyT
   }
   exact gps.2
   exact gps.1
-
-
-theorem fundamentalTheoremOfSymmetryBreaking {P : List Point → Prop} {L : List Point} (gp : Point.PointListInGeneralPosition L) :
-    OrientationProperty P → P L →
-    ∃ (w : WBPoints), w.length = L.length ∧ P w.points := by
-  sorry -- TODO(Bernardo)
-
-theorem fromLeanSAT :
-    ¬∃ (w : WBPoints), w.length = 10 ∧ ¬σHasEmptyTriangle w.points := by
-  sorry
-
-theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
-    HasEmptyTriangle pts := by
-  by_contra h'
-  rw [← σHasEmptyTriangle_iff gp] at h'
-  rw [←σHasEmptyTriangle_iff_σHasEmptyTriangle2] at h'
-  have ⟨w, hw, hw'⟩ := fundamentalTheoremOfSymmetryBreaking gp OrientationProperty_σHasEmptyTriangle.not h'
-  apply fromLeanSAT
-  use w, hw.trans h
-  exact gp
