@@ -111,6 +111,7 @@ theorem distinct_rotate_finset (A : Set Point) (h : Set.Countable A) :
   have : Set.Nonempty goodAngles := Set.Infinite.nonempty (fun h => uGood h.countable)
   ⟨this.some, (Set.mem_setOf_eq ▸ this.some_mem).right⟩
 
+-- TODO: make this work on finsets
 theorem distinct_rotate_list (l : List Point) (hDistinct : l.Pairwise (· ≠ ·)) :
     ∃ (θ : ℝ), l.map (rotationMap θ) |>.Pairwise (·.x ≠ ·.x) := by
   have ⟨θ, hθ⟩ := distinct_rotate_finset l.toFinset (Finset.countable_toSet _)

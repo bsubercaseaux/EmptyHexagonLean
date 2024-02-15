@@ -60,7 +60,7 @@ def PointListInGeneralPosition.to₄ {l : List Point} :
   constructor <;> { refine h (Sublist.trans ?_ h'); sublist_tac }
 
 def PointFinsetInGeneralPosition (S : Finset Point) : Prop :=
-  ∀ {p q r}, {p, q, r} ⊆ S → InGeneralPosition₃ p q r
+  ∀ {{p q r}}, {p, q, r} ⊆ S → InGeneralPosition₃ p q r
 
 /-! # Sorted (strictly, along x-coordinates) -/
 

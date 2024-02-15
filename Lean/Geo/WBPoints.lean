@@ -14,9 +14,13 @@ theorem nodup_of_gp (l : List Point) :
 
 /-- A well-behaved list of points: in general position, sorted by `x`. -/
 structure WBPoints where
-  points : List Point
-  sorted : PointListSorted points
-  gp : PointListInGeneralPosition points
+  leftmost : Point
+  rest : List Point
+  sorted : PointListSorted (leftmost :: rest)
+  gp : PointListInGeneralPosition (leftmost :: rest)
+  oriented : rest.Pairwise (σ leftmost · · = .CCW)
+
+def WBPoints.points (w : WBPoints) := w.leftmost :: w.rest
 
 def finset_sort (S : Finset Point) : List Point :=
   S.toList.insertionSort (·.x <= ·.x)
@@ -29,22 +33,6 @@ open List Finset Classical
 open LeanSAT Model PropFun
 
 def toFinset (w : WBPoints) : Finset Point := w.points.toFinset
-
--- Q: are we using this ever?
-def fromFinset {S : Finset Point} (hS : PointFinsetInGeneralPosition S)
-    (hX : Set.Pairwise S.toSet (·.x ≠ ·.x)) : WBPoints :=
-  { points := finset_sort S
-    -- nodup := (Perm.nodup_iff (perm_insertionSort _ _)).mpr (Finset.nodup_toList S)
-    sorted := by
-      unfold PointListSorted Sorted
-      rw [List.Pairwise.imp_mem]
-      have := List.sorted_insertionSort (·.x ≤ ·.x) (toList S)
-      unfold Sorted at this
-      sorry
-      done
-    gp := by
-      sorry
-      done}
 
 theorem nodupX (w : WBPoints) : w.points.Pairwise (·.x ≠ ·.x) :=
   Pairwise.imp ne_of_lt w.sorted
