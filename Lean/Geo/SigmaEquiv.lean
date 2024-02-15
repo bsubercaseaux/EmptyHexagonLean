@@ -42,39 +42,3 @@ theorem OrientationProperty.not : OrientationProperty P → OrientationProperty 
   unfold OrientationProperty
   intro h S T hσ hS hT
   exact hS (h _ _ hσ.symm hT)
-
--- Same as σPtInTriangle, here for reference
-def σPtInTriangle' (a p q r : Point) : Prop :=
-  σ p q r = σ p a r ∧
-  σ p a q = σ p r q ∧
-  σ q a r = σ q p r
-
-lemma σPtInTriangle'_of_σEquiv (f : S ≃σ T) (a p q r : S) :
-    σPtInTriangle' a p q r → σPtInTriangle' (f a) (f p) (f q) (f r) := by
-  simp only [σPtInTriangle', f.hσ]
-  exact id
-
-/-- `{p, q, r}` make up a triangle that contains no point in `S`. -/
-def σIsEmptyTriangleFor (p q r : Point) (S : Set Point) :=
-  Finset.card {p, q, r} = 3 ∧ -- TODO: maybe remove this part of the condition?
-    ∀ a ∈ S, ¬σPtInTriangle' a p q r
-
-def σHasEmptyTriangle (S : Set Point) : Prop :=
-  ∃ p q r : S, σIsEmptyTriangleFor p q r S
-
-theorem OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle := by
-  intro S T f ⟨p, q, r, h, h'⟩
-  use f p, f q, f r
-  constructor
-  . sorry -- boring bijection card
-  . intro t ht ht'
-    sorry
-    -- simp only [Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff, not_or] at ht
-    -- have ⟨ht, htp, htq, htr⟩ := ht
-    -- apply h' (f.symm ⟨t, ht⟩)
-    -- simp only [Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff, not_or]
-    -- refine ⟨by simp, ?_, ?_, ?_⟩
-    -- . sorry -- boring bijection coe
-    -- . sorry -- ditto
-    -- . sorry -- ditto
-    -- . sorry -- use σPtInTriangle_of_σEquiv

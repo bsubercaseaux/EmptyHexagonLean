@@ -1,67 +1,92 @@
 import Geo.Point
 import Geo.WBPoints
 import Geo.RunEncoding
+import Geo.SigmaEquiv
 
 namespace Geo
 open List
 open Classical
 
-def σIsEmptyTriangle (p q r : Point) (pts : List Point) : Prop :=
-  sorry
+def HasEmptyTriangle (pts : Set Point) : Prop :=
+  ∃ p q r, [p, q, r].Nodup ∧ {p,q,r} ⊆ pts ∧ ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬PtInTriangle a p q r
 
-def HasEmptyTriangle (pts : List Point) : Prop :=
-  ∃ p q r, Sublist [p, q, r] pts ∧ ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬PtInTriangle a p q r
+def σHasEmptyTriangle (pts : Set Point) : Prop :=
+  ∃ p q r, [p, q, r].Nodup ∧ {p,q,r} ⊆ pts ∧ ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬σPtInTriangle a p q r
 
-def σHasEmptyTriangle (pts : List Point) : Prop :=
-  ∃ p q r, Sublist [p, q, r] pts ∧ ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬σPtInTriangle a p q r
+/- JG: is this the right definition ^ or is below the right definition:
 
-theorem σHasEmptyTriangle_iff {pts : List Point} (gp : Point.PointListInGeneralPosition pts) :
+/-- `{p, q, r}` make up a triangle that contains no point in `S`. -/
+def σIsEmptyTriangleFor (p q r : Point) (S : Set Point) :=
+  Finset.card {p, q, r} = 3 ∧ -- TODO: maybe remove this part of the condition?
+    ∀ a ∈ S, ¬σPtInTriangle' a p q r
+
+def σHasEmptyTriangle (S : Set Point) : Prop :=
+  ∃ p q r : S, σIsEmptyTriangleFor p q r S
+
+-/
+
+
+theorem σHasEmptyTriangle_iff {pts : Finset Point} (gp : Point.PointFinsetInGeneralPosition pts) :
     σHasEmptyTriangle pts ↔ HasEmptyTriangle pts := by
   unfold σHasEmptyTriangle HasEmptyTriangle
+  apply exists_congr; intro p
+  apply exists_congr; intro q
+  apply exists_congr; intro r
+  simp [-List.nodup_cons]; intro hnodup hsubset
+  apply forall_congr'; intro a
+  apply imp_congr_right; intro ha
+  apply imp_congr_right; intro hane
+  rw [σPtInTriangle_iff]
+  intro a b c h
+  apply gp
+  trans
+  · exact h
+  · intro; aesop
+
+lemma σPtInTriangle_of_σEquiv (f : S ≃σ T) (a p q r : S) :
+    σPtInTriangle a p q r → σPtInTriangle (f a) (f p) (f q) (f r) := by
+  simp only [σPtInTriangle, f.hσ]
+  exact id
+
+
+theorem OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle := by
+  intro S T f ⟨p, q, r, h, h'⟩
+  stop -- JG: see comment below `σHasEmptyTriangle`
+  use f p, f q, f r
   constructor
-  sorry
-  -- . intro ⟨p, q, r, hSub, h⟩
-  --   use p, q, r, hSub
-  --   intro a ha ha'
-  --   rw [← σPtInTriangle_iff]
-  --   sorry
-  sorry -- obvious, TODO WN
+  . sorry -- boring bijection card
+  . intro t ht ht'
+    sorry
+    -- simp only [Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff, not_or] at ht
+    -- have ⟨ht, htp, htq, htr⟩ := ht
+    -- apply h' (f.symm ⟨t, ht⟩)
+    -- simp only [Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff, not_or]
+    -- refine ⟨by simp, ?_, ?_, ?_⟩
+    -- . sorry -- boring bijection coe
+    -- . sorry -- ditto
+    -- . sorry -- ditto
+    -- . sorry -- use σPtInTriangle_of_σEquiv
 
-/-
-/-- The convex hull of `S` contains none of the points in `T`,
-except those that are already in `S`. -/
-def IsEmptyWrt (S T : Finset Point) :=
-  ∀ p ∈ T, p ∉ S → p ∉ convexHull ℝ S
---def σMathyHasEmptyTriangle (pts : List Point) : Prop :=
-  -- ∃ p q r, Sublist [p, q, r] pts ∧ MathyIsEmptyWrt {p, q, r} pts.toFinset
--- theorem HasEmptyTriangle_iff_Mathy (pts : List Point) (gp : Point.PointListInGeneralPosition pts) :
- --   HasEmptyTriangle pts ↔ MathyHasEmptyTriangle pts := by
- --  sorry
- -/
 
-def OrientationProperty (P : List Point → Prop) :=
-  ∀ l₁ l₂, σ_equivalence l₁ l₂ → (P l₁ ↔ P l₂)
-
-theorem OrientationProperty.not : OrientationProperty P → OrientationProperty (¬P ·) := by
-  unfold OrientationProperty
-  intro h l₁ l₂ hσ
-  simp [h l₁ l₂ hσ]
-
-theorem OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle :=
-  sorry -- TODO(Bernardo)
-
-theorem fundamentalTheoremOfSymmetryBreaking {P : List Point → Prop} {L : List Point} (gp : Point.PointListInGeneralPosition L) :
+theorem fundamentalTheoremOfSymmetryBreaking {P : Set Point → Prop} {L : Finset Point} (gp : Point.PointFinsetInGeneralPosition L) :
     OrientationProperty P → P L →
-    ∃ (w : WBPoints), w.length = L.length ∧ P w.points := by
-  sorry -- TODO(Bernardo)
+    ∃ (w : WBPoints), w.length = L.card ∧ P w.points.toFinset := by
+  sorry
 
 open LeanSAT Encode in
 theorem fromLeanSAT :
-    ¬∃ (w : WBPoints), w.length = 10 ∧ ¬σHasEmptyTriangle w.points := by
+    ¬∃ (w : WBPoints), w.length = 10 ∧ ¬σHasEmptyTriangle w.points.toFinset := by
   have := cnfUnsat
   rw [VEncCNF.toICnf_equisatisfiable] at this
   simp at this ⊢
-  sorry -- TODO(Wojciech/Cayden/James)
+  intro w hw
+  let τ := w.toPropAssn
+  replace this := (hw.symm ▸ this) τ
+  by_contra h
+  apply this; clear this
+  apply w.satisfies_noHoles
+  sorry -- TODO(Wojciech?)
+
 
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
     HasEmptyTriangle pts := by
