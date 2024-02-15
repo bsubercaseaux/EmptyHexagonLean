@@ -5,7 +5,7 @@ import Mathlib.Algebra.Algebra.Basic
 import Geo.Orientations
 import Geo.ToMathlib
 import Geo.PointsToWB.TMatrix
-import Geo.WBPoints
+import Geo.Definitions.WBPoints
 import Geo.PointsToWB.Affine
 import Geo.PointsToWB.Projective
 import Geo.SigmaEquiv
