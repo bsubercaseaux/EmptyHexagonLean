@@ -139,6 +139,9 @@ theorem satisfies_insideDefs (w : WBPoints) : w.toPropAssn ⊨ insideDefs w.leng
 theorem satisfies_holeDefs (w : WBPoints) : w.toPropAssn ⊨ holeDefs w.length := by
   sorry -- TODO: we should agree on a defn of σIsEmptyTriangleFor globally first
 
+theorem satisfies_leftmostCCWDefs (w : WBPoints) : w.toPropAssn ⊨ pointsCCW w.length := by
+  sorry
+
 theorem satisfies_noHoles (w : WBPoints) :
     (∀ (a b c : Point), {a,b,c} ⊆ w.toFinset → ¬σIsEmptyTriangleFor a b c w.toFinset) →
     w.toPropAssn ⊨ theFormula w.length := by
@@ -146,7 +149,7 @@ theorem satisfies_noHoles (w : WBPoints) :
   intro noholes
   simp only [noHoles, satisfies_conj, satisfies_signotopeAxioms, satisfies_insideDefs, and_self,
     satisfies_holeDefs, satisfies_all, Multiset.mem_map, mem_val, mem_univ, true_and,
-    forall_exists_index, forall_apply_eq_imp_iff]
+    forall_exists_index, forall_apply_eq_imp_iff, satisfies_leftmostCCWDefs, and_true]
   intro a b c
   split_ifs
   . unfold toPropAssn
