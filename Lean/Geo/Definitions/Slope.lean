@@ -1,10 +1,9 @@
 import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
-import Geo.Point
+import Geo.Definitions.Point
 
 namespace Geo
-
 namespace Point
 
 noncomputable def slope (p1 p2 : Point) : Real :=
@@ -113,6 +112,5 @@ theorem slope_lt_iff_lt' {a b c : Point} (hS : Sorted₃ a b c) :
       _ ↔ dy_bc * dx_bc + dy_ab * dx_bc > dy_bc * dx_bc + dy_bc * dx_ab := by ring_nf
       _ ↔ dy_ab * dx_bc > dy_bc * dx_ab := by simp
       _ ↔ dy_ab / dx_ab > dy_bc / dx_bc := by rw [div_gt_div_iff dx_ab_pos dx_bc_pos]
-
 
 end Point

@@ -1,7 +1,7 @@
 import LeanSAT
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.List.Range
-import Geo.Formula
+import Geo.SAT.Formula
 
 -- CC: This is in my commit of LeanSAT, but not in the main branch/the branch this project pulls from
 -- Ah, it's because the underlying definition of .toPropFun changed to .any and not .foldr
@@ -355,3 +355,7 @@ def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ theFormula n)
     signotopeClauses n, insideClauses n, holeDefClauses n, noHoleClauses n, leftmostCCWClauses n
   ]).mapProp (by
     simp [theFormula]; aesop)
+
+open Model PropFun
+axiom cnfUnsat : ¬∃ τ : PropAssignment IVar,
+  τ ⊨ (Geo.theEncoding 10 |>.val.toICnf.toPropFun)

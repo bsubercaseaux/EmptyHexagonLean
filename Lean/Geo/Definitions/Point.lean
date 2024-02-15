@@ -3,7 +3,6 @@ import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Mathlib.Analysis.InnerProductSpace.PiL2
-import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
 
 syntax "sublist_tac" : tactic
 /-- Solves goals of the form `[a,b,c] <+ [p,a,q,b,r,c]`,
@@ -13,7 +12,6 @@ macro_rules
 
 namespace Geo
 open List
-open Classical
 
 abbrev Point := EuclideanSpace ℝ (Fin 2)
 
@@ -30,10 +28,10 @@ variable {p q r s t : Point}
   intros; ext i
   match i with | ⟨0, _⟩ | ⟨1, _⟩ => assumption
 
-instance : IsTotal Point (fun P Q => P.x <= Q.x) :=
+instance : IsTotal Point fun P Q => P.x <= Q.x :=
   ⟨fun _ _ => LE.isTotal.total _ _⟩
 
-instance : IsTrans Point (fun P Q => P.x <= Q.x) :=
+instance : IsTrans Point fun P Q => P.x <= Q.x :=
   ⟨fun _ _ _ _ _ => by linarith⟩
 
 def det (p q r : Point) : ℝ :=
@@ -59,8 +57,13 @@ def PointListInGeneralPosition.to₄ {l : List Point} :
   intro h _ _ _ _ h'
   constructor <;> { refine h (Sublist.trans ?_ h'); sublist_tac }
 
+open Classical in
 def PointFinsetInGeneralPosition (S : Finset Point) : Prop :=
   ∀ {{p q r}}, {p, q, r} ⊆ S → InGeneralPosition₃ p q r
+
+-- theorem nodup_of_gp (l : List Point) :
+--     3 < l.length → PointListInGeneralPosition l → l.Nodup :=
+--   sorry
 
 /-! # Sorted (strictly, along x-coordinates) -/
 
@@ -121,56 +124,4 @@ theorem PointListSorted.to₄ {l : List Point} :
   have := h.to₃ this
   exact ⟨h₁, this.h₂⟩
 
-end Point
-
--- Cayden says: Below is "dead code" for previous definitions of sorting, etc.
-#exit
-
-structure IsSortedPoints (pts : List Point) : Prop :=
-  triples_sorted : ∀ {p q r}, List.Sublist [p, q, r] pts → IsSortedPoints₃ p q r
-
-structure IsSortedPoints' (pts : List Point) : Prop :=
-  parwise_sorted : List.Sorted (·.x < ·.x) pts
-
--- Either pick one predicate, or prove they are equivalent
-theorem is_sorted_equiv : IsSortedPoints pts ↔ IsSortedPoints' pts := sorry
-
-theorem is_sorted_three {p q r : Point} : IsSortedPoints [p, q, r] ↔ IsSortedPoints₃ p q r := by
-  constructor
-  . intro h
-    apply h.triples_sorted
-    apply List.Sublist.refl
-  . intro h
-    constructor
-    intro _ _ _ hSub
-    cases List.Sublist.eq_of_length hSub rfl
-    assumption
-
-structure IsSortedPoints₄ (p q r s : Point) : Prop :=
-  sorted₁ : IsSortedPoints₃ p q r
-  sorted₂ : IsSortedPoints₃ p q s
-  sorted₃ : IsSortedPoints₃ p r s
-  sorted₄ : IsSortedPoints₃ q r s
-
-theorem is_sorted_four {p q r s : Point} : IsSortedPoints [p, q, r, s] ↔ IsSortedPoints₄ p q r s := by
-  constructor
-  . intro h
-    constructor <;> {
-      apply h.triples_sorted
-      aesop (add safe List.Sublist.refl, safe List.Sublist.cons_cons, unsafe List.Sublist.cons)
-    }
-  . intro h
-    constructor
-    intro p' q' r' hSub
-    cases' hSub with hSub hSub hSub hSub hSub hSub hSub hSub
-    . cases List.Sublist.eq_of_length hSub rfl
-      exact h.sorted₄
-    cases' hSub with hSub hSub hSub hSub hSub hSub hSub hSub
-    . cases List.Sublist.eq_of_length hSub rfl
-      exact h.sorted₃
-    cases' hSub with hSub hSub hSub hSub hSub hSub hSub hSub
-    . cases List.Sublist.eq_of_length hSub rfl
-      exact h.sorted₂
-    exact h.sorted₁
-
-end Geo
+end Geo.Point

@@ -1,87 +1,21 @@
-import LeanSAT.Model.PropFun
-import Geo.Point
+import Geo.Definitions.WBPoints
 import Geo.Orientations
-import Geo.Formula
+import Geo.SAT.Formula
 
-namespace Geo
+namespace Geo.WBPoints
+open List
+open Classical
 
-noncomputable section
+open LeanSAT.Model PropFun
+
 open Point
-
-theorem nodup_of_gp (l : List Point) :
-    3 < l.length → PointListInGeneralPosition l → l.Nodup :=
-  sorry
-
-/-- A well-behaved list of points: in general position, sorted by `x`,
-and containing at least one point `leftmost`
-such that all signotopes `σ leftmost a b` are `CCW`. -/
-structure WBPoints where
-  leftmost : Point
-  rest : List Point
-  sorted' : PointListSorted (leftmost :: rest)
-  gp' : PointListInGeneralPosition (leftmost :: rest)
-  oriented : rest.Pairwise (σ leftmost · · = .CCW)
-
-def finset_sort (S : Finset Point) : List Point :=
-  S.toList.insertionSort (·.x <= ·.x)
-
-theorem finset_sort_sorted (S : Finset Point) : (finset_sort S).Sorted (·.x <= ·.x) :=
-  List.sorted_insertionSort (·.x <= ·.x) (S.toList)
-
-namespace WBPoints
-open List Finset Classical
-open LeanSAT Model PropFun
-
-def points (w : WBPoints) := w.leftmost :: w.rest
-
-def toFinset (w : WBPoints) : Finset Point := w.points.toFinset
-
-theorem sorted (w : WBPoints) : PointListSorted w.points :=
-  w.sorted'
-
-theorem gp (w : WBPoints) : PointListInGeneralPosition w.points :=
-  w.gp'
-
-theorem nodupX (w : WBPoints) : w.points.Pairwise (·.x ≠ ·.x) :=
-  Pairwise.imp ne_of_lt w.sorted
-
-theorem nodup (w : WBPoints) : w.points.Nodup :=
-  w.nodupX.imp fun hx h => by rw [h] at hx; contradiction
-
-abbrev length (w : WBPoints) : Nat := w.points.length
-
-instance : GetElem WBPoints Nat Point (fun w i => i < w.length) where
-  getElem w i h := w.points[i]'h
-
-theorem sorted_get (w : WBPoints) {i j : Fin w.length} :
-    i < j → w[i].x < w[j].x := by
-  intro ij
-  apply List.pairwise_iff_get.mp w.sorted _ _ ij
-
-theorem of_sorted_get (w : WBPoints) {i j : Fin w.length} :
-    w[i].x < w[j].x → i < j := by
-  intro wiwj
-  by_contra h
-  rcases lt_or_eq_of_le (not_lt.mp h) with h | h
-  . have := w.sorted_get h
-    linarith
-  . rw [h] at wiwj
-    linarith
-
-theorem of_eqx (w : WBPoints) {i j : Fin w.length} :
-    w[i].x = w[j].x → i = j := by
-  intro h
-  by_contra h
-  rcases Ne.lt_or_lt h with h | h <;> {
-    have := w.sorted_get h
-    linarith
-  }
 
 -- TODO: use a definition from an earlier module
 def σIsEmptyTriangleFor (a b c : Point) (S : Finset Point) : Prop :=
   ∀ s ∈ S, ¬σPtInTriangle s a b c
 
-def toPropAssn (w : WBPoints) : PropAssignment (Var w.length)
+open Classical in
+noncomputable def toPropAssn (w : WBPoints) : PropAssignment (Var w.length)
   | .sigma a b c ..    => σ w[a] w[b] w[c] = .CCW
   | .inside x a b c .. => decide $ σPtInTriangle w[x] w[a] w[b] w[c]
   | .hole a b c ..     => decide $ σIsEmptyTriangleFor w[a] w[b] w[c] w.toFinset
@@ -113,7 +47,7 @@ theorem satisfies_signotopeAxiom (w : WBPoints) (i j k l : Fin w.length) :
 
 theorem satisfies_signotopeAxioms (w : WBPoints) : w.toPropAssn ⊨ signotopeAxioms w.length := by
   unfold signotopeAxioms
-  simp only [signotopeAxioms, satisfies_all, Multiset.mem_map, mem_val, mem_univ, true_and,
+  simp only [signotopeAxioms, satisfies_all, Multiset.mem_map, Finset.mem_val, Finset.mem_univ, true_and,
     forall_exists_index, forall_apply_eq_imp_iff]
   intro i j k l
   split
@@ -148,7 +82,8 @@ theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPos
 
 theorem satisfies_insideDefs (w : WBPoints) : w.toPropAssn ⊨ insideDefs w.length := by
   unfold insideDefs xIsInsideDef
-  simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff, mem_val, mem_univ, true_and]
+  simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff, Finset.mem_val,
+    Finset.mem_univ, true_and]
   intro a b c x
   split_ifs <;> first | exact satisfies_tr | unfold toPropAssn
   next abc axb =>
@@ -193,10 +128,11 @@ lemma σiff {x a b c : Point} : σPtInTriangle x a b c ↔ PtInTriangle x a b c 
 
 theorem satisfies_holeDefs (w : WBPoints) : w.toPropAssn ⊨ holeDefs w.length := by
   unfold holeDefs notHoleOfPointInside hasPointInside
-  simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff, mem_val, mem_univ, true_and]
+  simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff,
+    Finset.mem_val, Finset.mem_univ, true_and]
   intro a b c
   split_ifs <;> try exact satisfies_tr
-  simp only [ne_eq, satisfies_conj, satisfies_all, Multiset.mem_map, mem_val, mem_univ, true_and,
+  simp only [ne_eq, satisfies_conj, satisfies_all, Multiset.mem_map, Finset.mem_val, Finset.mem_univ, true_and,
     forall_exists_index, forall_apply_eq_imp_iff, satisfies_impl, satisfies_neg, satisfies_var,
     Bool.not_eq_true, satisfies_any, exists_exists_eq_and]
   constructor
@@ -279,7 +215,7 @@ theorem satisfies_noHoles (w : WBPoints) :
   unfold theFormula
   intro noholes
   simp only [noHoles, satisfies_conj, satisfies_signotopeAxioms, satisfies_insideDefs, and_self,
-    satisfies_holeDefs, satisfies_all, Multiset.mem_map, mem_val, mem_univ, true_and,
+    satisfies_holeDefs, satisfies_all, Multiset.mem_map, Finset.mem_val, Finset.mem_univ, true_and,
     forall_exists_index, forall_apply_eq_imp_iff, satisfies_leftmostCCWDefs, and_true]
   intro a b c
   split_ifs
@@ -288,7 +224,7 @@ theorem satisfies_noHoles (w : WBPoints) :
     apply noholes
     intro _ hx
     apply List.mem_toFinset.mpr
-    simp only [mem_insert, Finset.mem_singleton] at hx
+    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
     rcases hx with hx | hx | hx <;> { rw [hx]; apply List.get_mem }
   . exact satisfies_tr
 

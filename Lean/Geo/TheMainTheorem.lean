@@ -1,6 +1,5 @@
-import Geo.Point
-import Geo.WBPoints
-import Geo.RunEncoding
+import Geo.SAT.WBAssn
+import Geo.SAT.Encoding
 import Geo.SigmaEquiv
 
 namespace Geo

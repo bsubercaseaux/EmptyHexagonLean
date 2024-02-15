@@ -1,4 +1,4 @@
-import Geo.Encoding
+import Geo.SAT.Encoding
 
 open LeanSAT
 
@@ -12,7 +12,3 @@ def main (args : List String) : IO Unit := do
     | throw (.userError "hi")
   let enc := Geo.theEncoding n |>.val.toICnf
   Solver.Dimacs.printFormula (IO.print) enc
-
-open Model PropFun
-axiom cnfUnsat : ¬∃ τ : PropAssignment IVar,
-  τ ⊨ (Geo.theEncoding 10 |>.val.toICnf.toPropFun)

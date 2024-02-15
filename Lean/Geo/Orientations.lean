@@ -1,8 +1,8 @@
 import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
-import Geo.Point
-import Geo.Slope
+import Geo.Definitions.Point
+import Geo.Definitions.Slope
 import Geo.ToMathlib
 
 namespace Geo

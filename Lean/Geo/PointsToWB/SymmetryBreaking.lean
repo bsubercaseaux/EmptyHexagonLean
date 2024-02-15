@@ -52,7 +52,6 @@ def step2 : ∃ step2 : Finset Point,
   have ⟨step1, step1_seqv, step1_xInj, step1_gp⟩ := step1 l gp
   sorry
 
-
 /-! ## STEP 3: PROJECTION -/
 
 def step3 : ∃ step3 : Finset Point,
@@ -66,7 +65,6 @@ def step3 : ∃ step3 : Finset Point,
   := by
   have ⟨step2, step2_seqv, step2_xInj, step2_gp⟩ := step2 l gp
   sorry
-
 
 /-! ## STEP 4: SORT -/
 
