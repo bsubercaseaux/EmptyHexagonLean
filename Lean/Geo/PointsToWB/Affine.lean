@@ -47,7 +47,8 @@ lemma TMatrix.rotateByAffine (θ : ℝ) : TMatrix (Matrix.rotateByAffine θ) whe
   det_pos := by simp [Matrix.det_fin_three, Matrix.rotateByAffine, ← Real.cos_sub]
   third_row := by simp [Matrix.rotateByAffine]; rfl
 
-lemma pt_transform_rotateByAffine (p : Point) : pt_transform (Matrix.rotateByAffine θ) p = rotationMap θ p := by
+lemma pt_transform_rotateByAffine (p : Point) :
+    pt_transform (Matrix.rotateByAffine θ) p = rotationMap θ p := by
   ext <;> simp [pt_transform, Matrix.rotateByAffine, Point.x, Point.y, vec_to_pt, pt_to_vec]; ring
 
 /-- Given two distinct points `P, Q`,

@@ -22,20 +22,25 @@ variable (l : Finset Point) (hl : Finset.card l ≥ 3) (gp : Point.PointFinsetIn
 
 def step1 : ∃ step1 : Finset Point,
     ∃ _ : l ≃σ step1,
-    (∀ᵉ (x ∈ step1) (y ∈ step1), x.x = y.x → x = y) ∧
-    Point.PointFinsetInGeneralPosition step1
+    (∀ᵉ (x ∈ step1) (y ∈ step1), x.x = y.x → x = y)
   := by
   let _ := l
   let _ := gp
   have ⟨θ,h⟩ := distinct_rotate_finset l l.countable_toSet
-  use l.image (rotationMap θ)
-  refine ⟨?seqv, ?xInj, ?gp⟩
+  let T := TMatrix.rotateByAffine θ
+  use l.image T.toAffineMap
+  refine ⟨?seqv, ?xInj⟩
   case seqv =>
-    sorry
+    simp [TMatrix.toAffineMap]
+    exact T.toEquivσ l
   case xInj =>
-    sorry
-  case gp =>
-    sorry
+    intro x hx y hy
+    contrapose
+    intro hne
+    apply h
+    · simpa [TMatrix.toAffineMap, pt_transform_rotateByAffine] using hx
+    · simpa [TMatrix.toAffineMap, pt_transform_rotateByAffine] using hy
+    · exact hne
 
 /-! ## STEP 2: TRANSLATE -/
 
