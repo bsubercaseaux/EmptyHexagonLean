@@ -47,6 +47,10 @@ def Orientation.ofReal (r : ℝ) : Orientation :=
 theorem Orientation.ofReal_mul_left (r a : ℝ) (h : 0 < a) : ofReal (a * r) = ofReal r := by
   simp [ofReal, mul_pos_iff_of_pos_left h, mul_neg_iff_of_pos_left h]
 
+theorem Orientation.ofReal_neg (r : ℝ) : ofReal (-r) = -ofReal r := by
+  simp [ofReal]; split_ifs <;> try rfl
+  cases lt_asymm ‹_› ‹_›
+
 open Orientation Point
 
 def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=

@@ -21,8 +21,8 @@ namespace Point
 
 variable {p q r s t : Point}
 
-abbrev x (p : Point) : ℝ := p 0
-abbrev y (p : Point) : ℝ := p 1
+@[pp_dot] abbrev x (p : Point) : ℝ := p 0
+@[pp_dot] abbrev y (p : Point) : ℝ := p 1
 
 -- Cayden asks: would it be worth it to define a Triple type, like Prod?
 
