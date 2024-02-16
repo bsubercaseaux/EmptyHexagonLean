@@ -8,7 +8,6 @@ import Geo.PointsToWB.TMatrix
 import Geo.Definitions.WBPoints
 import Geo.PointsToWB.Affine
 import Geo.PointsToWB.Projective
-import Geo.SigmaEquiv
 
 open Classical
 open scoped List

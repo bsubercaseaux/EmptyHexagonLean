@@ -36,5 +36,11 @@ theorem List.toFinset_map [DecidableEq α] [DecidableEq β] (l : List α) (f : �
 theorem mul_neg_iff_of_pos_left {a b : ℝ} (h : 0 < a) : a * b < 0 ↔ b < 0 := by
   rw [← not_le, ← not_le, mul_nonneg_iff_right_nonneg_of_pos h]
 
-theorem exists_lt_list (l : List α) (f : α → ℝ) : ∃ a, ∀ x ∈ l, a < f x := sorry
-theorem exists_gt_list (l : List α) (f : α → ℝ) : ∃ a, ∀ x ∈ l, f x < a := sorry
+theorem exists_lt_list (l : List α) (f : α → ℝ) : ∃ a, ∀ x ∈ l, a < f x := by
+  induction' l with a l ih <;> simp
+  have ⟨r, h⟩ := ih
+  refine ⟨min (f a - 1) r, by simp (config := {contextual := true}) [h]⟩
+
+theorem exists_gt_list (l : List α) (f : α → ℝ) : ∃ a, ∀ x ∈ l, f x < a := by
+  have ⟨r, h⟩ := exists_lt_list l (-f ·)
+  exact ⟨-r, fun _ hx => lt_neg.1 (h _ hx)⟩
