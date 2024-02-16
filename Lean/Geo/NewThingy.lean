@@ -3,6 +3,7 @@ import Geo.Definitions.WBPoints
 import Geo.Orientations
 import Geo.PointsToWB.SymmetryBreaking
 
+open scoped Matrix
 namespace Geo
 noncomputable section
 
@@ -57,204 +58,15 @@ theorem detIffHalfPlaneCCW : a ∈ halfPlaneCCW p q ↔ matrix_det p q a ≥ 0 :
     · exact Or.inr $ σ_Co_iff_pos_0.mpr h.symm
     · exact Or.inl $ σ_CCW_iff_pos_det.mpr h
 
-#check Convex
-#check Matrix.dotProduct
 
-open Matrix in
 theorem HalfPlanesAreConvex : Convex ℝ (halfPlaneCCW p q) := by
-  convert convex_halfspace_ge (f := fun r => Matrix.dotProduct r (p - q)) _ (p.x * q.y + q.x - p.y) using 1
-  · ext
-    simp [detIffHalfPlaneCCW, matrix_det_eq_det_pts, Point.det, Point.x, Point.y]--exact detIffHalfPlaneCCW
-    -- use show _ ↔ _ ≤ _
-    dsimp
-    done
-
-#exit
-  infer_instance
-  infer_instance
-  simp [matrix_det_eq_det_pts, Point.det]
-  have : Point →ₗ[ℝ] ℝ :=
-    { toFun := fun r => Matrix.dotProduct r (p - q)
-    --r.x * (p.y - q.y) - p.x * r.y + q.x * r.y,
-      map_add' := by
-        intro x y
-        simp [Point.x, Point.y]
-        ring
-        done,
-      map_smul' := by simp }
-  apply IsLinearMap_sub
-
-  done
-
-  let S := { p : Point | a.x ≤ p.x } ∩ { p : Point | p.x ≤ c.x }
-  have cvxS : Convex ℝ S :=
-    Convex.inter
-      (convex_halfspace_ge ⟨fun _ _ => rfl, fun _ _ => rfl⟩ a.x)
-      (convex_halfspace_le ⟨fun _ _ => rfl, fun _ _ => rfl⟩ c.x)
-
-#exit
-  simp [Convex, StarConvex, detIffHalfPlaneCCW]
-  intro x hx y hy α β hα hβ hαβ
-  rcases eq_or_lt_of_le hα with (rfl | hα)
-  · rw [zero_add] at hαβ; subst hαβ
-    rw [zero_smul, one_smul, zero_add]
-    exact hy
-  · rcases eq_or_lt_of_le hβ with (rfl | hβ)
-    · rw [add_zero] at hαβ; subst hαβ
-      rw [zero_smul, one_smul, add_zero]
-      exact hx
-      done
-    · rw [matrix_det_eq_det_pts, Point.det] at hx hy ⊢
-
-      done
-#exit
-
-
-
-  unfold halfPlaneCCW
-  unfold Convex
-  intro a
-  intro h
-  unfold StarConvex
-  intro b
-  intro ypq
-  intro α β
-  intro hα hβ
-  intro hαβ
-  unfold ptInsideHalfPlaneCCW at *
-  simp [] at ypq
-  simp [] at h
-  rw [σ_CCW_iff_pos_det] at *
-  rw [σ_Co_iff_pos_0] at *
-  simp
-  rw [σ_CCW_iff_pos_det]
-  rw [σ_Co_iff_pos_0] at *
-  done
-
-#exit
-  have h' : matrix_det p q a ≥ 0 := by {
-    apply le_of_lt_or_eq
-    clear ypq
-    tauto
-  }
-  have ypq' : matrix_det p q b ≥ 0 := by {
-    apply le_of_lt_or_eq
-    clear h
-    tauto
-  }
-
-  suffices : matrix_det p q (α • a + β • b) ≥ 0
-  {
-    rcases lt_or_eq_of_le this with h | h
-    . exact Or.inl h
-    . apply Or.inr; rw [h]
-  }
-  clear ypq h
-
-  rw [matrix_det_eq_det_pts] at *
-  unfold Point.det at *
-
-  by_cases h1 : α = 0
-  {
-    rw [h1]
-    ring_nf
-    have h2 : β = 1 := by linarith
-    rw [h2]
-    ring_nf
-    simp at *
-    ring_nf at *
-    linarith
-  }
-  {
-  simp at *
-
-  have h3 : α > 0 := by {
-    apply lt_of_le_of_ne
-    exact hα
-    apply fix_mismatch_example at h1
-    exact h1
-  }
-
-  by_cases hb : β = 0
-  {
-    have h4 : α = 1 := by linarith
-    simp only [] at *
-    rw [h4]
-    rw [hb]
-    ring_nf
-    simp []
-    linarith
-  }
-  have h5 : β > 0 := by {
-    apply lt_of_le_of_ne
-    exact hβ
-    apply fix_mismatch_example at hb
-    exact hb
-  }
-
-  have αh : α * (Point.y a * Point.x p) ≤ α * (Point.x p * Point.y q + Point.x q * Point.y a + Point.x a * Point.y p - Point.y p * Point.x q - Point.y q * Point.x a) := by {
-    nlinarith
-  }
-
-  have βypq : β * (Point.y b * Point.x p) ≤ β * (Point.x p * Point.y q + Point.x q * Point.y b + Point.x b * Point.y p - Point.y p * Point.x q - Point.y q * Point.x b) := by {
-    nlinarith
-  }
-
-  have mix : α * (Point.y a * Point.x p) + β * (Point.y b * Point.x p) ≤ α * (Point.x p * Point.y q + Point.x q * Point.y a + Point.x a * Point.y p - Point.y p * Point.x q - Point.y q * Point.x a) + β * (Point.x p * Point.y q + Point.x q * Point.y b + Point.x b * Point.y p - Point.y p * Point.x q - Point.y q * Point.x b) := by {
-    nlinarith
-  }
-  ring_nf at mix
-  have ls: α * (Point.x p) * (Point.y q) + β * (Point.x p) * (Point.y q) = Point.x p * Point.y q :=
-    by
-    calc α * (Point.x p) * (Point.y q) + β * (Point.x p) * (Point.y q) = (α + β) * (Point.x p) * (Point.y q) := by ring
-      _ = Point.x p * Point.y q := by {
-        rw [hαβ]
-        simp
-      }
-  have mix2: α * (Point.y a * Point.x p) + β * (Point.y b * Point.x p) ≤ (α * (Point.x p * Point.y q) + β * (Point.x p * Point.y q))  + α * (Point.x q * Point.y a) + β * (Point.x q * Point.y b) + α * (Point.x a * Point.y p) + β * (Point.x b * Point.y p) - α * (Point.y p * Point.x q) - β * (Point.y p * Point.x q) - α * (Point.y q * Point.x a) - β * (Point.y q * Point.x b) := by {
-    nlinarith
-  }
-  have mix3: α * (Point.y a * Point.x p) + β * (Point.y b * Point.x p) ≤ (Point.x p * Point.y q) + α * (Point.x q * Point.y a) + β * (Point.x q * Point.y b) + α * (Point.x a * Point.y p) + β * (Point.x b * Point.y p) - α * (Point.y p * Point.x q) - β * (Point.y p * Point.x q) - α * (Point.y q * Point.x a) - β * (Point.y q * Point.x b) := by {
-    linarith
-  }
-  have exp : Point.y (α • a + β • b) = α * (Point.y a) + β * (Point.y b) := by {
-    simp []
-  }
-  have exp2 : Point.x (α • a + β • b) = α * (Point.x a) + β * (Point.x b) := by {
-    simp []
-  }
-
-  save
-  rw [←exp]
-  rw [←exp2]
-  ring_nf at *
-
-
-  have mx: Point.x p * Point.y q - (Point.y q) * α * (Point.x a)  - Point.y q * β * Point.x b +
-   - Point.x p * α * Point.y a - Point.x p * β * Point.y b +
-          (Point.x q * α * Point.y a - Point.x q * α * Point.y p) +
-        (Point.x q * β * Point.y b - Point.x q * β * Point.y p) +
-      α * Point.x a * Point.y p +
-    β * Point.x b * Point.y p ≥ 0 := by {
-      nlinarith
-  }
-  ring_nf at mx
-  ring_nf
-  -- (-(α * Point.y p * Point.x q) - Point.y p * Point.x q * β)
-  have ls2: α * (Point.y p) * (Point.x q) + β * (Point.y p) * (Point.x q) = Point.y p * Point.x q :=
-    by
-    calc α * (Point.y p) * (Point.x q) + β * (Point.y p) * (Point.x q) = (α + β) * (Point.y p) * (Point.x q) := by ring
-      _ = Point.y p * Point.x q := by {
-        rw [hαβ]
-        simp
-      }
-  rw [exp]
-  rw [exp2]
-  ring_nf at *
-  nlinarith
-  }
-
-example : True := by trivial
+  convert convex_halfspace_le (𝕜 := ℝ) (E := Point)
+      (f := fun r => (q.y - p.y) * r.x + (p.x - q.x) * r.y) _ (p.x * q.y - p.y * q.x) using 1
+  · ext r
+    simp only [detIffHalfPlaneCCW, matrix_det_eq_det_pts, Point.det,
+      Matrix.vec2_dotProduct, PiLp.sub_apply, Set.mem_setOf_eq]
+    simp (config := {singlePass := true}) [← sub_nonneg]; ring_nf
+  constructor <;> intros <;> simp [Point.x, Point.y] <;> ring
 
 theorem det_symmetry (a b c : Point) : matrix_det a b c = -matrix_det b a c := by
   rw [matrix_det_eq_det_pts]
