@@ -162,3 +162,107 @@ year = {1978},
       archivePrefix={arXiv},
       primaryClass={cs.DM}
 }
+
+
+@article{formalPythagoreanTriples,
+author = {Cruz-Filipe, Lu\'{\i}s and Marques-Silva, Joao and Schneider-Kamp, Peter},
+title = {Formally Verifying the Solution to the Boolean Pythagorean Triples Problem},
+year = {2019},
+issue_date = {Oct 2019},
+publisher = {Springer-Verlag},
+address = {Berlin, Heidelberg},
+volume = {63},
+number = {3},
+issn = {0168-7433},
+url = {https://doi.org/10.1007/s10817-018-9490-4},
+doi = {10.1007/s10817-018-9490-4},
+abstract = {The Boolean Pythagorean Triples problem asks: does there exist a binary coloring of the natural numbers such that every Pythagorean triple contains an element of each color? This problem was first solved in 2016, when Heule, Kullmann and Marek encoded a finite restriction of this problem as a propositional formula and showed its unsatisfiability. In this work we formalize their development in the theorem prover Coq. We state the Boolean Pythagorean Triples problem in Coq, define its encoding as a propositional formula and establish the relation between solutions to the problem and satisfying assignments to the formula. We verify Heule et al.’s proof by showing that the symmetry breaks they introduced to simplify the propositional formula are sound, and by implementing a correct-by-construction checker for proofs of unsatisfiability based on reverse unit propagation.},
+journal = {J. Autom. Reason.},
+month = {oct},
+pages = {695–722},
+numpages = {28},
+keywords = {Interactive theorem proving, Large-scale proofs, SAT solving}
+}
+
+
+@mastersthesis{GilAndWennerbeck,
+  author  = {Giljeg{\r{a}}rd, Sofia and Wennerbeck, Johan},
+  school  = {Chalmers University of Technology},
+  title   = {Puzzle Solving with Proof},
+  year    = {2021}
+}
+
+@inproceedings{Cayden,
+  author          = {Codel, Cayden and Heule, Marijn J. H. and Avigad, Jeremy},
+  booktitle       = {Proceedings of the 23rd conference on Formal Methods In Computer-Aided Design},
+  editor          = {Nadel, Alexander  and Rozie, Kristin Yvonne},
+  title           = {Verified Encodings for SAT Solvers},
+  year            = {2023}
+}
+
+@inproceedings{LPAR-21:Formally_Proving_Boolean_Pythagorean,
+  author    = {Lu\textbackslash{}'is Cruz-Filipe and Peter Schneider-Kamp},
+  title     = {Formally Proving the Boolean Pythagorean Triples Conjecture},
+  booktitle = {LPAR-21. 21st International Conference on Logic for Programming, Artificial Intelligence and Reasoning},
+  editor    = {Thomas Eiter and David Sands},
+  series    = {EPiC Series in Computing},
+  volume    = {46},
+  pages     = {509--522},
+  year      = {2017},
+  publisher = {EasyChair},
+  bibsource = {EasyChair, https://easychair.org},
+  issn      = {2398-7340},
+  url       = {https://easychair.org/publications/paper/xq6J},
+  doi       = {10.29007/jvdj}}
+  
+  
+  @article{lammichEfficientVerifiedSAT2020,
+  title = {Efficient {{Verified}} ({{UN}}){{SAT Certificate Checking}}},
+  author = {Lammich, Peter},
+  year = {2020},
+  month = mar,
+  journal = {Journal of Automated Reasoning},
+  volume = {64},
+  number = {3},
+  pages = {513--532},
+  issn = {1573-0670},
+  doi = {10.1007/s10817-019-09525-z},
+  abstract = {SAT solvers decide the satisfiability of Boolean formulas in conjunctive normal form. They are commonly used for software and hardware verification. Modern SAT solvers are highly complex and optimized programs. As a single bug in the solver may invalidate the verification of many systems, SAT solvers output certificates for their answer, which are then checked independently. However, even certificate checking requires highly optimized non-trivial programs. This paper presents the first SAT solver certificate checker that is formally verified down to the integer sequence representing the formula. Our tool supports the full DRAT standard, and is even faster than the unverified state-of-the-art tool drat-trim, on a realistic set of benchmarks drawn from the 2016 and 2017 SAT competitions. An optional multi-threaded mode further reduces the runtime, in particular for big certificates.}
+}
+
+
+@inproceedings{oeVersatVerifiedModern2012,
+  title = {Versat: {{A Verified Modern SAT Solver}}},
+  booktitle = {Verification, {{Model Checking}}, and {{Abstract Interpretation}}},
+  author = {Oe, Duckki and Stump, Aaron and Oliver, Corey and Clancy, Kevin},
+  editor = {Kuncak, Viktor and Rybalchenko, Andrey},
+  year = {2012},
+  pages = {363--378},
+  publisher = {{Springer Berlin Heidelberg}},
+  address = {{Berlin, Heidelberg}},
+  abstract = {This paper presents versat, a formally verified SAT solver incorporating the essential features of modern SAT solvers, including clause learning, watched literals, optimized conflict analysis, non-chronological backtracking, and decision heuristics. Unlike previous related work on SAT-solver verification, our implementation uses efficient low-level data structures like mutable C arrays for clauses and other solver state, and machine integers for literals. The implementation and proofs are written in Guru, a verified-programming language. We compare versat to a state-of-the-art SAT solver that produces certified ``unsat'' answers. We also show through an empirical evaluation that versat can solve SAT problems on the modern scale.},
+  isbn = {978-3-642-27940-9}
+}
+
+
+@article{tanVerifiedPropagationRedundancy2023,
+  title = {Verified {{Propagation Redundancy}} and {{Compositional UNSAT Checking}} in {{CakeML}}},
+  author = {Tan, Yong Kiam and Heule, Marijn J. H. and Myreen, Magnus O.},
+  year = {2023},
+  month = apr,
+  journal = {International Journal on Software Tools for Technology Transfer},
+  volume = {25},
+  number = {2},
+  pages = {167--184},
+  issn = {1433-2787},
+  doi = {10.1007/s10009-022-00690-y},
+  abstract = {Modern SAT solvers can emit independently-checkable proof certificates to validate their results. The state-of-the-art proof system that allows for compact proof certificates is propagation redundancy (\$\${\textbackslash}textsf\{PR\}\$\$). However, the only existing method to validate proofs in this system with a formally verified tool requires a transformation to a weaker proof system, which can result in a significant blowup in the size of the proof and increased proof validation time. This article describes the first approach to formally verify \$\${\textbackslash}textsf\{PR\}\$\$proofs on a succinct representation. We present (i) a new Linear PR (LPR) proof format, (ii) an extension of the DPR-trim tool to efficiently convert \$\${\textbackslash}textsf\{PR\}\$\$proofs into LPR format, and (iii) cake\_lpr, a verified LPR proof checker developed in CakeML. We also enhance these tools with (iv) a new compositional proof format designed to enable separate (parallel) proof checking. The LPR format is backwards compatible with the existing LRAT format, but extends LRAT with support for the addition of \$\${\textbackslash}textsf\{PR\}\$\$clauses. Moreover, cake\_lpr is verified using CakeML 's binary code extraction toolchain, which yields correctness guarantees for its machine code (binary) implementation. This further distinguishes our clausal proof checker from existing checkers because unverified extraction and compilation tools are removed from its trusted computing base. We experimentally show that: LPR provides efficiency gains over existing proof formats; cake\_lpr 's strong correctness guarantees are obtained without significant sacrifice in its performance; and the compositional proof format enables scalable parallel proof checking for large proofs.}
+}
+
+@mastersthesis{skotam_creusat_2022,
+	title = {{CreuSAT}, Using {Rust} and {Creusot} to create the world’s fastest deductively verified {SAT} solver},
+	url = {https://www.duo.uio.no/handle/10852/96757},
+	school = {University of Oslo},
+	author = {Skotåm, Sarek Høverstad},
+	year = {2022},
+}
