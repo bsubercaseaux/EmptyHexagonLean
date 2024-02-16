@@ -142,6 +142,33 @@ theorem Point.InGeneralPosition₃.perm₂ {p q r : Point} :
   rw [h'] at h
   contradiction
 
+theorem Point.InGeneralPosition₃.of_perm (h : [p, q, r].Perm [p', q', r']) :
+    InGeneralPosition₃ p q r ↔ InGeneralPosition₃ p' q' r' := by
+  suffices ∀ {p q r p' q' r'}, [p, q, r].Perm [p', q', r'] →
+    InGeneralPosition₃ p q r → InGeneralPosition₃ p' q' r' from ⟨this h, this h.symm⟩
+  clear p q r p' q' r' h; intro p q r p' q' r' h gp
+  rw [← List.mem_permutations] at h; change _ ∈ [_,_,_,_,_,_] at h; simp at h
+  obtain h|h|h|h|h|h := h <;> obtain ⟨rfl,rfl,rfl⟩ := h
+  · exact gp
+  · exact gp.perm₁
+  · exact gp.perm₁.perm₂.perm₁
+  · exact gp.perm₂.perm₁
+  · exact gp.perm₁.perm₂
+  · exact gp.perm₂
+
+theorem PointListInGeneralPosition.subperm : PointListInGeneralPosition l ↔
+    ∀ {{p q r : Point}}, [p, q, r].Subperm l → InGeneralPosition₃ p q r := by
+  refine ⟨fun H _ _ _ ⟨l, p, h⟩ => ?_, fun H _ _ _ h => H h.subperm⟩
+  match l, p.length_eq with
+  | [p',q',r'], _ => exact (Point.InGeneralPosition₃.of_perm p).1 (H h)
+
+theorem PointListInGeneralPosition.perm (h : l.Perm l') :
+    PointListInGeneralPosition l ↔ PointListInGeneralPosition l' := by
+  suffices ∀ {l l'}, l.Perm l' →
+    PointListInGeneralPosition l → PointListInGeneralPosition l' from ⟨this h, this h.symm⟩
+  clear l l' h; intro l l' p gp _ _ _ h
+  exact PointListInGeneralPosition.subperm.1 gp <| List.subperm_iff.2 ⟨_, p.symm, h⟩
+
 theorem Point.InGeneralPosition₃.ne₁ {p q r : Point} (h : InGeneralPosition₃ p q r) : p ≠ q := by
   rintro rfl; exact h.σ_ne (σ_self₃ _ _)
 

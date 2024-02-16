@@ -13,8 +13,6 @@ import Geo.SigmaEquiv
 open Classical
 open scoped List
 
-noncomputable section
-
 namespace Geo
 
 structure σEmbed (S T : List Point) :=
@@ -51,8 +49,17 @@ def OrientationProperty' (P : List Point → Prop) :=
 theorem OrientationProperty'.not : OrientationProperty' P → OrientationProperty' (¬P ·) :=
   fun h _ _ hσ => not_congr (h hσ)
 
-theorem σEmbed.gp : OrientationProperty' Point.PointListInGeneralPosition := fun S T hσ => by
-  sorry
+theorem σEmbed.gp : OrientationProperty' Point.PointListInGeneralPosition := fun S T f => by
+  rw [← PointListInGeneralPosition.perm f.perm]
+  simp only [Point.PointListInGeneralPosition, ← List.mem_sublists, List.sublists_map]
+  simp [Point.InGeneralPosition₃.iff_ne_collinear]
+  constructor
+  · intro | H, _, _, _, [p',q',r'], sl, rfl => ?_
+    have := sl.subset; simp at this
+    rw [f.σ _ _ _ this.1 this.2.1 this.2.2]; exact H sl
+  · intro H p q r sl
+    have := sl.subset; simp at this
+    rw [← f.σ _ _ _ this.1 this.2.1 this.2.2]; exact H _ sl rfl
 
 variable {l : List Point} (hl : 3 ≤ l.length) (gp : Point.PointListInGeneralPosition l)
 
@@ -136,11 +143,11 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
   }
 
   -- step 6: construct
-  refine ⟨{
+  exact ⟨{
     leftmost := z
     rest := l4
     sorted' := List.sorted_cons.2 ⟨hleft, l4_lt⟩
     gp' := σ5.gp.1 gp
-    oriented := l4_lt.imp_of_mem fun {a b} ha hb h => ?_
+    oriented := l4_lt.imp_of_mem fun ha hb h => by
+      rwa [← horiented _ ha _ hb, orientWithInfty, Orientation.ofReal_eq_ccw, sub_pos]
   }, ⟨σ5⟩⟩
-  rwa [← horiented _ ha _ hb, orientWithInfty, Orientation.ofReal_eq_ccw, sub_pos]
