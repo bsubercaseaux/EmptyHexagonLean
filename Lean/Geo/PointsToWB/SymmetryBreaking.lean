@@ -49,7 +49,7 @@ def step2 : ∃ step2 : Finset Point,
     (∀ x ∈ step2, x.x > 0) ∧
     (∀ᵉ (x ∈ step2) (y ∈ step2), x.x = y.x → x = y)
   := by
-  have ⟨step1, step1_seqv, step1_xInj, step1_gp⟩ := step1 l gp
+  have ⟨step1, step1_seqv, step1_xInj⟩ := step1 l gp
   sorry
 
 /-! ## STEP 3: PROJECTION -/
@@ -58,10 +58,10 @@ def step3 : ∃ step3 : Finset Point,
     ∃ step2 : Finset Point,
     ∃ _ : l ≃σ (insert ![0,0] step2),
     ∃ eqv : step2 ≃σ step3,
-      (∀ᵉ (x ∈ step2) (y ∈ step2), σ ![0,0] x y = orientWithInfty (eqv x) (eqv y)) ∧
+      (∀ x y : step2, σ ![0,0] x y = orientWithInfty (eqv x) (eqv y)) ∧
       (∀ᵉ (x ∈ step3) (y ∈ step3), x.x = y.x → x = y)
   := by
-  have ⟨step2, step2_seqv, step2_xInj, step2_gp⟩ := step2 l gp
+  have ⟨step2, step2_seqv, step2_xInj⟩ := step2 l gp
   sorry
 
 /-! ## STEP 4&5: SORT & CONSTRUCT HIGH-UP POINT -/
@@ -73,7 +73,7 @@ theorem finset_sort_sorted (S : Finset Point) : (finset_sort S).Sorted (·.x <= 
   List.sorted_insertionSort (·.x <= ·.x) (S.toList)
 
 def step45 : ∃ w : WBPoints, Nonempty (l ≃σ w.toFinset) := by
-  have ⟨step3, step2, seqv_l_2, seqv_2_3, σ_2_2, nodup3⟩ := step3 l
+  have ⟨step3, step2, seqv_l_2, seqv_2_3, σ_2_2, nodup3⟩ := step3 l gp
   let step4 := finset_sort step3
   -- TODO: step₃ ≃σ step₄.toFinset
   have step4_sorted : step4.Sorted (·.x < ·.x) := sorry

@@ -52,7 +52,7 @@ structure InGeneralPosition₄ (p q r s : Point) : Prop :=
   gp₄ : InGeneralPosition₃ q r s
 
 def PointListInGeneralPosition (l : List Point) : Prop :=
-  ∀ {p q r : Point}, [p, q, r] <+ l → InGeneralPosition₃ p q r
+  ∀ {{p q r : Point}}, [p, q, r] <+ l → InGeneralPosition₃ p q r
 
 def PointListInGeneralPosition.to₄ {l : List Point} :
     PointListInGeneralPosition l →
@@ -67,10 +67,6 @@ def PointFinsetInGeneralPosition (S : Finset Point) : Prop :=
 open Classical in
 theorem list_finset_gp (l : List Point) : l.Nodup → PointFinsetInGeneralPosition l.toFinset ↔ PointListInGeneralPosition l :=
   sorry -- TODO(WN)
-
--- theorem nodup_of_gp (l : List Point) :
---     3 < l.length → PointListInGeneralPosition l → l.Nodup :=
---   sorry
 
 /-! # Sorted (strictly, along x-coordinates) -/
 

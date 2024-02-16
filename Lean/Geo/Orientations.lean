@@ -142,12 +142,33 @@ theorem Point.InGeneralPosition₃.perm₂ {p q r : Point} :
   rw [h'] at h
   contradiction
 
+theorem Point.InGeneralPosition₃.ne₁ {p q r : Point} (h : InGeneralPosition₃ p q r) : p ≠ q := by
+  rintro rfl; exact h.σ_ne (σ_self₃ _ _)
+
+theorem Point.InGeneralPosition₃.ne₂ {p q r : Point} (h : InGeneralPosition₃ p q r) : p ≠ r :=
+  h.perm₂.ne₁
+
+theorem Point.InGeneralPosition₃.ne₃ {p q r : Point} (h : InGeneralPosition₃ p q r) : q ≠ r :=
+  h.perm₁.ne₂
+
 theorem Point.InGeneralPosition₃.σ_cases {p q r : Point} :
     InGeneralPosition₃ p q r → σ p q r = .CCW ∨ σ p q r = .CW := by
   intro h
   cases h' : σ p q r <;> try tauto
   have := h.σ_ne
   contradiction
+
+theorem Point.PointListInGeneralPosition.nodup {l : List Point}
+    (h : 3 ≤ l.length) (gp : PointListInGeneralPosition l) : l.Nodup := by
+  let a :: l := l
+  simp; constructor
+  · let b :: l := l
+    simp [not_or]; constructor
+    · let c :: l := l
+      exact (gp <| .cons₂ _ <| .cons₂ _ <| .cons₂ _ <| List.nil_sublist _).ne₁
+    · intro ha
+      exact (gp <| .cons₂ _ <| .cons₂ _ <| List.singleton_sublist.2 ha).ne₂ rfl
+  · refine List.nodup_iff_sublist.2 fun b h => (gp <| .cons₂ _ h).ne₃ rfl
 
 theorem Point.InGeneralPosition₃.σ_iff {p q r : Point} :
     InGeneralPosition₃ p q r → (σ p q r ≠ .CCW ↔ σ p q r = .CW) := by

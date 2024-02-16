@@ -16,13 +16,13 @@ noncomputable def orientWithInfty (p1 p2 : Point) :=
 theorem orientWithInfty_swap : -orientWithInfty p1 p2 = orientWithInfty p2 p1 := by
   simp [orientWithInfty, ← Orientation.ofReal_neg]
 
-theorem orientWithInfty_preserved (p1 p2 : Point) (h1 : p1.x > 0) (h2 : p2.x > 0) :
-    σ ![0,0] p1 p2 = orientWithInfty (projectiveMap p1) (projectiveMap p2) := by
+theorem orientWithInfty_preserved {p1 p2 : Point} (h1 : p1.x > 0) (h2 : p2.x > 0) :
+    σ 0 p1 p2 = orientWithInfty (projectiveMap p1) (projectiveMap p2) := by
   simp [projectiveMap, σ, orientWithInfty, matrix_det_eq_det_pts, Point.det]
   convert Orientation.ofReal_mul_left _ _ (mul_pos h1 h2) using 2
   field_simp; ring
 
-theorem orientations_preserved (p1 p2 p3 : Point) (h1 : p1.x > 0) (h2 : p2.x > 0) (h3 : p3.x > 0) :
+theorem orientations_preserved {p1 p2 p3 : Point} (h1 : p1.x > 0) (h2 : p2.x > 0) (h3 : p3.x > 0) :
     σ p1 p2 p3 = σ (projectiveMap p1) (projectiveMap p2) (projectiveMap p3) := by
   simp [projectiveMap, σ, matrix_det_eq_det_pts, Point.det]
   convert Orientation.ofReal_mul_left _ _ (mul_pos h1 <| mul_pos h2 h3) using 2
