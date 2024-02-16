@@ -3,7 +3,6 @@ import Geo.Definitions.WBPoints
 import Geo.Orientations
 import Geo.PointsToWB.SymmetryBreaking
 
-open scoped Matrix
 namespace Geo
 noncomputable section
 
@@ -57,7 +56,6 @@ theorem detIffHalfPlaneCCW : a ∈ halfPlaneCCW p q ↔ matrix_det p q a ≥ 0 :
     rcases eq_or_lt_of_le h with (h | h)
     · exact Or.inr $ σ_Co_iff_pos_0.mpr h.symm
     · exact Or.inl $ σ_CCW_iff_pos_det.mpr h
-
 
 theorem HalfPlanesAreConvex : Convex ℝ (halfPlaneCCW p q) := by
   convert convex_halfspace_le (𝕜 := ℝ) (E := Point)
@@ -136,7 +134,7 @@ theorem convex3combo (S : Set Point) (CS: Convex ℝ S) : ∀ (a b c : Point), a
 
     have combo2Eq : combo2 = α • a + β • b + γ • c := by {
       simp only [smul_add, ← smul_assoc]
-      have neq := fix_mismatch_example case
+      have neq := Ne.symm case
       field_simp
       rw [mul_comm]
       rw [mul_div_assoc]
@@ -629,7 +627,7 @@ theorem injective_rotateTranslateMap (θ : ℝ) (p : Point) : Function.Injective
   . exact fun x y h => add_left_cancel h
   . simp [injective_rotationMap]
 
-lemma pt_transform_translateMap (p  t: Point)  : pt_transform p (translation_matrix t.x t.y) = translateMap t p := by
+lemma pt_transform_translateMap (p  t: Point)  : pt_transform (translation_matrix t.x t.y) p = translateMap t p := by
   ext <;> simp [pt_transform, translation_matrix, Point.x, Point.y, vec_to_pt, pt_to_vec];
   ring_nf
   rw [translateMap_apply]
@@ -662,7 +660,7 @@ theorem PtInTriangle2InvariantUnderTransform {a p q r : Point}  (t : Point) (θ 
       exact injective_rotateTranslateMap θ t
 
 theorem rotateTranslateTransform (θ : ℝ) (t p : Point):
-(rotateTranslateMap θ t p) = pt_transform p ((translation_matrix t.x t.y)*(Matrix.rotateByAffine θ)) := by
+(rotateTranslateMap θ t p) = pt_transform ((translation_matrix t.x t.y)*(Matrix.rotateByAffine θ)) p := by
   rw [pt_transform_by_prod]
   unfold rotateTranslateMap
   simp
