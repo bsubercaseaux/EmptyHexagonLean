@@ -28,14 +28,7 @@ variable {p q r s t : Point}
   intros; ext i
   match i with | ⟨0, _⟩ | ⟨1, _⟩ => assumption
 
-<<<<<<< HEAD:Lean/Geo/Definitions/Point.lean
 instance : IsTotal Point fun P Q => P.x <= Q.x :=
-=======
-theorem eq_iff : p = q ↔ (p.x = q.x ∧ p.y = q.y) := by
-  aesop (add safe ext)
-
-instance : IsTotal Point (fun P Q => P.x <= Q.x) :=
->>>>>>> 8112270 (NewThingy is ready):Lean/Geo/Point.lean
   ⟨fun _ _ => LE.isTotal.total _ _⟩
 
 instance : IsTrans Point fun P Q => P.x <= Q.x :=
@@ -67,6 +60,10 @@ def PointListInGeneralPosition.to₄ {l : List Point} :
 open Classical in
 def PointFinsetInGeneralPosition (S : Finset Point) : Prop :=
   ∀ {{p q r}}, {p, q, r} ⊆ S → InGeneralPosition₃ p q r
+
+open Classical in
+theorem list_finset_gp (l : List Point) : l.Nodup → PointFinsetInGeneralPosition l.toFinset ↔ PointListInGeneralPosition l :=
+  sorry -- TODO(WN)
 
 -- theorem nodup_of_gp (l : List Point) :
 --     3 < l.length → PointListInGeneralPosition l → l.Nodup :=

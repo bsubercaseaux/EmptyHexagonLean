@@ -34,7 +34,7 @@ lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real)  (last1 : v 2 0 
 
 lemma pt_transform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
   (third_row: M₂ ⟨2, by trivial⟩ = ![0, 0, 1]) :
-  pt_transform p (M₁ * M₂) = pt_transform (pt_transform p M₂) M₁ := by
+  pt_transform (M₁ * M₂) p = pt_transform M₁ (pt_transform M₂ p) := by
   unfold pt_transform
   simp [Matrix.mul_assoc]
   let v := M₂ * pt_to_vec p
@@ -46,7 +46,6 @@ lemma pt_transform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
     have : M₂ 2 = ![0,0,1] := third_row
     rw [this]; simp
   rw [pt_to_vec_inv_vec_to_pt v t]
-
 
 
 theorem σ_equiv_transitivity {pts pts' pts'' : List Point} :
@@ -124,32 +123,32 @@ theorem toEquivσ (S: Set Point) (T: TMatrix M) :
     simp [pt_transform_preserves_sigma p q r T]
 
 
-theorem transform_returns_σ_equivalent (pts: List Point) (T: TMatrix M) :
-  σ_equivalence pts (transform_points pts M) := by
-    set resulting_pts := transform_points pts M
-    have same_length : pts.length = resulting_pts.length := by
-      simp
-      unfold transform_points
-      simp [List.map]
+-- theorem transform_returns_σ_equivalent (pts: List Point) (T: TMatrix M) :
+--   σ_equivalence pts (transform_points pts M) := by
+--     set resulting_pts := transform_points pts M
+--     have same_length : pts.length = resulting_pts.length := by
+--       simp
+--       unfold transform_points
+--       simp [List.map]
 
-    have same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
-      σ (pts.get ⟨i, hi⟩) (pts.get ⟨j, hj⟩) (pts.get ⟨k, hk⟩) =
-      σ (resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩)
-                    (resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩)
-                    (resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩) := by
-        intros i j k hi hj hk
-        have ti : pt_transform (pts.get ⟨i, hi⟩) M = resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩ := by
-          simp [transform_points]
+--     have same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
+--       σ (pts.get ⟨i, hi⟩) (pts.get ⟨j, hj⟩) (pts.get ⟨k, hk⟩) =
+--       σ (resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩)
+--                     (resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩)
+--                     (resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩) := by
+--         intros i j k hi hj hk
+--         have ti : pt_transform (pts.get ⟨i, hi⟩) M = resulting_pts.get ⟨i, by rw [←same_length] ; exact hi⟩ := by
+--           simp [transform_points]
 
-        have tj : pt_transform (pts.get ⟨j, hj⟩) M = resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩ := by
-          simp [transform_points]
-        have tk : pt_transform (pts.get ⟨k, hk⟩) M = resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩ := by
-          simp [transform_points]
+--         have tj : pt_transform (pts.get ⟨j, hj⟩) M = resulting_pts.get ⟨j, by rw [←same_length] ; exact hj⟩ := by
+--           simp [transform_points]
+--         have tk : pt_transform (pts.get ⟨k, hk⟩) M = resulting_pts.get ⟨k, by rw [←same_length] ; exact hk⟩ := by
+--           simp [transform_points]
 
-        rw [←ti, ←tj, ←tk]
-        rw [transform_preserve_sigma]
-        exact T
-    exact ⟨same_length, same_orientation⟩
+--         rw [←ti, ←tj, ←tk]
+--         rw [transform_preserve_sigma]
+--         exact T
+--     exact ⟨same_length, same_orientation⟩
 
 
   def TMatrix.mul {M₁ M₂ : Matrix (Fin 3) (Fin 3) Real} (t1: TMatrix M₁) (t2: TMatrix M₂) :

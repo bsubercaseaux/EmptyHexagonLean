@@ -35,6 +35,13 @@ instance : EquivLike (S ≃σ T) S T where
 instance : FunLike (S ≃σ T) S T :=
   EmbeddingLike.toDFunLike
 
+/-- Extend the equivalence by `x ↦ y`,
+assuming that signotopes are all preserved. -/
+def σEquiv.extend (x y : Point) (e : S ≃σ T) :
+    (∀ᵉ (ha : a ∈ S) (hb : b ∈ S), σ x a b = σ y (e ⟨a, ha⟩) (e ⟨b, hb⟩)) →
+    x ∉ S → y ∉ T → S ∪ {x} ≃σ T ∪ {y} :=
+  sorry
+
 def OrientationProperty (P : Set Point → Prop) :=
   ∀ S T, S ≃σ T → P S → P T
 

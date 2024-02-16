@@ -44,8 +44,9 @@ theorem σHasEmptyTriangle_iff {pts : Finset Point} (gp : Point.PointFinsetInGen
 
 lemma σPtInTriangle_of_σEquiv (f : S ≃σ T) (a p q r : S) :
     σPtInTriangle a p q r → σPtInTriangle (f a) (f p) (f q) (f r) := by
-  simp only [σPtInTriangle, f.hσ]
-  exact id
+  simp only [σPtInTriangle]
+  sorry
+
 
 
 theorem OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle := by
