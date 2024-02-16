@@ -1,13 +1,16 @@
-import Geo.Point
-import Geo.WBPoints
+import Geo.Definitions.Point
+import Geo.Definitions.WBPoints
 import Geo.Orientations
 import Geo.PointsToWB.SymmetryBreaking
 
 namespace Geo
 noncomputable section
-open List
+
+open List Orientation
 
 open Classical
+
+variable {p q r a : Point}
 
 /-- For distinct points in general position (`{a,p,q,r}.size = 4`),
 this means that `a` is strictly in the triangle `pqr`. --/
@@ -23,91 +26,91 @@ def σPtInTriangle2 (a p q r : Point) : Prop :=
 
 
 def ptInsideHalfPlaneCCW (p q a : Point) : Prop :=
-
-  (σ p q a = Orientation.CCW) ∨ (σ p q a = Orientation.Collinear)
+  (σ p q a = .CCW) ∨ (σ p q a = .Collinear)
 
 def halfPlaneCCW (p q : Point) : Set Point :=
   {a | ptInsideHalfPlaneCCW p q a}
 
 def ptInsideHalfPlaneCW (p q a : Point) : Prop :=
-  (σ p q a = Orientation.CW) ∨ (σ p q a = Orientation.Collinear)
+  (σ p q a = .CW) ∨ (σ p q a = .Collinear)
 
 def halfPlaneCW (p q : Point) : Set Point :=
   {a | ptInsideHalfPlaneCW p q a}
 
-theorem σ_CCW_iff_pos_det (p q r: Point) : σ p q r = Orientation.CCW ↔ matrix_det p q r > 0 := by
-  apply Iff.intro
-  unfold σ Orientation.ofReal
-  aesop
-  unfold σ Orientation.ofReal
-  aesop
+theorem σ_CCW_iff_pos_det : σ p q r = .CCW ↔ matrix_det p q r > 0 := by
+  rw [σ, ofReal_eq_ccw]
 
-theorem σ_CW_iff_neg_det (p q r: Point) : σ p q r = Orientation.CW ↔ matrix_det p q r < 0 := by
-  apply Iff.intro
-  unfold σ Orientation.ofReal
-  aesop
-  unfold σ Orientation.ofReal
-  split
-  intro h; linarith
-  intro h2
-  split
-  tauto
-  tauto
+theorem σ_CW_iff_neg_det : σ p q r = .CW ↔ matrix_det p q r < 0 := by
+  rw [σ, ofReal_eq_cw]
+
+theorem σ_Co_iff_pos_0 : σ p q r = .Collinear ↔ matrix_det p q r = 0 := by
+  rw [σ, ofReal_eq_collinear]
+
+theorem detIffHalfPlaneCCW : a ∈ halfPlaneCCW p q ↔ matrix_det p q a ≥ 0 := by
+  simp [halfPlaneCCW, ptInsideHalfPlaneCCW]
+  constructor
+  · rintro (h | h)
+    · exact le_of_lt $ σ_CCW_iff_pos_det.mp h
+    · exact le_of_eq $ symm $ σ_Co_iff_pos_0.mp h
+  · intro h
+    rcases eq_or_lt_of_le h with (h | h)
+    · exact Or.inr $ σ_Co_iff_pos_0.mpr h.symm
+    · exact Or.inl $ σ_CCW_iff_pos_det.mpr h
+
+#check Convex
+#check Matrix.dotProduct
+
+open Matrix in
+theorem HalfPlanesAreConvex : Convex ℝ (halfPlaneCCW p q) := by
+  convert convex_halfspace_ge (f := fun r => Matrix.dotProduct r (p - q)) _ (p.x * q.y + q.x - p.y) using 1
+  · ext
+    simp [detIffHalfPlaneCCW, matrix_det_eq_det_pts, Point.det, Point.x, Point.y]--exact detIffHalfPlaneCCW
+    -- use show _ ↔ _ ≤ _
+    dsimp
+    done
+
+#exit
+  infer_instance
+  infer_instance
+  simp [matrix_det_eq_det_pts, Point.det]
+  have : Point →ₗ[ℝ] ℝ :=
+    { toFun := fun r => Matrix.dotProduct r (p - q)
+    --r.x * (p.y - q.y) - p.x * r.y + q.x * r.y,
+      map_add' := by
+        intro x y
+        simp [Point.x, Point.y]
+        ring
+        done,
+      map_smul' := by simp }
+  apply IsLinearMap_sub
+
+  done
+
+  let S := { p : Point | a.x ≤ p.x } ∩ { p : Point | p.x ≤ c.x }
+  have cvxS : Convex ℝ S :=
+    Convex.inter
+      (convex_halfspace_ge ⟨fun _ _ => rfl, fun _ _ => rfl⟩ a.x)
+      (convex_halfspace_le ⟨fun _ _ => rfl, fun _ _ => rfl⟩ c.x)
+
+#exit
+  simp [Convex, StarConvex, detIffHalfPlaneCCW]
+  intro x hx y hy α β hα hβ hαβ
+  rcases eq_or_lt_of_le hα with (rfl | hα)
+  · rw [zero_add] at hαβ; subst hαβ
+    rw [zero_smul, one_smul, zero_add]
+    exact hy
+  · rcases eq_or_lt_of_le hβ with (rfl | hβ)
+    · rw [add_zero] at hαβ; subst hαβ
+      rw [zero_smul, one_smul, add_zero]
+      exact hx
+      done
+    · rw [matrix_det_eq_det_pts, Point.det] at hx hy ⊢
+
+      done
+#exit
 
 
-theorem σ_Co_iff_pos_0 (p q r: Point) : σ p q r = Orientation.Collinear ↔ matrix_det p q r = 0 := by
-  apply Iff.intro
-  unfold σ Orientation.ofReal
-  split
-  aesop
-  split
-  aesop
-  intro
-  linarith
-  unfold σ Orientation.ofReal
-  intro
-  split
-  aesop
-  aesop
 
-theorem detIffHalfPlaneCCW (p q a: Point): a ∈ halfPlaneCCW p q ↔ matrix_det p q a ≥ 0 := by
-  apply Iff.intro
-  {
-    intro h
-    unfold halfPlaneCCW at h
-    unfold ptInsideHalfPlaneCCW at h
-    simp at h
-    rw [σ_CCW_iff_pos_det] at h
-    rw [σ_Co_iff_pos_0] at h
-    apply le_of_lt_or_eq
-    tauto
-  }
-  {
-    intro h
-    unfold halfPlaneCCW
-    simp
-    unfold ptInsideHalfPlaneCCW
-    rw [σ_CCW_iff_pos_det]
-    rw [σ_Co_iff_pos_0]
-    have := lt_or_eq_of_le h
-    tauto
-  }
-
-
-
-def determinant_pts (a b c : Point) : Real :=
-  a.x * b.y + b.x * c.y + c.x * a.y - a.y * b.x - b.y * c.x - c.y * a.x
-
-
-theorem fix_mismatch_example {α : ℝ} (h1 : ¬α = 0) : 0 ≠ α := by
-
-  -- Direct method to restate the hypothesis in the expected form
-  intro h2 -- Assume α = 0 to derive a contradiction, given h1
-  apply h1  -- Apply ¬α = 0 to the assumption α = 0 to get a contradiction
-  linarith
-
-
-theorem HalfPlanesAreConvex {p q : Point} : Convex ℝ (halfPlaneCCW p q) := by
   unfold halfPlaneCCW
   unfold Convex
   intro a
@@ -126,7 +129,9 @@ theorem HalfPlanesAreConvex {p q : Point} : Convex ℝ (halfPlaneCCW p q) := by
   simp
   rw [σ_CCW_iff_pos_det]
   rw [σ_Co_iff_pos_0] at *
+  done
 
+#exit
   have h' : matrix_det p q a ≥ 0 := by {
     apply le_of_lt_or_eq
     clear ypq

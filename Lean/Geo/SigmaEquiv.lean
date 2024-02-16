@@ -16,14 +16,51 @@ structure σEquiv (S T : Set Point) :=
 
 infix:50 " ≃σ " => σEquiv
 
-def σEquiv.refl (S : Set Point) : S ≃σ S :=
+namespace σEquiv
+
+@[refl]
+def refl (S : Set Point) : S ≃σ S :=
   ⟨Equiv.refl _, by simp⟩
 
-def σEquiv.symm : S ≃σ T → T ≃σ S :=
+@[symm]
+def symm : S ≃σ T → T ≃σ S :=
   fun ⟨f, h⟩ => ⟨f.symm, by simp [h]⟩
 
-def σEquiv.trans : S ≃σ T → T ≃σ U → S ≃σ U :=
+@[trans]
+def trans : S ≃σ T → T ≃σ U → S ≃σ U :=
   fun ⟨f, hf⟩ ⟨g, hg⟩ => ⟨f.trans g, by simp [hg, hf]⟩
+
+open Point in
+
+theorem GP_of_σEquiv_of_GP {S T : Finset Point} :
+  S ≃σ T → PointFinsetInGeneralPosition S → PointFinsetInGeneralPosition T := by
+  sorry
+  /-
+  unfold PointFinsetInGeneralPosition
+  intro hEquiv hgp p q r hmem
+  --have := hEquiv
+  replace hEquiv := hEquiv.symm
+  rw [InGeneralPosition₃.iff_ne_collinear]
+  have hp : p ∈ T := hmem (Finset.mem_insert.mpr (Or.inl rfl))
+  have hq : q ∈ T := hmem (by simp)
+  have hr : r ∈ T := hmem (by simp)
+
+  let ⟨p', hp'⟩ := hEquiv.f ⟨p, hp⟩
+  let ⟨q', hq'⟩ := hEquiv.f ⟨q, hq⟩
+  let ⟨r', hr'⟩ := hEquiv.f ⟨r, hr⟩
+  have : {p', q', r'} ⊆ S := by
+    sorry
+    done
+  have := hgp this
+  rwa [InGeneralPosition₃.iff_ne_collinear] at this
+
+
+  --have := theorem Point.InGeneralPosition₃.iff_ne_collinear {p q r : Point} :
+  --  InGeneralPosition₃ p q r ↔ σ p q r ≠ .Collinear
+  sorry
+  done -/
+
+end σEquiv
 
 instance : EquivLike (S ≃σ T) S T where
   coe e := e.f.toFun
