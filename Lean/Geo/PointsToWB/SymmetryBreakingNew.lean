@@ -77,8 +77,8 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     exact this.imp_of_mem fun ha hb => hθ (by simpa using ha) (by simpa using hb)
 
   -- step 2: translate
-  have ⟨l2, σ2, l2_lt, l2_pw⟩ : ∃ l2, ∃ _ : l ≼σ 0 :: l2,
-      (∀ p ∈ l2, 0 < p.x) ∧ l2.Pairwise (·.x ≠ ·.x) := by
+  have ⟨l2, σ2, l2_lt /-, l2_pw -/⟩ : ∃ l2, ∃ _ : l ≼σ 0 :: l2,
+      (∀ p ∈ l2, 0 < p.x) /- ∧ l2.Pairwise (·.x ≠ ·.x) -/ := by
     cases e : l1.argmin (·.x) with
     | none => simp at e; cases e; cases σ1.len_ge_3 hl
     | some a => ?_
@@ -91,8 +91,8 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
         ext <;> simp [translation_translates, Point.x, Point.y] <;> rfl
       intro p q r _ _ _
       simpa [eq] using (translation_transform (-a.x) (-a.y)).pt_transform_preserves_sigma p q r
-    have ⟨ha, hl1'⟩ := List.pairwise_cons.1 (hl1.perm p1 Ne.symm)
-    refine ⟨_, σ1.trans σ2, ?_, hl1'.map _ fun _ _ => mt sub_left_inj.1⟩
+    have ⟨ha, _hl1'⟩ := List.pairwise_cons.1 (hl1.perm p1 Ne.symm)
+    refine ⟨_, σ1.trans σ2, ?_ /- , hl1'.map _ fun _ _ => mt sub_left_inj.1 -/⟩
     simp; intro a h'
     exact lt_of_le_of_ne (List.le_of_mem_argmin (List.mem_of_mem_erase h') e) (ha _ h')
   clear l1 σ1 hl1
