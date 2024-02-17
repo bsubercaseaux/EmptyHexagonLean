@@ -1,4 +1,4 @@
-Mathematicians are often skeptical of proofs backed by extensive computation.
+Mathematicians are often skeptical of proofs relying on extensive computation.
 A landmark example is the \emph{four-color theorem}, which states that any planar graph can be colored with at most four colors. 
 In 1879, Alfred Kempe published a proof of the four-color theorem, which was discovered to be incorrect 11 years later by Headwood~\cite{Walters2004ItAT,Wilson2002GraphsCA}.\footnote{The main idea of Kempe's proof was salvaged by Headwood to prove the weaker \emph{five-color theorem}, and it is still a building block in the theory of planar colorings~\cite{Walters2004ItAT}.} 
 A full proof of the four-color theorem was not found until 1976, when Kenneth Appel and Wolfgang Haken used a computer to check the 1\,834 cases that might contain a counterexample~\cite{appelFourColorProblem1978}.
@@ -11,12 +11,12 @@ An emerging trend is to use SAT solvers (or other automated reasoning tools) to 
 To name a few examples, the Erd\H{o}s Discrepancy Conjecture~\cite{konev2014sat}, Keller's conjecture~\cite{brakensiek2023resolution}, the Packing Chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023}, and the Pythagorean Triples Problem~\cite{Heule_2016} were all resolved using SAT solvers.
 All such SAT-based results follow a common structure: in order to show that a mathematical theorem $\mathcal{T}$ holds, one proves the following:
 \begin{enumerate}
-  \item (\textbf{Reduction Theorem}) There is a finite object $\mathcal{O}$ such that either (\emph{positive case}) $\mathcal{T}$ holds if and only if $\mathcal{O}$ exists, or (\emph{negative case}) $\mathcal{T}$ holds if and only if $\mathcal{O}$ does not exist.\footnote{Note that $\mathcal{T}$ can be a statement concerning infinite objects, as for example in the case of Keller's conjecture.~\cite{brakensiek2023resolution}}
-  \item (\textbf{Encoding Theorem}) There is a propositional formula $\varphi_{\mathcal{O}}$ that is satisfiable if and only if $\mathcal{O}$ exists.
+  \item (\textbf{Reduction Theorem}) There is a finite object $\mathcal{O}$ such that either (\emph{positive case}) if $\mathcal{O}$ exists then $\mathcal{T}$ holds, or (\emph{negative case}) if $\mathcal{O}$ does not exist then $\mathcal{T}$ holds.\footnote{Note that $\mathcal{T}$ can be a statement concerning infinite objects, as for example in the case of Keller's conjecture~\cite{brakensiek2023resolution}.}
+  \item (\textbf{Encoding Theorem}) There is a propositional formula $\varphi_{\mathcal{O}}$ such that either (\emph{positive case}) if $\varphi_{\mathcal{O}}$ is satisfiable then $\mathcal{O}$ exists, or (\emph{negative case}) if $\varphi_{\mathcal{O}}$ is unsatisfiable then $\mathcal{O}$ does not exist.
   \item (\textbf{SAT Result}) In the \emph{positive case}, a SAT solver finds a satisfying assignment for $\varphi_{\mathcal{O}}$, and in the \emph{negative case}, a SAT solver finds that $\varphi_{\mathcal{O}}$ is unsatisfiable.
 \end{enumerate}
 
-Unfortunately, the formula $\varphi_{\mathcal{O}}$ encoding the existence of $\mathcal{O}$ is often too large or computationally hard to be solved directly, so a fourth step is added to the above method: a \textbf{Re-encoding Theorem} showing that $\varphi_{\mathcal{O}}$ is equisatisfiable with a simpler formula $\phi_{\mathcal{O}}$.
+Unfortunately, the formula $\varphi_{\mathcal{O}}$ concerning the existence of $\mathcal{O}$ is often too large or computationally hard to be solved directly, so a fourth step is added to the above method: a \textbf{Re-encoding Theorem} showing that $\varphi_{\mathcal{O}}$ is equisatisfiable with a simpler formula $\phi_{\mathcal{O}}$.
 All the examples we mentioned above add this step, and so will we.
 
 One of the benefits of using a SAT solver for mathematical proofs is that in the \emph{positive case}, it is usually possible to construct the desired object $\mathcal{O}$ from a satisfying assignment to $\phi_{\mathcal{O}}$, and then by exhibiting $\mathcal{O}$, the correctness of theorem $\mathcal{T}$ can be easily verified by humans.

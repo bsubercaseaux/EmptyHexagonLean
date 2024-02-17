@@ -3,11 +3,11 @@
     \begin{tikzpicture}
       \node[draw, rounded corners] (theorem) at (0,0) {Theorem $\mathcal{T}$};
       \node[draw, rounded corners] (object) at (9,0) { Finite Object $\mathcal{O}$};
-      \node[draw, rounded corners, align=center, fill=green!40!white] (tiffo) at (4.5,0) { \textbf{Reduction theorem}\\$\mathcal{T}$ holds if and only if $\mathcal{O}$ exists};
+      \node[draw, rounded corners, align=center, fill=green!40!white] (tiffo) at (4.5,0) { \textbf{Reduction theorem}\\$\mathcal{T}$ holds if $\mathcal{O}$ does not exist};
       \draw[->, thick] (tiffo) -- (theorem);
       \draw[->, thick] (tiffo) -- (object);
       \node[draw, rounded corners, align=center] (varphi) at (9, -3) {CNF formula $\varphi_{\mathcal{O}}$};
-      \node[draw, rounded corners, align=center, fill=yellow!40!white] (encoding) at (9, -1.5) { \textbf{Encoding theorem}\\$\varphi_{\mathcal{O}}$ is satisfiable if and only if $\mathcal{O}$ exists};
+      \node[draw, rounded corners, align=center, fill=yellow!40!white] (encoding) at (9, -1.5) { \textbf{Encoding theorem}\\If $\varphi_{\mathcal{O}}$ is unsatisfiable then $\mathcal{O}$ does not exist};
       \draw[->, thick] (encoding) -- (object);
       \draw[->, thick] (encoding) -- (varphi);
       \node[draw, rounded corners] (phi) at (0, -3) {CNF formula $\phi_{\mathcal{O}}$};
