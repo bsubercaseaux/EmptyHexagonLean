@@ -112,18 +112,17 @@ theorem toEquivσ (S: Set Point) (T: TMatrix M) :
     simp [pt_transform_preserves_sigma p q r T]
 
 
-  def TMatrix.mul {M₁ M₂ : Matrix (Fin 3) (Fin 3) Real} (t1: TMatrix M₁) (t2: TMatrix M₂) :
-    TMatrix (M₁ * M₂) := by
-    have det_pos : Matrix.det (M₁ * M₂) > 0 := by
-      rw [Matrix.det_mul]
-      exact mul_pos t1.det_pos t2.det_pos
-    have third_row : (M₁ * M₂) ⟨2, by trivial⟩ = ![0, 0, 1] := by
-      ext i
-      simp [Matrix.mul_apply]
-      simp [t1.third_row, t2.third_row]
-      fin_cases i <;> simp
-      simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
-      simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
-      simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
+def mul {M₁ M₂ : Matrix (Fin 3) (Fin 3) Real} (t1: TMatrix M₁) (t2: TMatrix M₂) : TMatrix (M₁ * M₂) := by
+  have det_pos : Matrix.det (M₁ * M₂) > 0 := by
+    rw [Matrix.det_mul]
+    exact mul_pos t1.det_pos t2.det_pos
+  have third_row : (M₁ * M₂) ⟨2, by trivial⟩ = ![0, 0, 1] := by
+    ext i
+    simp [Matrix.mul_apply]
+    simp [t1.third_row, t2.third_row]
+    fin_cases i <;> simp
+    simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
+    simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
+    simp [Finset.univ, Fintype.elems, List.finRange, t2.third_row]
 
-    exact ⟨det_pos, third_row⟩
+  exact ⟨det_pos, third_row⟩

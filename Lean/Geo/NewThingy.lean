@@ -2,6 +2,7 @@ import Geo.Definitions.Point
 import Geo.Definitions.WBPoints
 import Geo.Orientations
 import Geo.PointsToWB.SymmetryBreaking
+import Geo.PointsToWB.TMatrix
 
 namespace Geo
 noncomputable section
@@ -30,12 +31,6 @@ def ptInsideHalfPlaneCCW (p q a : Point) : Prop :=
 
 def halfPlaneCCW (p q : Point) : Set Point :=
   {a | ptInsideHalfPlaneCCW p q a}
-
-def ptInsideHalfPlaneCW (p q a : Point) : Prop :=
-  (σ p q a = .CW) ∨ (σ p q a = .Collinear)
-
-def halfPlaneCW (p q : Point) : Set Point :=
-  {a | ptInsideHalfPlaneCW p q a}
 
 theorem σ_CCW_iff_pos_det : σ p q r = .CCW ↔ matrix_det p q r > 0 := by
   rw [σ, ofReal_eq_ccw]
@@ -683,8 +678,8 @@ theorem rotateTranslatePreserveσ (θ : ℝ) (t p q r : Point) :
       rw [rotateTranslateTransform]
       set T := (translation_matrix (Point.x t) (Point.y t) * Matrix.rotateByAffine θ)
       have : TMatrix T := by exact rotateTranslateTMatrix θ t
-      apply transform_preserve_sigma p q r this
-
+      symm
+      apply TMatrix.pt_transform_preserves_sigma p q r this
 
 theorem σPtInTriangle2InvariantUnderTransform {a p q r : Point}  (t : Point) (θ : ℝ) :
       σPtInTriangle2 a p q r ↔ σPtInTriangle2 (rotateTranslateMap θ t a) (rotateTranslateMap θ t p) (rotateTranslateMap θ t q) (rotateTranslateMap θ t r) := by
@@ -950,6 +945,9 @@ theorem σPtInTriangle_iff2 {a p q r : Point} (gp : Point.InGeneralPosition₄ a
     apply Iff.intro
     exact PtInTriangle2_of_σPtInTriange2' gp symm
     exact σPtInTriangle2_of_PtInTriange2 gp symm
+
+-- TODO(WN): Think we can cut the stuff below
+#exit
 
 def HasEmptyTriangle (pts : List Point) : Prop :=
   ∃ p q r, Sublist [p, q, r] pts ∧ ∀ a ∈ pts, a ∉ ({p, q, r} : Set Point) → ¬PtInTriangle a p q r
