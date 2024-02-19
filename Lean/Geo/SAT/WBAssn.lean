@@ -1,5 +1,6 @@
 import Geo.Definitions.WBPoints
 import Geo.Definitions.PtInTriangle
+import Geo.Definitions.Structures
 import Geo.Orientations
 import Geo.SAT.Formula
 
@@ -10,10 +11,6 @@ open Classical
 open LeanSAT.Model PropFun
 
 open Point
-
--- TODO: use a definition from an earlier module
-def σIsEmptyTriangleFor (a b c : Point) (S : Finset Point) : Prop :=
-  ∀ s ∈ S, ¬σPtInTriangle s a b c
 
 open Classical in
 noncomputable def toPropAssn (w : WBPoints) : PropAssignment (Var w.length)
@@ -122,7 +119,7 @@ theorem satisfies_notHoleOfPointInside (w : WBPoints) (a b c : Fin w.length) :
   intro x
   split_ifs <;> try exact satisfies_tr
   simp only [satisfies_impl, satisfies_var, satisfies_neg, decide_eq_true_eq, toPropAssn, σIsEmptyTriangleFor,
-    not_forall, not_not, exists_prop, toFinset, List.mem_toFinset]
+    not_forall, not_not, exists_prop, toFinset, List.mem_toFinset, coe_toFinset, Set.mem_setOf_eq]
   intro h
   exact ⟨w[x], List.get_mem _ x _, h⟩
 
@@ -207,7 +204,7 @@ theorem satisfies_leftmostCCWDefs (w : WBPoints) : w.toPropAssn ⊨ pointsCCW w.
     linarith
 
 theorem satisfies_noHoles (w : WBPoints) :
-    (∀ (a b c : Point), {a,b,c} ⊆ w.toFinset → ¬σIsEmptyTriangleFor a b c w.toFinset) →
+    ¬σHasEmptyTriangle w.toFinset →
     w.toPropAssn ⊨ theFormula w.length := by
   unfold theFormula
   intro noholes
@@ -216,13 +213,14 @@ theorem satisfies_noHoles (w : WBPoints) :
     forall_exists_index, forall_apply_eq_imp_iff, satisfies_leftmostCCWDefs, and_true]
   intro a b c
   split_ifs
-  . unfold toPropAssn
+  next h =>
+    unfold toPropAssn
     simp only [satisfies_neg, satisfies_var, decide_eq_true_eq]
-    apply noholes
-    intro _ hx
-    apply List.mem_toFinset.mpr
-    simp only [Finset.mem_insert, Finset.mem_singleton] at hx
-    rcases hx with hx | hx | hx <;> { rw [hx]; apply List.get_mem }
+    simp only [σHasEmptyTriangle, not_exists, not_and] at noholes
+    apply noholes _ (w.get_mem_toFinset a) _ (w.get_mem_toFinset b) _ (w.get_mem_toFinset c)
+      (fun h' => ne_of_lt h.left <| (w.of_eqx <| congrArg (·.x) h'))
+      (fun h' => ne_of_lt (h.left.trans h.right) <| (w.of_eqx <| congrArg (·.x) h'))
+      (fun h' => ne_of_lt h.right <| (w.of_eqx <| congrArg (·.x) h'))
   . exact satisfies_tr
 
 end WBPoints

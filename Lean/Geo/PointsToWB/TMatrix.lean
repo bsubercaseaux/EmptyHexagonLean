@@ -107,7 +107,7 @@ theorem toEquivσ (S: Set Point) (T: TMatrix M) :
     replace eqv := eqv.injective
     simp [LinearMap.equivOfDetNeZero, LinearEquiv.ofIsUnitDet] at eqv
     exact Equiv.Set.image _ S eqv
-  hσ := by
+  hσ' := by
     intro p q r
     simp [pt_transform_preserves_sigma p q r T]
 

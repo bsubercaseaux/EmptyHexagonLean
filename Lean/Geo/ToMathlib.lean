@@ -1,15 +1,6 @@
 import Std.Data.List.Basic
 import Mathlib.Tactic
 
--- theorem sublist_to_indexsequence
---   {L₁ : List α} {L : List α} (h : List.Sublist L₁ L) :
---   ∃ (indexList : List (Fin L.length)),
---     indexList.length = L₁.length ∧
---       (∀ (i : Fin indexList.length),
---     L[indexList[i]] =  L₁.get? i)
---       ∧ List.Sorted (· < ·) indexList  := by
---       sorry
-
 -- Q: Why are `List.get [i]` *and* `l[i.1]` both simp normal forms? Should we have `List.get i = l[i.1]`?
 -- There is also `List.getElem_eq_get : l[i] = l.get i` that never gets applied because `l[i]` is not simp-nf..
 -- Mario: can have a `simp` lemma for this in std4.
