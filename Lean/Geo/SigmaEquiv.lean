@@ -81,9 +81,9 @@ def σEquiv.extend (x y : Point) (e : S ≃σ T) :
   sorry
 
 def OrientationProperty (P : Set Point → Prop) :=
-  ∀ S T, S ≃σ T → P S → P T
+  ∀ {{S T}}, S ≃σ T → P S → P T
 
 theorem OrientationProperty.not : OrientationProperty P → OrientationProperty (¬P ·) := by
   unfold OrientationProperty
   intro h S T hσ hS hT
-  exact hS (h _ _ hσ.symm hT)
+  exact hS (h hσ.symm hT)

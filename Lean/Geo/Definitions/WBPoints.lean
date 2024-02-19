@@ -41,6 +41,11 @@ abbrev length (w : WBPoints) : Nat := w.points.length
 instance : GetElem WBPoints Nat Point (fun w i => i < w.length) where
   getElem w i h := w.points[i]'h
 
+theorem get_mem_toFinset (w : WBPoints) (i : Fin w.length) :
+    w[i] ∈ w.toFinset := by
+  simp only [GetElem.getElem, toFinset, List.mem_toFinset]
+  apply List.get_mem
+
 theorem sorted_get (w : WBPoints) {i j : Fin w.length} :
     i < j → w[i].x < w[j].x := by
   intro ij
