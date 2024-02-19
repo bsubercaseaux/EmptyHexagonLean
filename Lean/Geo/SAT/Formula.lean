@@ -94,7 +94,7 @@ def hasPointInside (a b c : Fin n) : PropFun (Var n) :=
 
 /-- Defines "is hole" variables.
 
-    ∀ {x}, a < x < c, with x ≠ b:
+    ∀ {a b c x}, a < x < c, with x ≠ b:
       I{x, a, b, c} → !H{a, b, c}
 
     !H{a, b, c} → ⋁_{a < x < c, x ≠ b} I{x, a, b, c}
@@ -112,6 +112,14 @@ def holeDefs (n : Nat) : PropFun (Var n) :=
           ]
         else
           ⊤))))
+
+/-- Defines "is hole" variables.
+
+  Triangle abc is a hole iff all x are not inside triangle abc. -/
+def holeDefs' (n : Nat) : PropAssignment (Var n) → Prop := fun τ =>
+  ∀ {a b c}, τ (Var.hole a b c) ↔
+    (∀ x, a < x → x < c → x ≠ b →
+      !τ (Var.inside x a b c))
 
 /-- Asserts that no holes exist. -/
 def noHoles (n : Nat) : PropFun (Var n) :=
