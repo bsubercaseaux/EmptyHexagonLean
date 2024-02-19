@@ -162,6 +162,15 @@ theorem Point.PointListInGeneralPosition.subperm : PointListInGeneralPosition l 
   match l, p.length_eq with
   | [p',q',r'], _ => exact (Point.InGeneralPosition₃.of_perm p).1 (H h)
 
+theorem Point.PointListInGeneralPosition.subperm₄ : PointListInGeneralPosition l →
+    ∀ {{p q r s : Point}}, [p, q, r, s].Subperm l → InGeneralPosition₄ p q r s := by
+  intro gp p q r s sub
+  constructor <;> {
+    apply subperm.mp gp
+    refine List.Subperm.trans ?_ sub -- `trans` doesn't seem to work?
+    subperm_tac
+  }
+
 theorem Point.PointListInGeneralPosition.perm (h : l.Perm l') :
     PointListInGeneralPosition l ↔ PointListInGeneralPosition l' := by
   suffices ∀ {l l'}, l.Perm l' →

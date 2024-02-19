@@ -8,9 +8,11 @@ import Mathlib.Analysis.InnerProductSpace.PiL2
 i.e., `List.Sublist` between two concrete lists. -/
 syntax "sublist_tac" : tactic
 syntax "subfinset_tac" : tactic
+syntax "subperm_tac" : tactic
 macro_rules
   | `(tactic| sublist_tac) => `(tactic| aesop (add safe List.Sublist.refl, safe List.Sublist.cons_cons, unsafe List.Sublist.cons))
   | `(tactic| subfinset_tac) => `(tactic| aesop (add safe Finset.mem_singleton, safe Finset.mem_insert_self, unsafe Finset.mem_insert_of_mem))
+  | `(tactic| subperm_tac) => `(tactic| aesop (add safe List.Subperm.refl, safe List.subperm.cons, unsafe List.Subperm.cons_right, unsafe List.Subperm.cons_left))
 
 namespace Geo
 open List

@@ -7,14 +7,19 @@ namespace Geo
 open List
 open Classical
 
-lemma lemma₁ (gp : Point.PointListInGeneralPosition pts) :
+lemma HasEmptyTriangle_of_σHasEmptyTriangle (gp : Point.PointListInGeneralPosition pts) :
     σHasEmptyTriangle pts.toFinset → HasEmptyTriangle pts.toFinset := by
   intro ⟨a, ha, b, hb, c, hc, ab, ac, bc, empty⟩
   use a, ha, b, hb, c, hc, ab, ac, bc
   intro s hs tri
-  apply empty s hs
+  simp only [coe_toFinset, Set.mem_diff, Set.mem_setOf_eq, Set.mem_insert_iff,
+    Set.mem_singleton_iff, not_or] at hs
+  have ⟨hs, _, _, _⟩ := hs
+  apply empty s (by simp [hs])
   rwa [σPtInTriangle_iff]
-  sorry -- maybe false and needs adjusting HasEmptyTri definitions?
+  apply gp.subperm₄
+  apply List.subperm_of_subset (by simp [*])
+  sublist_tac
 
 lemma OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle := by
   unfold σHasEmptyTriangle
@@ -44,7 +49,7 @@ open LeanSAT.Model.PropFun in
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
     HasEmptyTriangle pts.toFinset := by
   by_contra h'
-  have noσtri : ¬σHasEmptyTriangle pts.toFinset := fun h => h' <| lemma₁ gp h
+  have noσtri : ¬σHasEmptyTriangle pts.toFinset := fun h => h' <| HasEmptyTriangle_of_σHasEmptyTriangle gp h
   have ⟨w, hw⟩ := @symmetry_breaking pts (by omega) gp
   have noσtri' : ¬σHasEmptyTriangle w.toFinset :=
     hw.elim fun e => OrientationProperty_σHasEmptyTriangle.not (e.toEquiv w.nodup) noσtri
@@ -53,3 +58,6 @@ theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGe
   rw [LeanSAT.Encode.VEncCNF.toICnf_equisatisfiable, ← len10] at this
   apply this
   exact ⟨_, w.satisfies_noHoles noσtri'⟩
+
+/- 'Geo.EmptyTriangle10TheoremLists' depends on axioms: [propext, Classical.choice, Quot.sound, Geo.cnfUnsat] -/
+#print axioms EmptyTriangle10TheoremLists
