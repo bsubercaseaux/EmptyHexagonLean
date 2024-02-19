@@ -8,6 +8,7 @@ import Geo.PointsToWB.TMatrix
 import Geo.Definitions.WBPoints
 import Geo.PointsToWB.Affine
 import Geo.PointsToWB.Projective
+import Geo.SigmaEquiv
 
 open Classical
 open scoped List
@@ -41,6 +42,18 @@ def σEmbed.refl (S : List Point) : S ≼σ S := ⟨id, by simp, by simp⟩
 def σEmbed.trans (f : S ≼σ T) (g : T ≼σ U) : S ≼σ U := by
   refine ⟨g.f ∘ f.f, by simpa using (f.perm.map _).trans g.perm, fun p q r hp hq hr => ?_⟩
   simp [f.σ _ _ _ hp hq hr, g.σ _ _ _ (f.mem hp) (f.mem hq) (f.mem hr)]
+
+noncomputable def σEmbed.toEquiv (f : S ≼σ T) (h : T.Nodup) : S.toFinset ≃σ T.toFinset := by
+  refine ⟨Equiv.ofBijective (fun x => ⟨f.f x.1, ?_⟩) ⟨?_, ?_⟩, ?c⟩
+  case c =>
+    simp [Equiv.ofBijective, DFunLike.coe, EquivLike.coe]
+    exact fun _ ha _ hb _ hc => (f.σ _ _ _ ha hb hc).symm
+  · rcases x with ⟨x, hx⟩; simp at hx ⊢; exact f.mem hx
+  · intro ⟨a, ha⟩ ⟨b, hb⟩ eq; simp at ha hb eq ⊢
+    by_contra ne
+    exact (List.pairwise_map.1 (f.perm.nodup_iff.2 h)).forall (fun _ _ => Ne.symm) ha hb ne eq
+  · intro ⟨b, hb⟩; simp at hb ⊢
+    exact f.mem_iff.1 hb
 
 def OrientationProperty' (P : List Point → Prop) :=
   ∀ {{S T}}, S ≼σ T → (P S ↔ P T)
@@ -88,7 +101,7 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp), σ := ?σ }
     case σ =>
       have eq (p) : pt_transform (translation_matrix (-a.x) (-a.y)) p = p - a := by
-        ext <;> simp [translation_translates, Point.x, Point.y] <;> rfl
+        ext <;> simp [translation_translates] <;> rfl
       intro p q r _ _ _
       simpa [eq] using (translation_transform (-a.x) (-a.y)).pt_transform_preserves_sigma p q r
     have ⟨ha, _hl1'⟩ := List.pairwise_cons.1 (hl1.perm p1 Ne.symm)
