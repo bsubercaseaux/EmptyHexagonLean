@@ -30,8 +30,8 @@ def symm : S ≃σ T → T ≃σ S :=
 def trans : S ≃σ T → T ≃σ U → S ≃σ U :=
   fun ⟨f, hf⟩ ⟨g, hg⟩ => ⟨f.trans g, by simp [hg, hf]⟩
 
+/-
 open Point in
-
 theorem GP_of_σEquiv_of_GP {S T : Finset Point} :
   S ≃σ T → PointFinsetInGeneralPosition S → PointFinsetInGeneralPosition T := by
   sorry
@@ -59,6 +59,7 @@ theorem GP_of_σEquiv_of_GP {S T : Finset Point} :
   --  InGeneralPosition₃ p q r ↔ σ p q r ≠ .Collinear
   sorry
   done -/
+  -/
 
 end σEquiv
 

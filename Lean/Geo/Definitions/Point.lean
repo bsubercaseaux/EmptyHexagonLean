@@ -4,11 +4,13 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Mathlib.Analysis.InnerProductSpace.PiL2
 
-syntax "sublist_tac" : tactic
 /-- Solves goals of the form `[a,b,c] <+ [p,a,q,b,r,c]`,
 i.e., `List.Sublist` between two concrete lists. -/
+syntax "sublist_tac" : tactic
+syntax "subfinset_tac" : tactic
 macro_rules
   | `(tactic| sublist_tac) => `(tactic| aesop (add safe List.Sublist.refl, safe List.Sublist.cons_cons, unsafe List.Sublist.cons))
+  | `(tactic| subfinset_tac) => `(tactic| aesop (add safe Finset.mem_singleton, safe Finset.mem_insert_self, unsafe Finset.mem_insert_of_mem))
 
 namespace Geo
 open List
@@ -59,14 +61,6 @@ def PointListInGeneralPosition.to₄ {l : List Point} :
     ∀ {p q r s : Point}, [p, q, r, s] <+ l → InGeneralPosition₄ p q r s := by
   intro h _ _ _ _ h'
   constructor <;> { refine h (Sublist.trans ?_ h'); sublist_tac }
-
-open Classical in
-def PointFinsetInGeneralPosition (S : Finset Point) : Prop :=
-  ∀ {{p q r}}, {p, q, r} ⊆ S → InGeneralPosition₃ p q r
-
-open Classical in
-theorem list_finset_gp (l : List Point) : l.Nodup → PointFinsetInGeneralPosition l.toFinset ↔ PointListInGeneralPosition l :=
-  sorry -- TODO(WN)
 
 /-! # Sorted (strictly, along x-coordinates) -/
 

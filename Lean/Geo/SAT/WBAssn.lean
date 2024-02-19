@@ -1,4 +1,5 @@
 import Geo.Definitions.WBPoints
+import Geo.Definitions.PtInTriangle
 import Geo.Orientations
 import Geo.SAT.Formula
 
@@ -58,7 +59,13 @@ theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPos
     (σPtInTriangle x a b c ↔
       ((σ a b c = .CCW ↔ σ a x c = .CCW) ∧ (σ a x b ≠ .CCW ↔ σ a b c = .CCW))) := by
   intro sorted gp
-  simp only [σPtInTriangle, σ_perm₁ b x c, σ_perm₂ a c b, σ_perm₁ b a c, gp.gp₁.σ_iff]
+  simp only [σPtInTriangle,
+    σ_perm₂ a b x,
+    σ_perm₂ a c x,
+    σ_perm₂ a c b,
+    σ_perm₂ b c x, σ_perm₁ b x c,
+    σ_perm₂ b c a, σ_perm₁ b a c,
+    gp.gp₁.σ_iff]
   cases gp.gp₁.σ_cases <;> cases gp.gp₂.σ_cases <;> cases gp.gp₃.σ_cases <;> cases gp.gp₄.σ_cases <;> simp_all [-getElem_fin]
   next h₁ h₂ h₃ h₄ =>
     rw [σ_prop₁ sorted gp h₁ h₄] at h₃
@@ -71,7 +78,12 @@ theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPos
     (σPtInTriangle x a b c ↔
       ((σ a b c = .CCW ↔ σ a x c = .CCW) ∧ (σ b x c ≠ .CCW ↔ σ a b c = .CCW))) := by
   intro sorted gp
-  simp only [σPtInTriangle, σ_perm₂ a x b, σ_perm₂ a c b, σ_perm₁ b a c, gp.gp₄.σ_iff]
+  simp only [σPtInTriangle,
+    σ_perm₂ a c x,
+    σ_perm₂ a c b,
+    σ_perm₂ b c x,
+    σ_perm₂ b c a, σ_perm₁ b a c,
+    gp.gp₄.σ_iff]
   cases gp.gp₁.σ_cases <;> cases gp.gp₂.σ_cases <;> cases gp.gp₃.σ_cases <;> cases gp.gp₄.σ_cases <;> simp_all [-getElem_fin]
   next h₁ h₂ h₃ h₄ =>
     rw [σ_prop₁ sorted gp h₁ h₄] at h₃
@@ -103,88 +115,73 @@ theorem satisfies_insideDefs (w : WBPoints) : w.toPropAssn ⊨ insideDefs w.leng
       simp [abc.left, abc.left.trans bxc.left, abc.left.trans abc.right, bxc.left, abc.right, bxc.right]
     simp [-getElem_fin, insideDefs_aux₂ (w.sorted.to₄ this) (PointListInGeneralPosition.to₄ w.gp this)]
 
-lemma xBounded_of_PtInTriangle {x a b c : Point} :
-    Sorted₃ a b c → PtInTriangle x a b c → a.x ≤ x.x ∧ x.x ≤ c.x := by
-  unfold PtInTriangle
-  intro sorted tri
-  let S := { p : Point | a.x ≤ p.x } ∩ { p : Point | p.x ≤ c.x }
-  have cvxS : Convex ℝ S :=
-    Convex.inter
-      (convex_halfspace_ge ⟨fun _ _ => rfl, fun _ _ => rfl⟩ a.x)
-      (convex_halfspace_le ⟨fun _ _ => rfl, fun _ _ => rfl⟩ c.x)
-  have abcS : {a, b, c} ⊆ S := by
-    intro x hx
-    simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
-    rcases hx with rfl | rfl | rfl
-    . exact ⟨le_rfl, le_of_lt <| sorted.h₁.trans sorted.h₂⟩
-    . exact ⟨le_of_lt sorted.h₁, le_of_lt sorted.h₂⟩
-    . exact ⟨le_of_lt <| sorted.h₁.trans sorted.h₂, le_rfl⟩
-  have : x ∈ S := convexHull_min abcS cvxS tri
-  simpa only [Set.mem_inter_iff, Set.mem_setOf_eq] using this
+theorem satisfies_notHoleOfPointInside (w : WBPoints) (a b c : Fin w.length) :
+    w.toPropAssn ⊨ notHoleOfPointInside a b c := by
+  unfold notHoleOfPointInside
+  simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff, Finset.mem_val, Finset.mem_univ, true_and]
+  intro x
+  split_ifs <;> try exact satisfies_tr
+  simp only [satisfies_impl, satisfies_var, satisfies_neg, decide_eq_true_eq, toPropAssn, σIsEmptyTriangleFor,
+    not_forall, not_not, exists_prop, toFinset, List.mem_toFinset]
+  intro h
+  exact ⟨w[x], List.get_mem _ x _, h⟩
 
--- TODO: Use the real actual proof
-lemma σiff {x a b c : Point} : σPtInTriangle x a b c ↔ PtInTriangle x a b c := sorry
+theorem satisfies_hasPointInside (w : WBPoints) (a b c : Fin w.length) :
+    a < b → b < c →
+    w.toPropAssn ⊨ [propfun| (¬{Var.hole a b c} → {hasPointInside a b c}) ] := by
+  intro ab bc
+  unfold toPropAssn hasPointInside σIsEmptyTriangleFor
+  simp only [ne_eq, satisfies_impl, satisfies_neg, satisfies_var, decide_eq_true_eq,
+    not_forall, not_not, exists_prop, satisfies_any, Multiset.mem_map, Finset.mem_val,
+    Finset.mem_univ, true_and, exists_exists_eq_and, forall_exists_index, and_imp]
+  intro x hx tri
+  rcases List.get_of_mem <| List.mem_toFinset.mp hx with ⟨i, rfl⟩
+  have : List.get w.points i = w[i] := rfl
+  rw [this] at tri hx
+  clear this
+  use i
+  split_ifs
+  . simp only [satisfies_var, decide_eq_true_eq, tri]
+  next h =>
+    exfalso
+    simp only [not_and, not_not] at h
+    have sub : [w[a],w[b],w[c]] <+ w.points := by
+      have : [w[a],w[b],w[c]] = [a,b,c].map w.points.get := by
+        simp [GetElem.getElem, List.getElem_eq_get]
+      rw [this]
+      apply map_get_sublist
+      aesop (add unsafe lt_trans)
+    have ia : i ≠ a := fun h => by
+      rw [h] at tri
+      have := not_mem_σPtInTriangle (w.gp sub).perm₁
+      have := tri.perm₁
+      contradiction
+    have ic : i ≠ c := fun h => by
+      rw [h] at tri
+      have := not_mem_σPtInTriangle (w.gp sub).perm₂
+      have := tri.perm₂
+      contradiction
+    have : InGeneralPosition₄ w[i] w[a] w[b] w[c] := tri.gp₄_of_gp₃ (w.gp sub)
+    have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle (w.sorted.to₃ sub) ((σPtInTriangle_iff this).mp tri)
+    have : w[a].x < w[i].x := by
+      apply lt_of_le_of_ne wawi
+      intro h
+      exact ia <| w.of_eqx h.symm
+    have ai : a < i := w.of_sorted_get this
+    have : w[i].x < w[c].x := by
+      apply lt_of_le_of_ne wiwc
+      intro h
+      exact ic <| w.of_eqx h
+    have ic : i < c := w.of_sorted_get this
+    rw [h ai ic] at tri
+    apply not_mem_σPtInTriangle (w.gp sub) tri
 
 theorem satisfies_holeDefs (w : WBPoints) : w.toPropAssn ⊨ holeDefs w.length := by
-  unfold holeDefs notHoleOfPointInside hasPointInside
-  simp only [satisfies_all, Multiset.mem_map, forall_exists_index, forall_apply_eq_imp_iff,
-    Finset.mem_val, Finset.mem_univ, true_and]
+  simp [holeDefs]
   intro a b c
   split_ifs <;> try exact satisfies_tr
-  simp only [ne_eq, satisfies_conj, satisfies_all, Multiset.mem_map, Finset.mem_val, Finset.mem_univ, true_and,
-    forall_exists_index, forall_apply_eq_imp_iff, satisfies_impl, satisfies_neg, satisfies_var,
-    Bool.not_eq_true, satisfies_any, exists_exists_eq_and]
-  constructor
-  . intro x
-    split_ifs <;> try exact satisfies_tr
-    simp only [satisfies_impl, satisfies_var, toPropAssn, decide_eq_true_eq, satisfies_neg,
-      σIsEmptyTriangleFor, not_forall, not_not, exists_prop, toFinset, List.mem_toFinset]
-    intro h
-    exact ⟨w[x], List.get_mem _ x _, h⟩
-  . intro h
-    simp only [toPropAssn, σIsEmptyTriangleFor, decide_eq_false_iff_not, not_forall,
-      not_not, exists_prop] at h
-    have ⟨x, hx, tri⟩ := h
-    rcases List.get_of_mem <| List.mem_toFinset.mp hx with ⟨i, rfl⟩
-    have : List.get w.points i = w[i] := rfl
-    rw [this] at tri hx
-    clear this
-    use i
-    split_ifs
-    . simp only [toPropAssn, satisfies_var, decide_eq_true_eq, tri]
-    next h =>
-      exfalso
-      simp only [not_and, not_not] at h
-      have sub : [w[a],w[b],w[c]] <+ w.points := by
-        have : [w[a],w[b],w[c]] = [a,b,c].map w.points.get := by
-          simp [GetElem.getElem, List.getElem_eq_get]
-        rw [this]
-        apply map_get_sublist
-        aesop (add unsafe lt_trans)
-      have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle (w.sorted.to₃ sub) (σiff.mp tri)
-      have : i ≠ a := fun h => by
-        rw [h] at tri
-        have := not_mem_σPtInTriangle (w.gp sub).perm₁
-        have := tri.perm₁
-        contradiction
-      have : w[a].x < w[i].x := by
-        apply lt_of_le_of_ne wawi
-        intro h
-        exact this <| w.of_eqx h.symm
-      have ai : a < i := w.of_sorted_get this
-      have : i ≠ c := fun h => by
-        rw [h] at tri
-        have := not_mem_σPtInTriangle (w.gp sub).perm₂
-        have := tri.perm₂
-        contradiction
-      have : w[i].x < w[c].x := by
-        apply lt_of_le_of_ne wiwc
-        intro h
-        exact this <| w.of_eqx h
-      have ic : i < c := w.of_sorted_get this
-      rw [h ai ic] at tri
-      apply not_mem_σPtInTriangle (w.gp sub) tri
+  next h =>
+    simp only [satisfies_conj, satisfies_notHoleOfPointInside, satisfies_hasPointInside _ _ _ _ h.left h.right, true_and]
 
 theorem satisfies_leftmostCCWDefs (w : WBPoints) : w.toPropAssn ⊨ pointsCCW w.length := by
   unfold pointsCCW

@@ -69,6 +69,7 @@ open Orientation Point
 def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=
   !![a.x, b.x, c.x ; a.y, b.y, c.y ; 1, 1, 1]
 
+-- TODO: deduplicate det and matrix_det
 def matrix_det (a b c : Point) : Real :=
   Matrix.det (pts_to_matrix a b c)
 
@@ -78,7 +79,6 @@ lemma matrix_det_eq_det_pts (a b c : Point) :
     rw [Matrix.det_fin_three]
     simp [Matrix.vecHead, Matrix.vecTail]
     ring_nf
-
 
 noncomputable def σ (p q r : Point) : Orientation :=
   .ofReal (matrix_det p q r)
@@ -156,13 +156,13 @@ theorem Point.InGeneralPosition₃.of_perm (h : [p, q, r].Perm [p', q', r']) :
   · exact gp.perm₁.perm₂
   · exact gp.perm₂
 
-theorem PointListInGeneralPosition.subperm : PointListInGeneralPosition l ↔
+theorem Point.PointListInGeneralPosition.subperm : PointListInGeneralPosition l ↔
     ∀ {{p q r : Point}}, [p, q, r].Subperm l → InGeneralPosition₃ p q r := by
   refine ⟨fun H _ _ _ ⟨l, p, h⟩ => ?_, fun H _ _ _ h => H h.subperm⟩
   match l, p.length_eq with
   | [p',q',r'], _ => exact (Point.InGeneralPosition₃.of_perm p).1 (H h)
 
-theorem PointListInGeneralPosition.perm (h : l.Perm l') :
+theorem Point.PointListInGeneralPosition.perm (h : l.Perm l') :
     PointListInGeneralPosition l ↔ PointListInGeneralPosition l' := by
   suffices ∀ {l l'}, l.Perm l' →
     PointListInGeneralPosition l → PointListInGeneralPosition l' from ⟨this h, this h.symm⟩
@@ -355,67 +355,3 @@ theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   rw [slope_iff_orientation' h.sorted₃ hGp.gp₃] at h₂
   rw [slope_iff_orientation' h.sorted₂ hGp.gp₂]
   linarith
-
-/-- For distinct points in general position (`{a,p,q,r}.size = 4`),
-this means that `a` is strictly in the triangle `pqr`. --/
-def PtInTriangle (a : Point) (p q r : Point) : Prop :=
-  a ∈ convexHull ℝ {p, q, r}
-
-/-- The point `a` is strictly (not on the boundary) in the triangle `pqr`. -/
-def σPtInTriangle (a p q r : Point) : Prop :=
-  σ p q r = σ p a r ∧
-  σ p a q = σ p r q ∧
-  σ q a r = σ q p r
-
-theorem not_mem_σPtInTriangle {p q r : Point} :
-    InGeneralPosition₃ p q r → ¬σPtInTriangle q p q r := by
-  intro h ⟨_, h', _⟩
-  rw [σ_self₁, σ_perm₂] at h'
-  have := congrArg (-·) h'
-  simp only [neg_neg, neg_collinear] at this
-  have := this ▸ h.σ_ne
-  contradiction
-
-theorem PtInTriangle.perm₁ : PtInTriangle a p q r → PtInTriangle a q p r := by
-  unfold PtInTriangle
-  intro
-  have : ({q, p, r} : Set Point) = {p, q, r} := Set.insert_comm q p {r}
-  rwa [this]
-
-theorem PtInTriangle.perm₂ : PtInTriangle a p q r → PtInTriangle a p r q := by
-  unfold PtInTriangle
-  intro
-  have : ({r, q} : Set Point) = {q, r} := Set.pair_comm r q
-  have : ({p, r, q} : Set Point) = {p, q, r} := congrArg (insert p) this
-  rwa [this]
-
-theorem σPtInTriangle.perm₁ : σPtInTriangle a p q r → σPtInTriangle a q p r := by
-  unfold σPtInTriangle
-  intro ⟨h₁, h₂, h₃⟩
-  conv in σ q a p => rw [σ_perm₁, σ_perm₂, σ_perm₁]
-  conv in σ q r p => rw [σ_perm₁, σ_perm₂, σ_perm₁]
-  simp [*]
-
-theorem σPtInTriangle.perm₂ : σPtInTriangle a p q r → σPtInTriangle a p r q := by
-  unfold σPtInTriangle
-  intro ⟨h₁, h₂, h₃⟩
-  conv in σ r a q => rw [σ_perm₁, σ_perm₂, σ_perm₁]
-  conv in σ r p q => rw [σ_perm₁, σ_perm₂, σ_perm₁]
-  simp [*]
-
--- TODO: bernardo is proving this, copy actual proof later
-theorem σPtInTriangle_iff'' {a p q r : Point} (gp : Point.PointFinsetInGeneralPosition {a,p,q,r}) :
-  σ p q r = .CCW → (σPtInTriangle a p q r ↔ PtInTriangle a p q r) := sorry
-
-theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.PointFinsetInGeneralPosition {a,p,q,r}) :
-    σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
-  have : ({p,q,r} : Finset Point) ⊆ {a,p,q,r} := Finset.subset_insert a {p, q, r}
-  rcases (gp this).σ_cases with h | h
-  . exact σPtInTriangle_iff'' gp h
-  . have hccw : σ p r q = .CCW := by rw [σ_perm₂, h]; rfl
-    have : ({a,p,q,r} : Finset Point) = {a,p,r,q} := by ext; simp; tauto
-    have : Point.PointFinsetInGeneralPosition {a,p,r,q} := by rwa [this] at gp
-    have := σPtInTriangle_iff'' this hccw
-    exact ⟨
-      fun h => PtInTriangle.perm₂ (this.mp (σPtInTriangle.perm₂ h)),
-      fun h => σPtInTriangle.perm₂ (this.mpr (PtInTriangle.perm₂ h))⟩
