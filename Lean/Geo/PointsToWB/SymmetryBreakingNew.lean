@@ -62,7 +62,7 @@ theorem OrientationProperty'.not : OrientationProperty' P → OrientationPropert
   fun h _ _ hσ => not_congr (h hσ)
 
 theorem σEmbed.gp : OrientationProperty' Point.PointListInGeneralPosition := fun S T f => by
-  rw [← PointListInGeneralPosition.perm f.perm]
+  rw [← Point.PointListInGeneralPosition.perm f.perm]
   simp only [Point.PointListInGeneralPosition, ← List.mem_sublists, List.sublists_map]
   simp [Point.InGeneralPosition₃.iff_ne_collinear]
   constructor
