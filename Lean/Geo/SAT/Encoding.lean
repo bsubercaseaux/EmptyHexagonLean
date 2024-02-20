@@ -124,7 +124,7 @@ def Array.finRange (n : Nat) : Array (Fin n) :=
 @[simp] theorem Array.finRange_data (n)
   : (Array.finRange n).data = List.finRange n := rfl
 
-def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) (ν := Var n) Unit (· ⊨ signotopeAxiom a b c d) :=
+def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) (ν := Var n) Unit (· ⊨ orientationConstraint a b c d) :=
   seq[
     -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
     andImply (#[ mkPos <| sigma a b c, mkPos <| sigma a c d ]) (mkPos <| sigma a b d)
@@ -135,10 +135,10 @@ def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) (ν := Var n) 
   , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
     andImply (#[ mkNeg <| sigma a b c, mkNeg <| sigma b c d ]) (mkNeg <| sigma a c d)
   ].mapProp (by
-    simp [signotopeAxiom]
+    simp [orientationConstraint]
   )
 
-def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ signotopeAxioms n) :=
+def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (orientationConstraints n) :=
   let U := (Array.finRange n)
   ( -- for all `a`, `b`, `c` with `a < b < c`
     for_all U fun a =>
@@ -151,37 +151,18 @@ def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ signotop
       signotopeClause a b c d
   ).mapProp (by
     ext τ
-    simp [signotopeAxioms]
-    constructor
-    · intro h a b c d
-      split
-      next habcd =>
-        rcases habcd with ⟨hab,hbc,hcd⟩
-        specialize h a b; simp [hab] at h
-        specialize h c; simp [hbc] at h
-        specialize h d; simp [hcd] at h
-        exact h
-      · trivial
-    · intro h a b
-      split
-      next hab =>
-        simp; intro c
-        split
-        next hbc =>
-          simp; intro d
-          split
-          next hcd =>
-            specialize h a b c d
-            simp [*] at h
-            exact h
-          · trivial
-        · trivial
-      · trivial
-    )
+    simp [orientationConstraints, ite_apply]
+    apply forall_congr'; intro a; apply forall_congr'; intro b
+    split <;> simp [*]
+    apply forall_congr'; intro c
+    split <;> simp [*]
+    apply forall_congr'; intro d
+    split <;> simp [*]
+  )
 
 theorem Fin.lt_asymm {a b : Fin n} : a < b → ¬b < a := @Nat.lt_asymm a b
 
-def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (· ⊨ xIsInsideDef a b c x) :=
+def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsideDef a b c x) :=
   seq[
     -- a < x < b
     VEncCNF.guard (a < x ∧ x < b) fun _ =>
@@ -198,16 +179,11 @@ def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (· ⊨ x
       )]
   ].mapProp (by
     ext τ
-    simp [xIsInsideDef]
-    split
-    next h =>
-      rcases h with ⟨-,h2⟩
-      have := Fin.lt_asymm h2
-      simp [this]
-    · aesop
-    )
+    simp [xIsInsideDef, ite_apply]
+    aesop
+  )
 
-def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ insideDefs n) :=
+def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideDefs n) :=
   ( let U := (Array.finRange n)
     -- for all `a`, `b`, `c` with `a < b < c`
     for_all U fun a =>
@@ -219,26 +195,15 @@ def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ insideDefs 
     xIsInsideClause a b c x
   ).mapProp (by
     ext τ
-    simp [insideDefs]
-    constructor
-    · intro h a b c d
-      split
-      · specialize h a b; simp [*] at h
-        specialize h c; simp [*] at h
-        specialize h d; exact h
-      · trivial
-    · intro h a b
-      split
-      · simp; intro c
-        split
-        · simp; intro d
-          specialize h a b c d
-          simp [*] at h
-          exact h
-        · trivial
-      · trivial)
+    simp [insideDefs, ite_apply]
+    apply forall_congr'; intro a; apply forall_congr'; intro b
+    split <;> simp [*]
+    apply forall_congr'; intro c
+    split <;> simp [*]
+  )
 
-def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (· ⊨ notHoleOfPointInside a b c) :=
+def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (fun τ =>
+      ∀ x, a < x → x < c → x ≠ b → τ (Var.inside x a b c) → !τ (Var.hole a b c)) :=
   ( for_all (Array.finRange n) fun x =>
     VEncCNF.guard (a < x ∧ x < c ∧ x ≠ b) fun _ =>
       -- Q(WN): this is just a clause, why do we need Tseitin? Also in `signotopeClause` above
@@ -248,21 +213,22 @@ def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit
       imply (mkPos <| (Var.inside x a b c )) (mkNeg <| Var.hole a b c)
   ).mapProp (by
     ext τ
-    simp [notHoleOfPointInside]
+    simp
     apply forall_congr'
-    aesop)
+    aesop
+  )
 
-def pointInsideOfNotHoleClauses (a b c : Fin n) :
-    VEncCNF (Literal (Var n)) Unit (· ⊨ [propfun| ¬{Var.hole a b c} → {hasPointInside a b c} ]) :=
+def pointInsideOfNotHoleClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (fun τ =>
+    !τ (Var.hole a b c) → ∃ x, a < x ∧ x < c ∧ x ≠ b ∧ τ (Var.inside x a b c)) :=
   let insideVars :=
     Array.finRange n |>.filter (fun x => a < x ∧ x < c ∧ x ≠ b) |>.map fun x => LitVar.mkPos $ Var.inside x a b c
   ( implyOr (LitVar.mkNeg <| Var.hole a b c) insideVars
   ).mapProp (by
     ext τ
-    simp [hasPointInside]
+    simp
     aesop)
 
-def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ holeDefs n) :=
+def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeDefs n) :=
   ( let U := (Array.finRange n)
     for_all U fun a =>
     for_all U fun b =>
@@ -275,24 +241,19 @@ def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ holeDefs n
       ]
   ).mapProp (by
     ext τ
-    simp [holeDefs]
-    constructor
-    · intro h a b c
-      split
-      · specialize h a b; simp [*] at h
-        specialize h c; simp [*] at h
-        simp_all [h]
-      · trivial
-    · intro h a b
-      split
-      · simp; intro c
-        split
-        · specialize h a b c
-          simpa [*] using h
-        · trivial
-      · trivial)
+    simp [holeDefs, ite_apply]
+    apply forall_congr'; intro a
+    apply forall_congr'; intro b
+    split <;> simp [*]
+    apply forall_congr'; intro c
+    split <;> simp [*]
+    conv => rhs; rw [iff_def]
+    apply and_congr
+    · rw [imp_forall_iff]; apply forall_congr'; aesop
+    · rw [← not_imp_not]; simp
+  )
 
-def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ noHoles n) :=
+def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
   ( let U := (Array.finRange n)
     for_all U fun a =>
     for_all U fun b =>
@@ -302,25 +263,15 @@ def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ noHoles n) 
       addClause #[(mkNeg <| Var.hole a b c)]
   ).mapProp (by
     ext τ
-    simp [noHoles]
-    constructor
-    · intro h a b c
-      split
-      · specialize h a b; simp [*] at h
-        specialize h c; simp [*] at h
-        simp [h]
-      · trivial
-    · intro h a b
-      split
-      · simp; intro c
-        split
-        · specialize h a b c
-          simpa [*] using h
-        · trivial
-      · trivial
+    simp [noHoles, ite_apply]
+    apply forall_congr'; intro a
+    apply forall_congr'; intro b
+    split <;> simp [*]
+    apply forall_congr'; intro c
+    split <;> simp [*]
   )
 
-def leftmostCCWClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ pointsCCW n) :=
+def leftmostCCWClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (pointsCCW n) :=
   ( let U := (Array.finRange n)
     for_all U fun a =>
     VEncCNF.guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
@@ -329,28 +280,16 @@ def leftmostCCWClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ points
       addClause #[(mkPos <| Var.sigma ⟨0, Fin.size_positive a⟩ a b)]
   ).mapProp (by
     ext τ
-    simp [pointsCCW]
-    constructor
-    · rintro h ⟨a, ha⟩ b
-      match a with
-      | 0 => simp
-      | a + 1 =>
-        split
-        · specialize h ⟨a + 1, ha⟩; simp [*] at h
-          specialize h b; simp [*] at h
-          simp [h]
-        · trivial
-    · intro h a
-      split
-      · intro b
-        specialize h a b; simp [*] at h
-        split
-        · simp [*] at h
-          exact h
-        · trivial
-      · trivial)
+    simp [pointsCCW, ite_apply]
+    apply forall_congr'; intro a
+    split
+    · apply forall_congr'; intro b
+      split <;> simp [*]
+      aesop
+    · simp only [Fin.lt_def] at *; aesop
+  )
 
-def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (· ⊨ theFormula n) :=
+def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (theFormula n) :=
   (seq[
     signotopeClauses n, insideClauses n, holeDefClauses n, noHoleClauses n, leftmostCCWClauses n
   ]).mapProp (by
