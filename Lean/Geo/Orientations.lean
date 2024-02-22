@@ -112,6 +112,13 @@ theorem σ_self₃ (p q : Point) : σ q q p = .Collinear := by
   have : σ q q p = -σ q q p := by conv => lhs; rw [σ_perm₁]
   simpa using this
 
+theorem Point.InGeneralPosition₃.not_mem_seg :
+    InGeneralPosition₃ p q r → p ∉ convexHull ℝ {q, r} := mt fun h => by
+  rw [convexHull_pair] at h
+  obtain ⟨a, b, _, _, eq, rfl⟩ := h
+  simp [det]
+  linear_combination eq * (q 1 * r 0 - q 0 * r 1)
+
 theorem Point.InGeneralPosition₃.iff_ne_collinear {p q r : Point} :
     InGeneralPosition₃ p q r ↔ σ p q r ≠ .Collinear := by
   rw [InGeneralPosition₃, σ, matrix_det_eq_det_pts, ofReal]
@@ -186,6 +193,47 @@ theorem Point.InGeneralPosition₃.ne₂ {p q r : Point} (h : InGeneralPosition�
 
 theorem Point.InGeneralPosition₃.ne₃ {p q r : Point} (h : InGeneralPosition₃ p q r) : q ≠ r :=
   h.perm₁.ne₂
+
+open scoped Matrix
+theorem dotProduct_self_eq_zero {p : Point} : p ⬝ᵥ p = 0 ↔ p = 0 := by
+  refine ⟨fun h => ?_, fun h => h ▸ by simp⟩
+  simp at h
+  have := (add_eq_zero_iff' (mul_self_nonneg _) (mul_self_nonneg _)).1 h
+  simp [mul_self_eq_zero] at this
+  ext <;> simp [this]
+
+theorem collinear_iff : σ p q r = .Collinear ↔ _root_.Collinear ℝ {p, q, r} := by
+  rw [σ, Orientation.ofReal_eq_collinear, matrix_det_eq_det_pts]
+  constructor <;> intro H
+  · if h : q = r then subst r; simp [collinear_pair] else
+    apply collinear_insert_of_mem_affineSpan_pair
+    have : (r - q) ⬝ᵥ (r - q) ≠ 0 := mt dotProduct_self_eq_zero.1 <| sub_ne_zero.2 <| Ne.symm h
+    convert AffineMap.lineMap_mem_affineSpan_pair (k := ℝ)
+      ((r - q) ⬝ᵥ (p - q) / (r - q) ⬝ᵥ (r - q)) _ _ using 1
+    simp only [AffineMap.lineMap_apply_module']; rw [Point.det] at H
+    rw [← sub_eq_iff_eq_add, ← sub_eq_zero, ← smul_eq_zero_iff_right this,
+      smul_sub, smul_smul, mul_div_cancel' _ this]
+    ext <;> simp [norm_sq_eq_inner]
+    · linear_combination H * (q 1 - r 1)
+    · linear_combination H * (r 0 - q 0)
+  · let ⟨v, H⟩ := (collinear_iff_of_mem (p₀ := p) (by simp)).1 H
+    simp at H; obtain ⟨⟨a, rfl⟩, b, rfl⟩ := H
+    simp [Point.det]; ring
+
+theorem Point.InGeneralPosition₃.iff_collinear :
+    InGeneralPosition₃ p q r ↔ ¬_root_.Collinear ℝ {p, q, r} := by
+  rw [Point.InGeneralPosition₃.iff_ne_collinear, Ne, collinear_iff]
+
+theorem Point.InGeneralPosition₃.iff_not_mem_seg : InGeneralPosition₃ p q r ↔
+    p ∉ convexHull ℝ {q, r} ∧ q ∉ convexHull ℝ {p, r} ∧ r ∉ convexHull ℝ {p, q} := by
+  constructor
+  · intro h
+    exact ⟨h.not_mem_seg, h.perm₁.not_mem_seg, h.perm₂.perm₁.not_mem_seg⟩
+  · rw [Point.InGeneralPosition₃.iff_collinear, ← not_or, ← not_or]; refine mt fun h => ?_
+    simp; obtain h | h | h := h.wbtw_or_wbtw_or_wbtw
+    · right; left; exact mem_segment_iff_wbtw.2 h
+    · right; right; exact mem_segment_iff_wbtw.2 h.symm
+    · left; exact mem_segment_iff_wbtw.2 h.symm
 
 theorem Point.InGeneralPosition₃.σ_cases {p q r : Point} :
     InGeneralPosition₃ p q r → σ p q r = .CCW ∨ σ p q r = .CW := by

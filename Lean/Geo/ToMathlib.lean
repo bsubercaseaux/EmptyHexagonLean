@@ -35,3 +35,6 @@ theorem exists_lt_list (l : List α) (f : α → ℝ) : ∃ a, ∀ x ∈ l, a < 
 theorem exists_gt_list (l : List α) (f : α → ℝ) : ∃ a, ∀ x ∈ l, f x < a := by
   have ⟨r, h⟩ := exists_lt_list l (-f ·)
   exact ⟨-r, fun _ hx => lt_neg.1 (h _ hx)⟩
+
+theorem Finset.exists_mk (s : Finset A) : ∃ l : List A, ∃ h : l.Nodup, s = ⟨l, h⟩ := by
+  rcases s with ⟨⟨l⟩, h⟩; exact ⟨_, _, rfl⟩
