@@ -61,26 +61,23 @@ theorem ConvexEmptyIn.iff {S P : Set Point} (SP : S ⊆ P) :
     intro a aS aCH
     apply allempty (S \ {a}) (Set.diff_subset ..) a (by simp [SP aS]) aCH
 
-theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point} (sS : ↑s ⊆ S) :
+theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
+    (sS : ↑s ⊆ S) (sz : 3 ≤ s.card) :
     ConvexEmptyIn s S ↔ ∀ (t : Finset Point), t.card = 3 → t ⊆ s → ConvexEmptyIn t S := by
   constructor
   · intro ce _ _ ts
     apply ce.antitone_left ts
   · rw [ConvexEmptyIn.iff sS]
     intro H S' hS' p ⟨pS, pn⟩ pS'
-    rw [convexHull_eq_union] at pS'; simp at pS'
+    obtain ⟨S', rfl⟩ := (s.finite_toSet.subset hS').exists_finset_coe
+    rw [convexHull_eq_union] at pS'; simp at pS' hS' pn
     obtain ⟨t, indep, tS', ht⟩ := pS'
-    cases lt_or_eq_of_le (b := 3) (by simpa using indep.card_le_finrank_succ') with
-    | inr h => exact (H _ h (by simpa using tS'.trans hS')).2 _ ⟨pS, mt (tS' ·) pn⟩ ht
-    | inl h =>
-      match t, t.exists_mk with
-      | _, ⟨[], _, rfl⟩ => simp at ht
-      | t, ⟨[a], _, eq⟩ =>
-        simp [show (t:Set _) = {a} by ext; simp [eq]] at ht tS'
-        exact pn (ht ▸ tS')
-      | t, ⟨[a, b], _, eq⟩ =>
-        simp [Set.insert_subset_iff, show (t:Set _) = {a, b} by ext; simp [eq]] at ht tS'
-        sorry -- TODO: false
+    have : t.card ≤ 3 := by simpa using indep.card_le_finrank_succ'
+    obtain ⟨u, tu, us, hu⟩ := Finset.exists_intermediate_set (3 - t.card)
+      (by rwa [Nat.sub_add_cancel this]) (tS'.trans hS')
+    have := H _ (by rwa [Nat.sub_add_cancel this] at hu) us
+    refine this.2 _ ⟨pS, fun pu => ?_⟩ (convexHull_mono tu ht)
+    exact this.1 p pu (convexHull_mono (Set.subset_diff_singleton tu (mt (tS' ·) pn)) ht)
 
 def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
