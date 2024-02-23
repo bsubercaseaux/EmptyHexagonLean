@@ -1,3 +1,4 @@
+import Mathlib.Analysis.Convex.Caratheodory
 import Geo.Definitions.Point
 import Geo.Definitions.PtInTriangle
 
@@ -17,7 +18,7 @@ def ConvexPoints (S : Set Point) : Prop :=
   ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
 open Classical
-theorem ConvexPoints.triangle_iff {a b c : Point} {h} :
+theorem ConvexPoints.triangle_iff {a b c : Point} {h : [a, b, c].Nodup} :
     ConvexPoints (Finset.mk (α := Point) [a,b,c] h) ↔ Point.InGeneralPosition₃ a b c := by
   constructor <;> intro h2
   · simp [not_or, Set.subset_def] at h ⊢
@@ -34,46 +35,52 @@ theorem ConvexPoints.triangle_iff {a b c : Point} {h} :
     · exact h2.2.1 (convexHull_mono (by simp [Set.subset_def]) hp2)
     · exact h2.2.2 (convexHull_mono (by simp [Set.subset_def]) hp2)
 
+theorem ConvexPoints.antitone_left {S₁ S₂ : Set Point} (S₁S₂ : S₁ ⊆ S₂)
+    (convex : ConvexPoints S₂) : ConvexPoints S₁ := by
+  intro a aS₁ aCH
+  have : S₁ \ {a} ⊆ S₂ \ {a} := Set.diff_subset_diff S₁S₂ (le_refl _)
+  apply convex a (S₁S₂ aS₁) (convexHull_mono this aCH)
+
 def ConvexEmptyIn (S P : Set Point) : Prop :=
   ConvexPoints S ∧ EmptyShapeIn S P
 
 theorem ConvexEmptyIn.antitone_left {S₁ S₂ P : Set Point} (S₁S₂ : S₁ ⊆ S₂) :
     ConvexEmptyIn S₂ P → ConvexEmptyIn S₁ P := by
-  intro ⟨convex, empty⟩
-  constructor
-  . intro a aS₁ aCH
-    have : S₁ \ {a} ⊆ S₂ \ {a} := Set.diff_subset_diff S₁S₂ (le_refl _)
-    apply convex a (S₁S₂ aS₁) (convexHull_mono this aCH)
-  . intro p pPS₁ pCH
-    have : p ∈ convexHull ℝ S₂ := convexHull_mono S₁S₂ pCH
-    refine empty p ?_ this
-    rw [Set.mem_diff] at pPS₁ ⊢
-    refine ⟨pPS₁.left, ?_⟩
-    intro pS₂
-    have : S₁ ⊆ S₂ \ {p} := fun x xS₁ => by
-      rw [Set.mem_diff, Set.mem_singleton_iff]
-      refine ⟨S₁S₂ xS₁, fun xp => ?_⟩
-      rw [xp] at xS₁
-      exact pPS₁.right xS₁
-    have : p ∈ convexHull ℝ (S₂ \ {p}) := convexHull_mono this pCH
-    exact convex p pS₂ this
+  refine fun ⟨convex, empty⟩ => ⟨convex.antitone_left S₁S₂, fun p pPS₁ pCH => ?_⟩
+  refine empty p ⟨pPS₁.left, ?_⟩ (convexHull_mono S₁S₂ pCH)
+  refine fun pS₂ => convex p pS₂ (convexHull_mono ?_ pCH)
+  exact fun x xS₁ => ⟨S₁S₂ xS₁, fun xp => pPS₁.right (xp ▸ xS₁)⟩
 
 theorem ConvexEmptyIn.iff {S P : Set Point} (SP : S ⊆ P) :
     ConvexEmptyIn S P ↔ ∀ S' ⊆ S, EmptyShapeIn S' P := by
   constructor
-  . intro ce _ S'S
+  · intro ce _ S'S
     exact ce.antitone_left S'S |>.right
-  . intro allempty
+  · intro allempty
     refine ⟨?_, allempty S le_rfl⟩
     intro a aS aCH
     apply allempty (S \ {a}) (Set.diff_subset ..) a (by simp [SP aS]) aCH
 
-theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point} :
+theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point} (sS : ↑s ⊆ S) :
     ConvexEmptyIn s S ↔ ∀ (t : Finset Point), t.card = 3 → t ⊆ s → ConvexEmptyIn t S := by
   constructor
-  . intro ce _ _ ts
+  · intro ce _ _ ts
     apply ce.antitone_left ts
-  . sorry -- harder, needs triangulation?
+  · rw [ConvexEmptyIn.iff sS]
+    intro H S' hS' p ⟨pS, pn⟩ pS'
+    rw [convexHull_eq_union] at pS'; simp at pS'
+    obtain ⟨t, indep, tS', ht⟩ := pS'
+    cases lt_or_eq_of_le (b := 3) (by simpa using indep.card_le_finrank_succ') with
+    | inr h => exact (H _ h (by simpa using tS'.trans hS')).2 _ ⟨pS, mt (tS' ·) pn⟩ ht
+    | inl h =>
+      match t, t.exists_mk with
+      | _, ⟨[], _, rfl⟩ => simp at ht
+      | t, ⟨[a], _, eq⟩ =>
+        simp [show (t:Set _) = {a} by ext; simp [eq]] at ht tS'
+        exact pn (ht ▸ tS')
+      | t, ⟨[a, b], _, eq⟩ =>
+        simp [Set.insert_subset_iff, show (t:Set _) = {a, b} by ext; simp [eq]] at ht tS'
+        sorry -- TODO: false
 
 def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
@@ -87,7 +94,7 @@ theorem HasEmptyTriangle.iff (S : Set Point) :
   simp [HasEmptyTriangle, HasEmptyNGon, PtInTriangle]
   constructor
   · intro ⟨s, h1, h2, h3, h4⟩
-    match s, s.exists_mk, h1 with | _, ⟨[a,b,c], h1, rfl⟩, _ => ?_
+    match s, s.exists_mk with | _, ⟨[a,b,c], h1, rfl⟩ => ?_
     have s_eq : (Finset.mk (Multiset.ofList [a,b,c]) h1 : Set _) = {a, b, c} := by ext; simp
     simp [not_or, Set.subset_def] at h1 h2 h3 ⊢
     refine ⟨a, h2.1, b, h2.2.1, c, h2.2.2, ConvexPoints.triangle_iff.1 h3, ?_⟩

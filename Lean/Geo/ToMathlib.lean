@@ -38,3 +38,9 @@ theorem exists_gt_list (l : List α) (f : α → ℝ) : ∃ a, ∀ x ∈ l, f x 
 
 theorem Finset.exists_mk (s : Finset A) : ∃ l : List A, ∃ h : l.Nodup, s = ⟨l, h⟩ := by
   rcases s with ⟨⟨l⟩, h⟩; exact ⟨_, _, rfl⟩
+
+theorem AffineIndependent.card_le_finrank_succ' {k V P ι : Type*}
+    [DivisionRing k] [AddCommGroup V] [Module k V] [AddTorsor V P] [Module.Finite k V]
+    [Fintype ι] {p : ι → P} (H : AffineIndependent k p) :
+    Fintype.card ι ≤ FiniteDimensional.finrank k V + 1 :=
+  H.card_le_finrank_succ.trans <| Nat.succ_le_succ (Submodule.finrank_le _)
