@@ -40,7 +40,19 @@ theorem ConvexEmptyIn.antitone_left {S₁ S₂ P : Set Point} :
     have : p ∈ convexHull ℝ (S₂ \ {p}) := convexHull_mono this pCH
     exact convex p pS₂ this
 
-theorem ConvexEmptyIn.iff {s : Finset Point} {S : Set Point} :
+theorem ConvexEmptyIn.iff {S P : Set Point} :
+    S ⊆ P →
+    (ConvexEmptyIn S P ↔ ∀ S' ⊆ S, EmptyShapeIn S' P) := by
+  intro SP
+  constructor
+  . intro ce _ S'S
+    exact ce.antitone_left S'S |>.right
+  . intro allempty
+    refine ⟨?_, allempty S le_rfl⟩
+    intro a aS aCH
+    apply allempty (S \ {a}) (Set.diff_subset ..) a (by simp [SP aS]) aCH
+
+theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point} :
     ConvexEmptyIn s S ↔ ∀ (t : Finset Point), t.card = 3 → t ⊆ s → ConvexEmptyIn t S := by
   constructor
   . intro ce _ _ ts
