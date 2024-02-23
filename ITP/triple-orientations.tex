@@ -97,10 +97,8 @@ def PtInTriangle (a p q r : Point) : Prop :=
   a ∈ convexHull ℝ {p, q, r}
 
 def σPtInTriangle (a p q r : Point) : Prop :=
-  σ p q r = σ p a r ∧
-  σ p a q = σ p r q ∧
-  σ q a r = σ q p r
-
+  σ p q r = σ p a r ∧ σ p a q = σ p r q ∧  σ q a r = σ q p r
+  
 theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.PointFinsetInGeneralPosition {a,p,q,r}) :
   σPtInTriangle a p q r ↔ PtInTriangle a p q r -- this equivalence is not trivial.
 
@@ -122,7 +120,6 @@ Let us know discuss the previous steps. First,~\lstinline|(PtInTriangle a p q r)
 A few properties of the $\sigma$ function are heavily used in SAT encodings, ranging from the initial work of Peters and Szekeres~\cite{szekeres_peters_2006} to the recent work of Heule and Scheucher~\cite{emptyHexagonNumber}. At the base of such encodings, boolean variables $\orvar_{p,q,r}$ are used to represent $\sigma(p, q, r) = 1$\footnote{Given that pointsets are assumed to be in general position we have $\neg \orvar_{p,q,r} \iff \sigma(p, q, r) = -1$.}. If one were to create a variable $\orvar_{p,q,r}$ for every triple of points $p \neq q \neq r$, that would amount to $n(n-1)(n-2)$ variables for $n$ points. However, the orientations of triples $(p, q, r)$ and $(q, r, p)$ or $(r, q, p)$ contain redundant information: if $p,q,r$ are oriented counterclockwise, then $q,r,p$ and $r,p,q$ are also oriented counterclockwise, whereas $p,r,q$ is oriented clockwise. This is captured by the following two fundamental asymmetries:
 \begin{lstlisting}
   theorem σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
-
   theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
 \end{lstlisting}
 As a result, the number of boolean variables needed for the SAT encoding can be reduced by a factor of $3! = 6$.
@@ -140,12 +137,10 @@ We formalize these implication properties and prove their validity.
 theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     σ p q r = CCW → σ q r s = CCW → σ p r s = CCW 
 
-...
+[...]
 
 theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
     σ p q r = CW → σ q r s = CW → σ p r s = CW 
-
-...
 \end{lstlisting}
 The proofs of these properties are based on an equivalence between the orientation of a triple of points and the \emph{slopes} of the lines that connect them. Namely, if $p, q, r$  are sorted from left to right, then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pq}) < \textsf{slope}(\vec{pr})$  and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pr}) < \textsf{slope}(\vec{qr})$. By proving first these \emph{slope-orientation} equivalences we can then easily prove e.g.,~\lstinline|σ_prop₁|, as illustrated in~\Cref{fig:orientation-implication}. 
 

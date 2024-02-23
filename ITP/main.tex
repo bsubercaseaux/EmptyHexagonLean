@@ -1,6 +1,4 @@
-\PassOptionsToPackage{dvipsnames}{xcolor}
-
-\documentclass{easychair}
+\documentclass[a4paper,USenglish,cleveref, autoref, thm-restate]{lipics-v2021}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
@@ -22,7 +20,6 @@
 \usepackage{amssymb}
 \usepackage{todonotes}
 \usepackage{nicefrac}
-\usepackage{cleveref}
 \usepackage{booktabs}
 \usepackage{multirow}
 \usepackage{xpatch}
@@ -65,12 +62,13 @@
 \def\orcidID#1{\href{http://orcid.org/#1}{\protect\raisebox{-1.25pt}{\protect\includegraphics{orcid_color.eps}}}}
 \makeatother
 
-\newtheorem{theorem}{Theorem}
-\newtheorem{lemma}{Lemma}
-\newtheorem{definition}{Definition}
+% \newtheorem{theorem}{Theorem}
+% \newtheorem{lemma}{Lemma}
+% \newtheorem{definition}{Definition}
 
-\newcommand{\leansat}{\texttt{LeanSAT}}
+\newcommand{\leansat}{\textsf{LeanSAT}}
 
+\bibliographystyle{plainurl}
 
 \title{A Formal Verification of $h(6) = 30$,\\ the Empty Hexagon Number}%
 % \thanks{Other people who contributed to this document include Maria Voronkov
@@ -80,25 +78,31 @@
 % Authors are joined by \and. Their affiliations are given by \inst, which indexes
 % into the list defined using \institute
 %
-\author{ 
-        Mario Carneiro \orcidID{0000-0002-0470-5249} % change me for the real one
-  \and  Cayden Codel \orcidID{0000-0003-3588-4873}
-  \and  James Gallicchio \orcidID{0000-0002-0838-3240}
-  \and  \\ Wojciech Nawrocki \orcidID{0000-0002-8839-0618}
-  \and  Bernardo Subercaseaux \orcidID{0000-0003-2295-1299} }
+% \author{ 
+%         Mario Carneiro \orcidID{0000-0002-0470-5249} % change me for the real one
+%   \and  Cayden Codel \orcidID{0000-0003-3588-4873}
+%   \and  James Gallicchio \orcidID{0000-0002-0838-3240}
+%   \and  \\ Wojciech Nawrocki \orcidID{0000-0002-8839-0618}
+%   \and  Bernardo Subercaseaux \orcidID{0000-0003-2295-1299} 
+% }
 %
-\institute{
-  Carnegie Mellon University, Pittsburgh, PA 15213, USA\\
-  \email{\{mcarneir, ccodel, jgallicc, wnawrock, bsuberca\}@andrew.cmu.edu}
-}
+% \institute{
+%   Carnegie Mellon University, Pittsburgh, PA 15213, USA\\
+%   \email{\{mcarneir, ccodel, jgallicc, wnawrock, bsuberca\}@andrew.cmu.edu}
+% }
 
+\author{Bernardo {Subercaseaux}}{Carnegie Mellon University}{bsuberca@andrew.cmu.edu}{https://orcid.org/0000-0003-2295-1299}{}
+\author{Wojciech {Nawrocki}}{Carnegie Mellon University}{wnawrock@andrew.cmu.edu}{https://orcid.org/0000-0002-8839-0618}{}
+\author{James {Gallichio}}{Carnegie Mellon University}{jgallicc@andrew.cmu.edu}{https://orcid.org/0000-0002-0838-3240}{}
+\author{Cayden {Codel}}{Carnegie Mellon University}{ccodel@andrew.cmu.edu}{https://orcid.org/0000-0003-3588-4873}{}
+\author{Mario {Carneiro}}{Carnegie Mellon University}{mcarneir@andrew.cmu.edu}{https://orcid.org/0000-0002-0470-5249}{}
 
 %  \authorrunning{} has to be set for the shorter version of the authors' names;
 % otherwise a warning will be rendered in the running heads. When processed by
 % EasyChair, this command is mandatory: a document without \authorrunning
 % will be rejected by EasyChair
 
-\authorrunning{Carneiro, Codel, Gallicchio, Nawrocki, and Subercaseaux}
+\authorrunning{Subercaseaux, Nawrocki, Gallicchio, Codel, and Carneiro}
 
 % \titlerunning{} has to be set to either the main title or its shorter
 % version for the running heads. When processed by
@@ -148,10 +152,7 @@
 \section{Concluding Remarks}
 \label{sec:conclusion}
 
-\bibliographystyle{plain}
-% \bibliographystyle{alpha}
-% \bibliographystyle{unsrt}
-% \bibliographystyle{abbrv}
+
 \bibliography{bibliography}
 
 \end{document}
