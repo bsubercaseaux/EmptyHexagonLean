@@ -56,10 +56,10 @@ theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGe
     HasEmptyTriangle pts.toFinset := by
   by_contra h'
   have noσtri : ¬σHasEmptyTriangle pts.toFinset := fun h => h' <| HasEmptyTriangle_of_σHasEmptyTriangle gp h
-  have ⟨w, hw⟩ := @symmetry_breaking pts (by omega) gp
+  have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ by decide) gp
   have noσtri' : ¬σHasEmptyTriangle w.toFinset :=
-    hw.elim fun e => OrientationProperty_σHasEmptyTriangle.not (e.toEquiv w.nodup) noσtri
-  have len10 : w.length = 10 := hw.elim fun e => e.length_eq.symm.trans h
+    OrientationProperty_σHasEmptyTriangle.not (hw.toEquiv w.nodup) noσtri
+  have len10 : w.length = 10 := hw.length_eq.symm.trans h
   have := cnfUnsat
   rw [LeanSAT.Encode.VEncCNF.toICnf_equisatisfiable, ← len10] at this
   apply this

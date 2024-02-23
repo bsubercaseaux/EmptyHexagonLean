@@ -297,4 +297,4 @@ def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (theFormula n) :=
 
 open Model PropFun
 axiom cnfUnsat : ¬∃ τ : PropAssignment IVar,
-  τ ⊨ (Geo.theEncoding 10 |>.val.toICnf.toPropFun)
+  τ ⊨ (Geo.theEncoding 10).val.toICnf.toPropFun

@@ -35,6 +35,28 @@ theorem ConvexPoints.triangle_iff {a b c : Point} {h : [a, b, c].Nodup} :
     · exact h2.2.1 (convexHull_mono (by simp [Set.subset_def]) hp2)
     · exact h2.2.2 (convexHull_mono (by simp [Set.subset_def]) hp2)
 
+theorem ConvexPoints.lt_3 {s : Finset Point} (hs : s.card < 3) : ConvexPoints s := by
+  intro a ha hn
+  rw [← Finset.coe_erase] at hn
+  have := Nat.le_of_lt_succ <| (Finset.card_erase_lt_of_mem ha).trans_le (Nat.le_of_lt_succ hs)
+  generalize e1 : s.erase a = s' at *
+  match s'.exists_mk, this with
+  | ⟨[], _, (eq : s' = ∅)⟩, _ => subst eq; simp at hn
+  | ⟨[b], h1, (eq : s' = {b})⟩, _ =>
+    subst eq; simp at hn; subst b
+    simpa using congrArg (a ∈ ·) e1
+
+theorem ConvexPoints.triangle' {s : Finset Point} {S : List Point}
+    (hs : s.card ≤ 3) (sS : s ⊆ S.toFinset) (gp : Point.PointListInGeneralPosition S) :
+    ConvexPoints s := by
+  cases lt_or_eq_of_le hs with
+  | inl hs => exact ConvexPoints.lt_3 hs
+  | inr hs =>
+    match s, s.exists_mk with | _, ⟨[a,b,c], h1, rfl⟩ => ?_
+    rw [ConvexPoints.triangle_iff]
+    apply Point.PointListInGeneralPosition.subperm.1 gp
+    exact List.subperm_of_subset h1 (by simpa [Finset.subset_iff] using sS)
+
 theorem ConvexPoints.antitone_left {S₁ S₂ : Set Point} (S₁S₂ : S₁ ⊆ S₂)
     (convex : ConvexPoints S₂) : ConvexPoints S₁ := by
   intro a aS₁ aCH
@@ -70,7 +92,7 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
   · rw [ConvexEmptyIn.iff sS]
     intro H S' hS' p ⟨pS, pn⟩ pS'
     obtain ⟨S', rfl⟩ := (s.finite_toSet.subset hS').exists_finset_coe
-    rw [convexHull_eq_union] at pS'; simp at pS' hS' pn
+    rw [convexHull_eq_union] at pS'; simp at pS'
     obtain ⟨t, indep, tS', ht⟩ := pS'
     have : t.card ≤ 3 := by simpa using indep.card_le_finrank_succ'
     obtain ⟨u, tu, us, hu⟩ := Finset.exists_intermediate_set (3 - t.card)
@@ -78,6 +100,30 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
     have := H _ (by rwa [Nat.sub_add_cancel this] at hu) us
     refine this.2 _ ⟨pS, fun pu => ?_⟩ (convexHull_mono tu ht)
     exact this.1 p pu (convexHull_mono (Set.subset_diff_singleton tu (mt (tS' ·) pn)) ht)
+
+theorem ConvexEmptyIn.iff_triangles' {s : Finset Point} {S : List Point}
+    (sS : s ⊆ S.toFinset) (gp : Point.PointListInGeneralPosition S) :
+    ConvexEmptyIn s S.toFinset ↔
+    ∀ (t : Finset Point), t.card = 3 → t ⊆ s → EmptyShapeIn t S.toFinset := by
+  if sz : 3 ≤ s.card then
+    have' sS' : (s:Set _) ⊆ S.toFinset := sS
+    rw [ConvexEmptyIn.iff_triangles sS' sz]
+    simp (config := {contextual := true}) [ConvexEmptyIn,
+      fun a b => ConvexPoints.triangle' a (subset_trans b sS) gp]
+  else
+    constructor <;> intro
+    · intro _ h1 h2; cases sz (h1 ▸ Finset.card_le_card h2)
+    · refine ⟨ConvexPoints.lt_3 (not_le.1 sz), fun p ⟨pS, pn⟩ pS' => pn ?_⟩
+      have := Nat.le_of_lt_succ <| not_le.1 sz
+      match s.exists_mk, this with
+      | ⟨[], _, (eq : s = ∅)⟩, _ => subst eq; simp at pS'
+      | ⟨[a], _, (eq : s = {a})⟩, _ => subst eq; simpa using pS'
+      | ⟨[a,b], h1, eq⟩, _ =>
+        have : s = {a, b} := eq ▸ by ext; simp
+        have gp' := Point.PointListInGeneralPosition.subperm.1 gp <|
+          List.subperm_of_subset (.cons (a := p) (by simpa [this] using pn) h1) <|
+          List.cons_subset.2 ⟨by simpa using pS, by simpa [this, Finset.insert_subset_iff] using sS⟩
+        cases gp'.not_mem_seg (by simpa [this] using pS')
 
 def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S

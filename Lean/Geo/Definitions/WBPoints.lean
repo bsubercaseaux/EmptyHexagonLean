@@ -1,4 +1,3 @@
-import LeanSAT.Model.PropFun
 import Geo.Definitions.Point
 import Geo.Orientations
 
@@ -18,7 +17,6 @@ structure WBPoints where
 
 namespace WBPoints
 open List Finset Classical
-open LeanSAT Model PropFun
 
 def points (w : WBPoints) := w.leftmost :: w.rest
 
