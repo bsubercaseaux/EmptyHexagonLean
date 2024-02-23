@@ -130,3 +130,16 @@ def PropForm.toICnf (fmla : PropForm v) : ICnf :=
   let (_, { clauses, .. }) := Encode.pushICnfCore cmp fmla true |>.run vars
     |>.run { clauses := #[], nextVar := vars.size.succPNat, definitions := {} }
   clauses
+
+def Literal.eval [LitVar L v] (τ : v → Prop) (l : L) : Prop :=
+  if LitVar.polarity l then τ (LitVar.toVar l) else ¬τ (LitVar.toVar l)
+
+def Clause.eval [LitVar L v] (τ : v → Prop) (cnf : Clause L) : Prop :=
+  ∃ l ∈ cnf, Literal.eval τ l
+
+def Cnf.eval [LitVar L v] (τ : v → Prop) (cnf : Cnf L) : Prop :=
+  ∀ cl ∈ cnf, Clause.eval τ cl
+
+theorem PropForm.toICnf_sat [LinearOrder v] (f : PropForm v) :
+    (∃ τ, Cnf.eval τ (f.toICnf compare)) ↔ ∃ τ, eval τ f := by
+  sorry -- todo

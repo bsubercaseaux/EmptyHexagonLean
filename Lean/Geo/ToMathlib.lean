@@ -44,3 +44,21 @@ theorem AffineIndependent.card_le_finrank_succ' {k V P ι : Type*}
     [Fintype ι] {p : ι → P} (H : AffineIndependent k p) :
     Fintype.card ι ≤ FiniteDimensional.finrank k V + 1 :=
   H.card_le_finrank_succ.trans <| Nat.succ_le_succ (Submodule.finrank_le _)
+
+@[simp] theorem Array.concatMap_data (arr : Array α) (f : α → Array β) :
+    (arr.concatMap f).data = arr.data.bind fun a => (f a).data := by
+  have (l acc) : (List.foldl (fun bs a ↦ bs ++ f a) acc l).data =
+      acc.data ++ List.bind l fun a ↦ (f a).data := by
+    induction l generalizing acc <;> simp [*]
+  simp [concatMap, foldl_eq_foldl_data, this]; rfl
+
+theorem Array.mem_concatMap (arr : Array α) (f : α → Array β) :
+    b ∈ arr.concatMap f ↔ ∃ a ∈ arr, b ∈ f a := by simp [Array.mem_def]
+
+@[simp] theorem Array.forall_mem_concatMap (arr : Array α) (f : α → Array β) (p : β → Prop) :
+    (∀ x ∈ arr.concatMap f, p x) ↔ (∀ x ∈ arr, ∀ y ∈ f x, p y) := by
+  simp [Array.mem_concatMap]; aesop
+
+@[simp] theorem Array.exists_mem_concatMap (arr : Array α) (f : α → Array β) (p : β → Prop) :
+    (∃ x ∈ arr.concatMap f, p x) ↔ (∃ x ∈ arr, ∃ y ∈ f x, p y) := by
+  simp [Array.mem_concatMap]; aesop
