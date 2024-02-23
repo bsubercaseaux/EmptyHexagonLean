@@ -202,8 +202,7 @@ theorem collinear_iff : σ p q r = .Collinear ↔ _root_.Collinear ℝ {p, q, r}
   constructor <;> intro H
   · if h : q = r then subst r; simp [collinear_pair] else
     apply collinear_insert_of_mem_affineSpan_pair
-    have : ⟪r - q, r - q⟫_ℝ ≠ 0 :=
-      mt Matrix.dotProduct_self_eq_zero.1 <| sub_ne_zero.2 <| Ne.symm h
+    have : ⟪r - q, r - q⟫_ℝ ≠ 0 := mt inner_self_eq_zero.1 <| sub_ne_zero.2 <| Ne.symm h
     convert AffineMap.lineMap_mem_affineSpan_pair (k := ℝ)
       (⟪r - q, p - q⟫_ℝ / ⟪r - q, r - q⟫_ℝ) _ _ using 1
     simp only [AffineMap.lineMap_apply_module']; rw [Point.det] at H
