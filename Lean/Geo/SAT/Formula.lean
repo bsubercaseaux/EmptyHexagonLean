@@ -10,7 +10,7 @@ inductive Var (n : Nat)
   | sigma  (a b c : Fin n)
   | inside (x a b c : Fin n)
   | hole   (a b c : Fin n)
-  deriving DecidableEq
+  deriving DecidableEq, Ord
 
 def orientationConstraint (a b c d : Fin n) : PropFun (Var n) :=
   let sabc := Var.sigma a b c
