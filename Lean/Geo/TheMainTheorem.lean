@@ -10,7 +10,13 @@ open Classical
 lemma HasEmptyTriangle_of_σHasEmptyTriangle (gp : Point.PointListInGeneralPosition pts) :
     σHasEmptyTriangle pts.toFinset → HasEmptyTriangle pts.toFinset := by
   intro ⟨a, ha, b, hb, c, hc, ab, ac, bc, empty⟩
-  use a, ha, b, hb, c, hc, ab, ac, bc
+  rw [HasEmptyTriangle.iff]
+  use a, ha, b, hb, c, hc
+  have gp₃ : Point.InGeneralPosition₃ a b c := by
+    apply Point.PointListInGeneralPosition.subperm.mp gp
+    apply List.subperm_of_subset (by simp [*])
+    sublist_tac
+  refine ⟨gp₃, ?_⟩
   intro s hs tri
   simp only [coe_toFinset, Set.mem_diff, Set.mem_setOf_eq, Set.mem_insert_iff,
     Set.mem_singleton_iff, not_or] at hs
