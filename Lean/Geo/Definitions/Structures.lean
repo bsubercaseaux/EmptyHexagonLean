@@ -5,10 +5,10 @@ import Geo.Definitions.PtInTriangle
 
 namespace Geo
 
-/-- `IsEmptyShapeIn S P` means that `S` carves out an empty shape in `P`:
+/-- `EmptyShapeIn S P` means that `S` carves out an empty shape in `P`:
 the convex hull of `S` contains no point of `P`
 other than those already in `S`. -/
-def IsEmptyShapeIn (S P : Set Point) : Prop :=
+def EmptyShapeIn (S P : Set Point) : Prop :=
   ∀ p ∈ P \ S, p ∉ convexHull ℝ S
 
 /-- `ConvexPoints S` means that `S` consists of extremal points of its convex hull,
@@ -16,8 +16,39 @@ i.e. the point set encloses a convex polygon. -/
 def ConvexPoints (S : Set Point) : Prop :=
   ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
+def ConvexEmptyIn (S P : Set Point) : Prop :=
+  ConvexPoints S ∧ EmptyShapeIn S P
+
+theorem ConvexEmptyIn.antitone_left {S₁ S₂ P : Set Point} :
+    S₁ ⊆ S₂ → ConvexEmptyIn S₂ P → ConvexEmptyIn S₁ P := by
+  intro S₁S₂ ⟨convex, empty⟩
+  constructor
+  . intro a aS₁ aCH
+    have : S₁ \ {a} ⊆ S₂ \ {a} := Set.diff_subset_diff S₁S₂ (le_refl _)
+    apply convex a (S₁S₂ aS₁) (convexHull_mono this aCH)
+  . intro p pPS₁ pCH
+    have : p ∈ convexHull ℝ S₂ := convexHull_mono S₁S₂ pCH
+    refine empty p ?_ this
+    rw [Set.mem_diff] at pPS₁ ⊢
+    refine ⟨pPS₁.left, ?_⟩
+    intro pS₂
+    have : S₁ ⊆ S₂ \ {p} := fun x xS₁ => by
+      rw [Set.mem_diff, Set.mem_singleton_iff]
+      refine ⟨S₁S₂ xS₁, fun xp => ?_⟩
+      rw [xp] at xS₁
+      exact pPS₁.right xS₁
+    have : p ∈ convexHull ℝ (S₂ \ {p}) := convexHull_mono this pCH
+    exact convex p pS₂ this
+
+theorem ConvexEmptyIn.iff {s : Finset Point} {S : Set Point} :
+    ConvexEmptyIn s S ↔ ∀ (t : Finset Point), t.card = 3 → t ⊆ s → ConvexEmptyIn t S := by
+  constructor
+  . intro ce _ _ ts
+    apply ce.antitone_left ts
+  . sorry -- harder, needs triangulation?
+
 def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexPoints s ∧ IsEmptyShapeIn s S
+  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 
 def HasEmptyTriangle : Set Point → Prop := HasEmptyNGon 3
 
@@ -38,7 +69,7 @@ theorem HasEmptyTriangle.iff (S : Set Point) :
       · exact ⟨Ne.symm h1.1.1, Ne.symm h1.1.2⟩
       · exact ⟨h1.1.1, Ne.symm h1.2⟩
       · exact ⟨h1.1.2, h1.2⟩
-    · simpa [not_or, IsEmptyShapeIn, s_eq] using h4
+    · simpa [not_or, EmptyShapeIn, s_eq] using h4
   · intro ⟨a, ha, b, hb, c, hc, h1, h2⟩
     let s : Finset Point := ⟨[a,b,c], by simp [h1.ne₁, h1.ne₂, h1.ne₃]⟩
     have s_eq : s = {a,b,c} := by ext; simp
@@ -50,7 +81,7 @@ theorem HasEmptyTriangle.iff (S : Set Point) :
       · exact h1.1 (convexHull_mono (by simp) hp2)
       · exact h1.2.1 (convexHull_mono (by simp [Set.subset_def]) hp2)
       · exact h1.2.2 (convexHull_mono (by simp [Set.subset_def]) hp2)
-    · simpa [s_eq, IsEmptyShapeIn] using h2
+    · simpa [s_eq, EmptyShapeIn] using h2
 
 def HasEmptyHexagon : Set Point → Prop := HasEmptyNGon 6
 
