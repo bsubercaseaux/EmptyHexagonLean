@@ -1,6 +1,8 @@
 import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
+import Mathlib.Analysis.InnerProductSpace.PiL2
+import Mathlib.Analysis.Convex.Between
 import Geo.Definitions.Point
 import Geo.Definitions.Slope
 import Geo.ToMathlib
@@ -195,21 +197,15 @@ theorem Point.InGeneralPosition₃.ne₃ {p q r : Point} (h : InGeneralPosition�
   h.perm₁.ne₂
 
 open scoped Matrix
-theorem dotProduct_self_eq_zero {p : Point} : p ⬝ᵥ p = 0 ↔ p = 0 := by
-  refine ⟨fun h => ?_, fun h => h ▸ by simp⟩
-  simp at h
-  have := (add_eq_zero_iff' (mul_self_nonneg _) (mul_self_nonneg _)).1 h
-  simp [mul_self_eq_zero] at this
-  ext <;> simp [this]
-
 theorem collinear_iff : σ p q r = .Collinear ↔ _root_.Collinear ℝ {p, q, r} := by
   rw [σ, Orientation.ofReal_eq_collinear, matrix_det_eq_det_pts]
   constructor <;> intro H
   · if h : q = r then subst r; simp [collinear_pair] else
     apply collinear_insert_of_mem_affineSpan_pair
-    have : (r - q) ⬝ᵥ (r - q) ≠ 0 := mt dotProduct_self_eq_zero.1 <| sub_ne_zero.2 <| Ne.symm h
+    have : ⟪r - q, r - q⟫_ℝ ≠ 0 :=
+      mt Matrix.dotProduct_self_eq_zero.1 <| sub_ne_zero.2 <| Ne.symm h
     convert AffineMap.lineMap_mem_affineSpan_pair (k := ℝ)
-      ((r - q) ⬝ᵥ (p - q) / (r - q) ⬝ᵥ (r - q)) _ _ using 1
+      (⟪r - q, p - q⟫_ℝ / ⟪r - q, r - q⟫_ℝ) _ _ using 1
     simp only [AffineMap.lineMap_apply_module']; rw [Point.det] at H
     rw [← sub_eq_iff_eq_add, ← sub_eq_zero, ← smul_eq_zero_iff_right this,
       smul_sub, smul_smul, mul_div_cancel' _ this]
