@@ -1,18 +1,18 @@
-\documentclass[a4paper,USenglish,cleveref, autoref, thm-restate]{lipics-v2021}
+\documentclass[a4paper, USenglish, cleveref, autoref, thm-restate]{lipics-v2021}
 \usepackage[T1]{fontenc}
 \usepackage[utf8]{inputenc}
 \usepackage{listings}
 
 \usepackage{doc}
 \usepackage{mathtools}
-\usepackage{pgfplots}
-\usepackage{pgfmath}
+% \usepackage{pgfplots}
+% \usepackage{pgfmath}
 \usepackage{float}
 \usepackage[misc]{ifsym}
 \usepackage[ruled]{algorithm2e}
-\usepackage{subcaption}
-\captionsetup{compatibility=false}
-\usepackage{graphicx}
+% \usepackage{subcaption}
+% \captionsetup{compatibility=false}
+% \usepackage{graphicx}
 \usepackage{mathtools}
 \usepackage{amsthm}
 \usepackage{amsfonts}
@@ -38,7 +38,7 @@
 \usetikzlibrary{backgrounds}
 \usetikzlibrary{angles,quotes}
 
-\usepackage{hyperref}
+% \usepackage{hyperref}
 \hypersetup{
   colorlinks = true,
   citecolor = blue,
@@ -70,7 +70,7 @@
 
 \bibliographystyle{plainurl}
 
-\title{A Formal Verification of $h(6) = 30$,\\ the Empty Hexagon Number}%
+\title{\texorpdfstring{A Formal Verification of $h(6) = 30$,\\ the Empty Hexagon Number}{A Formal Verification of the Empty Hexagon Number}}%
 % \thanks{Other people who contributed to this document include Maria Voronkov
 %   (Imperial College and EasyChair) and Graham Gough (The University of
 %   Manchester).}}
@@ -93,7 +93,7 @@
 
 \author{Bernardo {Subercaseaux}}{Carnegie Mellon University}{bsuberca@andrew.cmu.edu}{https://orcid.org/0000-0003-2295-1299}{}
 \author{Wojciech {Nawrocki}}{Carnegie Mellon University}{wnawrock@andrew.cmu.edu}{https://orcid.org/0000-0002-8839-0618}{}
-\author{James {Gallichio}}{Carnegie Mellon University}{jgallicc@andrew.cmu.edu}{https://orcid.org/0000-0002-0838-3240}{}
+\author{James {Gallicchio}}{Carnegie Mellon University}{jgallicc@andrew.cmu.edu}{https://orcid.org/0000-0002-0838-3240}{}
 \author{Cayden {Codel}}{Carnegie Mellon University}{ccodel@andrew.cmu.edu}{https://orcid.org/0000-0003-3588-4873}{}
 \author{Mario {Carneiro}}{Carnegie Mellon University}{mcarneir@andrew.cmu.edu}{https://orcid.org/0000-0002-0470-5249}{}
 
@@ -110,6 +110,22 @@
 % will be rejected by EasyChair
 \titlerunning{Formal Verification of the Empty Hexagon Number}
 
+% \ccsdesc[100]{\begin{CCSXML}
+%   <ccs2012>
+%      <concept>
+%          <concept_id>10003752.10003790.10002990</concept_id>
+%          <concept_desc>Theory of computation~Logic and verification</concept_desc>
+%          <concept_significance>300</concept_significance>
+%          </concept>
+%    </ccs2012>
+%   \end{CCSXML}
+  
+\ccsdesc[300]{Theory of computation~Logic and verification} 
+
+\keywords{Empty Hexagon Number, Discrete Computational Geometry, Erd\H{o}s-Szekeres}
+
+\Copyright{Bernardo Subercaseaux and Wojciech Nawrocki and James Gallicchio and Cayden Codel and Mario Carneiro}
+
 \begin{document}
 
 \maketitle
@@ -124,36 +140,29 @@
 \end{abstract}
 
  
-\section{Introduction}
-\label{sec:intro}
+\section{Introduction}\label{sec:intro}
 \input{intro.tex}
 
-\section{Triple Orientations}
-\label{sec:triple-orientations}
+\section{Triple Orientations}\label{sec:triple-orientations}
 \input{triple-orientations.tex}
 
-\section{SAT Pipeline}
-\label{sec:leansat}
+\section{SAT Pipeline}\label{sec:leansat}
 \input{leansat.tex}
 
-\section{The Empty Triangle Theorem}
-\label{sec:empty-triangle}
+\section{The Empty Triangle Theorem}\label{sec:empty-triangle}
 % \input{empty_triangle.tex}
 
-\section{The Sortedness Assumption and Symmetry Breaking}
-\label{sec:symmetry-breaking}
+\section{The Sortedness Assumption and Symmetry Breaking}\label{sec:symmetry-breaking}
 % \input{symmetry-breaking.tex}
 
-\section{Verifying the Empty Hexagon Number}
-\label{sec:empty-hexagon-number}
+\section{Verifying the Empty Hexagon Number}\label{sec:empty-hexagon-number}
 \input{empty-hexagon-number.tex}
 
 
-\section{Concluding Remarks}
-\label{sec:conclusion}
+\section{Concluding Remarks}\label{sec:conclusion}
 
 
-\bibliography{bibliography}
+\bibliography{main}
 
 \end{document}
 
