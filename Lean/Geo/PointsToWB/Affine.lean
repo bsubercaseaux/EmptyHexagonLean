@@ -112,6 +112,19 @@ theorem distinct_rotate_finset (A : Set Point) (h : Set.Countable A) :
   have : Set.Nonempty goodAngles := Set.Infinite.nonempty (fun h => uGood h.countable)
   ⟨this.some, (Set.mem_setOf_eq ▸ this.some_mem).right⟩
 
+theorem distinct_rotate_list (l : List Point) (hNodup : l.Nodup) :
+    ∃ (θ : ℝ), l.map (rotationMap θ) |>.Pairwise (·.x ≠ ·.x) := by
+  have ⟨θ, hθ⟩ := distinct_rotate_finset l.toFinset (Finset.countable_toSet _)
+  use θ
+  simp at hθ
+  apply List.of_Pairwise_toFinset
+  . intro i j hLt hMap
+    exfalso
+    have : (l.map (rotationMap θ)).length = l.length := l.length_map ..
+    apply List.pairwise_iff_get.mp hNodup ⟨i.1, this ▸ i.2⟩ ⟨j.1, this ▸ j.2⟩ hLt
+    simp only [getElem_fin, List.getElem_eq_get, List.get_map] at hMap
+    exact injective_rotationMap θ hMap
+  simpa using hθ
 /-! ## Translation -/
 
 def translation_matrix (s t : Real) : Matrix (Fin 3) (Fin 3) Real :=

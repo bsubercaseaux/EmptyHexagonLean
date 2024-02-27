@@ -7,25 +7,50 @@ namespace Geo
 open List
 open Classical
 
-lemma HasEmptyTriangle_of_σHasEmptyTriangle (gp : Point.PointListInGeneralPosition pts) :
-    σHasEmptyTriangle pts.toFinset → HasEmptyTriangle pts.toFinset := by
-  intro ⟨a, ha, b, hb, c, hc, ab, ac, bc, empty⟩
+lemma HasEmptyTriangle_iff_σHasEmptyTriangle (gp : Point.PointListInGeneralPosition pts) :
+    σHasEmptyTriangle pts.toFinset ↔ HasEmptyTriangle pts.toFinset := by
   rw [HasEmptyTriangle.iff]
-  use a, ha, b, hb, c, hc
-  have gp₃ : Point.InGeneralPosition₃ a b c := by
-    apply Point.PointListInGeneralPosition.subperm.mp gp
+  constructor
+  . intro ⟨a, ha, b, hb, c, hc, ab, ac, bc, empty⟩
+    use a, ha, b, hb, c, hc
+    have gp₃ : Point.InGeneralPosition₃ a b c := by
+      apply Point.PointListInGeneralPosition.subperm.mp gp
+      apply List.subperm_of_subset (by simp [*])
+      sublist_tac
+    refine ⟨gp₃, ?_⟩
+    intro s hs tri
+    simp only [coe_toFinset, Set.mem_diff, Set.mem_setOf_eq, Set.mem_insert_iff,
+      Set.mem_singleton_iff, not_or] at hs
+    have ⟨hs, _, _, _⟩ := hs
+    apply empty s (by simp [hs])
+    rwa [σPtInTriangle_iff]
+    apply gp.subperm₄
     apply List.subperm_of_subset (by simp [*])
     sublist_tac
-  refine ⟨gp₃, ?_⟩
-  intro s hs tri
-  simp only [coe_toFinset, Set.mem_diff, Set.mem_setOf_eq, Set.mem_insert_iff,
-    Set.mem_singleton_iff, not_or] at hs
-  have ⟨hs, _, _, _⟩ := hs
-  apply empty s (by simp [hs])
-  rwa [σPtInTriangle_iff]
-  apply gp.subperm₄
-  apply List.subperm_of_subset (by simp [*])
-  sublist_tac
+  . intro ⟨a, ha, b, hb, c, hc, gp', empty⟩
+    use a, ha, b, hb, c, hc, gp'.ne₁, gp'.ne₂, gp'.ne₃
+    intro s hs
+    by_cases sb : s = b
+    . rw [sb]
+      apply not_mem_σPtInTriangle gp'
+    by_cases sa : s = a
+    . intro h
+      apply not_mem_σPtInTriangle gp'.perm₁
+      apply σPtInTriangle.perm₁
+      rwa [sa] at h
+    by_cases sc : s = c
+    . intro h
+      apply not_mem_σPtInTriangle gp'.perm₂
+      apply σPtInTriangle.perm₂
+      rwa [sc] at h
+    have gp₄ : Point.InGeneralPosition₄ s a b c := by
+      apply gp.subperm₄
+      apply List.subperm_of_subset (by simp [*, gp'.ne₁, gp'.ne₂, gp'.ne₃])
+      sublist_tac
+    rw [σPtInTriangle_iff gp₄]
+    apply empty
+    simp at hs
+    simp [hs, not_or, *]
 
 lemma OrientationProperty_σHasEmptyTriangle : OrientationProperty σHasEmptyTriangle := by
   unfold σHasEmptyTriangle
