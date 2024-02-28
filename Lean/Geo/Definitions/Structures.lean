@@ -125,6 +125,29 @@ theorem ConvexEmptyIn.iff_triangles' {s : Finset Point} {S : List Point}
           List.cons_subset.2 ⟨by simpa using pS, by simpa [this, Finset.insert_subset_iff] using sS⟩
         cases gp'.not_mem_seg (by simpa [this] using pS')
 
+theorem ConvexEmptyIn.iff_triangles'' {s : Finset Point} {S : List Point}
+    (sS : s ⊆ S.toFinset) (gp : Point.PointListInGeneralPosition S) :
+    ConvexEmptyIn s S.toFinset ↔
+    ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
+      ∀ p ∈ S.toFinset \ {a,b,c}, ¬PtInTriangle p a b c := by
+  simp_rw [iff_triangles' sS gp, Finset.card_eq_three, EmptyShapeIn, PtInTriangle]
+  constructor
+  . intro H a ha b hb c hc ab ac bc p hp
+    have := H {a,b,c} ⟨a,b,c,ab,ac,bc,rfl⟩
+    simp at this
+    apply this
+    . intro x h
+      simp only [Finset.mem_insert, Finset.mem_singleton] at h
+      rcases h with rfl | rfl | rfl <;> assumption
+    . simp_all
+    . simp_all
+  . intro h t ⟨a,b,c,ab,ac,bc,tabc⟩ ts p hp
+    cases tabc
+    simp only [Finset.coe_insert, Finset.coe_singleton] at hp ⊢
+    apply h a (ts (by subfinset_tac)) b (ts (by subfinset_tac)) c (ts (by subfinset_tac)) ab ac bc
+    simp at hp ⊢
+    assumption
+
 def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 
