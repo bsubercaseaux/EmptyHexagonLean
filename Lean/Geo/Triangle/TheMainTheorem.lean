@@ -1,7 +1,8 @@
-import Geo.SAT.WBAssn
-import Geo.SAT.Encoding
 import Geo.PointsToWB.SymmetryBreakingNew
 import Geo.SigmaEquiv
+
+import Geo.Triangle.WBAssn
+import Geo.Triangle.Encoding
 
 namespace Geo
 open List
@@ -80,7 +81,7 @@ open LeanSAT.Model.PropFun in
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
     HasEmptyTriangle pts.toFinset := by
   by_contra h'
-  have noσtri : ¬σHasEmptyTriangle pts.toFinset := fun h => h' <| HasEmptyTriangle_of_σHasEmptyTriangle gp h
+  have noσtri : ¬σHasEmptyTriangle pts.toFinset := fun h => h' <| HasEmptyTriangle_of_σHasEmptyTriangle _ h
   have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ by decide) gp
   have noσtri' : ¬σHasEmptyTriangle w.toFinset :=
     OrientationProperty_σHasEmptyTriangle.not (hw.toEquiv w.nodup) noσtri

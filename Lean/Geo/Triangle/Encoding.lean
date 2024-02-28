@@ -1,7 +1,8 @@
 import LeanSAT
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.List.Range
-import Geo.SAT.Formula
+
+import Geo.Triangle.Formula
 
 -- CC: This is in my commit of LeanSAT, but not in the main branch/the branch this project pulls from
 -- Ah, it's because the underlying definition of .toPropFun changed to .any and not .foldr

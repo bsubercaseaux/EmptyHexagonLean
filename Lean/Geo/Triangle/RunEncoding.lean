@@ -1,4 +1,4 @@
-import Geo.SAT.Encoding
+import Geo.Triangle.Encoding
 
 open LeanSAT
 
