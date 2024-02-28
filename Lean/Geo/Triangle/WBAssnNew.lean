@@ -2,7 +2,7 @@ import Geo.Definitions.WBPoints
 import Geo.Definitions.PtInTriangle
 import Geo.Definitions.Structures
 import Geo.Orientations
-import Geo.SAT.EncodingNew
+import Geo.Triangle.EncodingNew
 
 namespace Geo.WBPoints
 open List

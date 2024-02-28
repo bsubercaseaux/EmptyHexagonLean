@@ -1,7 +1,7 @@
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.List.Range
-import Geo.SAT.ToLeanSAT.Encode
-import Geo.SAT.Formula
+import Geo.SAT.ToLeanSAT.EncodeProof
+import Geo.Triangle.Formula
 
 namespace Geo
 
@@ -158,8 +158,7 @@ def theEncoding (n : Nat) : PropForm (Var n) :=
   ]
 
 open Model PropFun
-axiom cnfUnsat : ¬∃ τ : PropAssignment IVar,
-  τ ⊨ (Geo.theEncoding 10 |>.toICnf compare).toPropFun
+axiom cnfUnsat : ¬∃ τ : IVar → Prop, (Geo.theEncoding 10 |>.toICnf compare).eval τ
 
 -- set_option profiler true in
 -- #eval let cnf := Geo.theEncoding 10 |>.toICnf compare; (cnf.size, cnf.maxVar)

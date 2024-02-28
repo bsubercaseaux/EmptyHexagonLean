@@ -44,6 +44,7 @@ def all (as : Array (PropForm v)) : PropForm v :=
   | #[a] => a
   | as => .all' as
 
+@[simp] theorem eval_all' (τ : v → Prop) : eval τ (all' as) ↔ ∀ a ∈ as, eval τ a := by simp [eval]
 @[simp] theorem eval_all (τ : v → Prop) : eval τ (all as) ↔ ∀ a ∈ as, eval τ a := by
   unfold all
   trans ∀ a ∈ as.concatMap conjs, eval τ a
@@ -51,7 +52,7 @@ def all (as : Array (PropForm v)) : PropForm v :=
     -- split -- FIXME: doesn't work, lean4#3843
     unfold all.match_1; simp; split
     · let ⟨[a]⟩ := as'; change eval τ a ↔ _; simp [Array.mem_def]
-    · simp [eval]
+    · simp
   · simp [eval_conjs]
 
 def any (as : Array (PropForm v)) : PropForm v :=
@@ -59,6 +60,7 @@ def any (as : Array (PropForm v)) : PropForm v :=
   | #[a] => a
   | as => .any' as
 
+@[simp] theorem eval_any' (τ : v → Prop) : eval τ (any' as) ↔ ∃ a ∈ as, eval τ a := by simp [eval]
 @[simp] theorem eval_any (τ : v → Prop) : eval τ (any as) ↔ ∃ a ∈ as, eval τ a := by
   unfold any
   trans ∃ a ∈ as.concatMap disjs, eval τ a
@@ -66,7 +68,7 @@ def any (as : Array (PropForm v)) : PropForm v :=
     -- split -- FIXME: doesn't work, lean4#3843
     unfold all.match_1; simp; split
     · let ⟨[a]⟩ := as'; change eval τ a ↔ _; simp [Array.mem_def]
-    · simp [eval]
+    · simp
   · simp [eval_disjs]
 
 def and (a b : PropForm v) : PropForm v := .all (a.conjs ++ b.conjs)
@@ -79,9 +81,12 @@ def or (a b : PropForm v) : PropForm v := .any (a.disjs ++ b.disjs)
 @[simp] theorem eval_or (τ : v → Prop) : eval τ (.or a b) ↔ eval τ a ∨ eval τ b := by
   simp [or, or_and_right, exists_or, eval_disjs]
 
+@[simp] theorem eval_lit' (τ : v → Prop) : eval τ (.lit pos i) ↔ (τ i ↔ pos) := by
+  cases pos <;> simp [eval]
+
 @[match_pattern] def var (a : v) : PropForm v := .lit true a
 
-@[simp] theorem eval_var (τ : v → Prop) : eval τ (.var i) ↔ τ i := by simp [var, eval]
+@[simp] theorem eval_var (τ : v → Prop) : eval τ (.var i) ↔ τ i := by simp [var]
 
 instance : Coe v (PropForm v) := ⟨var⟩
 
@@ -90,8 +95,10 @@ instance : Coe v (PropForm v) := ⟨var⟩
   | .lit pos a => .lit (!pos) a
   | a => .not' a
 
+@[simp] theorem eval_not' (τ : v → Prop) : eval τ (.not' a) ↔ ¬eval τ a := by simp [eval]
+
 @[simp] theorem eval_not (τ : v → Prop) : eval τ (.not a) ↔ ¬eval τ a := by
-  simp [not]; split <;> (try cases ‹Bool›) <;> simp [eval]
+  simp [not]; split <;> (try cases ‹Bool›) <;> simp
 
 def imp (a b : PropForm v) : PropForm v := .or (.not a) b
 
@@ -104,16 +111,30 @@ def iff : PropForm v → PropForm v → PropForm v
   | .not' a, b => .iff' a (.not b)
   | a, b => .iff' a b
 
+@[simp] theorem eval_iff' (τ : v → Prop) : eval τ (.iff' a b) ↔ (eval τ a ↔ eval τ b) := by
+   simp [eval]
+
+attribute [-simp] eval_all' eval_any' in
 @[simp] theorem eval_iff (τ : v → Prop) : eval τ (.iff a b) ↔ (eval τ a ↔ eval τ b) := by
-  sorry -- pending lean4#3843
+  unfold iff iff.match_1 -- terrible proof, pending lean4#3843
+  have not_iff_comm' {a b} : (¬a ↔ b) ↔ (a ↔ ¬b) := by rw [not_iff_comm, @Iff.comm a]
+  cases a <;> simp <;> (try split_ifs)
+    <;> (try rename Array.size _ = 0 => h; have := Array.eq_empty_of_size_eq_zero h
+             subst this; simp; clear h)
+    <;> cases b <;> simp <;> (try split_ifs)
+    <;> (try rename Array.size _ = 0 => h; have := Array.eq_empty_of_size_eq_zero h
+             subst this; simp; clear h)
+    <;> simp [eval, not_iff_comm']
 
 def atomic : PropForm v → PropForm v
   | .atomic' a => .atomic' a
   | .lit pos a => .lit pos a
   | a => .atomic' a
 
+@[simp] theorem eval_atomic' (τ : v → Prop) : eval τ (.atomic' a) ↔ eval τ a := by simp [eval]
+
 @[simp] theorem eval_atomic (τ : v → Prop) : eval τ (.atomic a) ↔ eval τ a := by
-  simp [atomic]; split <;> (try cases ‹Bool›) <;> simp [eval]
+  simp [atomic]; split <;> (try cases ‹Bool›) <;> simp
 
 def forAll (as : σ) [ToArray as α] (f : α → PropForm v) : PropForm v :=
   .all <| ToArray.toArray as f

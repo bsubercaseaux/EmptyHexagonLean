@@ -1,8 +1,8 @@
 import Geo.PointsToWB.SymmetryBreakingNew
 import Geo.SigmaEquiv
 
-import Geo.Triangle.WBAssn
-import Geo.Triangle.Encoding
+import Geo.Triangle.WBAssnNew
+import Geo.Triangle.EncodingNew
 
 namespace Geo
 open List
@@ -86,10 +86,9 @@ theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGe
   have noσtri' : ¬σHasEmptyTriangle w.toFinset :=
     OrientationProperty_σHasEmptyTriangle.not (hw.toEquiv w.nodup) noσtri
   have len10 : w.length = 10 := hw.length_eq.symm.trans h
-  have := cnfUnsat
-  rw [LeanSAT.Encode.VEncCNF.toICnf_equisatisfiable, ← len10] at this
-  apply this
-  exact ⟨_, w.satisfies_noHoles noσtri'⟩
+  with_reducible have := (LeanSAT.PropForm.toICnf_sat _).2 ⟨w.toPropAssn, w.satisfies_noHoles noσtri'⟩
+  rw [len10] at this
+  exact cnfUnsat this
 
 /- 'Geo.EmptyTriangle10TheoremLists' depends on axioms: [propext, Classical.choice, Quot.sound, Geo.cnfUnsat] -/
 #print axioms EmptyTriangle10TheoremLists

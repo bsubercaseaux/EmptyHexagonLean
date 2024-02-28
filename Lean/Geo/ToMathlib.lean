@@ -62,3 +62,14 @@ theorem Array.mem_concatMap (arr : Array α) (f : α → Array β) :
 @[simp] theorem Array.exists_mem_concatMap (arr : Array α) (f : α → Array β) (p : β → Prop) :
     (∃ x ∈ arr.concatMap f, p x) ↔ (∃ x ∈ arr, ∃ y ∈ f x, p y) := by
   simp [Array.mem_concatMap]; aesop
+
+theorem Std.RBNode.toArray_eq {t : RBNode α} : t.toArray = ⟨t.toList⟩ := by
+  have (l : List α) (acc) : List.foldl (Array.push · ·) acc l = acc ++ l := by
+    induction l generalizing acc <;> simp [*]
+  simp [toArray, foldl_eq_foldl_toList, this]; apply Array.ext'; simp
+
+theorem Std.RBSet.toArray_eq {cmp} {t : RBSet α cmp} : t.1.toArray = ⟨t.toList⟩ :=
+  Std.RBNode.toArray_eq
+
+theorem Array.mem_iff_getElem {a} {as : Array α} : a ∈ as ↔ ∃ n: Fin as.size, as[n] = a := by
+  simp [mem_def, -getElem_fin, getElem_fin_eq_data_get, List.mem_iff_get]
