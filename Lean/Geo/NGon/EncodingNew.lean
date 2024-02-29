@@ -80,13 +80,13 @@ The contraints are:
 
 def signotopeClause (a b c d : Fin n) : PropForm (Var n) :=
   .all #[
-    -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
+    -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d} -- 1.2
     .imp (.and (sigma a b c) (sigma a c d)) (sigma a b d)
-  , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d}
+  , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d} -- 2.2
     .imp (.and (sigma a b c) (sigma b c d)) (sigma a c d)
-  , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d}
+  , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d} -- 1.1
     .imp (.and (.not (sigma a b c)) (.not (sigma a c d))) (.not (sigma a b d))
-  , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d}
+  , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d} -- 2.1
     .imp (.and (.not (sigma a b c)) (.not (sigma b c d))) (.not (sigma a c d))
   ]
 
