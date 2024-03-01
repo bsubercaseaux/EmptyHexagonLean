@@ -125,6 +125,16 @@ theorem distinct_rotate_list (l : List Point) (hNodup : l.Nodup) :
     simp only [getElem_fin, List.getElem_eq_get, List.get_map] at hMap
     exact injective_rotationMap θ hMap
   simpa using hθ
+
+-- theorem omega_equiv_rotate (l : List Point) (hDistinct : l.Pairwise (· ≠ ·)) :
+--     ∃ (l' : List Point), omega_equivalence l l' ∧ l'.Pairwise (·.x ≠ ·.x) := by
+--   sorry
+  -- have ⟨θ, hθ⟩ := distinct_rotate_list l hDistinct
+  -- refine ⟨_, ?_, hθ⟩
+  -- simp_rw [← funext pt_transform_rotateByAffine]
+  -- apply transform_returns_omega_equivalent
+  -- exact TMatrix.rotateByAffine θ
+
 /-! ## Translation -/
 
 def translation_matrix (s t : Real) : Matrix (Fin 3) (Fin 3) Real :=

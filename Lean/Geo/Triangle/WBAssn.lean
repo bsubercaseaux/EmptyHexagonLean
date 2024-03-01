@@ -1,6 +1,7 @@
 import Geo.Definitions.WBPoints
 import Geo.Definitions.PtInTriangle
 import Geo.Definitions.Structures
+import Geo.Definitions.OrientationProperties
 import Geo.Orientations
 
 import Geo.Triangle.Formula

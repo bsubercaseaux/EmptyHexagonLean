@@ -43,17 +43,27 @@ def σEmbed.trans (f : S ≼σ T) (g : T ≼σ U) : S ≼σ U := by
   refine ⟨g.f ∘ f.f, by simpa using (f.perm.map _).trans g.perm, fun p q r hp hq hr => ?_⟩
   simp [f.σ _ _ _ hp hq hr, g.σ _ _ _ (f.mem hp) (f.mem hq) (f.mem hr)]
 
-noncomputable def σEmbed.toEquiv (f : S ≼σ T) (h : T.Nodup) : S.toFinset ≃σ T.toFinset := by
-  refine ⟨Equiv.ofBijective (fun x => ⟨f.f x.1, ?_⟩) ⟨?_, ?_⟩, ?c⟩
-  case c =>
-    simp [Equiv.ofBijective, DFunLike.coe, EquivLike.coe]
-    exact fun _ ha _ hb _ hc => (f.σ _ _ _ ha hb hc).symm
-  · rcases x with ⟨x, hx⟩; simp at hx ⊢; exact f.mem hx
-  · intro ⟨a, ha⟩ ⟨b, hb⟩ eq; simp at ha hb eq ⊢
+def σEmbed.bijOn (f : S ≼σ T) (h : T.Nodup) : Set.BijOn f.f S.toFinset T.toFinset := by
+  refine ⟨?_, ?_, ?_⟩
+  . intro a ha
+    simp only [List.coe_toFinset, Set.mem_setOf_eq] at ha ⊢
+    apply f.mem_iff.mpr
+    use a, ha
+  . intro a ha b hb eq
+    simp only [List.coe_toFinset, Set.mem_setOf_eq] at ha hb
     by_contra ne
     exact (List.pairwise_map.1 (f.perm.nodup_iff.2 h)).forall (fun _ _ => Ne.symm) ha hb ne eq
-  · intro ⟨b, hb⟩; simp at hb ⊢
+  · intro b hb
+    simp only [List.coe_toFinset, Set.mem_setOf_eq] at hb ⊢
     exact f.mem_iff.1 hb
+
+noncomputable def σEmbed.toEquiv (f : S ≼σ T) (h : T.Nodup) : S.toFinset ≃σ T.toFinset where
+  f := f.f
+  bij' := f.bijOn h
+  σ_eq' := by
+    intro _ ha _ hb _ hc
+    simp only [List.coe_toFinset, Set.mem_setOf_eq] at ha hb hc
+    apply (f.σ _ _ _ ha hb hc).symm
 
 def OrientationProperty' (P : List Point → Prop) :=
   ∀ {{S T}}, S ≼σ T → (P S ↔ P T)
