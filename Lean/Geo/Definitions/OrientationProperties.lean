@@ -10,7 +10,7 @@ def σHasEmptyTriangle (S : Set Point) : Prop :=
   ∃ᵉ (a ∈ S) (b ∈ S) (c ∈ S),
     a ≠ b ∧ a ≠ c ∧ b ≠ c ∧ σIsEmptyTriangleFor a b c S
 
-lemma HasEmptyTriangle_iff_σHasEmptyTriangle (gp : Point.PointListInGeneralPosition pts) :
+lemma σHasEmptyTriangle_iff_HasEmptyTriangle (gp : Point.PointListInGeneralPosition pts) :
     σHasEmptyTriangle pts.toFinset ↔ HasEmptyTriangle pts.toFinset := by
   rw [HasEmptyTriangle.iff]
   constructor
@@ -60,40 +60,15 @@ def σHasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
     ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
       ∀ p ∈ S \ {a,b,c}, ¬σPtInTriangle p a b c
 
-section
-private lemma intro_exists {p q : α → Prop} : (∀ x, p x ↔ q x) → ((∃ x, p x) ↔ ∃ x, q x) := by
-  intro h
-  simp [h]
-
-private lemma intro_bounded_forall {p q : α → Prop} {s : Set α} : (∀ x ∈ s, p x ↔ q x) → ((∀ x ∈ s, p x) ↔ ∀ x ∈ s, q x) := by
-  intro h
-  simp (config := {contextual := true}) [h]
-
-@[simp]
-private lemma intro_assm {P Q R : Prop} : ((P → Q) ↔ (P → R)) ↔ (P → (Q ↔ R)) := by
-  tauto
-
-theorem HasEmptyNGon_iff_σHasEmptyNGon (gp : Point.PointListInGeneralPosition pts) :
+theorem σHasEmptyNGon_iff_HasEmptyNGon (gp : Point.PointListInGeneralPosition pts) :
     σHasEmptyNGon n pts.toFinset ↔ HasEmptyNGon n pts.toFinset := by
   unfold σHasEmptyNGon HasEmptyNGon
-  refine intro_exists fun s => ?_
-  simp only [and_imp, and_congr_right_iff]
-  intro scard spts
+  refine exists_congr fun s => and_congr_right' <| and_congr_right fun spts => ?_
   rw [ConvexEmptyIn.iff_triangles'' spts gp]
-  refine intro_bounded_forall fun a ha => ?_
-  refine intro_bounded_forall fun b hb => ?_
-  refine intro_bounded_forall fun c hc => ?_
-  simp only [intro_assm]
-  intro ab ac bc
-  simp
-  refine intro_bounded_forall fun p hp => ?_
-  simp only [intro_assm, not_or]
-  intro ⟨pa, pb, pc⟩
-  rw [σPtInTriangle_iff]
-  apply gp.subperm₄
-  apply List.subperm_of_subset (by simp [*])
-  subfinset_tac
-end
+  simp [Set.subset_def] at spts; simp [not_or]
+  repeat refine forall_congr' fun _ => ?_
+  rw [σPtInTriangle_iff]; apply gp.subperm₄
+  simp [*, List.subperm_of_subset]
 
 lemma σPtInTriangle_congr (e : S ≃σ T) :
     ∀ (_ : a ∈ S) (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),

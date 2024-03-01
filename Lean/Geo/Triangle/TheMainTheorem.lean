@@ -6,15 +6,12 @@ import Geo.Triangle.WBAssn
 import Geo.Triangle.Encoding
 
 namespace Geo
-open List
-open Classical
-
 
 open LeanSAT.Model.PropFun in
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
     HasEmptyTriangle pts.toFinset := by
   by_contra h'
-  have noσtri : ¬σHasEmptyTriangle pts.toFinset := mt (HasEmptyTriangle_iff_σHasEmptyTriangle gp).1 h'
+  have noσtri : ¬σHasEmptyTriangle pts.toFinset := mt (σHasEmptyTriangle_iff_HasEmptyTriangle gp).1 h'
   have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ by decide) gp
   have noσtri' : ¬σHasEmptyTriangle w.toFinset :=
     OrientationProperty_σHasEmptyTriangle.not (hw.toEquiv w.nodup) noσtri
