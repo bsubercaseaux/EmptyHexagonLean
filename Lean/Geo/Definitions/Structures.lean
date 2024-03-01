@@ -148,6 +148,7 @@ theorem ConvexEmptyIn.iff_triangles'' {s : Finset Point} {S : List Point}
     simp at hp ⊢
     assumption
 
+-- TODO: Rename to `HasEmptyKGon` to match TACAS paper
 def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 

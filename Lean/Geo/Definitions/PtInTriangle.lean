@@ -19,7 +19,29 @@ possibly on the boundary. -/
 def PtInTriangle (a : Point) (p q r : Point) : Prop :=
   a ∈ convexHull ℝ {p, q, r}
 
-lemma xBounded_of_PtInTriangle {x a b c : Point} :
+lemma xlt_convexHull {s : Set Point} (x₀ : ℝ) :
+    (∀ p ∈ s, p.x < x₀) → ∀ p ∈ convexHull ℝ s, p.x < x₀ := by
+  intro ub _ hp
+  let H := {p : Point | p.x < x₀ }
+  let cvxH : Convex ℝ H :=
+    convex_halfspace_lt ⟨fun _ _ => rfl, fun _ _ => rfl⟩ x₀
+  have : s ⊆ H := ub
+  have : convexHull ℝ s ⊆ H :=
+    convexHull_min ub cvxH
+  exact this hp
+
+lemma xgt_convexHull {s : Set Point} (x₀ : ℝ) :
+    (∀ p ∈ s, x₀ < p.x) → ∀ p ∈ convexHull ℝ s, x₀ < p.x := by
+  intro ub _ hp
+  let H := {p : Point | x₀ < p.x }
+  let cvxH : Convex ℝ H :=
+    convex_halfspace_gt ⟨fun _ _ => rfl, fun _ _ => rfl⟩ x₀
+  have : s ⊆ H := ub
+  have : convexHull ℝ s ⊆ H :=
+    convexHull_min ub cvxH
+  exact this hp
+
+lemma xBounded_of_PtInTriangle' {x a b c : Point} :
     Sorted₃ a b c → PtInTriangle x a b c → a.x ≤ x.x ∧ x.x ≤ c.x := by
   unfold PtInTriangle
   intro sorted tri

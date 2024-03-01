@@ -9,6 +9,13 @@ open List in
 theorem List.mem_sublist {l l' : List α} : l <+ l' → a ∈ l → a ∈ l' :=
   fun h h' => h.subset h'
 
+open List in
+theorem List.Sublist.toFinset_subset [DecidableEq α] {l l' : List α} :
+    l <+ l' → l.toFinset ⊆ l'.toFinset := by
+  intro h _ al
+  simp only [List.mem_toFinset] at al ⊢
+  apply h.subset al
+
 theorem List.of_Pairwise_toFinset [DecidableEq α] (as : List α) (R : α → α → Prop) :
     (∀ i j : Fin as.length, i < j → as[i] = as[j] → R as[i] as[j]) →
     as.toFinset.toSet.Pairwise R → as.Pairwise R := by

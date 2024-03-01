@@ -4,12 +4,13 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.Orientations
 import Geo.ToMathlib
-import Geo.PointsToWB.TMatrix
 import Geo.Definitions.WBPoints
+import Geo.Definitions.Structures
+import Geo.Definitions.OrientationProperties
+import Geo.PointsToWB.TMatrix
 import Geo.PointsToWB.Affine
 import Geo.PointsToWB.Projective
 import Geo.SigmaEquiv
-
 open Classical
 open scoped List
 
@@ -83,6 +84,14 @@ theorem σEmbed.gp : OrientationProperty' Point.PointListInGeneralPosition := fu
     have := sl.subset; simp at this
     rw [← f.σ _ _ _ this.1 this.2.1 this.2.2]; exact H _ sl rfl
 
+theorem σEmbed_rotate (l : List Point) (h : l.Nodup) :
+    ∃ l', ∃ _ : l ≼σ l', l'.Pairwise (·.x ≠ ·.x) := by
+  have ⟨θ, hDistinct⟩ := distinct_rotate_list _ h
+  refine have σ := ⟨rotationMap θ, .rfl, fun p q r _ _ _ => ?hσ⟩; ⟨_, σ, hDistinct⟩
+  case hσ =>
+    simpa [pt_transform_rotateByAffine] using
+      (TMatrix.rotateByAffine θ).pt_transform_preserves_sigma p q r
+
 variable {l : List Point} (hl : 3 ≤ l.length) (gp : Point.PointListInGeneralPosition l)
 
 theorem σEmbed.len_ge_3 (σ : l ≼σ l') : 3 ≤ l'.length := σ.length_eq ▸ hl
@@ -90,14 +99,8 @@ theorem σEmbed.len_ge_3 (σ : l ≼σ l') : 3 ≤ l'.length := σ.length_eq ▸
 theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
 
   -- step 1: rotate
-  have ⟨l1, σ1, hl1⟩ : ∃ l1, ∃ _ : l ≼σ l1, l1.Pairwise (·.x ≠ ·.x) := by
-    have ⟨θ, hθ⟩ := distinct_rotate_finset _ l.finite_toSet.countable
-    refine have σ := ⟨rotationMap θ, .rfl, fun p q r _ _ _ => ?hσ⟩; ⟨_, σ, ?_⟩
-    case hσ =>
-      simpa [pt_transform_rotateByAffine] using
-        (TMatrix.rotateByAffine θ).pt_transform_preserves_sigma p q r
-    have := (σ.gp.1 gp).nodup (σ.len_ge_3 hl)
-    exact this.imp_of_mem fun ha hb => hθ (by simpa using ha) (by simpa using hb)
+  have ⟨l1, σ1, hl1⟩ : ∃ l1, ∃ _ : l ≼σ l1, l1.Pairwise (·.x ≠ ·.x) :=
+    σEmbed_rotate l (gp.nodup hl)
 
   -- step 2: translate
   have ⟨l2, σ2, l2_lt /-, l2_pw -/⟩ : ∃ l2, ∃ _ : l ≼σ 0 :: l2,
@@ -173,3 +176,62 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     oriented := l4_lt.imp_of_mem fun ha hb h => by
       rwa [← horiented _ ha _ hb, orientWithInfty, Orientation.ofReal_eq_ccw, sub_pos]
   }, ⟨σ5⟩⟩
+
+-- WN: I put this here since it uses some σEmbed lemmas.
+theorem HasEmptyNGon_extension :
+    (∀ l : List Point, Point.PointListInGeneralPosition l → l.length = n → HasEmptyNGon k l.toFinset) →
+    3 ≤ n → n ≤ l.length → HasEmptyNGon k l.toFinset := by
+  intro H threen llength
+  rw [← σHasEmptyNGon_iff_HasEmptyNGon gp]
+
+  have ⟨l₁, σ₁, distinct⟩ := σEmbed_rotate l (gp.nodup <| threen.trans llength)
+  replace gp := σ₁.gp.mp gp
+  replace llength := σ₁.length_eq ▸ llength
+  replace σ₁ := σ₁.toEquiv (gp.nodup <| threen.trans llength)
+  suffices σHasEmptyNGon k l₁.toFinset from
+    OrientationProperty_σHasEmptyNGon σ₁.symm this
+
+  let l₂ := l₁.insertionSort (·.x ≤ ·.x)
+  have l₂l₁ : l₂ ~ l₁ := l₁.perm_insertionSort _
+  replace gp := Point.PointListInGeneralPosition.perm l₂l₁ |>.mpr gp
+  replace llength : n ≤ l₂.length := l₂l₁.length_eq ▸ llength
+  replace distinct := distinct.perm l₂l₁.symm Ne.symm
+  have l₂sorted : l₂.Sorted (·.x < ·.x) :=
+    List.pairwise_iff_get.mpr fun i j ij =>
+      have that := List.pairwise_iff_get.mp (l₁.sorted_insertionSort (·.x ≤ ·.x)) i j ij
+      have := List.pairwise_iff_get.mp distinct i j ij
+      lt_of_le_of_ne that this
+  suffices σHasEmptyNGon k l₂.toFinset by
+    rwa [List.toFinset_eq_of_perm _ _ l₂l₁] at this
+
+  rw [σHasEmptyNGon_iff_HasEmptyNGon gp]
+  let left := l₂.take n
+  let right := l₂.drop n
+  have leftl₂ : left <+ l₂ := List.take_sublist ..
+  have leftlength := List.length_take_of_le llength
+  have := H left (gp.mono_sublist leftl₂) leftlength
+
+  unfold HasEmptyNGon at this ⊢
+  have ⟨s, scard, sleft, ⟨convex, empty⟩⟩ := this
+  refine ⟨s, scard, ?_, convex, ?_⟩
+  . exact sleft.trans leftl₂.toFinset_subset
+  . simp (config := {zeta := false}) only
+      [EmptyShapeIn, List.mem_toFinset, Set.mem_diff, Finset.mem_coe] at empty ⊢
+    intro p ⟨pl₂, ps⟩
+    by_cases pleft : p ∈ left
+    . apply empty p ⟨pleft, ps⟩
+    intro pCH
+    have pright : p ∈ right := by
+      by_contra
+      rw [← List.take_append_drop n l₂, List.mem_append] at pl₂
+      cases pl₂ <;> contradiction
+    apply lt_irrefl p.x
+    refine xlt_convexHull (s := s) (x₀ := p.x) ?_ _ pCH
+    intro q qleft
+    replace qleft := List.mem_toFinset.mp <| sleft qleft
+    have ⟨⟨i, ilt⟩, hi⟩ := List.get_of_mem qleft
+    have ⟨j, hj⟩ := List.get_of_mem pright
+    rw [← hi, ← hj, List.get_take', List.get_drop']
+    rw [leftlength] at ilt
+    apply List.pairwise_iff_get.mp l₂sorted
+    simp; omega
