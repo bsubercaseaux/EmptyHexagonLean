@@ -57,7 +57,7 @@ theorem ConvexPoints.triangle' {s : Finset Point} {S : List Point}
     apply Point.PointListInGeneralPosition.subperm.1 gp
     exact List.subperm_of_subset h1 (by simpa [Finset.subset_iff] using sS)
 
-theorem ConvexPoints.antitone_left {S₁ S₂ : Set Point} (S₁S₂ : S₁ ⊆ S₂)
+theorem ConvexPoints.antitone {S₁ S₂ : Set Point} (S₁S₂ : S₁ ⊆ S₂)
     (convex : ConvexPoints S₂) : ConvexPoints S₁ := by
   intro a aS₁ aCH
   have : S₁ \ {a} ⊆ S₂ \ {a} := Set.diff_subset_diff S₁S₂ (le_refl _)
@@ -68,7 +68,7 @@ def ConvexEmptyIn (S P : Set Point) : Prop :=
 
 theorem ConvexEmptyIn.antitone_left {S₁ S₂ P : Set Point} (S₁S₂ : S₁ ⊆ S₂) :
     ConvexEmptyIn S₂ P → ConvexEmptyIn S₁ P := by
-  refine fun ⟨convex, empty⟩ => ⟨convex.antitone_left S₁S₂, fun p pPS₁ pCH => ?_⟩
+  refine fun ⟨convex, empty⟩ => ⟨convex.antitone S₁S₂, fun p pPS₁ pCH => ?_⟩
   refine empty p ⟨pPS₁.left, ?_⟩ (convexHull_mono S₁S₂ pCH)
   refine fun pS₂ => convex p pS₂ (convexHull_mono ?_ pCH)
   exact fun x xS₁ => ⟨S₁S₂ xS₁, fun xp => pPS₁.right (xp ▸ xS₁)⟩

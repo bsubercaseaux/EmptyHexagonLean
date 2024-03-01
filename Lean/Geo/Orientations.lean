@@ -180,6 +180,17 @@ theorem Point.PointListInGeneralPosition.subperm₄ : PointListInGeneralPosition
     subperm_tac
   }
 
+theorem Point.PointListInGeneralPosition.mono_subperm : List.Subperm l l' →
+    Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l := by
+  simp_rw [subperm]
+  intro lsub gp p q r pqrsub
+  apply gp
+  exact pqrsub.trans lsub
+
+theorem Point.PointListInGeneralPosition.mono_sublist : List.Sublist l l' →
+    Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l :=
+  fun lsub => mono_subperm lsub.subperm
+
 theorem Point.PointListInGeneralPosition.perm (h : l.Perm l') :
     PointListInGeneralPosition l ↔ PointListInGeneralPosition l' := by
   suffices ∀ {l l'}, l.Perm l' →
