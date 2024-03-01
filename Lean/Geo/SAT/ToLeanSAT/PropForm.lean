@@ -1,5 +1,6 @@
 import Geo.ToMathlib
 import Geo.SAT.ToLeanSAT.ToArray
+import LeanSAT.Upstream.ToStd
 
 namespace LeanSAT
 
@@ -156,5 +157,80 @@ def guard (p : Prop) [Decidable p] (f : p → PropForm v) : PropForm v :=
 @[simp] theorem eval_guard (τ : v → Prop) (p : Prop) {_ : Decidable p} (f : p → PropForm v) :
     eval τ (.guard p f) ↔ ∀ h : p, eval τ (f h) := by
   simp [guard]; split <;> simp [*]
+
+/-- Expands out a formula directly as a CNF, without auxiliaries (unlike `PropForm.toICnf`).
+Stops at `atomic` or literal subterms. -/
+def flatCNF (f : PropForm v) : PropForm v :=
+  .all (go f true (fun cl acc => acc.push <| .any cl) #[] #[])
+where
+  go : PropForm v → Bool →
+    (Array (PropForm v) → Array (PropForm v) → Array (PropForm v)) →
+    Array (PropForm v) → Array (PropForm v) → Array (PropForm v)
+  | .not' a, pos, F, cl, acc => go a (!pos) F cl acc
+  | .all' as, true, F, cl, acc => as.foldl' (fun acc a _ => go a true F cl acc) acc
+  | .any' as, false, F, cl, acc => as.foldl' (fun acc a _ => go a false F cl acc) acc
+  | .any' as, true, F, cl, acc => as.foldl' (fun G a _ F => G (go a true F)) (· cl acc) F
+  | .all' as, false, F, cl, acc => as.foldl' (fun G a _ F => G (go a false F)) (· cl acc) F
+  | .iff' a b, pos, F, cl, acc =>
+    go b (!pos) (go a true F) cl <| go a false (go b pos F) cl acc
+  | a, true, F, cl, acc => F (cl.push a) acc
+  | a, false, F, cl, acc => F (cl.push (.not a)) acc
+
+namespace eval_flatCNF
+variable {τ : v → Prop}
+
+abbrev R := Array (PropForm v)
+
+abbrev evals (τ : v → Prop) (acc' cl acc : R) (A) :=
+  (∀ a ∈ acc', eval τ a) ↔ (∀ a ∈ acc, eval τ a) ∧ (A ∨ ∃ a ∈ cl, eval τ a)
+
+theorem goAll {α} (as : Array α) {FF : R → (a : α) → a ∈ as → R} {G : α → Prop} {acc cl A}
+    (hFF : ∀ acc f h, evals τ (FF acc f h) cl acc (G f ∨ A)) :
+    evals τ (as.foldl' FF acc) cl acc ((∀ a ∈ as, G a) ∨ A) := by
+  refine Iff.trans (as.foldl'_induction (motive := fun i (acc' : R) =>
+    evals τ acc' cl acc ((∀ j:Fin as.size, j < i → G as[j]) ∨ A)) (by simp) ?_) ?_
+  · intro i acc IH; unfold evals at *
+    simp [hFF, IH, Nat.lt_succ_iff_lt_or_eq, or_imp, forall_and,
+      ← Fin.ext_iff, and_assoc, ← and_or_right]
+  · simp [Array.mem_iff_getElem]
+
+theorem goAny {α} (as : Array α) {FF : ∀ a ∈ as, (R → R → R) → R → R → R} {G : α → Prop}
+    (hFF : ∀ f h {F A},
+      (∀ cl acc, evals τ (F cl acc) cl acc A) →
+      ∀ cl acc, evals τ (FF f h F cl acc) cl acc (G f ∨ A))
+    {F A} (hF : ∀ cl acc, evals τ (F cl acc) cl acc A) (cl acc) :
+    evals τ (as.foldl' (fun G a h F => G (FF a h F)) (· cl acc) F)
+      cl acc ((∃ a ∈ as, G a) ∨ A) := by
+  refine Iff.trans (as.foldl'_induction (motive := fun i (G' : (R → R → R) → R) =>
+    ∀ {A F}, (∀ cl acc, evals τ (F cl acc) cl acc A) →
+      evals τ (G' F) cl acc ((∃ j:Fin as.size, j < i ∧ G as[j]) ∨ A)) ?_ ?_ hF) ?_
+  · simp; exact (· cl acc)
+  · intro i G' IH F A hF
+    rw [show ((∃ j, _) ∨ _) ↔ ?_ from ?_]; exact IH (hFF _ _ hF)
+    simp [Nat.lt_succ_iff_lt_or_eq, or_and_right, exists_or, ← Fin.ext_iff, or_assoc]
+  · simp [Array.mem_iff_getElem]
+
+@[simp] theorem core (f pos) {F A} (hF : ∀ cl acc, evals τ (F cl acc) cl acc A) (cl acc) :
+    evals τ (flatCNF.go f pos F cl acc) cl acc ((eval τ f ↔ pos) ∨ A) := by
+  unfold flatCNF.go; split
+  next /-not'-/ a => convert core a _ hF _ _ using 1; cases pos <;> simp
+  iterate 2 next /-all'-/ as =>
+    simp; refine goAll as fun acc f _ => (core f _ hF _ _).trans (by simp)
+  iterate 2 next /-any'-/ as =>
+    simp; refine (goAny as (fun f _ _ _ hF => core f _ hF) hF cl acc).trans (by simp)
+  next /-iff'-/ a b =>
+    unfold evals at *
+    simp [core b (!pos) (core a true hF) cl, core a false (core b pos hF) cl]
+    cases pos <;> simp <;> tauto
+  iterate 2 next /-atom-/ a =>
+    unfold evals at *
+    simp [hF, or_imp, forall_and, or_and_right, exists_or, or_assoc, or_comm]
+decreasing_by decreasing_with subst_vars; first | decreasing_trivial | simp_wf
+
+end eval_flatCNF
+
+@[simp] theorem eval_flatCNF (τ : v → Prop) (f : PropForm v) : eval τ (.flatCNF f) ↔ eval τ f := by
+  simp [flatCNF]; rw [show _ ↔ _ from eval_flatCNF.core (A := False) ..]
+    <;> simp [eval_flatCNF.evals, or_imp, forall_and]
 
 end PropForm
