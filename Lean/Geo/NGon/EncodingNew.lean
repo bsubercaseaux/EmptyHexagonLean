@@ -152,13 +152,111 @@ def leftmostCCWClauses (n : Nat) : PropForm (Var n) :=
   .guard (a < b) fun _ =>
     Var.sigma ⟨0, Fin.size_positive a⟩ a b
 
-def theEncoding (n : Nat) : PropForm (Var n) :=
+def baseEncoding (n : Nat) : PropForm (Var n) :=
+  .all #[signotopeClauses n, insideClauses n, holeDefClauses n, leftmostCCWClauses n]
+
+def triangleEncoding (n : Nat) : PropForm (Var n) :=
+  .and (baseEncoding n) (noHoleClauses n)
+
+def auxDefClause (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
+  .forAll (Fin n) fun b =>
+  .guard (a < b) fun _ =>
+  .forAll (Fin n) fun c =>
+  .guard (b < c) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
+    .all #[
+      .imp (.and (.not (Var.sigma a b c)) (.not (Var.sigma b c d))) (Var.cap a c d),
+      .imp (.and (Var.sigma a b c) (Var.sigma b c d)) (Var.cup a c d),
+      .imp (.all #[Var.hole a b d, .not (Var.sigma b c d), Var.cap a b c]) (Var.capF a c d)
+    ]
+
+def capFDefClause (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
+  .forAll (Fin n) fun c =>
+  .guard (∃ h, ⟨a+1, h⟩ < c) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
+  .forAll (Fin n) fun e =>
+  .guard (d < e) fun _ =>
+    .imp (.all #[Var.hole a c e, .not (Var.sigma c d e), Var.cap a c d]) (Var.capF a d e)
+
+--             .                          .
+--       ·           d            ·             d
+--  a ------------------ e     a ------------------ e
+--     b                              b
+--
+--             .                          .
+--     ·             d            ·             d
+--  a ------------------ e     a ------------------ e
+--               b                               b
+def no6Hole3H (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .forAll (Fin n) fun b =>
+  .guard (a < b) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (a < d) fun _ =>
+  .forAll (Fin n) fun e =>
+  .guard (b < e ∧ d < e) fun _ =>
+    .imp (Var.capF a d e) (.not (Var.sigma a b e))
+
+--          .   d
+--     .              e
+--  a ------------------ f
+def no6Hole4H (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .forAll (Fin n) fun d =>
+  .guard (a < d) fun _ =>
+  .forAll (Fin n) fun e =>
+  .guard (d < e) fun _ =>
+  .forAll (Fin n) fun f =>
+  .guard (e < f) fun _ =>
+    .imp (Var.capF a d e) (Var.sigma d e f)
+
+--              ·   c                  ·      c                  ·   b
+--  a ------------------ d    a ------------------ d    a ------------------ d
+--        ·   b                    ·      b                  ·          c
+--
+--        ·          c             ·       b                  ·   b
+--  a ------------------ d    a ------------------ d    a ------------------ d
+--           ·   b                     ·       c                     ·   c
+def no6Hole2H (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .forAll (Fin n) fun b =>
+  .guard (a < b) fun _ =>
+  .forAll (Fin n) fun c =>
+  .guard (b < c) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
   .all #[
-    signotopeClauses n, insideClauses n, holeDefClauses n, noHoleClauses n, leftmostCCWClauses n
+    .imp (Var.cap a b d) <| .imp (Var.cup a c d) <| .not (Var.hole a b c),
+    .imp (Var.cap a c d) <| .imp (Var.cup a b d) <| .not (Var.hole a b c)
+  ]
+
+--              ·                     ·      c                  ·   b
+--  a ------------------ e    a ------------------ d    a ------------------ d
+--         b   c    d              ·      b                  ·          c
+--
+--        ·          c             ·       b                  ·   b
+--  a ------------------ d    a ------------------ d    a ------------------ d
+--           ·   b                     ·       c                     ·   c
+def no6Hole1H (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
+  .forAll (Fin n) fun b =>
+  .guard (a < b) fun _ =>
+  .forAll (Fin n) fun c =>
+  .guard (b < c) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
+  .all #[
   ]
 
 open Model PropFun
-axiom cnfUnsat : ¬∃ τ : IVar → Prop, (Geo.theEncoding 10 |>.toICnf compare).eval τ
+axiom triangleCnfUnsat : ¬∃ τ : IVar → Prop, (Geo.triangleEncoding 10 |>.toICnf compare).eval τ
 
 -- set_option profiler true in
 -- #eval let cnf := Geo.theEncoding 10 |>.toICnf compare; (cnf.size, cnf.maxVar)

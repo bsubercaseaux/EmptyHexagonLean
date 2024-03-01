@@ -1,6 +1,7 @@
 import Geo.Definitions.WBPoints
 import Geo.Definitions.PtInTriangle
 import Geo.Definitions.Structures
+import Geo.Definitions.OrientationProperties
 import Geo.Orientations
 import Geo.Triangle.EncodingNew
 
@@ -12,10 +13,21 @@ open LeanSAT.Model PropFun
 
 open Point
 
+def isCap (w : WBPoints) (a c d : Fin w.length) (o : Orientation) :=
+  ∃ b, a < b ∧ b < c ∧ c < d ∧
+    σ w[a] w[b] w[c] = o ∧ σ w[a] w[c] w[d] = o
+
+def isCapF (w : WBPoints) (a d e : Fin w.length) :=
+  ∃ c : Fin w.length, isCap w a c d .CW ∧
+    σ w[c] w[d] w[e] = .CW ∧ σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset
+
 @[simp] def toPropAssn (w : WBPoints) : Var w.length → Prop
-  | .sigma a b c ..    => σ w[a] w[b] w[c] = .CCW
-  | .inside x a b c .. => σPtInTriangle w[x] w[a] w[b] w[c]
-  | .hole a b c ..     => σIsEmptyTriangleFor w[a] w[b] w[c] w.toFinset
+  | .sigma a b c    => σ w[a] w[b] w[c] = .CCW
+  | .inside x a b c => σPtInTriangle w[x] w[a] w[b] w[c]
+  | .hole a b c     => σIsEmptyTriangleFor w[a] w[b] w[c] w.toFinset
+  | .cap a c d      => isCap w a c d .CW
+  | .cup a c d      => isCap w a c d .CCW
+  | .capF a d e     => isCapF w a d e
 
 attribute [-simp] getElem_fin
 
