@@ -1,36 +1,6 @@
 import LeanSAT.Data.ICnf
 import Geo.SAT.ToLeanSAT.PropForm
 
-namespace Array
-
-@[inline]
-private unsafe def foldlM'Unsafe [Monad m]
-    (as : Array α) (f : β → (a : α) → a ∈ as → m β) (init : β) : m β :=
-  as.foldlM (fun b a => f b a lcProof) init
-
-@[implemented_by foldlM'Unsafe]
-def foldlM' [Monad m]
-    (as : Array α) (f : β → (a : α) → a ∈ as → m β) (init : β) : m β :=
-  let rec go (i : Nat) (acc : β) : m β := do
-    if h : i < as.size then
-      go (i+1) (← f acc (as.get ⟨i, h⟩) (by simp [mem_def, getElem_mem_data]))
-    else
-      pure acc
-  go 0 init
-termination_by _ => as.size - i
-
-@[inline] def foldl' {α : Type u} {β : Type v}
-    (as : Array α) (f : β → (a : α) → a ∈ as → β) (init : β) : β :=
-  Id.run <| foldlM' as f init
-
-def mapM'' [Monad m] (as : Array α) (f : (a : α) → a ∈ as → m β) : m (Array β) :=
-  foldlM' as (fun acc a h => acc.push <$> f a h) (mkEmpty as.size)
-
-def forM' [Monad m] (as : Array α) (f : (a : α) → a ∈ as → m Unit) : m Unit :=
-  foldlM' as (fun _ a h => f a h) ()
-
-end Array
-
 namespace LeanSAT
 open Std
 

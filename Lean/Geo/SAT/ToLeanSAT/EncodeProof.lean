@@ -1,46 +1,6 @@
 import Std
 import Geo.SAT.ToLeanSAT.Encode
 
-namespace Array
-
-theorem SatisfiesM_foldlM' [Monad m] [LawfulMonad m]
-    {as : Array α} (motive : Nat → β → Prop) {init : β} (h0 : motive 0 init)
-    {f : β → (a : α) → a ∈ as → m β}
-    (hf : ∀ i : Fin as.size, ∀ b, motive i.1 b →
-      SatisfiesM (motive (i.1 + 1)) (f b as[i] ⟨List.get_mem ..⟩)) :
-    SatisfiesM (motive as.size) (as.foldlM' f init) := by
-  let rec go {i b} (h₁ : i ≤ as.size) (H : motive i b) :
-    SatisfiesM (motive as.size) (foldlM'.go as f i b) := by
-    unfold foldlM'.go; split
-    · next hi =>
-      exact (hf ⟨i, hi⟩ b H).bind fun _ => go hi
-    · next hi => exact Nat.le_antisymm h₁ (Nat.ge_of_not_lt hi) ▸ .pure H
-  simp [foldlM']; exact go (Nat.zero_le _) h0
-termination_by _ => as.size - i
-
-theorem foldl'_induction
-    {as : Array α} (motive : Nat → β → Prop) {init : β} (h0 : motive 0 init)
-    {f : β → (a : α) → a ∈ as → β}
-    (hf : ∀ i : Fin as.size, ∀ b, motive i.1 b → motive (i.1 + 1) (f b as[i] ⟨List.get_mem ..⟩)) :
-    motive as.size (as.foldl' f init) := by
-  have := SatisfiesM_foldlM' (m := Id) (as := as) (f := f) motive h0
-  simp [SatisfiesM_Id_eq] at this
-  exact this hf
-
-theorem mem_sortAndDeduplicate [LinearOrder α] {as : Array α} :
-    x ∈ as.sortAndDeduplicate ↔ x ∈ as := sorry
-
-end Array
-
-namespace Std.HashMap
-
-theorem find?_empty [Hashable α] [BEq α] : (∅ : HashMap α β).find? k = none := sorry
-
-theorem of_find?_insert [Hashable α] [BEq α] {m : HashMap α β} {a b} :
-    (m.insert a b).find? k = some v → m.find? k = some v ∨ k = a ∧ v = b := sorry
-
-end Std.HashMap
-
 namespace LeanSAT
 open Std
 
