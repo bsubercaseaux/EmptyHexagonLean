@@ -158,7 +158,7 @@ def theEncoding (n : Nat) : PropForm (Var n) :=
   ]
 
 open Model PropFun
-axiom cnfUnsat : ¬∃ τ : IVar → Prop, (Geo.theEncoding 10 |>.toICnf compare).eval τ
+axiom cnfUnsat : ¬∃ τ : IVar → Prop, (Geo.theEncoding 10 |>.toICnf compare).2.eval τ
 
 -- set_option profiler true in
 -- #eval let cnf := Geo.theEncoding 10 |>.toICnf compare; (cnf.size, cnf.maxVar)

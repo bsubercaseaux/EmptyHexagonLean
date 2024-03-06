@@ -148,32 +148,43 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     exact fun _ _ h1 h2 => lt_of_le_of_ne h2 h1
   clear l3 σ3 l3_orient l3_ne
 
-  -- step 5: bring ∞ back into the range
-  have ⟨z, hleft, horiented⟩ := exists_pt_st_orientations_preserved l4 l4_lt
+  -- step 5: left-right flip
+  have ⟨l5, σ5, l5_orient, l5_lt, l5_adj⟩ : ∃ l5, ∃ f : l2 ≼σ l5,
+      (∀ x y, x ∈ l2 → y ∈ l2 → orientWithInfty (f.f x) (f.f y) = σ 0 x y) ∧
+      l5.Pairwise (·.x < ·.x) ∧ ListLexSelf (adjacentOrientations l5) := by
+    if l4_adj : ListLexSelf (adjacentOrientations l4) then
+      exact ⟨l4, σ4, l4_orient, l4_lt, l4_adj⟩
+    else
+      sorry
+  clear l4 σ4 l4_orient l4_lt
+
+  -- step 6: bring ∞ back into the range
+  have ⟨z, hleft, horiented⟩ := exists_pt_st_orientations_preserved l5 l5_lt
   have l2_nz : ∀ p ∈ l2, p ≠ 0 := by rintro _ h rfl; exact lt_irrefl _ (l2_lt _ h)
-  have σ5 : l ≼σ z :: l4 := σ2.trans {
-    f := fun p => if p = 0 then z else σ4.f p
+  have σ5 : l ≼σ z :: l5 := σ2.trans {
+    f := fun p => if p = 0 then z else σ5.f p
     perm := by
-      simp; refine List.map_congr ?_ ▸ σ4.perm
+      simp; refine List.map_congr ?_ ▸ σ5.perm
       intro _ hx; rw [if_neg (l2_nz _ hx)]
     σ := by
       simp
-      have {p q} (hp : p ∈ l2) (hq : q ∈ l2) : σ z (σEmbed.f σ4 p) (σEmbed.f σ4 q) = σ 0 p q := by
-        rw [← horiented _ (σ4.mem hp) _ (σ4.mem hq), l4_orient _ _ hp hq]
+      have {p q} (hp : p ∈ l2) (hq : q ∈ l2) : σ z (σEmbed.f σ5 p) (σEmbed.f σ5 q) = σ 0 p q := by
+        rw [← horiented _ (σ5.mem hp) _ (σ5.mem hq), l5_orient _ _ hp hq]
       rintro _ _ _ (rfl | hp) (rfl | hq) (rfl | hr)
         <;> try simp [σ_self₁, σ_self₂, σ_self₃, *]
       · rw [σ_perm₁, this hp hr, ← σ_perm₁]
       · rw [σ_perm₂, σ_perm₁, this hp hq, ← σ_perm₁, ← σ_perm₂]
-      · exact σ4.σ _ _ _ hp hq hr
+      · exact σ5.σ _ _ _ hp hq hr
   }
 
-  -- step 6: construct
+  -- step 7: construct
   exact ⟨{
     leftmost := z
-    rest := l4
-    sorted' := List.sorted_cons.2 ⟨hleft, l4_lt⟩
+    rest := l5
+    sorted' := List.sorted_cons.2 ⟨hleft, l5_lt⟩
     gp' := σ5.gp.1 gp
-    oriented := l4_lt.imp_of_mem fun ha hb h => by
+    lex := l5_adj
+    oriented := l5_lt.imp_of_mem fun ha hb h => by
       rwa [← horiented _ ha _ hb, orientWithInfty, Orientation.ofReal_eq_ccw, sub_pos]
   }, ⟨σ5⟩⟩
 

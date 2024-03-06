@@ -1,4 +1,5 @@
 import Geo.Definitions.Point
+import Geo.Definitions.ListLex
 import Geo.Orientations
 
 namespace Geo
@@ -14,6 +15,7 @@ structure WBPoints where
   sorted' : PointListSorted (leftmost :: rest)
   gp' : PointListInGeneralPosition (leftmost :: rest)
   oriented : rest.Pairwise (σ leftmost · · = .CCW)
+  lex : ListLexSelf (adjacentOrientations l5)
 
 namespace WBPoints
 open List Finset Classical
