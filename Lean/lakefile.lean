@@ -19,3 +19,6 @@ lean_lib «Geo» where
 
 lean_exe run_geo where
   root := `Geo
+
+lean_exe ngon where
+  root := `Geo.NGon.RunEncoding

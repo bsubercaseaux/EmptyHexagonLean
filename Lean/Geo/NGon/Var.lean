@@ -32,3 +32,11 @@ instance : LinearOrder (Var n) :=
       | .capF a d e => .inrₗ <| .inrₗ <| .inlₗ (a, d, e)
       | .cup a c d => .inrₗ <| .inrₗ <| .inrₗ (a, c, d))
     (by rintro ⟨⟩ ⟨⟩ <;> simp <;> rintro ⟨⟩ <;> simp)
+
+def Var.toCode : Var n → String
+  | .sigma a b c => s!"0 0 {a} {b} {c}"
+  | .inside x a b c => s!"1 {x} {a} {b} {c}"
+  | .hole a b c => s!"2 0 {a} {b} {c}"
+  | .cap a b c => s!"3 0 {a} {b} {c}"
+  | .cup a b c => s!"4 0 {a} {b} {c}"
+  | .capF a b c => s!"5 0 {a} {b} {c}"

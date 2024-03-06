@@ -1,4 +1,5 @@
 import Std
+import Mathlib.Tactic.LiftLets
 import Geo.SAT.ToLeanSAT.Encode
 
 namespace LeanSAT
@@ -569,7 +570,7 @@ end Encode
 open Encode
 
 theorem PropForm.toICnf_sat [LinearOrder v] (f : PropForm v) :
-    (∃ σ, Cnf.eval σ (f.toICnf compare)) ↔ ∃ τ, eval τ f := by
+    (∃ σ, Cnf.eval σ (f.toICnf compare).2) ↔ ∃ τ, eval τ f := by
   unfold toICnf; lift_lets; intro vars
   have allMem : f.onVars (· ∈ vars) := by
     refine (of_mem_toList_collectVars f (acc := ∅) fun x hx => ?_).1

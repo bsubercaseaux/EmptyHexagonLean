@@ -1,5 +1,6 @@
 import Std.Data.List.Basic
-import Mathlib.Tactic
+import Mathlib.Data.Complex.Abs
+import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 
 -- Q: Why are `List.get [i]` *and* `l[i.1]` both simp normal forms? Should we have `List.get i = l[i.1]`?
 -- There is also `List.getElem_eq_get : l[i] = l.get i` that never gets applied because `l[i]` is not simp-nf..

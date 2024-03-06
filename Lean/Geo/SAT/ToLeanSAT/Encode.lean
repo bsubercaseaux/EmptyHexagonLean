@@ -99,8 +99,8 @@ def pushICnf : PropForm v → Bool → M v Unit
 
 end Encode
 
-def PropForm.toICnf (fmla : PropForm v) : ICnf :=
+def PropForm.toICnf (fmla : PropForm v) : Array v × ICnf :=
   let vars := (collectVars cmp fmla ∅).1.toArray
   let (_, { clauses, .. }) := Encode.pushICnf cmp fmla true |>.run vars
     |>.run { clauses := #[], nextVar := vars.size.succPNat, definitions := {} }
-  clauses
+  (vars, clauses)

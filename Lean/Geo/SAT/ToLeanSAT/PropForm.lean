@@ -40,6 +40,7 @@ def disjs : PropForm v → Array (PropForm v)
 theorem eval_disjs (τ : v → Prop) : (∃ a ∈ disjs f, eval τ a) ↔ eval τ f := by
   simp [PropForm.disjs]; split <;> simp [eval]
 
+set_option compiler.extract_closed false in -- lean4#1965
 def all (as : Array (PropForm v)) : PropForm v :=
   match as.concatMap conjs with
   | #[a] => a
@@ -56,6 +57,7 @@ def all (as : Array (PropForm v)) : PropForm v :=
     · simp
   · simp [eval_conjs]
 
+set_option compiler.extract_closed false in -- lean4#1965
 def any (as : Array (PropForm v)) : PropForm v :=
   match as.concatMap disjs with
   | #[a] => a
