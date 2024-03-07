@@ -61,3 +61,57 @@ Then,~\Cref{sec:empty-triangle} presents how the previous elements are already e
 The Empty Hexagon Number requires a much more efficient encoding, for which two additional ingredients are introduced. First,~\Cref{sec:symmetry-breaking} deals with symmetry breaking, proving that one can assume, without loss of generality, that points are simultaneously sorted from left-to-right as well as by angle with respect to the leftmost point. 
 %  Namely, that one can assume without loss of generality the following two properties at the same time: (i) points are labeled from left to right without two of them having the same $x$-coordinate, and (ii) the triples $(p_1, p_i, p_j)$ are always oriented counterclockwise for $i < j$. 
 Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of Heule and Scheucher, the crucial piece to make the proof of $h(6) = 30$ feasible. We conclude by discussing the next steps towards the formal verification of other Erd\H{o}s-Szekeres-type problems in~\Cref{sec:conclusion}.
+
+
+\begin{framed}
+  \begin{spreadlines}{14pt} 
+\begin{gather}
+  \left(\ov{\orvar_{a, b, c}} \lor \ov{\orvar_{a, c, d}} \lor \orvar_{a, b, d}\right) \land   \left(\orvar_{a, b, c} \lor \orvar_{a, c, d} \lor  \ov{\orvar_{a, b, d}}\right)
+  \text{ for all } 1 \leq a < b < c < d \leq n\\
+% \end{equation}
+% \begin{equation}
+\left(\ov{\orvar_{a, b, c}} \lor \ov{\orvar_{b, c, d}} \lor  \orvar_{a, c, d}\right) \land \left(\orvar_{a, b, c} \lor \orvar_{b, c, d} \lor  \ov{\orvar_{a, c, d}}\right)
+\text{ for all } 1 \leq a < b < c < d \leq n\\
+% \end{equation}
+% \begin{equation}
+  \cvar_{i; a,b, c} \leftrightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{a, i, b}}  \right)\right) \text{ for all } 1 \leq a < i < b < c \leq n\\ 
+% \end{equation}
+% \begin{equation}
+  \cvar_{i; a,b, c} \leftrightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{b, i, c}}  \right)\right) \text{ for all } 1 \leq a < b < i < c \leq n\\ 
+%\end{equation}
+%\begin{equation}
+  \hvar_{a, b, c} \leftrightarrow \bigwedge_{\substack{a < i < c\\ i \neq b}} \ov{\cvar_{i; a,b,c}} \quad \text{ for all } 1 \leq a < b < c \leq n\\ 
+%\end{equation}
+  %\begin{equation}
+    \orvar_{1, b, c} \quad \text{ for all } 2 \leq b < c \leq n\\
+  %\end{equation}
+  %\begin{equation}
+ \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \preceq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\\ 
+  %\end{equation}
+  %\begin{equation}
+  \left(\orvar_{a,b,c} \lor \orvar_{b,c,d} \lor \uvar_{a, c, d} \right) \quad \text{ for all } 1 \leq a < b < c < d\\ 
+  %\end{equation}
+  %\begin{equation}
+    \left(\ov{\uvar_{a,c,d}} \lor \orvar_{c,d,e} \lor \ov{\hvar_{a,c,e}}\lor \ufvar_{a, d, e} \right) \quad \text{ for all } 1 \leq a < b < c < d\\ 
+    % \end{equation}
+% \begin{equation}
+  \ov{\ufvar_{a,d,e}} \lor \ov{\orvar_{a, b, e}} \quad \text { for all } 1 \leq a < d < e \leq n, \; a < b < e\\
+% \end{equation}
+% \begin{equation}
+  \ov{\ufvar_{a,d,e}} \lor \orvar_{d, e, f} \quad \text { for all } 1 \leq a < d < e < f\leq n\\
+% \end{equation}
+% \begin{equation}
+\orvar_{a, b, c} \land \orvar_{b, c, d} \rightarrow \vvar_{a, c, d} \quad \text{ for all } 1 \leq a < b < c < d \leq n\\
+% \end{equation}
+% \begin{equation}
+ \ov{\uvar_{a,c,d}} \lor \ov{\vvar{a, c', d}} \lor \ov{\hvar_{a,c,c'}} \quad \text{ for all } 1 \leq a < c < c' < d \leq n\\
+  % \end{equation}
+  % \begin{equation}
+    \ov{\uvar_{a,c,d}} \lor \ov{\vvar{a, c', d}} \lor \ov{\hvar_{a,c',c}} \quad \text{ for all } 1 \leq a < c' < c < d \leq n\\
+    %  \end{equation}
+    %  \begin{equation}
+      \ov{\vvar_{a,c,d}} \lor \ov{\orvar_{c, d, e}} \lor \ov{\hvar_{a,c,e}} \quad \text{ for all } 1 \leq a < c < d < e \leq n
+  \end{gather}
+\end{spreadlines}
+
+\end{framed}
