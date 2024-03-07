@@ -5,7 +5,7 @@ In 1879, Alfred Kempe published a proof of the four-color theorem, which was dis
 A full proof of the four-color theorem was not found until 1976, when Kenneth Appel and Wolfgang Haken used a computer to check the 1\,834 cases that might contain a counterexample~\cite{appelFourColorProblem1978}.
 Their proof was controversial, and small errors were indeed found in their initial calculations~\cite{Walters2004ItAT,Wilson2002GraphsCA}.
 In 2005, Georges Gonthier formalized a full proof of the four-color theorem in the \textsf{Coq} proof assistant~\cite{gonthierFourColourTheorem2008a}, thus laying to rest any lingering doubts about the correctness of the result.
-To this day, all proofs known for this theorem require the assistance of computers.
+% To this day, all proofs known for this theorem require the assistance of computers.
 
 The four-color theorem is far from the end of the story when it comes to computer-assisted mathematics.
 An emerging trend is to use SAT solvers (or other automated reasoning tools) to prove mathematical theorems by analyzing finite objects~\cite{avigad2023mathematics}. 
@@ -24,7 +24,8 @@ Furthermore,
 % One of the benefits of using a SAT solver for mathematical proofs is that in the \emph{positive case}, it is usually possible to construct the desired object $\mathcal{O}$ from a satisfying assignment to $\phi_{\mathcal{O}}$, and then by exhibiting $\mathcal{O}$, the correctness of theorem $\mathcal{T}$ can be easily verified by humans.
 the \emph{negative case} of SAT-based mathematical proofs presents a particular challenge for human trust: the unsatisfiability proofs emitted by SAT solvers are usually too large for human verification, and depend crucially on the correctness of the encoding.\footnote{In the positive case, the correctness of the encoding is not even required, as an incorrect encoding might still lead to obtaining a concrete object $\mathcal{O}$ that satisfies the desired properties, proving the intended theorem regardless.}
 % \todo[inline]{CC: I don't like how this paragraph is structured. The negative case isn't inherently \emph{harder}. Instead, the method of verifying the overall result is different: rather than constructing an actual object we can see or compute on, we have to rely on a non-existence result. Thus, the reduction must be correct, as errors can't be caught the same way they can be in a physical construction.\\ BS: I disagree; the NP vs coNP asymmetry is exactly about how easy it is to convince a verifier of existence vs. non-existence results.}
-For example, the resolution of the Boolean Pythagorean triples problem required an unsatisfiability proof of 200 terabytes~\cite{Heule_2016,lambTwohundredterabyteMathsProof2016}, and the proof of Schur's number five required 2 petabytes~\cite{heule2017schur}.
+The proof for the \emph{Empty Hexagon Number} uses 180 terabytes in the \textsf{LRAT} format, and around 80 terabytes in the \textsf{DRAT} format~\cite{emptyHexagonNumber}. Most of the other SAT-based proofs mentioned above result in even larger proofs~\cite{Heule_2016,lambTwohundredterabyteMathsProof2016,heule2017schur,Subercaseaux_Heule_2023}.
+% For example, the resolution of the Boolean Pythagorean triples problem required an unsatisfiability proof of 200 terabytes~\cite{Heule_2016,lambTwohundredterabyteMathsProof2016}, and the proof of Schur's number five required 2 petabytes~\cite{heule2017schur}.
 This raises a fundamental question for computational mathematics:
 \begin{center}
   \emph{How can we enhance trust for a theorem $\mathcal{T}$ that relies on a very long unsatisfiability proof?}
