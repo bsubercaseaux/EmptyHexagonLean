@@ -187,19 +187,25 @@ theorem Point.InGeneralPosition₃.perm₂ {p q r : Point} :
   rw [h'] at h
   contradiction
 
-theorem Point.InGeneralPosition₃.of_perm (h : [p, q, r].Perm [p', q', r']) :
-    InGeneralPosition₃ p q r ↔ InGeneralPosition₃ p' q' r' := by
+theorem perm₃_induction {P : α → α → α → Prop}
+    (H1 : ∀ {{a b c}}, P a b c → P b a c)
+    (H2 : ∀ {{a b c}}, P a b c → P a c b)
+    (h : [p, q, r].Perm [p', q', r']) : P p q r ↔ P p' q' r' := by
   suffices ∀ {p q r p' q' r'}, [p, q, r].Perm [p', q', r'] →
-    InGeneralPosition₃ p q r → InGeneralPosition₃ p' q' r' from ⟨this h, this h.symm⟩
+    P p q r → P p' q' r' from ⟨this h, this h.symm⟩
   clear p q r p' q' r' h; intro p q r p' q' r' h gp
   rw [← List.mem_permutations] at h; change _ ∈ [_,_,_,_,_,_] at h; simp at h
   obtain h|h|h|h|h|h := h <;> obtain ⟨rfl,rfl,rfl⟩ := h
   · exact gp
-  · exact gp.perm₁
-  · exact gp.perm₁.perm₂.perm₁
-  · exact gp.perm₂.perm₁
-  · exact gp.perm₁.perm₂
-  · exact gp.perm₂
+  · exact H1 gp
+  · exact H1 <| H2 <| H1 gp
+  · exact H1 <| H2 gp
+  · exact H2 <| H1 gp
+  · exact H2 gp
+
+theorem Point.InGeneralPosition₃.of_perm (h : [p, q, r].Perm [p', q', r']) :
+    InGeneralPosition₃ p q r ↔ InGeneralPosition₃ p' q' r' :=
+  perm₃_induction (fun _ _ _ => (·.perm₁)) (fun _ _ _ => (·.perm₂)) h
 
 theorem Point.PointListInGeneralPosition.subperm : PointListInGeneralPosition l ↔
     ∀ {{p q r : Point}}, [p, q, r].Subperm l → InGeneralPosition₃ p q r := by

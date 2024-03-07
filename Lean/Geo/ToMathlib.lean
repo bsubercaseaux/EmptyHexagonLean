@@ -23,6 +23,11 @@ theorem List.Sublist.toFinset_subset [DecidableEq α] {l l' : List α} :
   simp only [List.mem_toFinset] at al ⊢
   apply h.subset al
 
+open List in
+theorem List.Subperm.nodup (h : l <+~ l') (H : l'.Nodup) : l.Nodup :=
+  let ⟨_, h1, h2⟩ := h
+  h1.nodup_iff.1 <| H.sublist h2
+
 theorem List.of_Pairwise_toFinset [DecidableEq α] (as : List α) (R : α → α → Prop) :
     (∀ i j : Fin as.length, i < j → as[i] = as[j] → R as[i] as[j]) →
     as.toFinset.toSet.Pairwise R → as.Pairwise R := by

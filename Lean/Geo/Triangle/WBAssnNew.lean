@@ -7,21 +7,14 @@ import Geo.Triangle.EncodingNew
 import Geo.NGon.WBAssnNew
 
 namespace Geo.WBPoints
-open List
-open Classical
-
-open LeanSAT.Model PropFun
-
-open Point
+open List Classical Point
+attribute [-simp] getElem_fin
 
 theorem satisfies_triangleEncoding (w : WBPoints) :
-    ¬σHasEmptyTriangle w.toFinset →
+    ¬σHasEmptyNGon 3 w.toFinset →
     (triangleEncoding w.length).eval w.toPropAssn := by
-  simp [triangleEncoding, satisfies_baseEncoding, noHoleClauses,
-    σIsEmptyTriangleFor, mem_toFinset_iff, σHasEmptyTriangle]
-  intro noholes a b hab c hbc
-  exact noholes a b (ne_of_lt hab <| w.eq_iff.1 <| · ▸ rfl)
-                  c (ne_of_lt (hab.trans hbc) <| w.eq_iff.1 <| · ▸ rfl)
-                    (ne_of_lt hbc <| w.eq_iff.1 <| · ▸ rfl)
+  simp [triangleEncoding, satisfies_baseEncoding, noHoleClauses]
+  intro noholes a b hab c hbc h
+  refine noholes <| (σHasEmptyNGon_3_iff w.gp).2 ⟨w[a], w[b], w[c], (w.sublist hab hbc).subperm, h⟩
 
 end WBPoints

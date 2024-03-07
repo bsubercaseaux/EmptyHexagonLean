@@ -103,6 +103,10 @@ theorem σPtInTriangle.perm₂ : σPtInTriangle a p q r → σPtInTriangle a p r
   conv in σ r q p => rw [σ_perm₁]
   simp [*]
 
+theorem σPtInTriangle.perm (h : [p, q, r].Perm [p', q', r']) :
+    σPtInTriangle a p q r ↔ σPtInTriangle a p' q' r' :=
+  perm₃_induction (fun _ _ _ => (·.perm₁)) (fun _ _ _ => (·.perm₂)) h
+
 theorem σPtInTriangle.gp₄_of_gp₃ :
     InGeneralPosition₃ p q r → σPtInTriangle a p q r → InGeneralPosition₄ a p q r := by
   intro gp ⟨tri₁, tri₂, tri₃⟩

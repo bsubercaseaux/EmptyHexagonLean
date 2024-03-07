@@ -41,9 +41,11 @@ abbrev length (w : WBPoints) : Nat := w.points.length
 instance : GetElem WBPoints Nat Point (fun w i => i < w.length) where
   getElem w i h := w.points[i]'h
 
+theorem mem_points_iff {w : WBPoints} {a : Point} :
+    a ∈ w.points ↔ ∃ i : Fin w.length, w[i] = a := by simp [GetElem.getElem, List.mem_iff_get]
+
 theorem mem_toFinset_iff {w : WBPoints} {a : Point} :
-    a ∈ w.toFinset ↔ ∃ i : Fin w.length, w[i] = a := by
-  simp [GetElem.getElem, toFinset, List.mem_toFinset, List.mem_iff_get]
+    a ∈ w.toFinset ↔ ∃ i : Fin w.length, w[i] = a := by simp [mem_points_iff, toFinset]
 
 theorem get_mem_toFinset (w : WBPoints) (i : Fin w.length) :
     w[i] ∈ w.toFinset := mem_toFinset_iff.2 ⟨_, rfl⟩
@@ -69,14 +71,16 @@ theorem le_iff (w : WBPoints) {i j : Fin w.length} :
 theorem eq_iff (w : WBPoints) {i j : Fin w.length} :
     w[i].x = w[j].x ↔ i = j := by simp [le_antisymm_iff, -getElem_fin, w.le_iff]
 
+theorem sublist (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
+    [w[i], w[j], w[k]] <+ w.points := by
+  have : [w[i], w[j], w[k]] = [i,j,k].map w.points.get := by
+    simp [GetElem.getElem, List.getElem_eq_get]
+  rw [this]
+  apply map_get_sublist
+  simp [ij, jk, ij.trans jk]
+
 theorem gp₃ (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
-    InGeneralPosition₃ w[i] w[j] w[k] :=
-  w.gp <| by
-    have : [w[i], w[j], w[k]] = [i,j,k].map w.points.get := by
-      simp [GetElem.getElem, List.getElem_eq_get]
-    rw [this]
-    apply map_get_sublist
-    simp [ij, jk, ij.trans jk]
+    InGeneralPosition₃ w[i] w[j] w[k] := w.gp <| w.sublist ij jk
 
 theorem gp₄ (w : WBPoints) {i j k l : Fin w.length} (ij : i < j) (jk : j < k) (kl : k < l) :
     InGeneralPosition₄ w[i] w[j] w[k] w[l] :=

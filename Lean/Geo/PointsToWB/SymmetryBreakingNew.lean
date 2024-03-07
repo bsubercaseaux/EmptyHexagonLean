@@ -24,10 +24,7 @@ def σEmbed.flipX (S : List Point) : S ≼σ S.map flipX :=
 
 lemma sorted_reverse_flipX {S : List Point} :
     S.Sorted (·.x < ·.x) → (S.reverse.map Geo.flipX).Sorted (·.x < ·.x) := by
-  simp [List.Sorted, List.pairwise_iff_get, List.get_map, List.get_reverse'', flipX]
-  intro H _ _ _
-  apply H
-  simp [*]
+  simp [List.Sorted, List.pairwise_map, flipX, List.pairwise_reverse]
 
 lemma orientWithInfty_flipX (P Q : Point) :
     orientWithInfty (flipX P) (flipX Q) = -orientWithInfty P Q := by
