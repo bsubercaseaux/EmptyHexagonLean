@@ -1,5 +1,6 @@
 import Std.Data.List.Lemmas
 import Geo.Orientations
+import Geo.Definitions.SigmaEquiv
 
 namespace Geo
 open scoped List
@@ -35,8 +36,12 @@ def trans (f : S ≼σ T) (g : T ≼σ U) : S ≼σ U := by
   refine ⟨g.f ∘ f.f, by simpa using (f.perm.map _).trans g.perm, xor f.parity g.parity, fun p q r hp hq hr => ?_⟩
   simp [f.σ_eq _ _ _ hp hq hr, g.σ_eq _ _ _ (f.mem hp) (f.mem hq) (f.mem hr), Bool.xor_comm]
 
-open Classical in
-def bijOn (f : S ≼σ T) (h : T.Nodup) : Set.BijOn f.f S.toFinset T.toFinset := by
+theorem nodup_of (e : S ≼σ T) : T.Nodup → S.Nodup :=
+  fun h => List.Nodup.of_map _ (e.perm.nodup_iff.mpr h)
+
+open Classical
+
+theorem bijOn (f : S ≼σ T) (h : T.Nodup) : Set.BijOn f.f S.toFinset T.toFinset := by
   refine ⟨?_, ?_, ?_⟩
   . intro a ha
     simp only [List.coe_toFinset, Set.mem_setOf_eq] at ha ⊢
@@ -50,18 +55,27 @@ def bijOn (f : S ≼σ T) (h : T.Nodup) : Set.BijOn f.f S.toFinset T.toFinset :=
     simp only [List.coe_toFinset, Set.mem_setOf_eq] at hb ⊢
     exact f.mem_iff.1 hb
 
+noncomputable def toEquiv (f : S ≼σ T) (h : T.Nodup) : S.toFinset ≃σ T.toFinset where
+  f := f.f
+  bij' := f.bijOn h
+  parity := f.parity
+  σ_eq' := by
+    intro _ ha _ hb _ hc
+    simp only [List.coe_toFinset, Set.mem_setOf_eq] at ha hb hc
+    simp [f.σ_eq _ _ _ ha hb hc]
+
 end σEmbed
 
-def OrientationProperty (P : List Point → Prop) :=
+def OrientationProperty' (P : List Point → Prop) :=
   ∀ {{S T}}, S ≼σ T → (P S ↔ P T)
 
-theorem OrientationProperty.not : OrientationProperty P → OrientationProperty (¬P ·) :=
+theorem OrientationProperty'.not : OrientationProperty' P → OrientationProperty' (¬P ·) :=
   fun h _ _ hσ => not_congr (h hσ)
 
-theorem OrientationProperty.gp : OrientationProperty Point.PointListInGeneralPosition := fun S T f => by
+theorem OrientationProperty'.gp : OrientationProperty' Point.PointListInGeneralPosition := fun S T f => by
   rw [← Point.PointListInGeneralPosition.perm f.perm]
   simp only [Point.PointListInGeneralPosition, ← List.mem_sublists, List.sublists_map]
-  simp [Point.InGeneralPosition₃.iff_ne_collinear]
+  simp [Point.InGeneralPosition₃.iff_ne_collinear, -IsEmpty.forall_iff]
   constructor
   · intro | H, _, _, _, [p',q',r'], sl, rfl => ?_
     have := sl.subset; simp at this

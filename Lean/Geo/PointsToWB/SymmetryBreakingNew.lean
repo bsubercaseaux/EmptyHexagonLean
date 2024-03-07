@@ -83,7 +83,7 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     case hσ => exact (orientations_preserved (l2_lt _ hp) (l2_lt _ hq) (l2_lt _ hr)).symm
     · intro _ _ hp hq; exact (orientWithInfty_preserved (l2_lt _ hp) (l2_lt _ hq)).symm
     · refine List.pairwise_map.2 <| List.pairwise_iff_forall_sublist.2 fun h => Ne.symm ?_
-      have := (OrientationProperty.gp σ2).1 gp <| .cons₂ _ h
+      have := (OrientationProperty'.gp σ2).1 gp <| .cons₂ _ h
       have h := h.subset; simp at h horient
       rwa [Point.InGeneralPosition₃.iff_ne_collinear, ← horient _ _ h.1 h.2,
         orientWithInfty, Ne, Orientation.ofReal_eq_collinear, sub_eq_zero] at this
@@ -142,7 +142,7 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     leftmost := z
     rest := l5
     sorted' := List.sorted_cons.2 ⟨hleft, l5_lt⟩
-    gp' := (OrientationProperty.gp σ5).mp gp
+    gp' := (OrientationProperty'.gp σ5).mp gp
     lex := l5_adj
     oriented := l5_lt.imp_of_mem fun ha hb h => by
       rwa [← horiented _ ha _ hb, orientWithInfty, Orientation.ofReal_eq_ccw, sub_pos]
@@ -156,10 +156,11 @@ theorem HasEmptyNGon_extension :
   rw [← σHasEmptyNGon_iff_HasEmptyNGon gp]
 
   have ⟨l₁, σ₁, distinct⟩ := σEmbed_rotate l (gp.nodup <| threen.trans llength)
-  replace gp := (OrientationProperty.gp σ₁).mp gp
+  replace gp := (OrientationProperty'.gp σ₁).mp gp
   replace llength := σ₁.length_eq ▸ llength
+  replace σ₁ := σ₁.toEquiv (gp.nodup <| threen.trans llength)
   suffices σHasEmptyNGon k l₁.toFinset from
-    (OrientationProperty_σHasEmptyNGon σ₁).mpr this
+    OrientationProperty_σHasEmptyNGon σ₁.symm this
 
   let l₂ := l₁.insertionSort (·.x ≤ ·.x)
   have l₂l₁ : l₂ ~ l₁ := l₁.perm_insertionSort _
