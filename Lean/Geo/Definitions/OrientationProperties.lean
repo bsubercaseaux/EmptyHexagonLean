@@ -79,16 +79,17 @@ lemma σPtInTriangle_congr (e : S ≼σ T) :
 lemma σIsEmptyTriangleFor_congr (e : S ≼σ T) :
     ∀ (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),
       σIsEmptyTriangleFor (e.f p) (e.f q) (e.f r) T.toFinset ↔ σIsEmptyTriangleFor p q r S.toFinset  := by
-  unfold σIsEmptyTriangleFor
+  simp [σIsEmptyTriangleFor]
   intro hp hq hr
   refine ⟨fun h => ?_, fun h => ?_⟩
-  sorry; sorry
-  -- . intro s hs
-  --   have := h (e s) (e.bij.left hs)
-  --   rwa [σPtInTriangle_congr e hs hp hq hr] at this
-  -- . intro s hs
-  --   have := h (e.symm s) (e.symm.bij.left hs)
-  --   rwa [← σPtInTriangle_congr e (e.symm.bij.left hs) hp hq hr, e.apply_symm_apply hs] at this
+  . intro s hs
+    simp at h hs
+    have := h (e.f s) (e.mem hs)
+    rwa [σPtInTriangle_congr e hs hp hq hr] at this
+  . intro t ht
+    have ⟨s, hs, est⟩ := e.mem_iff.mp ht
+    rw [← est, σPtInTriangle_congr e hs hp hq hr]
+    apply h s hs
 
 lemma OrientationProperty_σHasEmptyNGon : OrientationProperty (σHasEmptyNGon n ·.toFinset) := by
   unfold σHasEmptyNGon
