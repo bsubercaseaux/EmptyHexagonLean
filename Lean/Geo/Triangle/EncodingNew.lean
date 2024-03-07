@@ -19,8 +19,5 @@ def noHoleClauses (n : Nat) : PropForm (Var n) :=
 def triangleEncoding (n : Nat) : PropForm (Var n) :=
   .and (baseEncoding n) (noHoleClauses n)
 
-open Model PropFun
-axiom triangleCnfUnsat : ¬∃ τ : IVar → Prop, (Geo.triangleEncoding 10 |>.toICnf compare).2.eval τ
-
 -- set_option profiler true in
 -- #eval let cnf := (Geo.triangleEncoding 10 |>.toICnf compare).2; (cnf.size, cnf.maxVar)

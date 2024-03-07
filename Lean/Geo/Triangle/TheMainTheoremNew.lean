@@ -3,8 +3,9 @@ import Geo.Triangle.WBAssnNew
 import Geo.Triangle.EncodingNew
 
 namespace Geo
-open List
-open Classical
+open Classical LeanSAT Model
+
+axiom triangleCnfUnsat : ¬∃ τ : IVar → Prop, (Geo.triangleEncoding 10 |>.toICnf compare).2.eval τ
 
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
     HasEmptyNGon 3 pts.toFinset := by

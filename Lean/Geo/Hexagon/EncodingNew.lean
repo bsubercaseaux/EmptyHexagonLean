@@ -100,8 +100,5 @@ def no6HoleClauses3 (n : Nat) : PropForm (Var n) :=
 def hexagonEncoding (n : Nat) : PropForm (Var n) :=
   .all #[baseEncoding n, no6HoleClauses1 n, no6HoleClauses2 n, no6HoleClauses3 n]
 
-open Model PropFun
-axiom hexagonCnfUnsat : ¬∃ τ : IVar → Prop, (Geo.hexagonEncoding 30 |>.toICnf compare).2.eval τ
-
 -- set_option profiler true in
 -- #eval let cnf := (Geo.triangleEncoding 10 |>.toICnf compare).2; (cnf.size, cnf.maxVar)
