@@ -19,6 +19,7 @@ noncomputable def toPropAssn (w : WBPoints) : PropAssignment (Var w.length)
   | .sigma a b c ..    => σ w[a] w[b] w[c] = .CCW
   | .inside x a b c .. => decide $ σPtInTriangle w[x] w[a] w[b] w[c]
   | .hole a b c ..     => decide $ σIsEmptyTriangleFor w[a] w[b] w[c] w.toFinset
+  | _ => False
 
 theorem satisfies_orientationConstraint (w : WBPoints) (i j k l : Fin w.length) :
     i < j → j < k → k < l → w.toPropAssn ⊨ orientationConstraint i j k l := by
@@ -163,17 +164,17 @@ theorem satisfies_hasPointInside (w : WBPoints) (a b c : Fin w.length) :
     have := tri.perm₂
     contradiction
   have : InGeneralPosition₄ w[i] w[a] w[b] w[c] := tri.gp₄_of_gp₃ (w.gp sub)
-  have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle (w.sorted.to₃ sub) ((σPtInTriangle_iff this).mp tri)
+  have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle' (w.sorted.to₃ sub) ((σPtInTriangle_iff this).mp tri)
   have : w[a].x < w[i].x := by
     apply lt_of_le_of_ne wawi
     intro h
-    exact ia <| w.of_eqx h.symm
-  have ai : a < i := w.of_sorted_get this
+    exact ia <| w.eq_iff.1 h.symm
+  have ai : a < i := w.lt_iff.1 this
   have : w[i].x < w[c].x := by
     apply lt_of_le_of_ne wiwc
     intro h
-    exact ic <| w.of_eqx h
-  have ic : i < c := w.of_sorted_get this
+    exact ic <| w.eq_iff.1 h
+  have ic : i < c := w.lt_iff.1 this
   simp_all
 
 theorem satisfies_holeDefs (w : WBPoints) : w.toPropAssn |> holeDefs w.length := by
@@ -227,8 +228,8 @@ theorem satisfies_noHoles (w : WBPoints) :
   simp only [getElem_fin, Bool.not_eq_true', decide_eq_false_iff_not]
   simp only [σHasEmptyTriangle, not_exists, not_and] at noholes
   apply noholes _ (w.get_mem_toFinset a) _ (w.get_mem_toFinset b) _ (w.get_mem_toFinset c)
-    (fun h' => ne_of_lt hab <| (w.of_eqx <| congrArg (·.x) h'))
-    (fun h' => ne_of_lt (hab.trans hbc) <| (w.of_eqx <| congrArg (·.x) h'))
-    (fun h' => ne_of_lt hbc <| (w.of_eqx <| congrArg (·.x) h'))
+    (fun h' => ne_of_lt hab <| (w.eq_iff.1 <| congrArg (·.x) h'))
+    (fun h' => ne_of_lt (hab.trans hbc) <| (w.eq_iff.1 <| congrArg (·.x) h'))
+    (fun h' => ne_of_lt hbc <| (w.eq_iff.1 <| congrArg (·.x) h'))
 
 end WBPoints
