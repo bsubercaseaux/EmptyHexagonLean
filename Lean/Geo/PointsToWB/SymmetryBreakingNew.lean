@@ -151,8 +151,8 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
   -- step 5: left-right flip
   have ⟨l5, σ5, l5_orient, l5_lt, l5_adj⟩ : ∃ l5, ∃ f : l2 ≼σ l5,
       (∀ x y, x ∈ l2 → y ∈ l2 → orientWithInfty (f.f x) (f.f y) = σ 0 x y) ∧
-      l5.Pairwise (·.x < ·.x) ∧ ListLexSelf (adjacentOrientations l5) := by
-    if l4_adj : ListLexSelf (adjacentOrientations l4) then
+      l5.Pairwise (·.x < ·.x) ∧ σRevLex l5 := by
+    if l4_adj : σRevLex l4 then
       exact ⟨l4, σ4, l4_orient, l4_lt, l4_adj⟩
     else
       sorry

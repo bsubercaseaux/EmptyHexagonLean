@@ -6,6 +6,12 @@ import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 -- There is also `List.getElem_eq_get : l[i] = l.get i` that never gets applied because `l[i]` is not simp-nf..
 -- Mario: can have a `simp` lemma for this in std4.
 
+theorem List.get_reverse'' (l : List α) (i : Fin l.reverse.length) :
+    get (reverse l) i = get l (Fin.rev ⟨i, by simpa using i.2⟩) := by
+  let j : Fin l.length := Fin.rev ⟨i, by simpa using i.2⟩
+  have : j.1 = l.length - 1 - i := by simp [j]; omega
+  convert List.get_reverse' _ _ (this ▸ j.2)
+
 open List in
 theorem List.mem_sublist {l l' : List α} : l <+ l' → a ∈ l → a ∈ l' :=
   fun h h' => h.subset h'
