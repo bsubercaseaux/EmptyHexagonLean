@@ -3,7 +3,7 @@ import Geo.Definitions.PtInTriangle
 import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
 import Geo.Orientations
-import Geo.Triangle.EncodingNew
+import Geo.NGon.EncodingNew
 
 namespace Geo.WBPoints
 open List
@@ -31,10 +31,9 @@ def isCapF (w : WBPoints) (a d e : Fin w.length) :=
 
 attribute [-simp] getElem_fin
 
-theorem satisfies_signotopeClause (w : WBPoints) (i j k l : Fin w.length) :
-    i < j → j < k → k < l → (signotopeClause i j k l).eval w.toPropAssn := by
-  simp [signotopeClause]
-  intro hij hjk hkl
+theorem satisfies_signotopeClauses (w : WBPoints) : (signotopeClauses w.length).eval w.toPropAssn := by
+  simp [signotopeClauses]
+  intro i j hij k hjk l hkl
   have : [w[i], w[j], w[k], w[l]] <+ w.points := by
     have : [w[i], w[j], w[k], w[l]] = [i,j,k,l].map w.points.get := by
       simp [GetElem.getElem, List.getElem_eq_get]
@@ -54,9 +53,6 @@ theorem satisfies_signotopeClause (w : WBPoints) (i j k l : Fin w.length) :
     exact σ_prop₄ s gp
   . simp_rw [gp.gp₁.σ_iff, gp.gp₄.σ_iff, gp.gp₃.σ_iff]
     exact σ_prop₃ s gp
-
-theorem satisfies_signotopeClauses (w : WBPoints) : (signotopeClauses w.length).eval w.toPropAssn := by
-  simp (config := {contextual := true}) [signotopeClauses, satisfies_signotopeClause]
 
 theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPosition₄ a x b c →
     (σPtInTriangle x a b c ↔
@@ -97,7 +93,7 @@ theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPos
     contradiction
 
 theorem satisfies_insideClauses (w : WBPoints) : (insideClauses w.length).eval w.toPropAssn := by
-  simp [insideClauses, xIsInsideClause]
+  simp [insideClauses]
   intro a b hab c hbc x
   constructor
   · intro hax hxb
@@ -109,7 +105,7 @@ theorem satisfies_insideClauses (w : WBPoints) : (insideClauses w.length).eval w
       have : a < c := hab.trans hbc
       have : x < c := hxb.trans hbc
       simp [*]
-    exact insideDefs_aux₁ (w.sorted.to₄ this) (PointListInGeneralPosition.to₄ w.gp this)
+    exact (insideDefs_aux₁ (w.sorted.to₄ this) (PointListInGeneralPosition.to₄ w.gp this)).1
   · intro hbx hxc
     have : [w[a], w[b], w[x], w[c]] <+ w.points := by
       have : [w[a], w[b], w[x], w[c]] = [a,b,x,c].map w.points.get := by
@@ -119,12 +115,11 @@ theorem satisfies_insideClauses (w : WBPoints) : (insideClauses w.length).eval w
       have : a < x := hab.trans hbx
       have : a < c := hab.trans hbc
       simp [*]
-    exact insideDefs_aux₂ (w.sorted.to₄ this) (PointListInGeneralPosition.to₄ w.gp this)
+    exact (insideDefs_aux₂ (w.sorted.to₄ this) (PointListInGeneralPosition.to₄ w.gp this)).1
 
 theorem satisfies_holeDefClauses (w : WBPoints) : (holeDefClauses w.length).eval w.toPropAssn := by
   simp [holeDefClauses, σIsEmptyTriangleFor, mem_toFinset_iff]
-  intro a b ab c bc
-  refine ⟨fun H _ _ _ _ => H _, fun H i tri => ?_⟩
+  intro a b ab c bc H i tri
   have sub : [w[a],w[b],w[c]] <+ w.points := by
     have : [w[a],w[b],w[c]] = [a,b,c].map w.points.get := by
       simp [GetElem.getElem, List.getElem_eq_get]
@@ -133,7 +128,7 @@ theorem satisfies_holeDefClauses (w : WBPoints) : (holeDefClauses w.length).eval
     aesop (add unsafe lt_trans)
   have gp₄ : InGeneralPosition₄ w[i] w[a] w[b] w[c] := tri.gp₄_of_gp₃ (w.gp sub)
   have ib : i ≠ b := mt (congrArg (w[·])) gp₄.gp₃.ne₁
-  have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle (w.sorted.to₃ sub) ((σPtInTriangle_iff gp₄).mp tri)
+  have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle' (w.sorted.to₃ sub) ((σPtInTriangle_iff gp₄).mp tri)
   have ai : a < i := w.of_sorted_get <| by
     apply lt_of_le_of_ne wawi
     intro h
@@ -151,11 +146,36 @@ theorem satisfies_leftmostCCWDefs (w : WBPoints) : (leftmostCCWClauses w.length)
   exact List.pairwise_iff_get.1 w.oriented
     ⟨_, Nat.lt_of_succ_lt_succ hi⟩ ⟨_, Nat.lt_of_succ_lt_succ hj⟩ (Nat.lt_of_succ_lt_succ hij)
 
-theorem satisfies_noHoles (w : WBPoints) :
+theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
+    (hF : ∀ a a', a'.1 = a.1 + 1 → ((F' a').eval τ ↔ F a))
+    (ha : a'.1 = a.1 + 1) (hb : b'.1 = b.1 + 1) (hacc : acc → acc'.eval τ) :
+    RevLexMid F a b acc → (revLexClausesCore (α := α) F' a' b' acc').eval τ := by
+  unfold RevLexMid revLexClausesCore
+  have : a' < b' ↔ a < b := by simp [Fin.lt_def, -Fin.val_fin_lt, ha, hb]
+  simp [this]; split
+  · apply satisfies_revLexClausesCore hF <;> simp [ha, hb]
+    · rw [Fin.lt_def] at *; omega
+    · simp [hF _ _ ha, hF _ _ hb]
+      exact .imp_right <| .imp_right hacc
+  · exact hacc
+
+theorem satisfies_revLexClauses (w : WBPoints) : (revLexClauses w.length).eval w.toPropAssn := by
+  simp [revLexClauses, length, points]
+  intro h5w
+  have := w.lex (by omega)
+  simp [σRevLex, RevLexMid3] at this
+  refine satisfies_revLexClausesCore ?_ (by simp) (by simp; omega) (by simp) this
+  rintro ⟨a, ha⟩ ⟨_, ha'⟩ ⟨⟩; simp [getElem, points]
+
+theorem satisfies_baseEncoding (w : WBPoints) : (baseEncoding w.length).eval w.toPropAssn := by
+  simp [baseEncoding, satisfies_signotopeClauses, satisfies_insideClauses, satisfies_holeDefClauses,
+    satisfies_leftmostCCWDefs, satisfies_revLexClauses]
+
+theorem satisfies_triangleEncoding (w : WBPoints) :
     ¬σHasEmptyTriangle w.toFinset →
-    (theEncoding w.length).eval w.toPropAssn := by
-  simp [theEncoding, satisfies_signotopeClauses, satisfies_insideClauses, satisfies_holeDefClauses,
-    satisfies_leftmostCCWDefs, noHoleClauses, σIsEmptyTriangleFor, mem_toFinset_iff, σHasEmptyTriangle]
+    (triangleEncoding w.length).eval w.toPropAssn := by
+  simp [triangleEncoding, satisfies_baseEncoding, noHoleClauses,
+    σIsEmptyTriangleFor, mem_toFinset_iff, σHasEmptyTriangle]
   intro noholes a b hab c hbc
   exact noholes a b (ne_of_lt hab <| w.of_eqx <| · ▸ rfl)
                   c (ne_of_lt (hab.trans hbc) <| w.of_eqx <| · ▸ rfl)
