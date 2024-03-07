@@ -53,9 +53,9 @@ theorem sorted_get (w : WBPoints) {i j : Fin w.length} :
   intro ij
   apply List.pairwise_iff_get.mp w.sorted _ _ ij
 
-theorem of_sorted_get (w : WBPoints) {i j : Fin w.length} :
-    w[i].x < w[j].x → i < j := by
-  intro wiwj
+theorem lt_iff (w : WBPoints) {i j : Fin w.length} :
+    w[i].x < w[j].x ↔ i < j := by
+  refine ⟨fun wiwj => ?_, w.sorted_get⟩
   by_contra h
   rcases lt_or_eq_of_le (not_lt.mp h) with h | h
   . have := w.sorted_get h
@@ -63,11 +63,27 @@ theorem of_sorted_get (w : WBPoints) {i j : Fin w.length} :
   . rw [h] at wiwj
     linarith
 
-theorem of_eqx (w : WBPoints) {i j : Fin w.length} :
-    w[i].x = w[j].x → i = j := by
-  intro h
-  by_contra h
-  rcases Ne.lt_or_lt h with h | h <;> {
-    have := w.sorted_get h
-    linarith
-  }
+theorem le_iff (w : WBPoints) {i j : Fin w.length} :
+    w[i].x ≤ w[j].x ↔ i ≤ j := by simpa using not_congr w.lt_iff
+
+theorem eq_iff (w : WBPoints) {i j : Fin w.length} :
+    w[i].x = w[j].x ↔ i = j := by simp [le_antisymm_iff, -getElem_fin, w.le_iff]
+
+theorem gp₃ (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
+    InGeneralPosition₃ w[i] w[j] w[k] :=
+  w.gp <| by
+    have : [w[i], w[j], w[k]] = [i,j,k].map w.points.get := by
+      simp [GetElem.getElem, List.getElem_eq_get]
+    rw [this]
+    apply map_get_sublist
+    simp [ij, jk, ij.trans jk]
+
+theorem gp₄ (w : WBPoints) {i j k l : Fin w.length} (ij : i < j) (jk : j < k) (kl : k < l) :
+    InGeneralPosition₄ w[i] w[j] w[k] w[l] :=
+  ⟨w.gp₃ ij jk, w.gp₃ ij (jk.trans kl), w.gp₃ (ij.trans jk) kl, w.gp₃ jk kl⟩
+
+theorem sorted₃ (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
+    Sorted₃ w[i] w[j] w[k] := ⟨w.lt_iff.2 ij, w.lt_iff.2 jk⟩
+
+theorem sorted₄ (w : WBPoints) {i j k l : Fin w.length} (ij : i < j) (jk : j < k) (kl : k < l) :
+    Sorted₄ w[i] w[j] w[k] w[l] := ⟨w.sorted₃ ij jk, w.lt_iff.2 kl⟩
