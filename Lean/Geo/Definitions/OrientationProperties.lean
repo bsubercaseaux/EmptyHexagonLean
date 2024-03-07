@@ -1,4 +1,5 @@
 import Geo.Definitions.Structures
+import Geo.Definitions.SigmaEmbed
 
 namespace Geo
 open Classical
@@ -70,61 +71,53 @@ theorem σHasEmptyNGon_iff_HasEmptyNGon (gp : Point.PointListInGeneralPosition p
   rw [σPtInTriangle_iff]; apply gp.subperm₄
   simp [*, List.subperm_of_subset]
 
-lemma σPtInTriangle_congr (e : S ≃σ T) :
+lemma σPtInTriangle_congr (e : S ≼σ T) :
     ∀ (_ : a ∈ S) (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),
-      σPtInTriangle (e a) (e p) (e q) (e r) ↔ σPtInTriangle a p q r := by
+      σPtInTriangle (e.f a) (e.f p) (e.f q) (e.f r) ↔ σPtInTriangle a p q r := by
   simp (config := {contextual := true}) [σPtInTriangle, e.σ_eq]
 
-lemma σIsEmptyTriangleFor_congr (e : S ≃σ T) :
+lemma σIsEmptyTriangleFor_congr (e : S ≼σ T) :
     ∀ (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),
-      σIsEmptyTriangleFor (e p) (e q) (e r) T ↔ σIsEmptyTriangleFor p q r S  := by
+      σIsEmptyTriangleFor (e.f p) (e.f q) (e.f r) T.toFinset ↔ σIsEmptyTriangleFor p q r S.toFinset  := by
   unfold σIsEmptyTriangleFor
   intro hp hq hr
   refine ⟨fun h => ?_, fun h => ?_⟩
-  . intro s hs
-    have := h (e s) (e.bij.left hs)
-    rwa [σPtInTriangle_congr e hs hp hq hr] at this
-  . intro s hs
-    have := h (e.symm s) (e.symm.bij.left hs)
-    rwa [← σPtInTriangle_congr e (e.symm.bij.left hs) hp hq hr, e.apply_symm_apply hs] at this
+  sorry; sorry
+  -- . intro s hs
+  --   have := h (e s) (e.bij.left hs)
+  --   rwa [σPtInTriangle_congr e hs hp hq hr] at this
+  -- . intro s hs
+  --   have := h (e.symm s) (e.symm.bij.left hs)
+  --   rwa [← σPtInTriangle_congr e (e.symm.bij.left hs) hp hq hr, e.apply_symm_apply hs] at this
 
--- Redundant with below
--- lemma OrientationProperty_σHasEmptyTriangle : OrientationProperty (σHasEmptyTriangle) := by
---   unfold σHasEmptyTriangle
---   intro S T e
---   -- Mario trick: turn bounded ∃ into ∀ so that contextual simp can work.
---   rw [← not_imp_not]
---   -- WTF: `IsEmpty.forall_iff` generates typeclass inference problems that time out.
---   simp (config := {contextual := true})
---     [e.mem_iff, e.bij.right.left.eq_iff, σIsEmptyTriangleFor_congr, -IsEmpty.forall_iff]
-
-lemma OrientationProperty_σHasEmptyNGon : OrientationProperty (σHasEmptyNGon n) := by
+lemma OrientationProperty_σHasEmptyNGon : OrientationProperty (σHasEmptyNGon n ·.toFinset) := by
   unfold σHasEmptyNGon
-  intro S T e ⟨s, scard, sS, h⟩
-  refine ⟨s.image e, ?_, ?_, ?_⟩
-  . rwa [s.card_image_of_injOn (e.bij.right.left.mono sS)]
-  . intro x; simp
-    rintro _ hx rfl
-    exact e.bij.left (sS hx)
-  . have injs : Set.InjOn e s := e.bij.right.left.mono sS
-    simp (config := { contextual := true }) only [injs.eq_iff,
-      Finset.mem_image, Finset.mem_coe,
-      and_imp, forall_exists_index, forall_apply_eq_imp_iff₂, ne_eq, not_or,
-      Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff] at h ⊢
-    -- The part below is very explicit, maybe could be automated.
-    intro a ha b hb c hc ab ac bc p hp pa pb pc
-    have : e.symm p ∈ S := e.symm.bij.left hp
-    have : p = e (e.symm p) := e.apply_symm_apply hp |>.symm
-    rw [this, σPtInTriangle_congr e (e.symm.bij.left hp) (sS ha) (sS hb) (sS hc)]
-    apply h a ha b hb c hc ab ac bc (e.symm p) (e.symm.bij.left hp)
-    . intro h
-      rw [← h, e.apply_symm_apply hp] at pa
-      contradiction
-    . intro h
-      rw [← h, e.apply_symm_apply hp] at pb
-      contradiction
-    . intro h
-      rw [← h, e.apply_symm_apply hp] at pc
-      contradiction
+  sorry
+  -- intro S T e ⟨s, scard, sS, h⟩
+  -- refine ⟨s.image e, ?_, ?_, ?_⟩
+  -- . rwa [s.card_image_of_injOn (e.bij.right.left.mono sS)]
+  -- . intro x; simp
+  --   rintro _ hx rfl
+  --   exact e.bij.left (sS hx)
+  -- . have injs : Set.InjOn e s := e.bij.right.left.mono sS
+  --   simp (config := { contextual := true }) only [injs.eq_iff,
+  --     Finset.mem_image, Finset.mem_coe,
+  --     and_imp, forall_exists_index, forall_apply_eq_imp_iff₂, ne_eq, not_or,
+  --     Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff] at h ⊢
+  --   -- The part below is very explicit, maybe could be automated.
+  --   intro a ha b hb c hc ab ac bc p hp pa pb pc
+  --   have : e.symm p ∈ S := e.symm.bij.left hp
+  --   have : p = e (e.symm p) := e.apply_symm_apply hp |>.symm
+  --   rw [this, σPtInTriangle_congr e (e.symm.bij.left hp) (sS ha) (sS hb) (sS hc)]
+  --   apply h a ha b hb c hc ab ac bc (e.symm p) (e.symm.bij.left hp)
+  --   . intro h
+  --     rw [← h, e.apply_symm_apply hp] at pa
+  --     contradiction
+  --   . intro h
+  --     rw [← h, e.apply_symm_apply hp] at pb
+  --     contradiction
+  --   . intro h
+  --     rw [← h, e.apply_symm_apply hp] at pc
+  --     contradiction
 
 end Geo

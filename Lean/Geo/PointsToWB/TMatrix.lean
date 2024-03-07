@@ -3,7 +3,6 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.Orientations
 import Geo.ToMathlib
-import Geo.SigmaEquiv
 
 namespace Geo
 
@@ -95,23 +94,6 @@ theorem pt_transform_preserves_sigma (p q r : Point) (T : TMatrix M) :
     · exact absurd T.det_pos (lt_asymm h)
   · intro h
     exact Or.inl ⟨T.det_pos, h⟩
-
-
--- theorem toEquivσ (S: Set Point) (T: TMatrix M) :
---   S ≃σ ((pt_transform M) '' S) where
---   f := by
---     let eqv := LinearMap.equivOfDetNeZero T.toAffineMap.linear (by
---       have := T.det_pos
---       rw [det_eq_det_toLinearMatrix] at this
---       simp [toAffineMap, Matrix.toEuclideanLin_eq_toLin]
---       exact ne_of_gt this)
---     replace eqv := eqv.injective
---     simp [LinearMap.equivOfDetNeZero, LinearEquiv.ofIsUnitDet] at eqv
---     exact Equiv.Set.image _ S eqv
---   hσ' := by
---     intro p q r
---     simp [pt_transform_preserves_sigma p q r T]
-
 
 def mul {M₁ M₂ : Matrix (Fin 3) (Fin 3) Real} (t1: TMatrix M₁) (t2: TMatrix M₂) : TMatrix (M₁ * M₂) := by
   have det_pos : Matrix.det (M₁ * M₂) > 0 := by

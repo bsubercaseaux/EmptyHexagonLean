@@ -56,12 +56,16 @@ lemma Orientation.false_xor (o : Orientation) : false ^^^ o = o := rfl
 lemma Orientation.true_xor (o : Orientation) : true ^^^ o = -o := rfl
 
 @[simp]
-lemma Orientation.not_xor (o : Orientation) (a : Bool) : -(a ^^^ o) = (!a) ^^^ o := by
+lemma Orientation.not_xor (a : Bool) (o : Orientation) : -(a ^^^ o) = (!a) ^^^ o := by
   cases a <;> cases o <;> simp
 
 @[simp]
-lemma Orientation.xor_neg (o : Orientation) (a : Bool) : a ^^^ (-o) = (!a) ^^^ o := by
+lemma Orientation.xor_neg (a : Bool) (o : Orientation) : a ^^^ (-o) = (!a) ^^^ o := by
   cases a <;> cases o <;> simp
+
+@[simp]
+lemma Orientation.xor_eq_xor (a : Bool) (o o' : Orientation) : (a ^^^ o = a ^^^ o') ↔ o = o' := by
+  cases a <;> simp
 
 @[simp]
 lemma Orientation.xor_collinear (a : Bool) : a ^^^ Collinear = Collinear := by
