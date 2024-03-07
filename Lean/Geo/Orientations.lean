@@ -44,6 +44,38 @@ theorem Orientation.eq_neg_self (o : Orientation) : (o = -o) ↔ (o = .Collinear
 theorem Orientation.neg_self_eq (o : Orientation) : (-o = o) ↔ (o = .Collinear) := by
   cases o <;> simp [neg]
 
+instance : HXor Bool Orientation Orientation :=
+  ⟨fun
+    | true,  o => -o
+    | false, o => o⟩
+
+@[simp]
+lemma Orientation.false_xor (o : Orientation) : false ^^^ o = o := rfl
+
+@[simp]
+lemma Orientation.true_xor (o : Orientation) : true ^^^ o = -o := rfl
+
+@[simp]
+lemma Orientation.not_xor (o : Orientation) (a : Bool) : -(a ^^^ o) = (!a) ^^^ o := by
+  cases a <;> cases o <;> simp
+
+@[simp]
+lemma Orientation.xor_neg (o : Orientation) (a : Bool) : a ^^^ (-o) = (!a) ^^^ o := by
+  cases a <;> cases o <;> simp
+
+@[simp]
+lemma Orientation.xor_collinear (a : Bool) : a ^^^ Collinear = Collinear := by
+  cases a <;> rfl
+
+@[simp]
+lemma Orientation.xor_eq_collinear (a : Bool) (o : Orientation) :
+    (a ^^^ o = Collinear) ↔ o = Collinear := by
+  cases a <;> cases o <;> simp
+
+@[simp]
+lemma Orientation.xor_xor (a b : Bool) (o : Orientation) : a ^^^ (b ^^^ o) = (xor a b) ^^^ o := by
+  cases a <;> cases b <;> simp
+
 def Orientation.ofReal (r : ℝ) : Orientation :=
   if 0 < r then CCW
   else if r < 0 then CW

@@ -88,14 +88,15 @@ lemma σIsEmptyTriangleFor_congr (e : S ≃σ T) :
     have := h (e.symm s) (e.symm.bij.left hs)
     rwa [← σPtInTriangle_congr e (e.symm.bij.left hs) hp hq hr, e.apply_symm_apply hs] at this
 
-lemma OrientationProperty_σHasEmptyTriangle : OrientationProperty (σHasEmptyTriangle) := by
-  unfold σHasEmptyTriangle
-  intro S T e
-  -- Mario trick: turn bounded ∃ into ∀ so that contextual simp can work.
-  rw [← not_imp_not]
-  -- WTF: `IsEmpty.forall_iff` generates typeclass inference problems that time out.
-  simp (config := {contextual := true})
-    [e.mem_iff, e.bij.right.left.eq_iff, σIsEmptyTriangleFor_congr, -IsEmpty.forall_iff]
+-- Redundant with below
+-- lemma OrientationProperty_σHasEmptyTriangle : OrientationProperty (σHasEmptyTriangle) := by
+--   unfold σHasEmptyTriangle
+--   intro S T e
+--   -- Mario trick: turn bounded ∃ into ∀ so that contextual simp can work.
+--   rw [← not_imp_not]
+--   -- WTF: `IsEmpty.forall_iff` generates typeclass inference problems that time out.
+--   simp (config := {contextual := true})
+--     [e.mem_iff, e.bij.right.left.eq_iff, σIsEmptyTriangleFor_congr, -IsEmpty.forall_iff]
 
 lemma OrientationProperty_σHasEmptyNGon : OrientationProperty (σHasEmptyNGon n) := by
   unfold σHasEmptyNGon

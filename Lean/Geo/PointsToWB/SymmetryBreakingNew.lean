@@ -19,7 +19,8 @@ namespace Geo
 structure σEmbed (S T : List Point) :=
   (f : Point → Point)
   (perm : S.map f ~ T)
-  (σ : ∀ p q r, p ∈ S → q ∈ S → r ∈ S → σ (f p) (f q) (f r) = σ p q r)
+  (parity : Bool)
+  (σ : ∀ p q r, p ∈ S → q ∈ S → r ∈ S → σ (f p) (f q) (f r) = parity ^^^ σ p q r)
 
 infix:50 " ≼σ " => σEmbed
 
@@ -38,11 +39,31 @@ def σEmbed.range (σ : S ≼σ T) : List Point := S.map σ.f
 
 theorem σEmbed.length_eq (σ : S ≼σ T) : S.length = T.length := by simp [← σ.perm.length_eq]
 
-def σEmbed.refl (S : List Point) : S ≼σ S := ⟨id, by simp, by simp⟩
+def σEmbed.refl (S : List Point) : S ≼σ S := ⟨id, by simp, false, by simp⟩
 
 def σEmbed.trans (f : S ≼σ T) (g : T ≼σ U) : S ≼σ U := by
-  refine ⟨g.f ∘ f.f, by simpa using (f.perm.map _).trans g.perm, fun p q r hp hq hr => ?_⟩
-  simp [f.σ _ _ _ hp hq hr, g.σ _ _ _ (f.mem hp) (f.mem hq) (f.mem hr)]
+  refine ⟨g.f ∘ f.f, by simpa using (f.perm.map _).trans g.perm, xor f.parity g.parity, fun p q r hp hq hr => ?_⟩
+  simp [f.σ _ _ _ hp hq hr, g.σ _ _ _ (f.mem hp) (f.mem hq) (f.mem hr), Bool.xor_comm]
+
+def σEmbed.reverse (S : List Point) : S ≼σ S.reverse :=
+  ⟨id, by simp [List.reverse_perm S |>.symm], false, by simp⟩
+
+def σEmbed.flipX (S : List Point) : S ≼σ S.map flipX :=
+  ⟨Geo.flipX, by simp, true, by
+    simp [Geo.σ, Geo.flipX, matrix_det_eq_det_pts, Point.det, Orientation.true_xor, ← Orientation.ofReal_neg]
+    intros; congr 1; ring⟩
+
+lemma sorted_reverse_flipX {S : List Point} :
+    S.Sorted (·.x < ·.x) → (S.reverse.map Geo.flipX).Sorted (·.x < ·.x) := by
+  simp [List.Sorted, List.pairwise_iff_get, List.get_map, List.get_reverse'', flipX]
+  intro H _ _ _
+  apply H
+  simp [*]
+
+lemma orientWithInfty_flipX (P Q : Point) :
+    orientWithInfty (flipX P) (flipX Q) = -orientWithInfty P Q := by
+  simp [orientWithInfty, flipX, ← Orientation.ofReal_neg]
+  congr 1; ring
 
 def σEmbed.bijOn (f : S ≼σ T) (h : T.Nodup) : Set.BijOn f.f S.toFinset T.toFinset := by
   refine ⟨?_, ?_, ?_⟩
@@ -58,13 +79,14 @@ def σEmbed.bijOn (f : S ≼σ T) (h : T.Nodup) : Set.BijOn f.f S.toFinset T.toF
     simp only [List.coe_toFinset, Set.mem_setOf_eq] at hb ⊢
     exact f.mem_iff.1 hb
 
-noncomputable def σEmbed.toEquiv (f : S ≼σ T) (h : T.Nodup) : S.toFinset ≃σ T.toFinset where
-  f := f.f
-  bij' := f.bijOn h
-  σ_eq' := by
-    intro _ ha _ hb _ hc
-    simp only [List.coe_toFinset, Set.mem_setOf_eq] at ha hb hc
-    apply (f.σ _ _ _ ha hb hc).symm
+-- TODO: retire ≃σ
+-- noncomputable def σEmbed.toEquiv (f : S ≼σ T) (h : T.Nodup) : S.toFinset ≃σ T.toFinset where
+--   f := f.f
+--   bij' := f.bijOn h
+--   σ_eq' := by
+--     intro _ ha _ hb _ hc
+--     simp only [List.coe_toFinset, Set.mem_setOf_eq] at ha hb hc
+--     apply (f.σ _ _ _ ha hb hc).symm
 
 def OrientationProperty' (P : List Point → Prop) :=
   ∀ {{S T}}, S ≼σ T → (P S ↔ P T)
@@ -79,15 +101,16 @@ theorem σEmbed.gp : OrientationProperty' Point.PointListInGeneralPosition := fu
   constructor
   · intro | H, _, _, _, [p',q',r'], sl, rfl => ?_
     have := sl.subset; simp at this
-    rw [f.σ _ _ _ this.1 this.2.1 this.2.2]; exact H sl
+    rw [f.σ _ _ _ this.1 this.2.1 this.2.2]
+    simp [H sl]
   · intro H p q r sl
     have := sl.subset; simp at this
-    rw [← f.σ _ _ _ this.1 this.2.1 this.2.2]; exact H _ sl rfl
+    rw [← Orientation.xor_eq_collinear f.parity, ← f.σ _ _ _ this.1 this.2.1 this.2.2]; exact H _ sl rfl
 
 theorem σEmbed_rotate (l : List Point) (h : l.Nodup) :
     ∃ l', ∃ _ : l ≼σ l', l'.Pairwise (·.x ≠ ·.x) := by
   have ⟨θ, hDistinct⟩ := distinct_rotate_list _ h
-  refine have σ := ⟨rotationMap θ, .rfl, fun p q r _ _ _ => ?hσ⟩; ⟨_, σ, hDistinct⟩
+  refine have σ := ⟨rotationMap θ, .rfl, false, fun p q r _ _ _ => ?hσ⟩; ⟨_, σ, hDistinct⟩
   case hσ =>
     simpa [pt_transform_rotateByAffine] using
       (TMatrix.rotateByAffine θ).pt_transform_preserves_sigma p q r
@@ -111,7 +134,7 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     let l1' := l1.erase a
     have p1 : l1 ~ a :: l1' := List.perm_cons_erase (List.argmin_mem e)
     let f := (· - a)
-    have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp), σ := ?σ }
+    have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp), parity := false, σ := ?σ }
     case σ =>
       have eq (p) : pt_transform (translation_matrix (-a.x) (-a.y)) p = p - a := by
         ext <;> simp [translation_translates] <;> rfl
@@ -125,37 +148,46 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
 
   -- step 3: projection
   have ⟨l3, σ3, l3_orient, l3_ne⟩ : ∃ l3, ∃ f : l2 ≼σ l3,
-      (∀ x y, x ∈ l2 → y ∈ l2 → orientWithInfty (f.f x) (f.f y) = σ 0 x y) ∧
+      (∀ x y, x ∈ l2 → y ∈ l2 → orientWithInfty (f.f x) (f.f y) = f.parity ^^^ σ 0 x y) ∧
       l3.Pairwise (·.x ≠ ·.x) := by
     refine
-      let σ := ⟨projectiveMap, .rfl, fun _ _ _ hp hq hr => ?hσ⟩
+      let σ := ⟨projectiveMap, .rfl, false, fun _ _ _ hp hq hr => ?hσ⟩
       have horient := ?_; ⟨_, σ, horient, ?_⟩
     case hσ => exact (orientations_preserved (l2_lt _ hp) (l2_lt _ hq) (l2_lt _ hr)).symm
     · intro _ _ hp hq; exact (orientWithInfty_preserved (l2_lt _ hp) (l2_lt _ hq)).symm
     · refine List.pairwise_map.2 <| List.pairwise_iff_forall_sublist.2 fun h => Ne.symm ?_
       have := σ2.gp.1 gp <| .cons₂ _ h
-      have h := h.subset; simp at h
+      have h := h.subset; simp at h horient
       rwa [Point.InGeneralPosition₃.iff_ne_collinear, ← horient _ _ h.1 h.2,
         orientWithInfty, Ne, Orientation.ofReal_eq_collinear, sub_eq_zero] at this
 
   -- step 4: sort
   have ⟨l4, σ4, l4_orient, l4_lt⟩ : ∃ l4, ∃ f : l2 ≼σ l4,
-      (∀ x y, x ∈ l2 → y ∈ l2 → orientWithInfty (f.f x) (f.f y) = σ 0 x y) ∧
+      (∀ x y, x ∈ l2 → y ∈ l2 → orientWithInfty (f.f x) (f.f y) = f.parity ^^^ σ 0 x y) ∧
       l4.Pairwise (·.x < ·.x) := by
     let l4 := l3.mergeSort (·.x ≤ ·.x)
     have p4 : l3 ~ l4 := (l3.perm_mergeSort _).symm
     refine ⟨l4, σ3.permRight p4, l3_orient, (l3_ne.perm p4 Ne.symm).imp₂ ?_ (l3.sorted_mergeSort _)⟩
     exact fun _ _ h1 h2 => lt_of_le_of_ne h2 h1
   clear l3 σ3 l3_orient l3_ne
+  save
 
   -- step 5: left-right flip
   have ⟨l5, σ5, l5_orient, l5_lt, l5_adj⟩ : ∃ l5, ∃ f : l2 ≼σ l5,
-      (∀ x y, x ∈ l2 → y ∈ l2 → orientWithInfty (f.f x) (f.f y) = σ 0 x y) ∧
+      (∀ p q, p ∈ l2 → q ∈ l2 → orientWithInfty (f.f p) (f.f q) = f.parity ^^^ σ 0 p q) ∧
       l5.Pairwise (·.x < ·.x) ∧ σRevLex l5 := by
     if l4_adj : σRevLex l4 then
       exact ⟨l4, σ4, l4_orient, l4_lt, l4_adj⟩
     else
-      sorry
+      have l4_rev_adj : σRevLex (l4.reverse.map flipX) :=
+        (σRevLex_total l4).elim (by intro; contradiction) id
+      refine ⟨
+        l4.reverse.map flipX,
+        σ4.trans (σEmbed.reverse _) |>.trans (σEmbed.flipX _),
+        ?_,
+        sorted_reverse_flipX l4_lt, l4_rev_adj⟩
+      simp (config := {contextual := true})
+        [σEmbed.trans, σEmbed.reverse, σEmbed.flipX, orientWithInfty_flipX, l4_orient]
   clear l4 σ4 l4_orient l4_lt
 
   -- step 6: bring ∞ back into the range
@@ -166,14 +198,15 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     perm := by
       simp; refine List.map_congr ?_ ▸ σ5.perm
       intro _ hx; rw [if_neg (l2_nz _ hx)]
+    parity := σ5.parity
     σ := by
       simp
-      have {p q} (hp : p ∈ l2) (hq : q ∈ l2) : σ z (σEmbed.f σ5 p) (σEmbed.f σ5 q) = σ 0 p q := by
+      have {p q} (hp : p ∈ l2) (hq : q ∈ l2) : σ z (σ5.f p) (σ5.f q) = σ5.parity ^^^ σ 0 p q := by
         rw [← horiented _ (σ5.mem hp) _ (σ5.mem hq), l5_orient _ _ hp hq]
       rintro _ _ _ (rfl | hp) (rfl | hq) (rfl | hr)
         <;> try simp [σ_self₁, σ_self₂, σ_self₃, *]
-      · rw [σ_perm₁, this hp hr, ← σ_perm₁]
-      · rw [σ_perm₂, σ_perm₁, this hp hq, ← σ_perm₁, ← σ_perm₂]
+      · rw [σ_perm₁, this hp hr, σ_perm₁]; simp
+      · rw [σ_perm₂, σ_perm₁, this hp hq, σ_perm₁, σ_perm₂]; simp
       · exact σ5.σ _ _ _ hp hq hr
   }
 
