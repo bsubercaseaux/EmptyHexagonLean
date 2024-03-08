@@ -1,6 +1,7 @@
 import Std.Data.List.Basic
 import Mathlib.Data.Complex.Abs
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
+import Mathlib.Analysis.Convex.Between
 
 -- Q: Why are `List.get [i]` *and* `l[i.1]` both simp normal forms? Should we have `List.get i = l[i.1]`?
 -- There is also `List.getElem_eq_get : l[i] = l.get i` that never gets applied because `l[i]` is not simp-nf..
@@ -166,3 +167,27 @@ theorem of_find?_insert [Hashable α] [BEq α] {m : HashMap α β} {a b} :
     (m.insert a b).find? k = some v → m.find? k = some v ∨ k = a ∧ v = b := mathlibSorry _
 
 end Std.HashMap
+
+theorem mem_affineSpan_pair [Ring k] [AddCommGroup V] [Module k V] [AddTorsor V P]
+    {p₁ p₂ p : P} : p ∈ line[k, p₁, p₂] ↔ ∃ r : k, r • (p₂ -ᵥ p₁) +ᵥ p₁ = p := by
+  conv_lhs => rw [← vsub_vadd p p₁]
+  rw [vadd_left_mem_affineSpan_pair]; simp only [eq_comm, eq_vadd_iff_vsub_eq]
+
+theorem Wbtw.trans_ne_right [LinearOrderedField R] [AddCommGroup V] [Module R V] [AddTorsor V P]
+    {w x y z : P} (h₁ : Wbtw R w x y) (h₂ : Wbtw R x y z) (ne : x ≠ y) : Wbtw R w y z := by
+  replace h₂ := h₂.symm
+  simp [wbtw_iff_right_eq_or_left_mem_image_Ici, ne, ne.symm] at h₁ h₂
+  obtain ⟨r, hr, rfl⟩ := h₁
+  obtain ⟨s, hs, rfl⟩ := h₂
+  rw [AffineMap.lineMap_apply, ← AffineMap.lineMap_apply_one_sub, AffineMap.lineMap_apply]
+  exact wbtw_smul_vadd_smul_vadd_of_nonneg_of_nonpos _ _ (zero_le_one.trans hr) (sub_nonpos.2 hs)
+
+theorem Wbtw.trans_ne_left [LinearOrderedField R] [AddCommGroup V] [Module R V] [AddTorsor V P]
+    {w x y z : P} (h₁ : Wbtw R w x y) (h₂ : Wbtw R x y z) (ne : x ≠ y) : Wbtw R w x z :=
+  (Wbtw.trans_ne_right h₂.symm h₁.symm ne.symm).symm
+
+theorem Wbtw.wbtw_or_wbtw [LinearOrderedField R] [AddCommGroup V] [Module R V] [AddTorsor V P]
+    {w x y z : P} (h₁ : Wbtw R w x z) (h₂ : Wbtw R w y z) : Wbtw R w x y ∨ Wbtw R w y x := by
+  obtain ⟨r, ⟨r0, _⟩, rfl⟩ := h₁
+  obtain ⟨s, ⟨s0, _⟩, rfl⟩ := h₂
+  exact wbtw_or_wbtw_smul_vadd_of_nonneg _ _ r0 s0

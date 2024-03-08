@@ -121,6 +121,15 @@ lemma matrix_det_eq_det_pts (a b c : Point) :
 noncomputable def σ (p q r : Point) : Orientation :=
   .ofReal (matrix_det p q r)
 
+def detAffineMap (p q : Point) : Point →ᵃ[ℝ] ℝ where
+  toFun r := det p q r
+  linear.toFun r := q.x * r.y + r.x * p.y - q.y * r.x - r.y * p.x
+  linear.map_add' a b := by simp [x, y]; ring
+  linear.map_smul' a b := by simp [x, y]; ring
+  map_vadd' a b := by simp [det, x, y]; ring
+
+@[simp] theorem detAffineMap_apply : detAffineMap p q r = det p q r := rfl
+
 theorem σ_perm₁ (p q r : Point) : σ p q r = -σ q p r := by
   have : det p q r = -det q p r := by
     unfold det
