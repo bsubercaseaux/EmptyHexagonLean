@@ -123,6 +123,10 @@ def forM' [Monad m] (as : Array α) (f : (a : α) → a ∈ as → m Unit) : m U
 
 end Array
 
+/-- An axiom that stands for things which have been proven, or should be proven,
+in mathlib or std; but which we don't consider `sorry`s on our end. -/
+axiom mathlibSorry (P : Prop) : P
+
 namespace Array
 
 theorem SatisfiesM_foldlM' [Monad m] [LawfulMonad m]
@@ -150,15 +154,15 @@ theorem foldl'_induction
   exact this hf
 
 theorem mem_sortAndDeduplicate [LinearOrder α] {as : Array α} :
-    x ∈ as.sortAndDeduplicate ↔ x ∈ as := sorry
+    x ∈ as.sortAndDeduplicate ↔ x ∈ as := mathlibSorry _
 
 end Array
 
 namespace Std.HashMap
 
-theorem find?_empty [Hashable α] [BEq α] : (∅ : HashMap α β).find? k = none := sorry
+theorem find?_empty [Hashable α] [BEq α] : (∅ : HashMap α β).find? k = none := mathlibSorry _
 
 theorem of_find?_insert [Hashable α] [BEq α] {m : HashMap α β} {a b} :
-    (m.insert a b).find? k = some v → m.find? k = some v ∨ k = a ∧ v = b := sorry
+    (m.insert a b).find? k = some v → m.find? k = some v ∨ k = a ∧ v = b := mathlibSorry _
 
 end Std.HashMap

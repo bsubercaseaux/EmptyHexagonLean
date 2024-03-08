@@ -1,5 +1,5 @@
 import Geo.PointsToWB.SymmetryBreakingNew
-import Geo.SigmaEquiv
+import Geo.Definitions.SigmaEquiv
 
 import Geo.Hexagon.WBAssn
 import Geo.Hexagon.Encoding

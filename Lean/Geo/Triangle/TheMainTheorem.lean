@@ -1,5 +1,5 @@
 import Geo.PointsToWB.SymmetryBreakingNew
-import Geo.SigmaEquiv
+import Geo.Definitions.SigmaEquiv
 import Geo.Definitions.OrientationProperties
 
 import Geo.Triangle.WBAssn
