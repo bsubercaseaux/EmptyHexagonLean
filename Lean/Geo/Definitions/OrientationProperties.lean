@@ -59,17 +59,30 @@ def σIsEmptyTriangleFor (a b c : Point) (S : Set Point) : Prop :=
 def σHasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧
     ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
-      σIsEmptyTriangleFor a b c (S \ {a,b,c})
+      σIsEmptyTriangleFor a b c S
+
+theorem σIsEmptyTriangleFor_iff_diff (gp : Point.InGeneralPosition₃ a b c) :
+    σIsEmptyTriangleFor a b c S ↔ σIsEmptyTriangleFor a b c (S\{a,b,c}) := by
+  refine ⟨fun H x h => H x h.1, fun H x h hn => H x ⟨h, ?_⟩ hn⟩
+  rintro (rfl|rfl|rfl)
+  · exact not_mem_σPtInTriangle gp.perm₁ hn.perm₁
+  · exact not_mem_σPtInTriangle gp hn
+  · exact not_mem_σPtInTriangle gp.perm₂ hn.perm₂
 
 theorem σHasEmptyNGon_iff_HasEmptyNGon (gp : Point.PointListInGeneralPosition pts) :
     σHasEmptyNGon n pts.toFinset ↔ HasEmptyNGon n pts.toFinset := by
   unfold σHasEmptyNGon HasEmptyNGon
   refine exists_congr fun s => and_congr_right' <| and_congr_right fun spts => ?_
   rw [ConvexEmptyIn.iff_triangles'' spts gp]
-  simp [Set.subset_def] at spts; simp [not_or, σIsEmptyTriangleFor]
-  repeat refine forall_congr' fun _ => ?_
-  rw [σPtInTriangle_iff]; apply gp.subperm₄
-  simp [*, List.subperm_of_subset]
+  simp [Set.subset_def] at spts; simp
+  iterate 9 refine forall_congr' fun _ => ?_
+  rw [σIsEmptyTriangleFor_iff_diff]
+  · simp [not_or, σIsEmptyTriangleFor]
+    repeat refine forall_congr' fun _ => ?_
+    rw [σPtInTriangle_iff]; apply gp.subperm₄
+    simp [*, List.subperm_of_subset]
+  · apply Point.PointListInGeneralPosition.subperm.1 gp
+    simp [*, List.subperm_of_subset]
 
 lemma σPtInTriangle_congr (e : S ≃σ T) :
     ∀ (_ : a ∈ S) (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),
@@ -88,9 +101,7 @@ theorem σHasEmptyNGon_3_iff (gp : Point.PointListInGeneralPosition pts) :
     have := (hs2 a · b · c ·)
     simp [not_or] at h1 hp; simp [h1] at this
     refine this _ ?_ hn
-    simp [hp, not_or]
-    have := hn.gp₄_of_gp₃ (Point.PointListInGeneralPosition.subperm.1 gp sp)
-    exact ⟨this.gp₁.ne₁, this.gp₃.ne₁, this.gp₃.ne₂⟩
+    simp [hp]
   · intro ⟨a, b, c, sp, H⟩
     have nd := sp.nodup (gp.nodup sp.length_le)
     have ⟨s, hs1, hs2⟩ : ∃ s : Finset Point, s = ⟨[a, b, c], nd⟩ ∧ s.card = 3 := ⟨_, rfl, rfl⟩
@@ -131,19 +142,37 @@ lemma OrientationProperty_σHasEmptyNGon : OrientationProperty (σHasEmptyNGon n
       and_imp, forall_exists_index, forall_apply_eq_imp_iff₂, ne_eq, not_or,
       Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff] at h ⊢
     -- The part below is very explicit, maybe could be automated.
-    intro a ha b hb c hc ab ac bc p hp pa pb pc
+    intro a ha b hb c hc ab ac bc p hp
     have : e.symm p ∈ S := e.symm.bij.left hp
     have : p = e (e.symm p) := e.apply_symm_apply hp |>.symm
     rw [this, σPtInTriangle_congr e (e.symm.bij.left hp) (sS ha) (sS hb) (sS hc)]
-    apply h a ha b hb c hc ab ac bc (e.symm p) (e.symm.bij.left hp)
-    . intro h
-      rw [← h, e.apply_symm_apply hp] at pa
-      contradiction
-    . intro h
-      rw [← h, e.apply_symm_apply hp] at pb
-      contradiction
-    . intro h
-      rw [← h, e.apply_symm_apply hp] at pc
-      contradiction
+    exact h a ha b hb c hc ab ac bc (e.symm p) (e.symm.bij.left hp)
+
+theorem σIsEmptyTriangleFor_exists (gp : Point.PointListInGeneralPosition S)
+    (abc : [a, b, c] <+~ S) :
+    ∃ b' ∈ S, σ a b' c = σ a b c ∧ σIsEmptyTriangleFor a b' c S.toFinset := by
+  have gp' := Point.PointListInGeneralPosition.subperm.1 gp
+  have ss := abc.subset; simp at ss
+  let _ : Preorder Point := {
+    le := fun x y => PtInTriangle x a y c
+    le_refl := fun z => subset_convexHull _ _ <| by simp
+    le_trans := fun u v w uv vw => by
+      simp [PtInTriangle] at uv vw ⊢
+      refine convexHull_min ?_ (convex_convexHull ..) uv
+      simp [Set.subset_def, *]; constructor <;> apply subset_convexHull <;> simp
+  }
+  have ⟨b', hb1, hb2⟩ :=
+    Finset.exists_minimal (S.toFinset.filter fun x => σ a x c = σ a b c) ⟨b, by simp [ss]⟩
+  simp at hb1 hb2; refine ⟨_, hb1.1, hb1.2, fun z hz hn => ?_⟩
+  simp at hz
+  have abc' : Point.InGeneralPosition₃ a b' c := by
+    rw [Point.InGeneralPosition₃.iff_ne_collinear, hb1.2,
+      ← Point.InGeneralPosition₃.iff_ne_collinear]; exact gp' abc
+  have gp4 := hn.gp₄_of_gp₃ abc'
+  have := (σPtInTriangle_iff gp4.perm₁.perm₂.perm₁).2 <|
+    hb2 _ hz (by rw [σ_perm₂, hn.2.1, ← σ_perm₂, hb1.2]) <| (σPtInTriangle_iff gp4).1 hn
+  simp [σPtInTriangle] at hn this
+  refine Point.InGeneralPosition₃.iff_ne_collinear.1 abc' <| (Orientation.eq_neg_self _).1 ?_
+  rw [← σ_perm₂, ← hn.1, ← hn.2.1, σ_perm₂, this.1, ← σ_perm₂]
 
 end Geo

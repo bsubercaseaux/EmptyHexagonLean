@@ -222,6 +222,15 @@ theorem Point.PointListInGeneralPosition.subperm₄ : PointListInGeneralPosition
     subperm_tac
   }
 
+theorem Point.InGeneralPosition₄.perm₁ : InGeneralPosition₄ p q r s → InGeneralPosition₄ q p r s
+  | ⟨H1, H2, H3, H4⟩ => ⟨H1.perm₁, H2.perm₁, H4, H3⟩
+
+theorem Point.InGeneralPosition₄.perm₂ : InGeneralPosition₄ p q r s → InGeneralPosition₄ p r q s
+  | ⟨H1, H2, H3, H4⟩ => ⟨H1.perm₂, H3, H2, H4.perm₁⟩
+
+theorem Point.InGeneralPosition₄.perm₃ : InGeneralPosition₄ p q r s → InGeneralPosition₄ p q s r
+  | ⟨H1, H2, H3, H4⟩ => ⟨H2, H1, H3.perm₂, H4.perm₂⟩
+
 theorem Point.PointListInGeneralPosition.mono_subperm : List.Subperm l l' →
     Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l := by
   simp_rw [subperm]
