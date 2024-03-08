@@ -150,7 +150,9 @@ lemma OrientationProperty_σHasEmptyNGon : OrientationProperty (σHasEmptyNGon n
 
 theorem σIsEmptyTriangleFor_exists (gp : Point.PointListInGeneralPosition S)
     (abc : [a, b, c] <+~ S) :
-    ∃ b' ∈ S, σ a b' c = σ a b c ∧ σIsEmptyTriangleFor a b' c S.toFinset := by
+    ∃ b' ∈ S, σ a b' c = σ a b c ∧ (b' = b ∨ σPtInTriangle b' a b c) ∧
+      σIsEmptyTriangleFor a b' c S.toFinset := by
+  have nd := gp.nodup abc.length_le
   have gp' := Point.PointListInGeneralPosition.subperm.1 gp
   have ss := abc.subset; simp at ss
   let _ : Preorder Point := {
@@ -161,17 +163,23 @@ theorem σIsEmptyTriangleFor_exists (gp : Point.PointListInGeneralPosition S)
       refine convexHull_min ?_ (convex_convexHull ..) uv
       simp [Set.subset_def, *]; constructor <;> apply subset_convexHull <;> simp
   }
-  have ⟨b', hb1, hb2⟩ :=
-    Finset.exists_minimal (S.toFinset.filter fun x => σ a x c = σ a b c) ⟨b, by simp [ss]⟩
-  simp at hb1 hb2; refine ⟨_, hb1.1, hb1.2, fun z hz hn => ?_⟩
-  simp at hz
+  have ⟨b', hb1, hb2⟩ := Finset.exists_minimal
+    (S.toFinset.filter fun x => σ a x c = σ a b c ∧ x ≤ b)
+    ⟨b, by simp [ss]; apply subset_convexHull; simp⟩
+  simp at hb1 hb2
   have abc' : Point.InGeneralPosition₃ a b' c := by
-    rw [Point.InGeneralPosition₃.iff_ne_collinear, hb1.2,
+    rw [Point.InGeneralPosition₃.iff_ne_collinear, hb1.2.1,
       ← Point.InGeneralPosition₃.iff_ne_collinear]; exact gp' abc
+  refine ⟨_, hb1.1, hb1.2.1, ?_, fun z hz hn => ?_⟩
+  · refine or_iff_not_imp_left.2 fun h => ?_
+    refine (σPtInTriangle_iff <| gp.subperm₄ ?_).2 hb1.2.2
+    refine subperm_of_subset ?_ (List.cons_subset.2 ⟨hb1.1, abc.subset⟩)
+    exact nodup_cons.2 ⟨by simp [not_or, h, abc'.ne₁.symm, abc'.ne₃], abc.nodup nd⟩
+  simp at hz
   have gp4 := hn.gp₄_of_gp₃ abc'
+  have zb' : z ≤ b' := (σPtInTriangle_iff gp4).1 hn
   have := (σPtInTriangle_iff gp4.perm₁.perm₂.perm₁).2 <|
-    hb2 _ hz (by rw [σ_perm₂, hn.2.1, ← σ_perm₂, hb1.2]) <| (σPtInTriangle_iff gp4).1 hn
-  simp [σPtInTriangle] at hn this
+    hb2 _ hz (by rw [σ_perm₂, hn.2.1, ← σ_perm₂, hb1.2.1]) (zb'.trans hb1.2.2) zb'
   refine Point.InGeneralPosition₃.iff_ne_collinear.1 abc' <| (Orientation.eq_neg_self _).1 ?_
   rw [← σ_perm₂, ← hn.1, ← hn.2.1, σ_perm₂, this.1, ← σ_perm₂]
 
