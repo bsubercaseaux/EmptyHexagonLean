@@ -30,6 +30,8 @@ def OptClause.eval [LitVar L v] (τ : v → Prop) : Option (Clause L) → Prop
 def Cnf.eval [LitVar L v] (τ : v → Prop) (cnf : Cnf L) : Prop :=
   ∀ cl ∈ cnf, cl.eval τ
 
+def Cnf.isUnsat [LitVar L v] (cnf : Cnf L) : Prop := ¬ ∃ τ, cnf.eval τ
+
 theorem of_mem_toList_collectVars [LinearOrder v] (f) {acc : RBSet v compare} {P : v → Prop}
     (H : ∀ x ∈ (collectVars compare f acc).toList, P x) :
     f.onVars P ∧ (∀ x ∈ acc.toList, P x) := by

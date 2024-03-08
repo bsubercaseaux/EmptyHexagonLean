@@ -5,7 +5,7 @@ import Geo.Triangle.EncodingNew
 namespace Geo
 open Classical LeanSAT Model
 
-axiom triangleCnfUnsat : ¬∃ τ : IVar → Prop, (Geo.triangleEncoding 10 |>.toICnf compare).2.eval τ
+axiom triangleCnfUnsat : (Geo.triangleEncoding 10 |>.toICnf compare).2.isUnsat
 
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 10) :
     HasEmptyNGon 3 pts.toFinset := by

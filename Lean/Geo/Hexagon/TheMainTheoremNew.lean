@@ -5,7 +5,7 @@ import Geo.Hexagon.EncodingNew
 namespace Geo
 open Classical LeanSAT Model
 
-axiom hexagonCnfUnsat : ¬∃ τ : IVar → Prop, (Geo.hexagonEncoding 30 |>.toICnf compare).2.eval τ
+axiom hexagonCnfUnsat : (Geo.hexagonEncoding 30 |>.toICnf compare).2.isUnsat
 
 theorem EmptyHexagon30TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts) (h : pts.length = 30) :
     HasEmptyNGon 6 pts.toFinset := by
