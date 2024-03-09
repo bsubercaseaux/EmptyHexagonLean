@@ -106,14 +106,20 @@ instance : Alternative Multiset where
 instance : FinEnum (Var n) := FinEnum.ofEquiv {
     toFun := fun
       | Var.sigma a b c => Sum.inl (a,b,c)
-      | Var.inside x a b c => Sum.inr (Sum.inl (x,a,b,c))
-      | Var.hole a b c => Sum.inr (Sum.inr (a,b,c))
+      | Var.inside x a b c => Sum.inr <| Sum.inl (x,a,b,c)
+      | Var.hole a b c => Sum.inr <| Sum.inr <| Sum.inl (a,b,c)
+      | Var.cap a c d => Sum.inr <| Sum.inr <| Sum.inr <| Sum.inl (a,c,d)
+      | Var.cup a c d => Sum.inr <| Sum.inr <| Sum.inr <| Sum.inr <| Sum.inl (a,c,d)
+      | Var.capF a d e => Sum.inr <| Sum.inr <| Sum.inr <| Sum.inr <| Sum.inr (a,d,e)
     invFun := fun
       | Sum.inl (a,b,c) => Var.sigma a b c
       | Sum.inr (Sum.inl (x,a,b,c)) => Var.inside x a b c
-      | Sum.inr (Sum.inr (a,b,c)) => Var.hole a b c
+      | Sum.inr (Sum.inr (Sum.inl (a,b,c))) => Var.hole a b c
+      | Sum.inr (Sum.inr (Sum.inr (Sum.inl (a,c,d)))) => Var.cap a c d
+      | Sum.inr (Sum.inr (Sum.inr (Sum.inr (Sum.inl (a,d,e))))) => Var.cup a d e
+      | Sum.inr (Sum.inr (Sum.inr (Sum.inr (Sum.inr (a,c,d))))) => Var.capF a c d
     left_inv := by intro x; cases x <;> simp
-    right_inv := by intro x; rcases x with (_|_|_) <;> simp
+    right_inv := by intro x; rcases x with (_|_|_|_|_|_) <;> simp
   }
 
 def Array.finRange (n : Nat) : Array (Fin n) :=
@@ -125,7 +131,7 @@ def Array.finRange (n : Nat) : Array (Fin n) :=
 @[simp] theorem Array.finRange_data (n)
   : (Array.finRange n).data = List.finRange n := rfl
 
-def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) (ν := Var n) Unit (· ⊨ orientationConstraint a b c d) :=
+def signotopeClause (a b c d : Fin n) : VEncCNF (Var n) Unit (· ⊨ orientationConstraint a b c d) :=
   seq[
     -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d}
     andImply (#[ mkPos <| sigma a b c, mkPos <| sigma a c d ]) (mkPos <| sigma a b d)
@@ -139,7 +145,7 @@ def signotopeClause (a b c d : Fin n) : VEncCNF (Literal (Var n)) (ν := Var n) 
     simp [orientationConstraint]
   )
 
-def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (orientationConstraints n) :=
+def signotopeClauses (n : Nat) : VEncCNF (Var n) Unit (orientationConstraints n) :=
   let U := (Array.finRange n)
   ( -- for all `a`, `b`, `c` with `a < b < c`
     for_all U fun a =>
@@ -163,7 +169,7 @@ def signotopeClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (orientationCons
 
 theorem Fin.lt_asymm {a b : Fin n} : a < b → ¬b < a := @Nat.lt_asymm a b
 
-def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsideDef a b c x) :=
+def xIsInsideClause (a b c x : Fin n) : VEncCNF (Var n) Unit (xIsInsideDef a b c x) :=
   seq[
     -- a < x < b
     VEncCNF.guard (a < x ∧ x < b) fun _ =>
@@ -184,7 +190,7 @@ def xIsInsideClause (a b c x : Fin n) : VEncCNF (Literal (Var n)) Unit (xIsInsid
     aesop
   )
 
-def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideDefs n) :=
+def insideClauses (n : Nat) : VEncCNF (Var n) Unit (insideDefs n) :=
   ( let U := (Array.finRange n)
     -- for all `a`, `b`, `c` with `a < b < c`
     for_all U fun a =>
@@ -203,7 +209,7 @@ def insideClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (insideDefs n) :=
     split <;> simp [*]
   )
 
-def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (fun τ =>
+def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Var n) Unit (fun τ =>
       ∀ x, a < x → x < c → x ≠ b → τ (Var.inside x a b c) → !τ (Var.hole a b c)) :=
   ( for_all (Array.finRange n) fun x =>
     VEncCNF.guard (a < x ∧ x < c ∧ x ≠ b) fun _ =>
@@ -219,7 +225,7 @@ def notHoleOfPointInsideClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit
     aesop
   )
 
-def pointInsideOfNotHoleClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit (fun τ =>
+def pointInsideOfNotHoleClauses (a b c : Fin n) : VEncCNF (Var n) Unit (fun τ =>
     !τ (Var.hole a b c) → ∃ x, a < x ∧ x < c ∧ x ≠ b ∧ τ (Var.inside x a b c)) :=
   let insideVars :=
     Array.finRange n |>.filter (fun x => a < x ∧ x < c ∧ x ≠ b) |>.map fun x => LitVar.mkPos $ Var.inside x a b c
@@ -229,7 +235,7 @@ def pointInsideOfNotHoleClauses (a b c : Fin n) : VEncCNF (Literal (Var n)) Unit
     simp
     aesop)
 
-def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeDefs n) :=
+def holeDefClauses (n : Nat) : VEncCNF (Var n) Unit (holeDefs n) :=
   ( let U := (Array.finRange n)
     for_all U fun a =>
     for_all U fun b =>
@@ -254,7 +260,7 @@ def holeDefClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (holeDefs n) :=
     · rw [← not_imp_not]; simp
   )
 
-def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
+def noHoleClauses (n : Nat) : VEncCNF (Var n) Unit (noHoles n) :=
   ( let U := (Array.finRange n)
     for_all U fun a =>
     for_all U fun b =>
@@ -272,7 +278,7 @@ def noHoleClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (noHoles n) :=
     split <;> simp [*]
   )
 
-def leftmostCCWClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (pointsCCW n) :=
+def leftmostCCWClauses (n : Nat) : VEncCNF (Var n) Unit (pointsCCW n) :=
   ( let U := (Array.finRange n)
     for_all U fun a =>
     VEncCNF.guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
@@ -290,7 +296,7 @@ def leftmostCCWClauses (n : Nat) : VEncCNF (Literal (Var n)) Unit (pointsCCW n) 
     · simp only [Fin.lt_def] at *; aesop
   )
 
-def theEncoding (n : Nat) : VEncCNF (Literal (Var n)) Unit (theFormula n) :=
+def theEncoding (n : Nat) : VEncCNF (Var n) Unit (theFormula n) :=
   (seq[
     signotopeClauses n, insideClauses n, holeDefClauses n, noHoleClauses n, leftmostCCWClauses n
   ]).mapProp (by
