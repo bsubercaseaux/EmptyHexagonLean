@@ -483,3 +483,25 @@ theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   rw [slope_iff_orientation' h.sorted₃ hGp.gp₃] at h₂
   rw [slope_iff_orientation' h.sorted₂ hGp.gp₂]
   linarith
+
+theorem σ_prop₁' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+    σ p q r = CCW → σ q r s = CCW → σ p q s = CCW :=
+  fun h₁ h₂ => σ_prop₂ h gp h₁ (σ_prop₁ h gp h₁ h₂)
+
+theorem σ_prop₂' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+    σ p q s = CCW → σ q r s = CCW → σ p r s = CCW := by
+  intro h₁ h₂; by_contra h₃
+  have := σ_prop₄ h gp
+  simp_rw [← gp.gp₁.σ_iff, ← gp.gp₂.σ_iff, ← gp.gp₃.σ_iff] at this
+  refine this (h₃ <| σ_prop₁ h gp · h₂) h₃ h₁
+
+theorem σ_prop₃' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+    σ p q r = CW → σ q r s = CW → σ p q s = CW :=
+  fun h₁ h₂ => σ_prop₄ h gp h₁ (σ_prop₃ h gp h₁ h₂)
+
+theorem σ_prop₄' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+    σ p q s = CW → σ q r s = CW → σ p r s = CW := by
+  intro h₁ h₂; by_contra h₃
+  have := σ_prop₂ h gp
+  simp_rw [← gp.gp₁.σ_iff', ← gp.gp₂.σ_iff', ← gp.gp₃.σ_iff'] at this
+  refine this (h₃ <| σ_prop₃ h gp · h₂) h₃ h₁

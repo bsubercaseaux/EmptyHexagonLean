@@ -71,6 +71,9 @@ theorem le_iff (w : WBPoints) {i j : Fin w.length} :
 theorem eq_iff (w : WBPoints) {i j : Fin w.length} :
     w[i].x = w[j].x ↔ i = j := by simp [le_antisymm_iff, -getElem_fin, w.le_iff]
 
+theorem eq_iff' (w : WBPoints) {i j : Fin w.length} :
+    w[i] = w[j] ↔ i = j := ⟨fun h => w.eq_iff.1 (h ▸ rfl), congrArg _⟩
+
 theorem sublist (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
     [w[i], w[j], w[k]] <+ w.points := by
   have : [w[i], w[j], w[k]] = [i,j,k].map w.points.get := by
@@ -78,6 +81,14 @@ theorem sublist (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) 
   rw [this]
   apply map_get_sublist
   simp [ij, jk, ij.trans jk]
+
+theorem σ_0 (w : WBPoints) {i j : Fin w.length}
+    (i0 : (0 : Fin (w.rest.length+1)) < i) (ij : i < j) :
+    σ w[(0 : Fin (w.rest.length+1))] w[i] w[j] = .CCW := by
+  let ⟨i+1,hi⟩ := i
+  let ⟨j+1,hj⟩ := j
+  exact pairwise_iff_get.1 w.oriented
+    ⟨_, Nat.lt_of_succ_lt_succ hi⟩ ⟨_, Nat.lt_of_succ_lt_succ hj⟩ (Nat.lt_of_succ_lt_succ ij)
 
 theorem gp₃ (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
     InGeneralPosition₃ w[i] w[j] w[k] := w.gp <| w.sublist ij jk

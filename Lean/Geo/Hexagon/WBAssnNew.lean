@@ -36,13 +36,120 @@ theorem satisfies_capFDef (w : WBPoints) {a b c d : Fin (length w)} (bc : b < c)
   simp [capFDef, isCapF]; intro h1 h2
   exact ⟨cd, _, h2, (w.gp₃ bc cd).σ_iff.1 h1, hh⟩
 
+inductive Arc (w : WBPoints) (o : Orientation) : List (Fin (length w)) → Prop where
+  | one : a < b → Arc w o [a, b]
+  | cons : a < b → σ w[a] w[b] w[c] = o → Arc w o (b::c::l) → Arc w o (a::b::c::l)
+
+theorem Arc.sorted (H : Arc w o l) : l.Sorted (·<·) := by
+  apply chain'_iff_pairwise.1
+  induction H with
+  | one ab => simp [*]
+  | cons ab _ _ IH => exact .cons ab IH
+
+theorem Arc.head_lt (H : Arc w o (a::b::l)) : a < b := by
+  have := H.sorted; simp at this; simp [this]
+
+theorem Arc.pairwise {a b c : Fin w.length} (ab : a < b) (abc : σ w[a] w[b] w[c] = o)
+    (H : Arc w o (b::c::l)) : (b::c::l).Pairwise (σ w[a] w[·] w[·] = o) := by
+  generalize eq : b::c::l = l' at H ⊢
+  induction H generalizing b c l with cases eq
+  | one _ => simp [abc]
+  | @cons b c d l bc bcd h IH =>
+    have .cons ce de := h.sorted; have cd := ce _ (.head _)
+    have sorted := w.sorted₄ ab bc cd; have gp := w.gp₄ ab bc cd
+    match o with
+    | .Collinear => cases (w.gp₃ ab bc).σ_ne abc
+    | .CCW =>
+      have IH := IH (ab.trans bc) (σ_prop₁ sorted gp abc bcd) rfl
+      refine .cons ?_ IH; let .cons IH1 IH2 := IH
+      refine forall_mem_cons.2 ⟨abc, fun e he => ?_⟩
+      exact σ_prop₂ (w.sorted₄ ab bc (ce _ he)) (w.gp₄ ab bc (ce _ he)) abc (IH1 _ he)
+    | .CW =>
+      have IH := IH (ab.trans bc) (σ_prop₃ sorted gp abc bcd) rfl
+      refine .cons ?_ IH; let .cons IH1 IH2 := IH
+      refine forall_mem_cons.2 ⟨abc, fun e he => ?_⟩
+      exact σ_prop₄ (w.sorted₄ ab bc (ce _ he)) (w.gp₄ ab bc (ce _ he)) abc (IH1 _ he)
+
+theorem Arc.ccw (H : Arc w .CCW l) : σCCWPoints (l.map (w[·])) := by
+  induction H with
+  | one _ => simp [σCCWPoints]
+  | @cons a b c l ab abc h IH => exact ⟨pairwise_map.2 (h.pairwise ab abc), IH⟩
+
+theorem Arc.cw (H : Arc w .CW l) : σCCWPoints (l.reverse.map (w[·])) := by
+  induction H with
+  | one _ => simp [σCCWPoints]
+  | @cons a b c l ab abc h IH =>
+    rw [reverse_cons, map_append, σCCWPoints_append]
+    refine ⟨IH, ?_⟩; simp [σCCWPoints, pairwise_map, pairwise_append, pairwise_reverse]
+    have := (h.pairwise ab abc).imp fun {b c} h => show σ w[c] w[b] w[a] = .CCW by
+      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, h]; rfl
+    simp at this; simp (config := {contextual := true}) [this]
+
+theorem Arc.join (H1 : Arc w .CCW (a::l₁++[b])) (H2 : Arc w .CW (a::l₂++[b])) :
+    σCCWPoints ((a::l₁++b::l₂.reverse).map (w[·])) := by
+  have C1 := H1.ccw; have C2 := H2.cw
+  have S1 := H1.sorted; have S2 := H2.sorted; simp [Sorted, -cons_append, pairwise_append] at S1 S2
+  rw [show reverse (a :: l₂ ++ [b]) = b :: reverse l₂ ++ [a] by simp] at C2
+  rw [map_append, σCCWPoints_append] at C1 C2 ⊢
+  refine ⟨C1.1, C2.1, ?_⟩; simp [σCCWPoints, pairwise_map, pairwise_reverse] at C1 C2 ⊢
+  have ⟨⟨A1, A2⟩, A3, A4⟩ := C1
+  have ⟨⟨B1, B2⟩, B3, B4⟩ := C2
+  refine ⟨⟨⟨fun d hd => ?_, B4.imp <| Eq.trans ?_⟩,
+    fun c hc => ⟨fun d hd => ?_, ?_⟩⟩, ⟨A3, A4⟩, fun d hd => ⟨fun c hc => ?_, ?_⟩⟩
+  · rw [σ_perm₁, ← σ_perm₂, B3 _ hd]
+  · rw [σ_perm₁, ← σ_perm₂]
+  · obtain cd | rfl | dc := lt_trichotomy c d
+    · have sorted := w.sorted₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
+      have gp := w.gp₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
+      rw [σ_perm₂, gp.gp₄.σ_iff.1 fun h => ?_]; rfl
+      have := σ_prop₂' sorted gp (A3 _ hc) h
+      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
+    · have := A3 _ hc
+      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
+    · have sorted := w.sorted₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
+      have gp := w.gp₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
+      rw [σ_perm₂, ← σ_perm₁, gp.gp₄.σ_iff'.1 fun h => ?_]
+      have := σ_prop₄' sorted gp (by rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd]; rfl) h
+      rw [A3 _ hc] at this; cases this
+  · sorry
+  · obtain cd | rfl | dc := lt_trichotomy c d
+    · have sorted := w.sorted₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
+      have gp := w.gp₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
+      rw [gp.gp₁.σ_iff'.1 fun h => ?_]
+      have := σ_prop₄ sorted gp h (by rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd]; rfl)
+      rw [A3 _ hc] at this; cases this
+    · have := A3 _ hc
+      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
+    · have sorted := w.sorted₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
+      have gp := w.gp₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
+      rw [σ_perm₂, gp.gp₁.σ_iff.1 fun h => ?_]; rfl
+      have := σ_prop₂ sorted gp h (A3 _ hc)
+      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
+  · sorry
+
+theorem of_5hole {w : WBPoints}
+    {a b c d e : Fin (length w)}
+    (ha : (0 : Fin (w.rest.length+1)) < a) (ab : a < b) (bc : b < c) (cd : c < d) (de : d < e)
+    (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset)
+    (abc : σ w[a] w[b] w[c] = .CCW)
+    (bcd : σ w[b] w[c] w[d] = .CCW)
+    (cde : σ w[c] w[d] w[e] = .CCW) : σHasEmptyNGon 6 w.toFinset := by
+  have ae := ab.trans <| bc.trans <| cd.trans de
+  have ⟨i, hi1, hi2, hi3, hi4⟩ := σIsEmptyTriangleFor_exists w.gp ⟨_, .swap .., w.sublist ha ae⟩
+  obtain ⟨i, rfl⟩ := mem_points_iff.1 hi1
+  obtain eq | hi := hi3
+  · cases w.eq_iff'.1 eq
+    have := w.σ_0 ha ab
+    sorry
+  sorry
+
 theorem satisfies_no6Hole3Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
     {a c d e : Fin (length w)}
     (ha : (0 : Fin (w.rest.length+1)) < a) (de : d < e)
     (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset) :
     (no6Hole3Below a c d e).eval w.toPropAssn := by
   simp [no6Hole3Below]; intro ⟨b, ab, bc, cd, abc, bcd⟩ cde
-  sorry
+  exact hw <| of_5hole ha ab bc cd de ace abc bcd cde
 
 theorem satisfies_no6Hole4Above {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
     {a d e f : Fin (length w)}
