@@ -130,19 +130,15 @@ def detAffineMap (p q : Point) : Point →ᵃ[ℝ] ℝ where
 
 @[simp] theorem detAffineMap_apply : detAffineMap p q r = det p q r := rfl
 
+theorem det_perm₁ (p q r) : det p q r = -det q p r := by unfold det; ring
 theorem σ_perm₁ (p q r : Point) : σ p q r = -σ q p r := by
-  have : det p q r = -det q p r := by
-    unfold det
-    linarith
-  simp only [σ, matrix_det_eq_det_pts, this, ofReal]
-  split_ifs <;> { first | rfl | exfalso; linarith }
+  simp only [σ, matrix_det_eq_det_pts, det_perm₁ p q r, ofReal]
+  split_ifs <;> first | rfl | exfalso; linarith
 
+theorem det_perm₂ (p q r) : det p q r = -det p r q := by unfold det; ring
 theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q := by
-  have : det p q r = -det p r q := by
-    unfold det
-    linarith
-  simp only [σ, matrix_det_eq_det_pts, this, ofReal]
-  split_ifs <;> { first | rfl | exfalso; linarith }
+  simp only [σ, matrix_det_eq_det_pts, det_perm₂ p q r, ofReal]
+  split_ifs <;> first | rfl | exfalso; linarith
 
 -- NOTE(WN): This is annoying to have to prove.
 -- Does mathlib have a theory of antisymmetric functions, or tensors or something?
@@ -158,6 +154,15 @@ theorem σ_self₂ (p q : Point) : σ q p q = .Collinear := by
 theorem σ_self₃ (p q : Point) : σ q q p = .Collinear := by
   have : σ q q p = -σ q q p := by conv => lhs; rw [σ_perm₁]
   simpa using this
+
+theorem det_add_det (a b c d) : det a b c + det a c d = det a b d + det b c d := by
+  unfold det; ring
+
+theorem σ_trans (h1 : σ a b c = .CCW) (h2 : σ a c d = .CCW) (h3 : σ a d b = .CCW) :
+    σ b c d = .CCW := by
+  rw [σ, matrix_det_eq_det_pts, Orientation.ofReal_eq_ccw] at *
+  rw [det_perm₂] at h3
+  linarith [det_add_det a b c d]
 
 theorem Point.InGeneralPosition₃.not_mem_seg :
     InGeneralPosition₃ p q r → p ∉ convexHull ℝ {q, r} := mt fun h => by

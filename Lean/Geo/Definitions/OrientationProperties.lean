@@ -183,4 +183,43 @@ theorem σIsEmptyTriangleFor_exists (gp : Point.PointListInGeneralPosition S)
   refine Point.InGeneralPosition₃.iff_ne_collinear.1 abc' <| (Orientation.eq_neg_self _).1 ?_
   rw [← σ_perm₂, ← hn.1, ← hn.2.1, σ_perm₂, this.1, ← σ_perm₂]
 
+def σCCWPoints : List Point → Prop
+  | [] => True
+  | a :: l => l.Pairwise (σ a · · = .CCW) ∧ σCCWPoints l
+
+theorem σCCWPoints_append : σCCWPoints (l₁ ++ l₂) ↔
+    σCCWPoints l₁ ∧ σCCWPoints l₂ ∧
+    (∀ a ∈ l₁, l₂.Pairwise (σ a · · = .CCW)) ∧
+    (∀ c ∈ l₂, l₁.Pairwise (σ · · c = .CCW)) := by
+  induction l₁ generalizing l₂ with | nil => simp [σCCWPoints] | cons a l₁ IH => ?_
+  simp [σCCWPoints, pairwise_append, forall_and, IH]; aesop
+
+theorem σCCWPoints.cycle (H : σCCWPoints (l₁ ++ l₂)) : σCCWPoints (l₂ ++ l₁) := by
+  simp [σCCWPoints_append] at H ⊢
+  let ⟨H1, H2, H3, H4⟩ := H
+  exact ⟨H2, H1,
+    fun c hc => (H4 c hc).imp <| Eq.trans (by rw [σ_perm₁, ← σ_perm₂]),
+    fun a ha => (H3 a ha).imp <| Eq.trans (by rw [σ_perm₂, ← σ_perm₁])⟩
+
+theorem σCCWPoints.join
+    (H1 : σCCWPoints (b :: a :: l₁))
+    (H2 : σCCWPoints (a :: b :: l₂))
+    (hj : ∀ᵉ (c ∈ l₁) (d ∈ l₂), σ a c d = .CCW ∧ σ c b d = .CCW) :
+    σCCWPoints (a :: l₁ ++ b :: l₂) := by
+  simp [σCCWPoints, σCCWPoints_append, pairwise_append] at H1 H2 ⊢; simp [H1, H2]
+  obtain ⟨⟨bac, bcc⟩, acc, -⟩ := H1
+  obtain ⟨⟨abd, add⟩, bdd, -⟩ := H2
+  refine ⟨⟨abd, fun c hc => ⟨?_, fun d hd => ?_⟩⟩,
+    fun c hc => ⟨fun d hd => ?_, ?_⟩, ?_, fun d hd => ?_⟩
+  · rw [σ_perm₂, ← σ_perm₁]; exact bac _ hc
+  · exact (hj _ hc _ hd).1
+  · exact (hj _ hc _ hd).2
+  · refine (Pairwise.and_mem.1 add).imp₂ (fun d e ⟨hd, he, ade⟩ bdd => ?_) bdd
+    have abe := abd _ he
+    have ⟨dac, cbd⟩ := hj _ hc _ hd
+    have ⟨eac, cbe⟩ := hj _ hc _ he
+    sorry
+  · sorry
+  · sorry
+
 end Geo
