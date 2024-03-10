@@ -74,13 +74,13 @@ theorem eq_iff (w : WBPoints) {i j : Fin w.length} :
 theorem eq_iff' (w : WBPoints) {i j : Fin w.length} :
     w[i] = w[j] ↔ i = j := ⟨fun h => w.eq_iff.1 (h ▸ rfl), congrArg _⟩
 
+theorem sublist_of_chain (w : WBPoints) {l : List (Fin w.length)} (hl : Chain' (· < ·) l) :
+    l.map (w[·]) <+ w.points :=
+  have : IsTrans (Fin w.length) (↑· < ↑·) := ⟨fun _ _ _ => Nat.lt_trans⟩
+  map_get_sublist (chain'_iff_pairwise.1 hl)
+
 theorem sublist (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
-    [w[i], w[j], w[k]] <+ w.points := by
-  have : [w[i], w[j], w[k]] = [i,j,k].map w.points.get := by
-    simp [GetElem.getElem, List.getElem_eq_get]
-  rw [this]
-  apply map_get_sublist
-  simp [ij, jk, ij.trans jk]
+    [w[i], w[j], w[k]] <+ w.points := sublist_of_chain w <| .cons ij <| .cons jk <| .nil
 
 theorem σ_0 (w : WBPoints) {i j : Fin w.length}
     (i0 : (0 : Fin (w.rest.length+1)) < i) (ij : i < j) :

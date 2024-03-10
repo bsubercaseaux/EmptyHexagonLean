@@ -364,19 +364,30 @@ theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.PointList
 
 theorem σCCWPoints.emptyHexagon
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.PointListInGeneralPosition S)
-    (hole : EmptyShapeIn [a, c, e].toFinset S.toFinset) (sp : [a, b, c, d, e, f] <+~ S) :
-    ∃ l, l <+~ S ∧ l.length = 6 ∧ σCCWPoints l ∧ ConvexEmptyIn l.toFinset S.toFinset := by
+    (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] <+~ S) :
+    σHasEmptyNGon 6 S.toFinset := by
+  have hole := (σIsEmptyTriangleFor_iff' gp <|
+    .trans (.cons₂ <| .cons <| .cons₂ <| .cons <| .cons₂ nil_subperm) sp).2 hole
   have ⟨b', sp, H, abc⟩ := σCCWPoints.flatten H gp sp
   have ⟨d', sp, H, cde⟩ := σCCWPoints.flatten (H.cycle (l₁ := [a, b']) (l₂ := [c,d,e,f]))
     gp ((@perm_append_comm _ [c,d,e,f] [a, b']).subperm.trans sp)
   have ⟨f', sp, H, efa⟩ := σCCWPoints.flatten (H.cycle (l₁ := [c, d']) (l₂ := [e,f,a,b']))
     gp ((@perm_append_comm _ [e,f,a,b'] [c, d']).subperm.trans sp)
-  refine ⟨_, sp, rfl, H, H.convex, ?_⟩
-  refine σCCWPoints.split_emptyShapeIn e [f'] a [b', c, d'] H efa ?_
-  have H := H.split_r (l₁ := [f'])
-  refine σCCWPoints.split_emptyShapeIn a [b'] c [d', e] H abc ?_
-  have H := H.split_r (l₁ := [b'])
-  refine σCCWPoints.split_emptyShapeIn c [d'] e [a] H cde ?_
-  exact (EmptyShapeIn.perm <| @perm_append_comm _ [a, c] [e]).1 hole
+  refine (σHasEmptyNGon_iff_HasEmptyNGon gp).2
+    ⟨[e, f', a, b', c, d'].toFinset, ?_, by simpa [Set.subset_def] using sp.subset, H.convex, ?_⟩
+  · exact congrArg length (dedup_eq_self.2 (H.gp.nodup (by show 3 ≤ 6; decide)))
+  · refine σCCWPoints.split_emptyShapeIn e [f'] a [b', c, d'] H efa ?_
+    have H := H.split_r (l₁ := [f'])
+    refine σCCWPoints.split_emptyShapeIn a [b'] c [d', e] H abc ?_
+    have H := H.split_r (l₁ := [b'])
+    refine σCCWPoints.split_emptyShapeIn c [d'] e [a] H cde ?_
+    refine (EmptyShapeIn.perm <| @perm_append_comm _ [a, c] [e]).1 hole
+
+theorem σCCWPoints.emptyHexagon'
+    (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.PointListInGeneralPosition S)
+    (hole : σIsEmptyTriangleFor b d f S.toFinset) (sp : [a, b, c, d, e, f] <+~ S) :
+    σHasEmptyNGon 6 S.toFinset :=
+  σCCWPoints.emptyHexagon (H.cycle (l₁ := [a])) gp hole <|
+    (@perm_append_comm _ _ [a]).subperm.trans sp
 
 end Geo

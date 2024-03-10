@@ -165,14 +165,11 @@ theorem of_5hole {w : WBPoints}
     (abc : σ w[a] w[b] w[c] = .CCW)
     (bcd : σ w[b] w[c] w[d] = .CCW)
     (cde : σ w[c] w[d] w[e] = .CCW) : σHasEmptyNGon 6 w.toFinset := by
-  have ae := ab.trans <| bc.trans <| cd.trans de
-  have ⟨i, hi1, hi2, hi3, hi4⟩ := σIsEmptyTriangleFor_exists w.gp ⟨_, .swap .., w.sublist ha ae⟩
-  obtain ⟨i, rfl⟩ := mem_points_iff.1 hi1
-  obtain eq | hi := hi3
-  · cases w.eq_iff'.1 eq
-    have := w.σ_0 ha ab
-    sorry
-  sorry
+  refine σCCWPoints.emptyHexagon' ?_ w.gp ace <|
+    (sublist_of_chain w <| .cons ha <| .cons ab <| .cons bc <| .cons cd <| .cons de .nil).subperm
+  refine Arc.join (l₁ := [a,b,c,d]) (l₂ := [])
+    (.cons ha (w.σ_0 ha ab) <| .cons ab abc <| .cons bc bcd <| .cons cd cde <| .one de)
+    (.one <| ha.trans <| ab.trans <| bc.trans <| cd.trans de)
 
 theorem satisfies_no6Hole3Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
     {a c d e : Fin (length w)}
