@@ -7,6 +7,12 @@ open Classical List
 def σIsEmptyTriangleFor (a b c : Point) (S : Set Point) : Prop :=
   ∀ s ∈ S, ¬σPtInTriangle s a b c
 
+theorem σIsEmptyTriangleFor.perm₁ : σIsEmptyTriangleFor p q r S → σIsEmptyTriangleFor q p r S :=
+  fun H s hs hn => H s hs hn.perm₁
+
+theorem σIsEmptyTriangleFor.perm₂ : σIsEmptyTriangleFor p q r S → σIsEmptyTriangleFor p r q S :=
+  fun H s hs hn => H s hs hn.perm₂
+
 -- def σHasEmptyTriangle (S : Set Point) : Prop :=
 --   ∃ᵉ (a ∈ S) (b ∈ S) (c ∈ S),
 --     a ≠ b ∧ a ≠ c ∧ b ≠ c ∧ σIsEmptyTriangleFor a b c S
@@ -364,8 +370,9 @@ theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.PointList
 
 theorem σCCWPoints.emptyHexagon
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.PointListInGeneralPosition S)
-    (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] <+~ S) :
+    (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
     σHasEmptyNGon 6 S.toFinset := by
+  have sp := subperm_of_subset (H.gp.nodup (by show 3 ≤ 6; decide)) sp
   have hole := (σIsEmptyTriangleFor_iff' gp <|
     .trans (.cons₂ <| .cons <| .cons₂ <| .cons <| .cons₂ nil_subperm) sp).2 hole
   have ⟨b', sp, H, abc⟩ := σCCWPoints.flatten H gp sp
@@ -385,9 +392,9 @@ theorem σCCWPoints.emptyHexagon
 
 theorem σCCWPoints.emptyHexagon'
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.PointListInGeneralPosition S)
-    (hole : σIsEmptyTriangleFor b d f S.toFinset) (sp : [a, b, c, d, e, f] <+~ S) :
+    (hole : σIsEmptyTriangleFor b d f S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
     σHasEmptyNGon 6 S.toFinset :=
   σCCWPoints.emptyHexagon (H.cycle (l₁ := [a])) gp hole <|
-    (@perm_append_comm _ _ [a]).subperm.trans sp
+    (@perm_append_comm _ _ [a]).subset.trans sp
 
 end Geo

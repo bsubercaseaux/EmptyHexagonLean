@@ -82,6 +82,9 @@ theorem sublist_of_chain (w : WBPoints) {l : List (Fin w.length)} (hl : Chain' (
 theorem sublist (w : WBPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
     [w[i], w[j], w[k]] <+ w.points := sublist_of_chain w <| .cons ij <| .cons jk <| .nil
 
+theorem subset_map (w : WBPoints) (l : List (Fin w.length)) :
+    l.map (w[·]) ⊆ w.points := by simp [List.subset_def, mem_points_iff]
+
 theorem σ_0 (w : WBPoints) {i j : Fin w.length}
     (i0 : (0 : Fin (w.rest.length+1)) < i) (ij : i < j) :
     σ w[(0 : Fin (w.rest.length+1))] w[i] w[j] = .CCW := by

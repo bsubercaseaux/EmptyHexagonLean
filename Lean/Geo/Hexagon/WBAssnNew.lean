@@ -158,51 +158,53 @@ theorem Arc.join (H1 : Arc w .CCW (a::l₁++[b])) (H2 : Arc w .CW (a::l₂++[b])
       rw [σ_perm₂, ← σ_perm₁, gp.gp₄.σ_iff'.1 fun h => ?_]
       rw [σ_prop₃ sorted gp (by rw [σ_perm₂, (O hc he).1]; rfl) h] at acd; cases acd
 
-theorem of_5hole {w : WBPoints}
-    {a b c d e : Fin (length w)}
+theorem of_5hole {w : WBPoints} {a b c d e : Fin (length w)}
     (ha : (0 : Fin (w.rest.length+1)) < a) (ab : a < b) (bc : b < c) (cd : c < d) (de : d < e)
     (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset)
     (abc : σ w[a] w[b] w[c] = .CCW)
     (bcd : σ w[b] w[c] w[d] = .CCW)
     (cde : σ w[c] w[d] w[e] = .CCW) : σHasEmptyNGon 6 w.toFinset := by
-  refine σCCWPoints.emptyHexagon' ?_ w.gp ace <|
-    (sublist_of_chain w <| .cons ha <| .cons ab <| .cons bc <| .cons cd <| .cons de .nil).subperm
+  refine σCCWPoints.emptyHexagon' ?_ w.gp ace (subset_map w [(0:Fin (_+1)), a, b, c, d, e])
   refine Arc.join (l₁ := [a,b,c,d]) (l₂ := [])
     (.cons ha (w.σ_0 ha ab) <| .cons ab abc <| .cons bc bcd <| .cons cd cde <| .one de)
     (.one <| ha.trans <| ab.trans <| bc.trans <| cd.trans de)
 
 theorem satisfies_no6Hole3Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
-    {a c d e : Fin (length w)}
-    (ha : (0 : Fin (w.rest.length+1)) < a) (de : d < e)
+    {a c d e : Fin (length w)} (ha : (0 : Fin (w.rest.length+1)) < a) (de : d < e)
     (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset) :
     (no6Hole3Below a c d e).eval w.toPropAssn := by
   simp [no6Hole3Below]; intro ⟨b, ab, bc, cd, abc, bcd⟩ cde
   exact hw <| of_5hole ha ab bc cd de ace abc bcd cde
 
 theorem satisfies_no6Hole4Above {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
-    {a d e f : Fin (length w)}
-    (ha : (0 : Fin (w.rest.length+1)) < a) (ef : e < f) :
+    {a d e f : Fin (length w)} (ef : e < f) :
     (no6Hole4Above a d e f).eval w.toPropAssn := by
   simp [no6Hole4Above]; intro ⟨de, c, ⟨b, ab, bc, cd, abc, bcd⟩, cde, ace⟩
   refine (w.gp₃ de ef).σ_iff'.1 fun def_ => ?_
-  sorry
+  refine hw <| (σCCWPoints.cycle (l₂ := [_, _, _, _, _]) ?_).emptyHexagon'
+    w.gp ace.perm₂.perm₁.perm₂ (subset_map w [f, e, d, c, b, a])
+  exact Arc.join (l₁ := []) (l₂ := [b,c,d,e])
+    (.one <| ab.trans <| bc.trans <| cd.trans <| de.trans ef)
+    (.cons ab abc <| .cons bc bcd <| .cons cd cde <| .cons de def_ <| .one ef)
 
 theorem satisfies_no6Hole2Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
-    {a c e f : Fin (length w)}
-    (ha : (0 : Fin (w.rest.length+1)) < a) (ce : c ≠ e) :
+    {a c e f : Fin (length w)} :
     (no6Hole2Below a c f e).eval w.toPropAssn := by
   simp [no6Hole2Below]; intro ⟨b, ab, bc, cf, abc, bcd⟩ ⟨d, ad, de, ef, ade, def_⟩ hh
-  split_ifs at hh with ce <;> simp at hh
-  · sorry
-  · replace ce := lt_of_le_of_ne (not_lt.1 ce) (Ne.symm ‹_›)
-    sorry
+  have := Arc.join (l₁ := [b,c]) (l₂ := [d,e])
+    (.cons ab abc <| .cons bc bcd <| .one cf)
+    (.cons ad ade <| .cons de def_ <| .one ef)
+  refine hw <| this.emptyHexagon w.gp ?_ (subset_map w [a, b, c, f, e, d])
+  split_ifs at hh with ce <;> simp at hh <;> [exact hh; exact hh.perm₂]
 
 theorem satisfies_no6Hole1Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
-    {a d e f : Fin (length w)}
-    (ha : (0 : Fin (w.rest.length+1)) < a) (df : d < f) (ae : a < e) (ef : e < f) (de : d ≠ e) :
+    {a d e f : Fin (length w)} (ae : a < e) (ef : e < f) :
     (no6Hole1Below a d f e).eval w.toPropAssn := by
   simp [no6Hole1Below]; intro ⟨df, c, ⟨b, ab, bc, cd, abc, bcd⟩, cdf, acf⟩ aef
-  sorry
+  have := Arc.join (l₁ := [e]) (l₂ := [b,c,d])
+    (.cons ae aef <| .one ef)
+    (.cons ab abc <| .cons bc bcd <| .cons cd cdf <| .one df)
+  refine hw <| this.emptyHexagon w.gp acf.perm₂ (subset_map w [a, e, f, d, c, b])
 
 theorem satisfies_hexagonEncoding (w : WBPoints) (hw : ¬σHasEmptyNGon 6 w.toFinset) :
     (hexagonEncoding w.length).eval w.toPropAssn := by
@@ -210,15 +212,15 @@ theorem satisfies_hexagonEncoding (w : WBPoints) (hw : ¬σHasEmptyNGon 6 w.toFi
   refine ⟨
     fun a ha b ab c bc d cd => ⟨?_, ?_, fun _ => ⟨fun hh => ⟨?_, ?_⟩, fun _ => ?_⟩⟩,
     fun a _ b _ c _ => ⟨?_, ?_⟩,
-    fun a ha b _ c bc p ap pc bp => ⟨fun _ _ => ?_, fun _ => ?_⟩⟩
+    fun a _ b _ c _ p ap pc _ => ⟨fun _ _ => ?_, fun _ => ?_⟩⟩
   · with_reducible exact satisfies_capDef w ab bc cd
   · with_reducible exact satisfies_cupDef w ab bc cd
   · with_reducible exact satisfies_capFDef w bc cd hh
   · with_reducible exact satisfies_no6Hole3Below hw ha cd hh
-  · with_reducible exact satisfies_no6Hole4Above hw ha cd
+  · with_reducible exact satisfies_no6Hole4Above hw cd
   · with_reducible exact satisfies_capDef2 w
   · with_reducible exact satisfies_cupDef2 w
-  · with_reducible exact satisfies_no6Hole2Below hw ha bp
-  · with_reducible exact satisfies_no6Hole1Below hw ha bc ap pc bp
+  · with_reducible exact satisfies_no6Hole2Below hw
+  · with_reducible exact satisfies_no6Hole1Below hw ap pc
 
 end WBPoints
