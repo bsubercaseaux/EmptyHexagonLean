@@ -8,7 +8,8 @@ open Classical LeanSAT Model
 axiom triangleCnfUnsat : (Geo.triangleCNF 10).isUnsat
 
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts)
-    (h : pts.length = 10) : HasEmptyNGon 3 pts.toFinset := by
+    (h : pts.length ≥ 10) : HasEmptyNGon 3 pts.toFinset := by
+  refine HasEmptyNGon_extension gp (fun pts gp h => ?_) (by decide) h
   by_contra h'
   have noσtri : ¬σHasEmptyNGon 3 pts.toFinset := mt (σHasEmptyNGon_iff_HasEmptyNGon gp).1 h'
   have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ by decide) gp
