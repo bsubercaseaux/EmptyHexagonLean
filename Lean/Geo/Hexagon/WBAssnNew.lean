@@ -91,41 +91,72 @@ theorem Arc.join (H1 : Arc w .CCW (a::l₁++[b])) (H2 : Arc w .CW (a::l₂++[b])
   have S1 := H1.sorted; have S2 := H2.sorted; simp [Sorted, -cons_append, pairwise_append] at S1 S2
   rw [show reverse (a :: l₂ ++ [b]) = b :: reverse l₂ ++ [a] by simp] at C2
   rw [map_append, σCCWPoints_append] at C1 C2 ⊢
-  refine ⟨C1.1, C2.1, ?_⟩; simp [σCCWPoints, pairwise_map, pairwise_reverse] at C1 C2 ⊢
-  have ⟨⟨A1, A2⟩, A3, A4⟩ := C1
-  have ⟨⟨B1, B2⟩, B3, B4⟩ := C2
-  refine ⟨⟨⟨fun d hd => ?_, B4.imp <| Eq.trans ?_⟩,
-    fun c hc => ⟨fun d hd => ?_, ?_⟩⟩, ⟨A3, A4⟩, fun d hd => ⟨fun c hc => ?_, ?_⟩⟩
-  · rw [σ_perm₁, ← σ_perm₂, B3 _ hd]
-  · rw [σ_perm₁, ← σ_perm₂]
-  · obtain cd | rfl | dc := lt_trichotomy c d
-    · have sorted := w.sorted₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
-      have gp := w.gp₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
+  refine ⟨C1.1, C2.1, ?_⟩
+  simp only [σCCWPoints, pairwise_map, Pairwise.nil, map_cons, mem_cons,
+    mem_map, pairwise_cons, not_mem_nil, IsEmpty.forall_iff, implies_true,
+    mem_singleton, forall_exists_index, and_imp, forall_apply_eq_imp_iff₂, true_and,
+    pairwise_reverse, mem_reverse, forall_eq_or_imp, and_true] at C1 C2 ⊢
+  obtain ⟨⟨A1, -⟩, A3, A4⟩ := C1; obtain ⟨⟨B1, -⟩, B3, B4⟩ := C2
+  have ne {c e} (hc : c ∈ l₁) (he : e ∈ l₂) : c ≠ e := by
+    rintro rfl; have := A3 _ hc; rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ he] at this; cases this
+  have O {c e} (hc : c ∈ l₁) (he : e ∈ l₂) : σ w[a] w[c] w[e] = .CCW ∧ σ w[c] w[b] w[e] = .CCW := by
+    obtain ce | ec := lt_or_gt_of_ne (ne hc he)
+    · have sorted := w.sorted₄ (S1.1.1 _ hc) ce (S2.2.2 _ he)
+      have gp := w.gp₄ (S1.1.1 _ hc) ce (S2.2.2 _ he)
+      constructor
+      · rw [gp.gp₁.σ_iff'.1 fun h => ?_]
+        have := σ_prop₄ sorted gp h (by rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ he]; rfl)
+        rw [A3 _ hc] at this; cases this
+      · rw [σ_perm₂, gp.gp₄.σ_iff.1 fun h => ?_]; rfl
+        have := σ_prop₂' sorted gp (A3 _ hc) h
+        rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ he] at this; cases this
+    · have sorted := w.sorted₄ (S2.1.1 _ he) ec (S1.2.2 _ hc)
+      have gp := w.gp₄ (S2.1.1 _ he) ec (S1.2.2 _ hc)
+      constructor
+      · rw [σ_perm₂, gp.gp₁.σ_iff.1 fun h => ?_]; rfl
+        have := σ_prop₂ sorted gp h (A3 _ hc)
+        rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ he] at this; cases this
+      · rw [σ_perm₂, ← σ_perm₁, gp.gp₄.σ_iff'.1 fun h => ?_]
+        have := σ_prop₄' sorted gp (by rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ he]; rfl) h
+        rw [A3 _ hc] at this; cases this
+  refine ⟨⟨⟨fun e he => ?_, B4.imp <| Eq.trans (by rw [σ_perm₁, ← σ_perm₂])⟩,
+    fun c hc => ⟨fun e he => (O hc he).2, ?_⟩⟩, ⟨A3, A4⟩,
+    fun e he => ⟨fun c hc => (O hc he).1, ?_⟩⟩
+  · rw [σ_perm₁, ← σ_perm₂, B3 _ he]
+  · refine (Pairwise.and_mem.1 <| S2.1.2.and B1).imp₂ (fun e f ⟨he, hf, ef, bfe⟩ aef => ?_) B4
+    rw [σ_perm₁, ← σ_perm₂, σ_perm₁] at aef
+    have ⟨acf, cbf⟩ := O hc hf
+    obtain ce | ec := lt_or_gt_of_ne (ne hc he)
+    · have sorted := w.sorted₄ (S1.1.1 _ hc) ce ef
+      have gp := w.gp₄ (S1.1.1 _ hc) ce ef
       rw [σ_perm₂, gp.gp₄.σ_iff.1 fun h => ?_]; rfl
-      have := σ_prop₂' sorted gp (A3 _ hc) h
-      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
-    · have := A3 _ hc
-      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
-    · have sorted := w.sorted₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
-      have gp := w.gp₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
+      rw [σ_prop₁ sorted gp (O hc he).1 h] at aef; cases aef
+    obtain cf | fc := lt_or_gt_of_ne (ne hc hf)
+    · have sorted := w.sorted₄ (S2.1.1 _ he) ec cf
+      have gp := w.gp₄ (S2.1.1 _ he) ec cf
       rw [σ_perm₂, ← σ_perm₁, gp.gp₄.σ_iff'.1 fun h => ?_]
-      have := σ_prop₄' sorted gp (by rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd]; rfl) h
-      rw [A3 _ hc] at this; cases this
-  · sorry
-  · obtain cd | rfl | dc := lt_trichotomy c d
-    · have sorted := w.sorted₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
-      have gp := w.gp₄ (S1.1.1 _ hc) cd (S2.2.2 _ hd)
+      rw [σ_prop₄' sorted gp (neg_inj.1 <| aef ▸ rfl) h] at acf; cases acf
+    · have sorted := w.sorted₄ ef fc (S1.2.2 _ hc)
+      have gp := w.gp₄ ef fc (S1.2.2 _ hc)
+      rw [σ_perm₂, ← σ_perm₁, σ_perm₂, gp.gp₁.σ_iff.1 fun h => ?_]; rfl
+      rw [σ_perm₂, ← σ_perm₁, σ_perm₂,
+        σ_prop₁' sorted gp h (by rw [σ_perm₁, ← σ_perm₂, cbf])] at bfe; cases bfe
+  · refine (Pairwise.and_mem.1 <| S1.1.2.and A1).imp₂ (fun c d ⟨hc, hd, cd, acd⟩ cdb => ?_) A4
+    have ⟨ade, dbe⟩ := O hd he
+    obtain ce | ec := lt_or_gt_of_ne (ne hc he)
+    obtain de | ed := lt_or_gt_of_ne (ne hd he)
+    · have sorted := w.sorted₄ cd de (S2.2.2 _ he)
+      have gp := w.gp₄ cd de (S2.2.2 _ he)
       rw [gp.gp₁.σ_iff'.1 fun h => ?_]
-      have := σ_prop₄ sorted gp h (by rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd]; rfl)
-      rw [A3 _ hc] at this; cases this
-    · have := A3 _ hc
-      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
-    · have sorted := w.sorted₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
-      have gp := w.gp₄ (S2.1.1 _ hd) dc (S1.2.2 _ hc)
-      rw [σ_perm₂, gp.gp₁.σ_iff.1 fun h => ?_]; rfl
-      have := σ_prop₂ sorted gp h (A3 _ hc)
-      rw [σ_perm₁, ← σ_perm₂, σ_perm₁, B3 _ hd] at this; cases this
-  · sorry
+      rw [σ_prop₃' sorted gp h (by rw [σ_perm₂, dbe]; rfl)] at cdb; cases cdb
+    · have sorted := w.sorted₄ (S1.1.1 _ hc) ce ed
+      have gp := w.gp₄ (S1.1.1 _ hc) ce ed
+      rw [σ_perm₂, gp.gp₄.σ_iff.1 fun h => ?_]; rfl
+      rw [σ_perm₂, σ_prop₂' sorted gp acd h] at ade; cases ade
+    · have sorted := w.sorted₄ (S2.1.1 _ he) ec cd
+      have gp := w.gp₄ (S2.1.1 _ he) ec cd
+      rw [σ_perm₂, ← σ_perm₁, gp.gp₄.σ_iff'.1 fun h => ?_]
+      rw [σ_prop₃ sorted gp (by rw [σ_perm₂, (O hc he).1]; rfl) h] at acd; cases acd
 
 theorem of_5hole {w : WBPoints}
     {a b c d e : Fin (length w)}
