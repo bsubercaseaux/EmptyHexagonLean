@@ -5,11 +5,11 @@ import Geo.Definitions.SigmaEquiv
 namespace Geo
 open scoped List
 
-structure σEmbed (S T : List Point) :=
-  (f : Point → Point)
-  (perm : S.map f ~ T)
-  (parity : Bool)
-  (σ_eq : ∀ p q r, p ∈ S → q ∈ S → r ∈ S → σ (f p) (f q) (f r) = parity ^^^ σ p q r)
+structure σEmbed (S T : List Point) where
+  f : Point → Point
+  perm : S.map f ~ T
+  parity : Bool := false
+  σ_eq : ∀ p q r, p ∈ S → q ∈ S → r ∈ S → σ (f p) (f q) (f r) = parity ^^^ σ p q r
 
 infix:50 " ≼σ " => σEmbed
 

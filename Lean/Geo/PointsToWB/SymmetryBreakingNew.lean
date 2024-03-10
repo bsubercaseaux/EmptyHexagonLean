@@ -58,7 +58,7 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     let l1' := l1.erase a
     have p1 : l1 ~ a :: l1' := List.perm_cons_erase (List.argmin_mem e)
     let f := (· - a)
-    have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp), parity := false, σ_eq := ?σ_eq }
+    have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp), σ_eq := ?σ_eq }
     case σ_eq =>
       have eq (p) : pt_transform (translation_matrix (-a.x) (-a.y)) p = p - a := by
         ext <;> simp [translation_translates] <;> rfl
