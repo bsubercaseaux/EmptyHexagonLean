@@ -2,7 +2,7 @@ import Geo.Definitions.Structures
 import Geo.Definitions.SigmaEquiv
 
 namespace Geo
-open Classical
+open Classical List
 
 def σIsEmptyTriangleFor (a b c : Point) (S : Set Point) : Prop :=
   ∀ s ∈ S, ¬σPtInTriangle s a b c
@@ -69,27 +69,37 @@ theorem σIsEmptyTriangleFor_iff_diff (gp : Point.InGeneralPosition₃ a b c) :
   · exact not_mem_σPtInTriangle gp hn
   · exact not_mem_σPtInTriangle gp.perm₂ hn.perm₂
 
+theorem σIsEmptyTriangleFor_iff (gp : Point.PointListInGeneralPosition S)
+  (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (ab : a ≠ b) (ac : a ≠ c) (bc : b ≠ c) :
+  σIsEmptyTriangleFor a b c S.toFinset ↔ EmptyShapeIn {a, b, c} S.toFinset := by
+  rw [σIsEmptyTriangleFor_iff_diff]
+  · simp [not_or, σIsEmptyTriangleFor, EmptyShapeIn]
+    repeat refine forall_congr' fun _ => ?_
+    rw [σPtInTriangle_iff, PtInTriangle]; apply gp.subperm₄
+    simp [*, List.subperm_of_subset]
+  · apply Point.PointListInGeneralPosition.subperm.1 gp
+    simp [*, List.subperm_of_subset]
+
+theorem σIsEmptyTriangleFor_iff' {a b c : Point} (gp : Point.PointListInGeneralPosition S)
+    (hs : [a, b, c] <+~ S) :
+    EmptyShapeIn [a, b, c].toFinset S.toFinset ↔ σIsEmptyTriangleFor a b c S.toFinset := by
+  have ss := hs.subset; have nd := hs.nodup (gp.nodup hs.length_le); simp [not_or] at ss nd
+  rw [σIsEmptyTriangleFor_iff] <;> simp [*]
+
 theorem σHasEmptyNGon_iff_HasEmptyNGon (gp : Point.PointListInGeneralPosition pts) :
     σHasEmptyNGon n pts.toFinset ↔ HasEmptyNGon n pts.toFinset := by
   unfold σHasEmptyNGon HasEmptyNGon
   refine exists_congr fun s => and_congr_right' <| and_congr_right fun spts => ?_
   rw [ConvexEmptyIn.iff_triangles'' spts gp]
-  simp [Set.subset_def] at spts; simp
+  simp [Set.subset_def] at spts
   iterate 9 refine forall_congr' fun _ => ?_
-  rw [σIsEmptyTriangleFor_iff_diff]
-  · simp [not_or, σIsEmptyTriangleFor]
-    repeat refine forall_congr' fun _ => ?_
-    rw [σPtInTriangle_iff]; apply gp.subperm₄
-    simp [*, List.subperm_of_subset]
-  · apply Point.PointListInGeneralPosition.subperm.1 gp
-    simp [*, List.subperm_of_subset]
+  rw [σIsEmptyTriangleFor_iff gp] <;> simp [EmptyShapeIn, PtInTriangle, *]
 
 lemma σPtInTriangle_congr (e : S ≃σ T) :
     ∀ (_ : a ∈ S) (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),
       σPtInTriangle (e.f a) (e.f p) (e.f q) (e.f r) ↔ σPtInTriangle a p q r := by
   simp (config := {contextual := true}) [σPtInTriangle, e.σ_eq]
 
-open List
 theorem σHasEmptyNGon_3_iff (gp : Point.PointListInGeneralPosition pts) :
     σHasEmptyNGon 3 pts.toFinset ↔
       ∃ a b c, [a, b, c] <+~ pts ∧ σIsEmptyTriangleFor a b c pts.toFinset := by
@@ -194,6 +204,30 @@ theorem σCCWPoints_append : σCCWPoints (l₁ ++ l₂) ↔
   induction l₁ generalizing l₂ with | nil => simp [σCCWPoints] | cons a l₁ IH => ?_
   simp [σCCWPoints, pairwise_append, forall_and, IH]; aesop
 
+theorem σCCWPoints.iff_sublist :
+    σCCWPoints l ↔ ∀ {{p q r : Point}}, [p, q, r] <+ l → σ p q r = .CCW := by
+  constructor <;> intro H
+  · intro p q r ss
+    induction l with
+    | nil => cases ss
+    | cons a l IH =>
+      cases ss with
+      | cons _ ss => exact IH H.2 ss
+      | cons₂ _ ss => exact pairwise_iff_forall_sublist.1 H.1 ss
+  · induction l with
+    | nil => trivial
+    | cons a l IH =>
+      exact ⟨
+        pairwise_iff_forall_sublist.2 fun ss => H (.cons₂ _ ss),
+        IH fun _ _ _ ss => H (.cons _ ss)⟩
+
+theorem σCCWPoints.sublist (H : σCCWPoints l') (ss : l <+ l') : σCCWPoints l :=
+  σCCWPoints.iff_sublist.2 fun _ _ _ h => σCCWPoints.iff_sublist.1 H (h.trans ss)
+
+theorem σCCWPoints.gp (H : σCCWPoints l) : Point.PointListInGeneralPosition l :=
+  fun a b c ss => Point.InGeneralPosition₃.iff_ne_collinear.2 <|
+    σCCWPoints.iff_sublist.1 H ss ▸ by decide
+
 theorem σCCWPoints.cycle (H : σCCWPoints (l₁ ++ l₂)) : σCCWPoints (l₂ ++ l₁) := by
   simp [σCCWPoints_append] at H ⊢
   let ⟨H1, H2, H3, H4⟩ := H
@@ -201,25 +235,148 @@ theorem σCCWPoints.cycle (H : σCCWPoints (l₁ ++ l₂)) : σCCWPoints (l₂ +
     fun c hc => (H4 c hc).imp <| Eq.trans (by rw [σ_perm₁, ← σ_perm₂]),
     fun a ha => (H3 a ha).imp <| Eq.trans (by rw [σ_perm₂, ← σ_perm₁])⟩
 
-theorem σCCWPoints.join
-    (H1 : σCCWPoints (b :: a :: l₁))
-    (H2 : σCCWPoints (a :: b :: l₂))
-    (hj : ∀ᵉ (c ∈ l₁) (d ∈ l₂), σ a c d = .CCW ∧ σ c b d = .CCW) :
-    σCCWPoints (a :: l₁ ++ b :: l₂) := by
-  simp [σCCWPoints, σCCWPoints_append, pairwise_append] at H1 H2 ⊢; simp [H1, H2]
-  obtain ⟨⟨bac, bcc⟩, acc, -⟩ := H1
-  obtain ⟨⟨abd, add⟩, bdd, -⟩ := H2
-  refine ⟨⟨abd, fun c hc => ⟨?_, fun d hd => ?_⟩⟩,
-    fun c hc => ⟨fun d hd => ?_, ?_⟩, ?_, fun d hd => ?_⟩
-  · rw [σ_perm₂, ← σ_perm₁]; exact bac _ hc
-  · exact (hj _ hc _ hd).1
-  · exact (hj _ hc _ hd).2
-  · refine (Pairwise.and_mem.1 add).imp₂ (fun d e ⟨hd, he, ade⟩ bdd => ?_) bdd
-    have abe := abd _ he
-    have ⟨dac, cbd⟩ := hj _ hc _ hd
-    have ⟨eac, cbe⟩ := hj _ hc _ he
-    sorry
-  · sorry
-  · sorry
+-- theorem σCCWPoints.join
+--     (H1 : σCCWPoints (b :: a :: l₁))
+--     (H2 : σCCWPoints (a :: b :: l₂))
+--     (hj : ∀ᵉ (c ∈ l₁) (d ∈ l₂), σ a c d = .CCW ∧ σ c b d = .CCW) :
+--     σCCWPoints (a :: l₁ ++ b :: l₂) := by
+--   simp [σCCWPoints, σCCWPoints_append, pairwise_append] at H1 H2 ⊢; simp [H1, H2]
+--   obtain ⟨⟨bac, bcc⟩, acc, -⟩ := H1
+--   obtain ⟨⟨abd, add⟩, bdd, -⟩ := H2
+--   refine ⟨⟨abd, fun c hc => ⟨?_, fun d hd => ?_⟩⟩,
+--     fun c hc => ⟨fun d hd => ?_, ?_⟩, ?_, fun d hd => ?_⟩
+--   · rw [σ_perm₂, ← σ_perm₁]; exact bac _ hc
+--   · exact (hj _ hc _ hd).1
+--   · exact (hj _ hc _ hd).2
+--   · refine (Pairwise.and_mem.1 add).imp₂ (fun d e ⟨hd, he, ade⟩ bdd => ?_) bdd
+--     have abe := abd _ he
+--     have ⟨dac, cbd⟩ := hj _ hc _ hd
+--     have ⟨eac, cbe⟩ := hj _ hc _ he
+--     sorry
+--   · sorry
+--   · sorry
+
+theorem σCCWPoints.convex (H : σCCWPoints l) : ConvexPoints l.toFinset := by
+  refine ((ConvexEmptyIn.iff_triangles'' subset_rfl H.gp).2 ?_).1
+  simp only [mem_toFinset, Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton,
+    not_or, and_imp]
+  intro a ha b hb c hc ab ac bc p hp pa pb pc hn
+  have ⟨l', lp, H⟩ : ∃ l', l ~ p::l' ∧ σCCWPoints (p::l') := by
+    obtain ⟨l₁, l₂, rfl⟩ := List.append_of_mem hp
+    exact ⟨l₂++l₁, perm_append_comm, σCCWPoints.cycle H⟩
+  simp [lp.mem_iff, Ne.symm, pa, pb, pc] at ha hb hc
+  have sp : [a, b, c] <+~ l' := by apply subperm_of_subset <;> simp [*]
+  have := (σPtInTriangle_iff <| H.gp.subperm₄ (.cons₂ sp)).2 hn
+  let ⟨l₂, hp, sp⟩ := sp
+  match l₂, hp.length_eq with | [a, b, c], _ => ?_
+  have acp := ((σPtInTriangle.perm hp).2 this).2.1
+  have abc := σCCWPoints.iff_sublist.1 H.2 sp
+  have pac := pairwise_iff_forall_sublist.1 H.1 (.trans (.cons₂ _ (.cons _ (.refl _))) sp)
+  rw [σ_perm₁, ← σ_perm₂, acp, σ_perm₂, abc] at pac; cases pac
+
+theorem σCCWPoints.split_l (H : σCCWPoints (a::l₁++b::l₂)) : σCCWPoints (a::l₁++[b]) :=
+  H.sublist <| .append_left (.cons₂ _ <| nil_sublist _) _
+
+theorem σCCWPoints.split_r (H : σCCWPoints (a::l₁++b::l₂)) : σCCWPoints (b::l₂++[a]) :=
+  H.cycle.split_l
+
+theorem EmptyShapeIn.perm {l₁ l₂ : List Point} (p : l₁ ~ l₂) :
+    EmptyShapeIn l₁.toFinset P ↔ EmptyShapeIn l₂.toFinset P := by simp [p.mem_iff]
+
+theorem σCCWPoints.split_emptyShapeIn (a l₁ b l₂) (H : σCCWPoints (a::l₁++b::l₂))
+    (H1 : EmptyShapeIn (a::l₁++[b]).toFinset P)
+    (H2 : EmptyShapeIn (b::l₂++[a]).toFinset P) :
+    EmptyShapeIn (a::l₁ ++ b::l₂).toFinset P := by
+  have h1 {c} (hc : c ∈ l₁) : σ a b c = .CW := by
+    rw [σ_perm₂, (pairwise_cons.1 ((σCCWPoints_append.1 H).2.2.2 _ (.head _))).1 _ hc]; rfl
+  have h2 {c} (hc : c ∈ l₂) : σ a b c = .CCW :=
+    (pairwise_cons.1 ((σCCWPoints_append.1 H).2.2.1 _ (.head _))).1 _ hc
+  refine EmptyShapeIn.split (a := a) (b := b) H.convex (by simp) (by simp) ?_ ?_
+  · convert H1 using 1; ext x; simp
+    refine (and_congr_left fun h => ?_).trans (and_iff_left_of_imp ?_)
+    · refine or_congr_right <| or_congr_right <| or_iff_left <| mt h2 h
+    · rintro (rfl | rfl | h) <;> simp [σ_self₁, σ_self₂, *]
+  · convert H2 using 1; ext x; simp
+    refine (and_congr_left fun h => ?_).trans (and_iff_left_of_imp ?_)
+    · refine or_left_comm.trans <| or_congr_right <| or_congr_right <| or_iff_right <| mt h1 h
+    · rintro (rfl | rfl | h) <;> simp [σ_self₁, σ_self₂, *]
+
+theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.PointListInGeneralPosition S)
+    (sp : a::b::c::l <+~ S) :
+    ∃ b', a::b'::c::l <+~ S ∧ σCCWPoints (a::b'::c::l) ∧
+      EmptyShapeIn [a, b', c].toFinset S.toFinset := by
+  have sp' := (sublist_append_left [a, b, c] l).subperm.trans sp
+  obtain ⟨b', hb', ab'c, h1, h2⟩ := σIsEmptyTriangleFor_exists gp sp'
+  by_cases bb : b' = b
+  · subst bb; exact ⟨b', sp, H, (σIsEmptyTriangleFor_iff' gp sp').2 h2⟩
+  replace h1 := h1.resolve_left bb
+  have abc := σCCWPoints.iff_sublist.1 H (sublist_append_left _ l)
+  rw [abc] at ab'c
+  have ndS := gp.nodup sp'.length_le
+  have ss := sp.subset; have nd := sp.nodup (gp.nodup sp'.length_le); simp [not_or] at ss nd
+  have nd' : b' ∉ a :: b :: c :: l := by
+    have gp3 := H.gp (sublist_append_left _ l)
+    rintro (_|⟨_, _|⟨_, _|⟨_, h : b' ∈ l⟩⟩⟩)
+    · exact not_mem_σPtInTriangle gp3.perm₁ h1.perm₁
+    · exact not_mem_σPtInTriangle gp3 h1
+    · exact not_mem_σPtInTriangle gp3.perm₂ h1.perm₂
+    · rw [σ_perm₂, σCCWPoints.iff_sublist.1 H] at ab'c; cases ab'c
+      exact .cons₂ _ <| .cons _ <| .cons₂ _ <| singleton_sublist.2 h
+  have sp4 : b' :: a :: b :: c :: l <+~ S :=
+    subperm_of_subset (nodup_cons.2 ⟨nd', sp.nodup ndS⟩) (cons_subset.2 ⟨hb', sp.subset⟩)
+  have sp3 : a :: b' :: c :: l <+~ S :=
+    .trans ⟨_, .swap .., .cons₂ _ <| .cons₂ _ <| .cons _ <| .refl _⟩ sp4
+  refine ⟨b', sp3, ?_, (σIsEmptyTriangleFor_iff' gp <|
+    (sublist_append_left _ l).subperm.trans sp3).2 h2⟩
+  have gp3 := gp.mono_subperm sp3
+  have cvx {e f} (sp : [e, f, b'] <+~ a::b'::c::l)
+      (ss : σ e f a ≠ .CW ∧ σ e f b ≠ .CW ∧ σ e f c ≠ .CW) : σ e f b' = .CCW := by
+    rw [← (Point.PointListInGeneralPosition.subperm.1 gp3 sp).σ_iff']
+    rw [σ, Ne, Orientation.ofReal_eq_cw, not_lt, matrix_det_eq_det_pts]
+    refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (detAffineMap e f)) <|
+      (σPtInTriangle_iff (gp.subperm₄ ((sublist_append_left _ l).subperm.trans sp4))).1 h1
+    replace ss : ∀ d ∈ ({a, b, c}:Set _), σ e f d ≠ .CW := by simpa using ss
+    intro d hd
+    simpa [σ, Orientation.ofReal_eq_cw, matrix_det_eq_det_pts] using ss d hd
+  simp [σCCWPoints] at H; simp [H, ab'c, σCCWPoints]
+  obtain ⟨⟨⟨-, abd⟩, acd, ade⟩, ⟨bcd, bde⟩, cde, -⟩ := H
+  refine ⟨⟨fun d hd => ?_, acd⟩, fun d hd => ?_, ?_⟩
+  · rw [σ_perm₂, ← σ_perm₁]
+    refine cvx ⟨_, @perm_append_comm _ [a, b'] [d],
+      .append_left (.cons _ (by simp [hd])) [a,b']⟩ ⟨?_, ?_, ?_⟩
+    · simp [σ_self₁]
+    · rw [σ_perm₁, ← σ_perm₂, abd _ hd]; decide
+    · rw [σ_perm₁, ← σ_perm₂, acd _ hd]; decide
+  · rw [σ_perm₁, ← σ_perm₂]
+    refine cvx ⟨_, @perm_append_comm _ [b'] [c, d],
+      .cons _ <| .cons₂ _ <| .cons₂ _ (by simp [hd])⟩ ⟨?_, ?_, ?_⟩
+    · rw [σ_perm₂, ← σ_perm₁, acd _ hd]; decide
+    · rw [σ_perm₂, ← σ_perm₁, bcd _ hd]; decide
+    · simp [σ_self₂]
+  · rw [pairwise_iff_forall_sublist] at ade bde cde ⊢
+    intro d e de
+    rw [σ_perm₁, ← σ_perm₂]
+    refine cvx ⟨_, @perm_append_comm _ [b'] [d, e],
+      .cons _ <| .cons₂ _ <| .cons _ de⟩ ⟨?_, ?_, ?_⟩
+    · rw [σ_perm₂, ← σ_perm₁, ade de]; decide
+    · rw [σ_perm₂, ← σ_perm₁, bde de]; decide
+    · rw [σ_perm₂, ← σ_perm₁, cde de]; decide
+
+theorem σCCWPoints.emptyHexagon
+    (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.PointListInGeneralPosition S)
+    (hole : EmptyShapeIn [a, c, e].toFinset S.toFinset) (sp : [a, b, c, d, e, f] <+~ S) :
+    ∃ l, l <+~ S ∧ l.length = 6 ∧ σCCWPoints l ∧ ConvexEmptyIn l.toFinset S.toFinset := by
+  have ⟨b', sp, H, abc⟩ := σCCWPoints.flatten H gp sp
+  have ⟨d', sp, H, cde⟩ := σCCWPoints.flatten (H.cycle (l₁ := [a, b']) (l₂ := [c,d,e,f]))
+    gp ((@perm_append_comm _ [c,d,e,f] [a, b']).subperm.trans sp)
+  have ⟨f', sp, H, efa⟩ := σCCWPoints.flatten (H.cycle (l₁ := [c, d']) (l₂ := [e,f,a,b']))
+    gp ((@perm_append_comm _ [e,f,a,b'] [c, d']).subperm.trans sp)
+  refine ⟨_, sp, rfl, H, H.convex, ?_⟩
+  refine σCCWPoints.split_emptyShapeIn e [f'] a [b', c, d'] H efa ?_
+  have H := H.split_r (l₁ := [f'])
+  refine σCCWPoints.split_emptyShapeIn a [b'] c [d', e] H abc ?_
+  have H := H.split_r (l₁ := [b'])
+  refine σCCWPoints.split_emptyShapeIn c [d'] e [a] H cde ?_
+  exact (EmptyShapeIn.perm <| @perm_append_comm _ [a, c] [e]).1 hole
 
 end Geo

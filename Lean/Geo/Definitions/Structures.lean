@@ -149,36 +149,34 @@ theorem ConvexEmptyIn.iff_triangles'' {s : Finset Point} {S : List Point}
     simp at hp ⊢
     assumption
 
-theorem EmptyShapeIn.split (cvx : ConvexPoints S) :
+theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
-    EmptyShapeIn {x ∈ S | σ a b x ≠ .CCW} P →
-    EmptyShapeIn {x ∈ S | σ a b x ≠ .CW} P →
-    EmptyShapeIn S P := by
+    convexHull ℝ S ⊆
+    convexHull ℝ {x ∈ S | σ a b x ≠ .CCW} ∪
+    convexHull ℝ {x ∈ S | σ a b x ≠ .CW} := by
   suffices ∀ {a b}, a ∈ S → b ∈ S →
       let S1 := {x ∈ S | σ a b x ≠ .CCW}
       let S2 := {x ∈ S | σ a b x ≠ .CW}
-      EmptyShapeIn S1 P → EmptyShapeIn S2 P →
-      ∀ p ∈ P \ S, σ a b p ≠ .CW → p ∉ convexHull ℝ S by
-    intro a b ha hb H1 H2 p hp
+      ∀ p, σ a b p ≠ .CW → p ∈ convexHull ℝ S → p ∈ convexHull ℝ S1 ∨ p ∈ convexHull ℝ S2 by
+    intro a b ha hb p hp
     by_cases h : σ a b p = .CW
-    · exact this hb ha
-        (by (with_reducible convert H2 using 4); rw [Ne, ← neg_inj, ← σ_perm₁]; rfl)
-        (by (with_reducible convert H1 using 4); rw [Ne, ← neg_inj, ← σ_perm₁]; rfl)
-        _ hp (by rw [σ_perm₁, h]; decide)
-    · exact this ha hb H1 H2 _ hp h
-  intro a b ha hb S1 S2 H1 H2 p ⟨pP, pS⟩ hp hn
+    · cases this hb ha _ (by rw [σ_perm₁, h]; decide) hp with
+      | inl h => right; (with_reducible convert h using 4); rw [Ne, ← neg_inj, ← σ_perm₁]; rfl
+      | inr h => left; (with_reducible convert h using 4); rw [Ne, ← neg_inj, ← σ_perm₁]; rfl
+    · exact this ha hb _ h hp
+  intro a b ha hb S1 S2 p hp hn
   have : S = S1 ∪ S2 := by
     ext x; refine (and_iff_left <| imp_iff_not_or.1 (· ▸ by decide)).symm.trans and_or_left
-  have ab : a ≠ b := by
-    rintro rfl
-    refine H1 _ ⟨pP, mt And.left pS⟩ (convexHull_mono ?_ hn)
+  by_cases ab : a = b
+  · subst ab
+    refine .inl (convexHull_mono ?_ hn)
     exact fun x hx => ⟨hx, by simp [σ_self₃]⟩
   rcases Set.eq_empty_or_nonempty S1 with eq1 | ne1
   · clear_value S1 S2; simp [eq1] at this; subst S
-    exact H2 _ ⟨pP, pS⟩ hn
+    exact .inr hn
   rcases Set.eq_empty_or_nonempty S2 with eq2 | ne2
   · clear_value S1 S2; simp [eq2] at this; subst S
-    exact H1 _ ⟨pP, pS⟩ hn
+    exact .inl hn
   replace := congrArg (convexHull ℝ) this
   rw [convexHull_union ne1 ne2] at this
   let ⟨u, hu, v, hv, hp2⟩ := mem_convexJoin.1 <| this ▸ hn
@@ -196,7 +194,7 @@ theorem EmptyShapeIn.split (cvx : ConvexPoints S) :
       have := h.trans_ne_left hw2 (zab <| · ▸ subset_convexHull _ _ (by simp))
       exact cvx _ ha <| (convex_convexHull ..).segment_subset hba hw1 (mem_segment_iff_wbtw.2 this)
     exact ngp <| Point.InGeneralPosition₃.iff_not_mem_seg.2
-      ⟨this ha hb ab zab, this hb ha ab.symm (Set.pair_comm .. ▸ zab), zab⟩
+      ⟨this ha hb ab zab, this hb ha (Ne.symm ab) (Set.pair_comm .. ▸ zab), zab⟩
   have hu0 : detAffineMap a b u ≤ 0 := by
     refine convexHull_min ?_ ((convex_Iic 0).affine_preimage (detAffineMap a b)) hu
     intro x ⟨_, hx⟩
@@ -212,8 +210,7 @@ theorem EmptyShapeIn.split (cvx : ConvexPoints S) :
     (by rw [this, mem_convexJoin]; exact ⟨_, hu, _, hv, hz1⟩)
     (by simpa [Point.InGeneralPosition₃] using hz2)
   if hp' : Point.InGeneralPosition₃ a b p then ?_ else
-    exact H2 _ ⟨pP, mt And.left pS⟩ <|
-      convexHull_mono (by simp [Set.subset_def, ha, hb, σ_self₁, σ_self₂]) (hcvx hn hp')
+    right; exact convexHull_mono (by simp [Set.subset_def, ha, hb, σ_self₁, σ_self₂]) (hcvx hn hp')
   have : p ∈ segment ℝ v z := by
     simp [mem_segment_iff_wbtw] at hp2 hz1 ⊢
     refine (hp2.trans_left_right <| (hz1.wbtw_or_wbtw hp2).resolve_right fun h => ?_).symm
@@ -221,8 +218,13 @@ theorem EmptyShapeIn.split (cvx : ConvexPoints S) :
     have := ((convex_Iic 0).affine_preimage (detAffineMap a b)).segment_subset hu0 hz2.le h
     simp [σ, matrix_det_eq_det_pts, Orientation.ofReal_eq_cw] at hp this
     exact hp' <| this.antisymm hp
-  refine H2 _ ⟨pP, mt And.left pS⟩ <| (convex_convexHull ..).segment_subset hv ?_ this
+  right; refine (convex_convexHull ..).segment_subset hv ?_ this
   simp at zab; refine segment_subset_convexHull ?_ ?_ zab <;> simp [ha, hb, σ_self₁, σ_self₂]
+
+theorem EmptyShapeIn.split (cvx : ConvexPoints S) (ha : a ∈ S) (hb : b ∈ S)
+    (H1 : EmptyShapeIn {x ∈ S | σ a b x ≠ .CCW} P)
+    (H2 : EmptyShapeIn {x ∈ S | σ a b x ≠ .CW} P) : EmptyShapeIn S P := fun _ ⟨pP, pS⟩ hn =>
+  (split_convexHull cvx ha hb hn).elim (H1 _ ⟨pP, mt And.left pS⟩) (H2 _ ⟨pP, mt And.left pS⟩)
 
 -- TODO: Rename to `HasEmptyKGon` to match TACAS paper
 def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
