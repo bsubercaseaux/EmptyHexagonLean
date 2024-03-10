@@ -21,5 +21,11 @@ theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGe
     rw [len10] at this
     rwa [triangleCNF]
 
-/- 'Geo.EmptyTriangle10TheoremLists' depends on axioms: [propext, Classical.choice, Quot.sound, Geo.cnfUnsat] -/
+/-
+'Geo.EmptyTriangle10TheoremLists' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Geo.triangleCnfUnsat,
+ mathlibSorry]
+-/
 #print axioms EmptyTriangle10TheoremLists

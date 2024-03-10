@@ -17,9 +17,15 @@ theorem EmptyHexagon30TheoremLists (pts : List Point) (gp : Point.PointListInGen
   have len10 : w.length = 30 := hw.length_eq.symm.trans h
   apply hexagonCnfUnsat
   with_reducible
-    have := (LeanSAT.PropForm.toICnf_sat _).2 ⟨w.toPropAssn, w.satisfies_hexagonEncoding noσtri'⟩
+    have := (PropForm.toICnf_sat _).2 ⟨w.toPropAssn, w.satisfies_hexagonEncoding noσtri'⟩
     rw [len10] at this
     rwa [hexagonCNF]
 
-/- 'Geo.EmptyHexagon10TheoremLists' depends on axioms: [propext, Classical.choice, Quot.sound, Geo.cnfUnsat] -/
+/-
+'Geo.EmptyHexagon30TheoremLists' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Geo.hexagonCnfUnsat,
+ mathlibSorry]
+-/
 #print axioms EmptyHexagon30TheoremLists
