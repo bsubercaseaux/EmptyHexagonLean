@@ -146,18 +146,18 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
   }, ⟨σ5⟩⟩
 
 -- WN: I put this here since it uses some σEmbed lemmas.
-theorem HasEmptyNGon_extension :
-    (∀ l : List Point, Point.PointListInGeneralPosition l → l.length = n → HasEmptyNGon k l.toFinset) →
-    3 ≤ n → n ≤ l.length → HasEmptyNGon k l.toFinset := by
+theorem HasEmptyKGon_extension :
+    (∀ l : List Point, Point.PointListInGeneralPosition l → l.length = n → HasEmptyKGon k l.toFinset) →
+    3 ≤ n → n ≤ l.length → HasEmptyKGon k l.toFinset := by
   intro H threen llength
-  rw [← σHasEmptyNGon_iff_HasEmptyNGon gp]
+  rw [← σHasEmptyKGon_iff_HasEmptyKGon gp]
 
   have ⟨l₁, σ₁, distinct⟩ := σEmbed_rotate l (gp.nodup <| threen.trans llength)
   replace gp := (OrientationProperty'.gp σ₁).mp gp
   replace llength := σ₁.length_eq ▸ llength
   replace σ₁ := σ₁.toEquiv (gp.nodup <| threen.trans llength)
-  suffices σHasEmptyNGon k l₁.toFinset from
-    OrientationProperty_σHasEmptyNGon σ₁.symm this
+  suffices σHasEmptyKGon k l₁.toFinset from
+    OrientationProperty_σHasEmptyKGon σ₁.symm this
 
   let l₂ := l₁.insertionSort (·.x ≤ ·.x)
   have l₂l₁ : l₂ ~ l₁ := l₁.perm_insertionSort _
@@ -169,17 +169,17 @@ theorem HasEmptyNGon_extension :
       have that := List.pairwise_iff_get.mp (l₁.sorted_insertionSort (·.x ≤ ·.x)) i j ij
       have := List.pairwise_iff_get.mp distinct i j ij
       lt_of_le_of_ne that this
-  suffices σHasEmptyNGon k l₂.toFinset by
+  suffices σHasEmptyKGon k l₂.toFinset by
     rwa [List.toFinset_eq_of_perm _ _ l₂l₁] at this
 
-  rw [σHasEmptyNGon_iff_HasEmptyNGon gp]
+  rw [σHasEmptyKGon_iff_HasEmptyKGon gp]
   let left := l₂.take n
   let right := l₂.drop n
   have leftl₂ : left <+ l₂ := List.take_sublist ..
   have leftlength := List.length_take_of_le llength
   have := H left (gp.mono_sublist leftl₂) leftlength
 
-  unfold HasEmptyNGon at this ⊢
+  unfold HasEmptyKGon at this ⊢
   have ⟨s, scard, sleft, ⟨convex, empty⟩⟩ := this
   refine ⟨s, scard, ?_, convex, ?_⟩
   . exact sleft.trans leftl₂.toFinset_subset

@@ -62,7 +62,7 @@ theorem σIsEmptyTriangleFor.perm₂ : σIsEmptyTriangleFor p q r S → σIsEmpt
 --     simp at hs
 --     simp [hs, not_or, *]
 
-def σHasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
+def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧
     ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
       σIsEmptyTriangleFor a b c S
@@ -92,9 +92,9 @@ theorem σIsEmptyTriangleFor_iff' {a b c : Point} (gp : Point.PointListInGeneral
   have ss := hs.subset; have nd := hs.nodup (gp.nodup hs.length_le); simp [not_or] at ss nd
   rw [σIsEmptyTriangleFor_iff] <;> simp [*]
 
-theorem σHasEmptyNGon_iff_HasEmptyNGon (gp : Point.PointListInGeneralPosition pts) :
-    σHasEmptyNGon n pts.toFinset ↔ HasEmptyNGon n pts.toFinset := by
-  unfold σHasEmptyNGon HasEmptyNGon
+theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : Point.PointListInGeneralPosition pts) :
+    σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset := by
+  unfold σHasEmptyKGon HasEmptyKGon
   refine exists_congr fun s => and_congr_right' <| and_congr_right fun spts => ?_
   rw [ConvexEmptyIn.iff_triangles'' spts gp]
   simp [Set.subset_def] at spts
@@ -106,8 +106,8 @@ lemma σPtInTriangle_congr (e : S ≃σ T) :
       σPtInTriangle (e.f a) (e.f p) (e.f q) (e.f r) ↔ σPtInTriangle a p q r := by
   simp (config := {contextual := true}) [σPtInTriangle, e.σ_eq]
 
-theorem σHasEmptyNGon_3_iff (gp : Point.PointListInGeneralPosition pts) :
-    σHasEmptyNGon 3 pts.toFinset ↔
+theorem σHasEmptyKGon_3_iff (gp : Point.PointListInGeneralPosition pts) :
+    σHasEmptyKGon 3 pts.toFinset ↔
       ∃ a b c, [a, b, c] <+~ pts ∧ σIsEmptyTriangleFor a b c pts.toFinset := by
   constructor
   · intro ⟨s, hs1, ss, hs2⟩
@@ -144,8 +144,8 @@ theorem σHasEmptyNGon_3_iff (gp : Point.PointListInGeneralPosition pts) :
 --     rw [← est, σPtInTriangle_congr e hs hp hq hr]
 --     apply h s hs
 
-lemma OrientationProperty_σHasEmptyNGon : OrientationProperty (σHasEmptyNGon n) := by
-  unfold σHasEmptyNGon
+lemma OrientationProperty_σHasEmptyKGon : OrientationProperty (σHasEmptyKGon n) := by
+  unfold σHasEmptyKGon
   intro S T e ⟨s, scard, sS, h⟩
   refine ⟨s.image e, ?_, ?_, ?_⟩
   . rwa [s.card_image_of_injOn (e.bij.right.left.mono sS)]
@@ -371,7 +371,7 @@ theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.PointList
 theorem σCCWPoints.emptyHexagon
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.PointListInGeneralPosition S)
     (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
-    σHasEmptyNGon 6 S.toFinset := by
+    σHasEmptyKGon 6 S.toFinset := by
   have sp := subperm_of_subset (H.gp.nodup (by show 3 ≤ 6; decide)) sp
   have hole := (σIsEmptyTriangleFor_iff' gp <|
     .trans (.cons₂ <| .cons <| .cons₂ <| .cons <| .cons₂ nil_subperm) sp).2 hole
@@ -380,7 +380,7 @@ theorem σCCWPoints.emptyHexagon
     gp ((@perm_append_comm _ [c,d,e,f] [a, b']).subperm.trans sp)
   have ⟨f', sp, H, efa⟩ := σCCWPoints.flatten (H.cycle (l₁ := [c, d']) (l₂ := [e,f,a,b']))
     gp ((@perm_append_comm _ [e,f,a,b'] [c, d']).subperm.trans sp)
-  refine (σHasEmptyNGon_iff_HasEmptyNGon gp).2
+  refine (σHasEmptyKGon_iff_HasEmptyKGon gp).2
     ⟨[e, f', a, b', c, d'].toFinset, ?_, by simpa [Set.subset_def] using sp.subset, H.convex, ?_⟩
   · exact congrArg length (dedup_eq_self.2 (H.gp.nodup (by show 3 ≤ 6; decide)))
   · refine σCCWPoints.split_emptyShapeIn e [f'] a [b', c, d'] H efa ?_
@@ -393,7 +393,7 @@ theorem σCCWPoints.emptyHexagon
 theorem σCCWPoints.emptyHexagon'
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.PointListInGeneralPosition S)
     (hole : σIsEmptyTriangleFor b d f S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
-    σHasEmptyNGon 6 S.toFinset :=
+    σHasEmptyKGon 6 S.toFinset :=
   σCCWPoints.emptyHexagon (H.cycle (l₁ := [a])) gp hole <|
     (@perm_append_comm _ _ [a]).subset.trans sp
 

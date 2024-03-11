@@ -163,20 +163,20 @@ theorem of_5hole {w : WBPoints} {a b c d e : Fin (length w)}
     (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset)
     (abc : σ w[a] w[b] w[c] = .ccw)
     (bcd : σ w[b] w[c] w[d] = .ccw)
-    (cde : σ w[c] w[d] w[e] = .ccw) : σHasEmptyNGon 6 w.toFinset := by
+    (cde : σ w[c] w[d] w[e] = .ccw) : σHasEmptyKGon 6 w.toFinset := by
   refine σCCWPoints.emptyHexagon' ?_ w.gp ace (subset_map w [(0:Fin (_+1)), a, b, c, d, e])
   refine Arc.join (l₁ := [a,b,c,d]) (l₂ := [])
     (.cons ha (w.σ_0 ha ab) <| .cons ab abc <| .cons bc bcd <| .cons cd cde <| .one de)
     (.one <| ha.trans <| ab.trans <| bc.trans <| cd.trans de)
 
-theorem satisfies_no6Hole3Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
+theorem satisfies_no6Hole3Below {w : WBPoints} (hw : ¬σHasEmptyKGon 6 w.toFinset)
     {a c d e : Fin (length w)} (ha : (0 : Fin (w.rest.length+1)) < a) (de : d < e)
     (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset) :
     (no6Hole3Below a c d e).eval w.toPropAssn := by
   simp [no6Hole3Below]; intro ⟨b, ab, bc, cd, abc, bcd⟩ cde
   exact hw <| of_5hole ha ab bc cd de ace abc bcd cde
 
-theorem satisfies_no6Hole4Above {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
+theorem satisfies_no6Hole4Above {w : WBPoints} (hw : ¬σHasEmptyKGon 6 w.toFinset)
     {a d e f : Fin (length w)} (ef : e < f) :
     (no6Hole4Above a d e f).eval w.toPropAssn := by
   simp [no6Hole4Above]; intro ⟨de, c, ⟨b, ab, bc, cd, abc, bcd⟩, cde, ace⟩
@@ -187,7 +187,7 @@ theorem satisfies_no6Hole4Above {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFins
     (.one <| ab.trans <| bc.trans <| cd.trans <| de.trans ef)
     (.cons ab abc <| .cons bc bcd <| .cons cd cde <| .cons de def_ <| .one ef)
 
-theorem satisfies_no6Hole2Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
+theorem satisfies_no6Hole2Below {w : WBPoints} (hw : ¬σHasEmptyKGon 6 w.toFinset)
     {a c e f : Fin (length w)} :
     (no6Hole2Below a c f e).eval w.toPropAssn := by
   simp [no6Hole2Below]; intro ⟨b, ab, bc, cf, abc, bcd⟩ ⟨d, ad, de, ef, ade, def_⟩ hh
@@ -197,7 +197,7 @@ theorem satisfies_no6Hole2Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFins
   refine hw <| this.emptyHexagon w.gp ?_ (subset_map w [a, b, c, f, e, d])
   split_ifs at hh with ce <;> simp at hh <;> [exact hh; exact hh.perm₂]
 
-theorem satisfies_no6Hole1Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFinset)
+theorem satisfies_no6Hole1Below {w : WBPoints} (hw : ¬σHasEmptyKGon 6 w.toFinset)
     {a d e f : Fin (length w)} (ae : a < e) (ef : e < f) :
     (no6Hole1Below a d f e).eval w.toPropAssn := by
   simp [no6Hole1Below]; intro ⟨df, c, ⟨b, ab, bc, cd, abc, bcd⟩, cdf, acf⟩ aef
@@ -206,7 +206,7 @@ theorem satisfies_no6Hole1Below {w : WBPoints} (hw : ¬σHasEmptyNGon 6 w.toFins
     (.cons ab abc <| .cons bc bcd <| .cons cd cdf <| .one df)
   refine hw <| this.emptyHexagon w.gp acf.perm₂ (subset_map w [a, e, f, d, c, b])
 
-theorem satisfies_hexagonEncoding (w : WBPoints) (hw : ¬σHasEmptyNGon 6 w.toFinset) :
+theorem satisfies_hexagonEncoding (w : WBPoints) (hw : ¬σHasEmptyKGon 6 w.toFinset) :
     (hexagonEncoding w.length).eval w.toPropAssn := by
   simp [hexagonEncoding, satisfies_baseEncoding, no6HoleClauses1, no6HoleClauses2, no6HoleClauses3]
   refine ⟨

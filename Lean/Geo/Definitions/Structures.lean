@@ -226,17 +226,16 @@ theorem EmptyShapeIn.split (cvx : ConvexPoints S) (ha : a ∈ S) (hb : b ∈ S)
     (H2 : EmptyShapeIn {x ∈ S | σ a b x ≠ .cw} P) : EmptyShapeIn S P := fun _ ⟨pP, pS⟩ hn =>
   (split_convexHull cvx ha hb hn).elim (H1 _ ⟨pP, mt And.left pS⟩) (H2 _ ⟨pP, mt And.left pS⟩)
 
--- TODO: Rename to `HasEmptyKGon` to match TACAS paper
-def HasEmptyNGon (n : Nat) (S : Set Point) : Prop :=
+def HasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 
-def HasEmptyTriangle : Set Point → Prop := HasEmptyNGon 3
+def HasEmptyTriangle : Set Point → Prop := HasEmptyKGon 3
 
 theorem HasEmptyTriangle.iff (S : Set Point) :
     HasEmptyTriangle S ↔
     ∃ᵉ (a ∈ S) (b ∈ S) (c ∈ S), Point.InGeneralPosition₃ a b c ∧
       ∀ s ∈ S \ {a,b,c}, ¬PtInTriangle s a b c := by
-  simp [HasEmptyTriangle, HasEmptyNGon, PtInTriangle]
+  simp [HasEmptyTriangle, HasEmptyKGon, PtInTriangle]
   constructor
   · intro ⟨s, h1, h2, h3, h4⟩
     match s, s.exists_mk with | _, ⟨[a,b,c], h1, rfl⟩ => ?_
@@ -251,6 +250,6 @@ theorem HasEmptyTriangle.iff (S : Set Point) :
     · simp [Set.subset_def, ha, hb, hc]
     · simpa [s_eq, EmptyShapeIn] using h2
 
-def HasEmptyHexagon : Set Point → Prop := HasEmptyNGon 6
+def HasEmptyHexagon : Set Point → Prop := HasEmptyKGon 6
 
 end Geo
