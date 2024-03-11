@@ -8,13 +8,13 @@ open Point
 /-- A well-behaved list of points: in general position, sorted by `x`,
 and containing at least one point `leftmost`
 such that all signotopes `σ leftmost a b`
-for `leftmost < a < b` are `CCW`. -/
+for `leftmost < a < b` are `ccw`. -/
 structure WBPoints where
   leftmost : Point
   rest : List Point
   sorted' : PointListSorted (leftmost :: rest)
   gp' : PointListInGeneralPosition (leftmost :: rest)
-  oriented : rest.Pairwise (σ leftmost · · = .CCW)
+  oriented : rest.Pairwise (σ leftmost · · = .ccw)
   lex : σRevLex rest
 
 namespace WBPoints
@@ -87,7 +87,7 @@ theorem subset_map (w : WBPoints) (l : List (Fin w.length)) :
 
 theorem σ_0 (w : WBPoints) {i j : Fin w.length}
     (i0 : (0 : Fin (w.rest.length+1)) < i) (ij : i < j) :
-    σ w[(0 : Fin (w.rest.length+1))] w[i] w[j] = .CCW := by
+    σ w[(0 : Fin (w.rest.length+1))] w[i] w[j] = .ccw := by
   let ⟨i+1,hi⟩ := i
   let ⟨j+1,hj⟩ := j
   exact pairwise_iff_get.1 w.oriented

@@ -40,7 +40,7 @@ theorem RevLexMid3_total (F : Fin n → Fin n → Fin n → Prop) :
     simp [Fin.rev]; apply Iff.of_eq; congr 2 <;> omega
 
 def σRevLex (l : List Point) : Prop :=
-  RevLexMid3 fun a b c : Fin l.length => σ l[a] l[b] l[c] = .CCW
+  RevLexMid3 fun a b c : Fin l.length => σ l[a] l[b] l[c] = .ccw
 
 def flipX (pt : Point) : Point := ![-pt.x, pt.y]
 

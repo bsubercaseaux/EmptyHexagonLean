@@ -201,17 +201,17 @@ theorem σIsEmptyTriangleFor_exists (gp : Point.PointListInGeneralPosition S)
 
 def σCCWPoints : List Point → Prop
   | [] => True
-  | a :: l => l.Pairwise (σ a · · = .CCW) ∧ σCCWPoints l
+  | a :: l => l.Pairwise (σ a · · = .ccw) ∧ σCCWPoints l
 
 theorem σCCWPoints_append : σCCWPoints (l₁ ++ l₂) ↔
     σCCWPoints l₁ ∧ σCCWPoints l₂ ∧
-    (∀ a ∈ l₁, l₂.Pairwise (σ a · · = .CCW)) ∧
-    (∀ c ∈ l₂, l₁.Pairwise (σ · · c = .CCW)) := by
+    (∀ a ∈ l₁, l₂.Pairwise (σ a · · = .ccw)) ∧
+    (∀ c ∈ l₂, l₁.Pairwise (σ · · c = .ccw)) := by
   induction l₁ generalizing l₂ with | nil => simp [σCCWPoints] | cons a l₁ IH => ?_
   simp [σCCWPoints, pairwise_append, forall_and, IH]; aesop
 
 theorem σCCWPoints.iff_sublist :
-    σCCWPoints l ↔ ∀ {{p q r : Point}}, [p, q, r] <+ l → σ p q r = .CCW := by
+    σCCWPoints l ↔ ∀ {{p q r : Point}}, [p, q, r] <+ l → σ p q r = .ccw := by
   constructor <;> intro H
   · intro p q r ss
     induction l with
@@ -244,7 +244,7 @@ theorem σCCWPoints.cycle (H : σCCWPoints (l₁ ++ l₂)) : σCCWPoints (l₂ +
 -- theorem σCCWPoints.join
 --     (H1 : σCCWPoints (b :: a :: l₁))
 --     (H2 : σCCWPoints (a :: b :: l₂))
---     (hj : ∀ᵉ (c ∈ l₁) (d ∈ l₂), σ a c d = .CCW ∧ σ c b d = .CCW) :
+--     (hj : ∀ᵉ (c ∈ l₁) (d ∈ l₂), σ a c d = .ccw ∧ σ c b d = .ccw) :
 --     σCCWPoints (a :: l₁ ++ b :: l₂) := by
 --   simp [σCCWPoints, σCCWPoints_append, pairwise_append] at H1 H2 ⊢; simp [H1, H2]
 --   obtain ⟨⟨bac, bcc⟩, acc, -⟩ := H1
@@ -293,9 +293,9 @@ theorem σCCWPoints.split_emptyShapeIn (a l₁ b l₂) (H : σCCWPoints (a::l₁
     (H1 : EmptyShapeIn (a::l₁++[b]).toFinset P)
     (H2 : EmptyShapeIn (b::l₂++[a]).toFinset P) :
     EmptyShapeIn (a::l₁ ++ b::l₂).toFinset P := by
-  have h1 {c} (hc : c ∈ l₁) : σ a b c = .CW := by
+  have h1 {c} (hc : c ∈ l₁) : σ a b c = .cw := by
     rw [σ_perm₂, (pairwise_cons.1 ((σCCWPoints_append.1 H).2.2.2 _ (.head _))).1 _ hc]; rfl
-  have h2 {c} (hc : c ∈ l₂) : σ a b c = .CCW :=
+  have h2 {c} (hc : c ∈ l₂) : σ a b c = .ccw :=
     (pairwise_cons.1 ((σCCWPoints_append.1 H).2.2.1 _ (.head _))).1 _ hc
   refine EmptyShapeIn.split (a := a) (b := b) H.convex (by simp) (by simp) ?_ ?_
   · convert H1 using 1; ext x; simp
@@ -336,12 +336,12 @@ theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.PointList
     (sublist_append_left _ l).subperm.trans sp3).2 h2⟩
   have gp3 := gp.mono_subperm sp3
   have cvx {e f} (sp : [e, f, b'] <+~ a::b'::c::l)
-      (ss : σ e f a ≠ .CW ∧ σ e f b ≠ .CW ∧ σ e f c ≠ .CW) : σ e f b' = .CCW := by
+      (ss : σ e f a ≠ .cw ∧ σ e f b ≠ .cw ∧ σ e f c ≠ .cw) : σ e f b' = .ccw := by
     rw [← (Point.PointListInGeneralPosition.subperm.1 gp3 sp).σ_iff']
     rw [σ, Ne, Orientation.ofReal_eq_cw, not_lt]
     refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (detAffineMap e f)) <|
       (σPtInTriangle_iff (gp.subperm₄ ((sublist_append_left _ l).subperm.trans sp4))).1 h1
-    replace ss : ∀ d ∈ ({a, b, c}:Set _), σ e f d ≠ .CW := by simpa using ss
+    replace ss : ∀ d ∈ ({a, b, c}:Set _), σ e f d ≠ .cw := by simpa using ss
     intro d hd
     simpa [σ, Orientation.ofReal_eq_cw] using ss d hd
   simp [σCCWPoints] at H; simp [H, ab'c, σCCWPoints]

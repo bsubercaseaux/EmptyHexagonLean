@@ -12,15 +12,15 @@ noncomputable section
 open Classical
 
 inductive Orientation : Type where
-  | CW -- clockwise :=  -
-  | CCW -- counter clockwise:= +
-  | Collinear -- := 0
+  | cw -- clockwise :=  -
+  | ccw -- counter clockwise := +
+  | collinear -- := 0
   deriving DecidableEq
 
 def Orientation.neg : Orientation → Orientation
-  | CW => CCW
-  | CCW => CW
-  | Collinear => Collinear
+  | cw => ccw
+  | ccw => cw
+  | collinear => collinear
 
 instance : Neg Orientation := ⟨Orientation.neg⟩
 
@@ -28,20 +28,20 @@ instance : InvolutiveNeg Orientation :=
   ⟨fun o => by cases o <;> simp [Neg.neg, Orientation.neg]⟩
 
 @[simp]
-theorem Orientation.neg_cw : -CW = CCW := by rfl
+theorem Orientation.neg_cw : -cw = ccw := by rfl
 
 @[simp]
-theorem Orientation.neg_ccw : -CCW = CW := by rfl
+theorem Orientation.neg_ccw : -ccw = cw := by rfl
 
 @[simp]
-theorem Orientation.neg_collinear : -Collinear = Collinear := by rfl
+theorem Orientation.neg_collinear : -collinear = collinear := by rfl
 
 @[simp]
-theorem Orientation.eq_neg_self (o : Orientation) : (o = -o) ↔ (o = .Collinear) := by
+theorem Orientation.eq_neg_self (o : Orientation) : (o = -o) ↔ (o = .collinear) := by
   cases o <;> simp [neg]
 
 @[simp]
-theorem Orientation.neg_self_eq (o : Orientation) : (-o = o) ↔ (o = .Collinear) := by
+theorem Orientation.neg_self_eq (o : Orientation) : (-o = o) ↔ (o = .collinear) := by
   cases o <;> simp [neg]
 
 instance : HXor Bool Orientation Orientation :=
@@ -68,12 +68,12 @@ lemma Orientation.xor_eq_xor (a : Bool) (o o' : Orientation) : (a ^^^ o = a ^^^ 
   cases a <;> simp
 
 @[simp]
-lemma Orientation.xor_collinear (a : Bool) : a ^^^ Collinear = Collinear := by
+lemma Orientation.xor_collinear (a : Bool) : a ^^^ collinear = collinear := by
   cases a <;> rfl
 
 @[simp]
 lemma Orientation.xor_eq_collinear (a : Bool) (o : Orientation) :
-    (a ^^^ o = Collinear) ↔ o = Collinear := by
+    (a ^^^ o = collinear) ↔ o = collinear := by
   cases a <;> cases o <;> simp
 
 @[simp]
@@ -81,9 +81,9 @@ lemma Orientation.xor_xor (a b : Bool) (o : Orientation) : a ^^^ (b ^^^ o) = (xo
   cases a <;> cases b <;> simp
 
 def Orientation.ofReal (r : ℝ) : Orientation :=
-  if 0 < r then CCW
-  else if r < 0 then CW
-  else Collinear
+  if 0 < r then ccw
+  else if r < 0 then cw
+  else collinear
 
 theorem Orientation.ofReal_mul_left (r a : ℝ) (h : 0 < a) : ofReal (a * r) = ofReal r := by
   simp [ofReal, mul_pos_iff_of_pos_left h, mul_neg_iff_of_pos_left h]
@@ -92,14 +92,14 @@ theorem Orientation.ofReal_neg (r : ℝ) : ofReal (-r) = -ofReal r := by
   simp [ofReal]; split_ifs <;> try rfl
   cases lt_asymm ‹_› ‹_›
 
-theorem Orientation.ofReal_eq_ccw (r : ℝ) : ofReal r = .CCW ↔ 0 < r := by
+theorem Orientation.ofReal_eq_ccw (r : ℝ) : ofReal r = .ccw ↔ 0 < r := by
   simp [ofReal]; split_ifs <;> simp [*]
 
-theorem Orientation.ofReal_eq_collinear (r : ℝ) : ofReal r = .Collinear ↔ r = 0 := by
+theorem Orientation.ofReal_eq_collinear (r : ℝ) : ofReal r = .collinear ↔ r = 0 := by
   simp [ofReal]; split_ifs <;> simp [*, ne_of_lt, ne_of_gt]
   exact le_antisymm (not_lt.1 ‹_›) (not_lt.1 ‹_›)
 
-theorem Orientation.ofReal_eq_cw (r : ℝ) : ofReal r = .CW ↔ r < 0 := by
+theorem Orientation.ofReal_eq_cw (r : ℝ) : ofReal r = .cw ↔ r < 0 := by
   simp [ofReal]; split_ifs <;> simp [*, le_of_lt]
 
 open Orientation Point
@@ -130,24 +130,24 @@ theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q := by
 
 -- NOTE(WN): This is annoying to have to prove.
 -- Does mathlib have a theory of antisymmetric functions, or tensors or something?
-theorem σ_self₁ (p q : Point) : σ p q q = .Collinear := by
+theorem σ_self₁ (p q : Point) : σ p q q = .collinear := by
   have : σ p q q = -σ p q q := by conv => lhs; rw [σ_perm₂]
   simpa using this
 
-theorem σ_self₂ (p q : Point) : σ q p q = .Collinear := by
+theorem σ_self₂ (p q : Point) : σ q p q = .collinear := by
   have : σ q p q = -σ q p q := by conv =>
     lhs; rw [σ_perm₁, σ_perm₂, σ_perm₁]; simp only [neg_neg]
   simpa using this
 
-theorem σ_self₃ (p q : Point) : σ q q p = .Collinear := by
+theorem σ_self₃ (p q : Point) : σ q q p = .collinear := by
   have : σ q q p = -σ q q p := by conv => lhs; rw [σ_perm₁]
   simpa using this
 
 theorem det_add_det (a b c d) : det a b c + det a c d = det a b d + det b c d := by
   simp only [det_eq]; ring
 
-theorem σ_trans (h1 : σ a b c = .CCW) (h2 : σ a c d = .CCW) (h3 : σ a d b = .CCW) :
-    σ b c d = .CCW := by
+theorem σ_trans (h1 : σ a b c = .ccw) (h2 : σ a c d = .ccw) (h3 : σ a d b = .ccw) :
+    σ b c d = .ccw := by
   rw [σ, Orientation.ofReal_eq_ccw] at *
   rw [det_perm₂] at h3
   linarith [det_add_det a b c d]
@@ -160,34 +160,19 @@ theorem Point.InGeneralPosition₃.not_mem_seg :
   linear_combination eq * (q 1 * r 0 - q 0 * r 1)
 
 theorem Point.InGeneralPosition₃.iff_ne_collinear {p q r : Point} :
-    InGeneralPosition₃ p q r ↔ σ p q r ≠ .Collinear := by
-  rw [InGeneralPosition₃, σ, det_eq, ofReal]
-  split
-  . simp; linarith
-  . split
-    . simp; linarith
-    . simp; linarith
+    InGeneralPosition₃ p q r ↔ σ p q r ≠ .collinear := by
+  rw [InGeneralPosition₃, σ, Ne, ← Orientation.ofReal_eq_collinear]
 
 theorem Point.InGeneralPosition₃.σ_ne {p q r : Point} :
-    InGeneralPosition₃ p q r → σ p q r ≠ .Collinear := by
-  intro h
-  exact iff_ne_collinear.mp h
+    InGeneralPosition₃ p q r → σ p q r ≠ .collinear := iff_ne_collinear.1
 
 theorem Point.InGeneralPosition₃.perm₁ {p q r : Point} :
     InGeneralPosition₃ p q r → InGeneralPosition₃ q p r := by
-  simp_rw [iff_ne_collinear]
-  rw [σ_perm₁ p q r]
-  intro h h'
-  rw [h'] at h
-  contradiction
+  simp [InGeneralPosition₃, det_perm₁ p q r]
 
 theorem Point.InGeneralPosition₃.perm₂ {p q r : Point} :
     InGeneralPosition₃ p q r → InGeneralPosition₃ p r q := by
-  simp_rw [iff_ne_collinear]
-  rw [σ_perm₂ p q r]
-  intro h h'
-  rw [h'] at h
-  contradiction
+  simp [InGeneralPosition₃, det_perm₂ p q r]
 
 theorem perm₃_induction {P : α → α → α → Prop}
     (H1 : ∀ {{a b c}}, P a b c → P b a c)
@@ -234,11 +219,8 @@ theorem Point.InGeneralPosition₄.perm₃ : InGeneralPosition₄ p q r s → In
   | ⟨H1, H2, H3, H4⟩ => ⟨H2, H1, H3.perm₂, H4.perm₂⟩
 
 theorem Point.PointListInGeneralPosition.mono_subperm : List.Subperm l l' →
-    Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l := by
-  simp_rw [subperm]
-  intro lsub gp p q r pqrsub
-  apply gp
-  exact pqrsub.trans lsub
+    Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l :=
+  fun sp H _ _ _ h => subperm.1 H (h.subperm.trans sp)
 
 theorem Point.PointListInGeneralPosition.mono_sublist : List.Sublist l l' →
     Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l :=
@@ -261,7 +243,7 @@ theorem Point.InGeneralPosition₃.ne₃ {p q r : Point} (h : InGeneralPosition�
   h.perm₁.ne₂
 
 open scoped Matrix
-theorem collinear_iff : σ p q r = .Collinear ↔ _root_.Collinear ℝ {p, q, r} := by
+theorem collinear_iff : σ p q r = .collinear ↔ Collinear ℝ {p, q, r} := by
   rw [σ, Orientation.ofReal_eq_collinear]
   constructor <;> intro H
   · if h : q = r then subst r; simp [collinear_pair] else
@@ -280,7 +262,7 @@ theorem collinear_iff : σ p q r = .Collinear ↔ _root_.Collinear ℝ {p, q, r}
     simp [det_eq]; ring
 
 theorem Point.InGeneralPosition₃.iff_collinear :
-    InGeneralPosition₃ p q r ↔ ¬_root_.Collinear ℝ {p, q, r} := by
+    InGeneralPosition₃ p q r ↔ ¬Collinear ℝ {p, q, r} := by
   rw [Point.InGeneralPosition₃.iff_ne_collinear, Ne, collinear_iff]
 
 theorem Point.InGeneralPosition₃.iff_not_mem_seg : InGeneralPosition₃ p q r ↔
@@ -295,7 +277,7 @@ theorem Point.InGeneralPosition₃.iff_not_mem_seg : InGeneralPosition₃ p q r 
     · left; exact mem_segment_iff_wbtw.2 h.symm
 
 theorem Point.InGeneralPosition₃.σ_cases {p q r : Point} :
-    InGeneralPosition₃ p q r → σ p q r = .CCW ∨ σ p q r = .CW := by
+    InGeneralPosition₃ p q r → σ p q r = .ccw ∨ σ p q r = .cw := by
   intro h
   cases h' : σ p q r <;> try tauto
   have := h.σ_ne
@@ -314,27 +296,27 @@ theorem Point.PointListInGeneralPosition.nodup {l : List Point}
   · refine List.nodup_iff_sublist.2 fun b h => (gp <| .cons₂ _ h).ne₃ rfl
 
 theorem Point.InGeneralPosition₃.σ_iff {p q r : Point} :
-    InGeneralPosition₃ p q r → (σ p q r ≠ .CCW ↔ σ p q r = .CW) := by
+    InGeneralPosition₃ p q r → (σ p q r ≠ .ccw ↔ σ p q r = .cw) := by
   intro h; cases h.σ_cases <;> simp_all
 
 theorem Point.InGeneralPosition₃.σ_iff' {p q r : Point} :
-    InGeneralPosition₃ p q r → (σ p q r ≠ .CW ↔ σ p q r = .CCW) := by
+    InGeneralPosition₃ p q r → (σ p q r ≠ .cw ↔ σ p q r = .ccw) := by
   intro h; cases h.σ_cases <;> simp_all
 
 -- NOTE(WN): These lemmas are a bit upsetting.
--- Ideally we'd redefine `σ : Point³ → Bool` by arbitrarily mapping `.Collinear` to `true`.
+-- Ideally we'd redefine `σ : Point³ → Bool` by arbitrarily mapping `.collinear` to `true`.
 theorem Point.InGeneralPosition₃.σ_iff₂ :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r = .CCW ↔ σ s t u = .CCW) ↔ σ p q r = σ s t u) := by
+    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r = .ccw ↔ σ s t u = .ccw) ↔ σ p q r = σ s t u) := by
   intro h h'
   cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
 
 theorem Point.InGeneralPosition₃.σ_iff₂' :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r ≠ .CCW ↔ σ s t u = .CCW) ↔ σ p q r ≠ σ s t u) := by
+    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r ≠ .ccw ↔ σ s t u = .ccw) ↔ σ p q r ≠ σ s t u) := by
   intro h h'
   cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
 
 theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
-    σ p q r = CCW ↔ slope p q < slope p r := by
+    σ p q r = ccw ↔ slope p q < slope p r := by
   unfold σ Point.slope
   have qp_dx_pos : 0 < q.x - p.x := by linarith [h.h₁]
   have rp_dx_pos : 0 < r.x - p.x := by linarith [h.h₂]
@@ -386,11 +368,11 @@ theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPo
   linarith
 
 theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
-    σ p q r = CW ↔ slope p q > slope p r := by
+    σ p q r = cw ↔ slope p q > slope p r := by
     rw [←Point.InGeneralPosition₃.σ_iff]
     apply Iff.intro
     { intro hσ
-      have: ¬(σ p q r = CCW) :=  by
+      have: ¬(σ p q r = ccw) :=  by
         {aesop}
       rw [slope_iff_orientation h hGp] at this
       have: Point.slope p q ≥ Point.slope p r := by
@@ -407,7 +389,7 @@ theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGe
     }
     {
       intro hS
-      suffices: ¬(σ p q r = CCW)
+      suffices: ¬(σ p q r = ccw)
       { aesop }
       {
         rw [slope_iff_orientation h hGp]
@@ -426,7 +408,7 @@ structure σ_equivalence (pts pts' : List Point) : Prop where
                       (pts'.get ⟨k, by rw [←same_length] ; exact hk⟩)
 
 theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    σ p q r = CCW → σ q r s = CCW → σ p r s = CCW := by
+    σ p q r = ccw → σ q r s = ccw → σ p r s = ccw := by
   rw [slope_iff_orientation h.h₁ hGp.gp₁,
     slope_iff_orientation h.sorted₃ hGp.gp₃,
     slope_iff_orientation h.sorted₄ hGp.gp₄]
@@ -439,7 +421,7 @@ theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   exact this
 
 theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    σ p q r = CCW → σ p r s = CCW → σ p q s = CCW := by
+    σ p q r = ccw → σ p r s = ccw → σ p q s = ccw := by
   rw [slope_iff_orientation h.h₁ hGp.gp₁,
     slope_iff_orientation h.sorted₃ hGp.gp₃,
     slope_iff_orientation h.sorted₂ hGp.gp₂]
@@ -447,7 +429,7 @@ theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   linarith
 
 theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    σ p q r = CW → σ q r s = CW → σ p r s = CW := by
+    σ p q r = cw → σ q r s = cw → σ p r s = cw := by
   intro h₁ h₂
   rw [slope_iff_orientation' h.h₁ hGp.gp₁] at h₁
   rw [slope_iff_orientation' h.sorted₄ hGp.gp₄] at h₂
@@ -462,7 +444,7 @@ theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   linarith
 
 theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-    σ p q r = CW → σ p r s = CW → σ p q s = CW := by
+    σ p q r = cw → σ p r s = cw → σ p q s = cw := by
   intro h₁ h₂
   rw [slope_iff_orientation' h.h₁ hGp.gp₁] at h₁
   rw [slope_iff_orientation' h.sorted₃ hGp.gp₃] at h₂
@@ -470,22 +452,22 @@ theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   linarith
 
 theorem σ_prop₁' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
-    σ p q r = CCW → σ q r s = CCW → σ p q s = CCW :=
+    σ p q r = ccw → σ q r s = ccw → σ p q s = ccw :=
   fun h₁ h₂ => σ_prop₂ h gp h₁ (σ_prop₁ h gp h₁ h₂)
 
 theorem σ_prop₂' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
-    σ p q s = CCW → σ q r s = CCW → σ p r s = CCW := by
+    σ p q s = ccw → σ q r s = ccw → σ p r s = ccw := by
   intro h₁ h₂; by_contra h₃
   have := σ_prop₄ h gp
   simp_rw [← gp.gp₁.σ_iff, ← gp.gp₂.σ_iff, ← gp.gp₃.σ_iff] at this
   refine this (h₃ <| σ_prop₁ h gp · h₂) h₃ h₁
 
 theorem σ_prop₃' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
-    σ p q r = CW → σ q r s = CW → σ p q s = CW :=
+    σ p q r = cw → σ q r s = cw → σ p q s = cw :=
   fun h₁ h₂ => σ_prop₄ h gp h₁ (σ_prop₃ h gp h₁ h₂)
 
 theorem σ_prop₄' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
-    σ p q s = CW → σ q r s = CW → σ p r s = CW := by
+    σ p q s = cw → σ q r s = cw → σ p r s = cw := by
   intro h₁ h₂; by_contra h₃
   have := σ_prop₂ h gp
   simp_rw [← gp.gp₁.σ_iff', ← gp.gp₂.σ_iff', ← gp.gp₃.σ_iff'] at this

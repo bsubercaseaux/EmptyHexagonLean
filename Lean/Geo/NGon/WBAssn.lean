@@ -14,15 +14,15 @@ def isCap (w : WBPoints) (a c d : Fin w.length) (o : Orientation) :=
     σ w[a] w[b] w[c] = o ∧ σ w[b] w[c] w[d] = o
 
 def isCapF (w : WBPoints) (a c d : Fin w.length) :=
-  c < d ∧ ∃ b : Fin w.length, isCap w a b c .CW ∧
-    σ w[b] w[c] w[d] = .CW ∧ σIsEmptyTriangleFor w[a] w[b] w[d] w.toFinset
+  c < d ∧ ∃ b : Fin w.length, isCap w a b c .cw ∧
+    σ w[b] w[c] w[d] = .cw ∧ σIsEmptyTriangleFor w[a] w[b] w[d] w.toFinset
 
 @[simp] def toPropAssn (w : WBPoints) : Var w.length → Prop
-  | .sigma a b c    => σ w[a] w[b] w[c] = .CCW
+  | .sigma a b c    => σ w[a] w[b] w[c] = .ccw
   | .inside x a b c => σPtInTriangle w[x] w[a] w[b] w[c]
   | .hole a b c     => σIsEmptyTriangleFor w[a] w[b] w[c] w.toFinset
-  | .cap a c d      => isCap w a c d .CW
-  | .cup a c d      => isCap w a c d .CCW
+  | .cap a c d      => isCap w a c d .cw
+  | .cup a c d      => isCap w a c d .ccw
   | .capF a d e     => isCapF w a d e
 
 theorem satisfies_signotopeClauses (w : WBPoints) :
@@ -43,7 +43,7 @@ theorem satisfies_signotopeClauses (w : WBPoints) :
 
 theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPosition₄ a x b c →
     (σPtInTriangle x a b c ↔
-      ((σ a b c = .CCW ↔ σ a x c = .CCW) ∧ (σ a x b ≠ .CCW ↔ σ a b c = .CCW))) := by
+      ((σ a b c = .ccw ↔ σ a x c = .ccw) ∧ (σ a x b ≠ .ccw ↔ σ a b c = .ccw))) := by
   intro sorted gp
   simp only [σPtInTriangle,
     σ_perm₂ a b x,
@@ -63,7 +63,7 @@ theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPos
 
 theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPosition₄ a b x c →
     (σPtInTriangle x a b c ↔
-      ((σ a b c = .CCW ↔ σ a x c = .CCW) ∧ (σ b x c ≠ .CCW ↔ σ a b c = .CCW))) := by
+      ((σ a b c = .ccw ↔ σ a x c = .ccw) ∧ (σ b x c ≠ .ccw ↔ σ a b c = .ccw))) := by
   intro sorted gp
   simp only [σPtInTriangle,
     σ_perm₂ a c x,

@@ -50,21 +50,21 @@ An example is illustrated in~\Cref{fig:triple-orientation}. Formally, we identif
 abbrev Point := EuclideanSpace ℝ (Fin 2)
 
 inductive Orientation : Type where
-  | CW -- clockwise :=  -
-  | CCW -- counter clockwise := +
-  | Collinear -- := 0
+  | cw -- clockwise :=  -
+  | ccw -- counter clockwise := +
+  | collinear -- := 0
 
 noncomputable def σ (p q r : Point) : Orientation :=
   let det := Matrix.det !![p.x, q.x, r.x ; p.y, q.y, r.y ; 1, 1, 1]
-  if 0 < det then CCW
-  else if det < 0 then CW
-  else Collinear
+  if 0 < det then ccw
+  else if det < 0 then cw
+  else collinear
 \end{lstlisting}
 
 % def Orientation.ofReal (r : ℝ) : Orientation :=
-%   if 0 < r then CCW
-%   else if r < 0 then CW
-%   else Collinear
+%   if 0 < r then ccw
+%   else if r < 0 then cw
+%   else collinear
 
 Through the $\sigma$ function we can immediately define the notion of \emph{general position} for collections (e.g., finite sets, lists, etc.) of points, simply establishing that $\sigma(p, q, r) \neq 0$ for every three distinct points $p, q, r$ in the collection.
 Furthermore, we can start formalizing sets of points that are \emph{equivalent} with respect to their triple orientations, and consequently, properties of pointsets that are fully captured by their triple orientations~(\emph{orientation properties}).
@@ -134,13 +134,13 @@ Now, consider four points $p, q, r, s$ that are sorted from left to right. If $p
 We formalize these implication properties and prove their validity, as for example:
 \begin{lstlisting}
 theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGenPos₄ p q r s) :
-    σ p q r = CCW → σ q r s = CCW → σ p r s = CCW
+    σ p q r = ccw → σ q r s = ccw → σ p r s = ccw
 \end{lstlisting}
 
 % [...]
 
 % theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
-%     σ p q r = CW → σ q r s = CW → σ p r s = CW
+%     σ p q r = cw → σ q r s = cw → σ p r s = cw
 The proofs of these properties are based on an equivalence between the orientation of a triple of points and the \emph{slopes} of the lines that connect them. Namely, if $p, q, r$  are sorted from left to right, then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pq}) < \textsf{slope}(\vec{pr})$  and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pr}) < \textsf{slope}(\vec{qr})$. By proving first these \emph{slope-orientation} equivalences we can then easily prove e.g.,~\lstinline|σ_prop₁|, as illustrated in~\Cref{fig:orientation-implication}.
 
 \begin{figure}

@@ -152,14 +152,14 @@ theorem ConvexEmptyIn.iff_triangles'' {s : Finset Point} {S : List Point}
 theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
     convexHull ℝ S ⊆
-    convexHull ℝ {x ∈ S | σ a b x ≠ .CCW} ∪
-    convexHull ℝ {x ∈ S | σ a b x ≠ .CW} := by
+    convexHull ℝ {x ∈ S | σ a b x ≠ .ccw} ∪
+    convexHull ℝ {x ∈ S | σ a b x ≠ .cw} := by
   suffices ∀ {a b}, a ∈ S → b ∈ S →
-      let S1 := {x ∈ S | σ a b x ≠ .CCW}
-      let S2 := {x ∈ S | σ a b x ≠ .CW}
-      ∀ p, σ a b p ≠ .CW → p ∈ convexHull ℝ S → p ∈ convexHull ℝ S1 ∨ p ∈ convexHull ℝ S2 by
+      let S1 := {x ∈ S | σ a b x ≠ .ccw}
+      let S2 := {x ∈ S | σ a b x ≠ .cw}
+      ∀ p, σ a b p ≠ .cw → p ∈ convexHull ℝ S → p ∈ convexHull ℝ S1 ∨ p ∈ convexHull ℝ S2 by
     intro a b ha hb p hp
-    by_cases h : σ a b p = .CW
+    by_cases h : σ a b p = .cw
     · cases this hb ha _ (by rw [σ_perm₁, h]; decide) hp with
       | inl h => right; (with_reducible convert h using 4); rw [Ne, ← neg_inj, ← σ_perm₁]; rfl
       | inr h => left; (with_reducible convert h using 4); rw [Ne, ← neg_inj, ← σ_perm₁]; rfl
@@ -222,8 +222,8 @@ theorem split_convexHull (cvx : ConvexPoints S) :
   simp at zab; refine segment_subset_convexHull ?_ ?_ zab <;> simp [ha, hb, σ_self₁, σ_self₂]
 
 theorem EmptyShapeIn.split (cvx : ConvexPoints S) (ha : a ∈ S) (hb : b ∈ S)
-    (H1 : EmptyShapeIn {x ∈ S | σ a b x ≠ .CCW} P)
-    (H2 : EmptyShapeIn {x ∈ S | σ a b x ≠ .CW} P) : EmptyShapeIn S P := fun _ ⟨pP, pS⟩ hn =>
+    (H1 : EmptyShapeIn {x ∈ S | σ a b x ≠ .ccw} P)
+    (H2 : EmptyShapeIn {x ∈ S | σ a b x ≠ .cw} P) : EmptyShapeIn S P := fun _ ⟨pP, pS⟩ hn =>
   (split_convexHull cvx ha hb hn).elim (H1 _ ⟨pP, mt And.left pS⟩) (H2 _ ⟨pP, mt And.left pS⟩)
 
 -- TODO: Rename to `HasEmptyKGon` to match TACAS paper

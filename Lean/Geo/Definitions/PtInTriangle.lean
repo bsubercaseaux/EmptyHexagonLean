@@ -189,18 +189,18 @@ lemma rotateTranslateTMatrix (θ : ℝ) (t : Point) :
   exact TMatrix.mul this (TMatrix.rotateByAffine θ)
 
 def ptInsideHalfPlaneCCW (p q a : Point) : Prop :=
-  (σ p q a = .CCW) ∨ (σ p q a = .Collinear)
+  (σ p q a = .ccw) ∨ (σ p q a = .collinear)
 
 def halfPlaneCCW (p q : Point) : Set Point :=
   {a | ptInsideHalfPlaneCCW p q a}
 
-theorem σ_CCW_iff_pos_det : σ p q r = .CCW ↔ det p q r > 0 := by
+theorem σ_CCW_iff_pos_det : σ p q r = .ccw ↔ det p q r > 0 := by
   rw [σ, ofReal_eq_ccw]
 
-theorem σ_CW_iff_neg_det : σ p q r = .CW ↔ det p q r < 0 := by
+theorem σ_CW_iff_neg_det : σ p q r = .cw ↔ det p q r < 0 := by
   rw [σ, ofReal_eq_cw]
 
-theorem σ_Co_iff_pos_0 : σ p q r = .Collinear ↔ det p q r = 0 := by
+theorem σ_Co_iff_pos_0 : σ p q r = .collinear ↔ det p q r = 0 := by
   rw [σ, ofReal_eq_collinear]
 
 theorem detIffHalfPlaneCCW : a ∈ halfPlaneCCW p q ↔ det p q a ≥ 0 := by
@@ -433,7 +433,7 @@ theorem convexComboTransitive {p q r a x: Point} :
 
 theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     (spq: p.x < q.x)
-    (symm: σ p q r = Orientation.CCW) (py0: p.y = 0) (qy0: q.y = 0) :
+    (symm: σ p q r = Orientation.ccw) (py0: p.y = 0) (qy0: q.y = 0) :
     σPtInTriangle a p q r → PtInTriangle a p q r  := by
   unfold PtInTriangle
   intro ⟨h1, h2, h3⟩
@@ -477,7 +477,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
 
   have pqa_pos : det p q a > 0 := by {
 
-    have : σ p q a = Orientation.CCW := by {
+    have : σ p q a = Orientation.ccw := by {
       rw [h1]
       exact symm
     }
@@ -559,7 +559,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
   exact this
 
 theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
-    (symm: σ p q r = Orientation.CCW) :
+    (symm: σ p q r = Orientation.ccw) :
     PtInTriangle a p q r → σPtInTriangle a p q r := by
   intro h
   unfold PtInTriangle at h
@@ -681,7 +681,7 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
       linarith
     }
 
-  have pqa_CCW : σ p q a = Orientation.CCW := by
+  have pqa_CCW : σ p q a = Orientation.ccw := by
     {
       rw [detIffHalfPlaneCCW] at aInHalfPQ
       rw [σ_CCW_iff_pos_det]
@@ -966,7 +966,7 @@ theorem existsNiceRotTrans {p q : Point} (diff: p ≠ q): ∃ (θ : ℝ) (t : Po
   }
 
 theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
-    (symm: σ p q r = Orientation.CCW) :
+    (symm: σ p q r = Orientation.ccw) :
     σPtInTriangle a p q r → PtInTriangle a p q r  := by
   intro h
   have p_neq_q : p ≠ q := by {
@@ -988,7 +988,7 @@ theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralP
     rw [← σPtInTriangleInvariantUnderTransform]
     exact h
   }
-  have symm' : σ p' q' r' = Orientation.CCW := by {
+  have symm' : σ p' q' r' = Orientation.ccw := by {
      rw [←rotateTranslatePreserveσ]
      exact symm
   }
@@ -997,7 +997,7 @@ theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralP
   exact this
 
 theorem σPtInTriangle_iff_of_CCW {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
-    (symm: σ p q r = Orientation.CCW) :
+    (symm: σ p q r = Orientation.ccw) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
   apply Iff.intro
   exact PtInTriangle_of_σPtInTriangle' gp symm
@@ -1007,7 +1007,7 @@ theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.InGeneralPosition₄ a 
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
   rcases gp.gp₄.σ_cases with h | h
   . exact σPtInTriangle_iff_of_CCW gp h
-  . have hccw : σ p r q = .CCW := by rw [σ_perm₂, h]; rfl
+  . have hccw : σ p r q = .ccw := by rw [σ_perm₂, h]; rfl
     have : InGeneralPosition₄ a p r q := ⟨gp.gp₂, gp.gp₁, gp.gp₃.perm₂, gp.gp₄.perm₂⟩
     have := σPtInTriangle_iff_of_CCW this hccw
     exact ⟨
