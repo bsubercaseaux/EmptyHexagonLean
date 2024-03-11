@@ -306,112 +306,79 @@ theorem Point.InGeneralPosition₃.σ_iff' {p q r : Point} :
 -- NOTE(WN): These lemmas are a bit upsetting.
 -- Ideally we'd redefine `σ : Point³ → Bool` by arbitrarily mapping `.collinear` to `true`.
 theorem Point.InGeneralPosition₃.σ_iff₂ :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r = .ccw ↔ σ s t u = .ccw) ↔ σ p q r = σ s t u) := by
+    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u →
+    ((σ p q r = .ccw ↔ σ s t u = .ccw) ↔ σ p q r = σ s t u) := by
   intro h h'
   cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
 
 theorem Point.InGeneralPosition₃.σ_iff₂' :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u → ((σ p q r ≠ .ccw ↔ σ s t u = .ccw) ↔ σ p q r ≠ σ s t u) := by
+    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u →
+    ((σ p q r ≠ .ccw ↔ σ s t u = .ccw) ↔ σ p q r ≠ σ s t u) := by
   intro h h'
   cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
 
-theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
+theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPosition₃ p q r) :
     σ p q r = ccw ↔ slope p q < slope p r := by
   unfold σ Point.slope
   have qp_dx_pos : 0 < q.x - p.x := by linarith [h.h₁]
   have rp_dx_pos : 0 < r.x - p.x := by linarith [h.h₂]
   simp only [ofReal]
   split
-  {
-    next det_pqr_pos =>
-      simp only [true_iff]
-      rw [det_eq] at det_pqr_pos
-      have : (r.x - p.x) * (q.y - p.y) < (r.y - p.y) * (q.x - p.x) := by linarith
-      rw [div_lt_div_iff qp_dx_pos rp_dx_pos]
+  · next det_pqr_pos =>
+    simp only [true_iff]
+    rw [det_eq] at det_pqr_pos
+    have : (r.x - p.x) * (q.y - p.y) < (r.y - p.y) * (q.x - p.x) := by linarith
+    rw [div_lt_div_iff qp_dx_pos rp_dx_pos]
+    linarith
+  · next det_pqr_not_pos =>
+    split
+    · next det_pqr_neg =>
+      simp only [false_iff, not_lt]
+      rw [det_eq] at det_pqr_neg
+      rw [div_le_div_iff rp_dx_pos qp_dx_pos]
       linarith
-  }
-  {
-    next det_pqr_not_pos =>
-      split
-      {
-        next det_pqr_neg =>
-          simp only [false_iff, not_lt]
-          rw [det_eq] at det_pqr_neg
-          rw [div_le_div_iff rp_dx_pos qp_dx_pos]
-          linarith
-      }
-      {
-        next det_pqr_nonneg =>
-          simp only [false_iff, not_lt]
-          have det_pqr_zero : det p q r = 0 := by linarith
-          contradiction
-      }
-  }
+    · next det_pqr_nonneg =>
+      simp only [false_iff, not_lt]
+      have det_pqr_zero : det p q r = 0 := by linarith
+      contradiction
 
-theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
-  slope p q ≠ slope p r := by
+theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPosition₃ p q r) :
+    slope p q ≠ slope p r := by
   by_contra slope_eq
-  have p_lt_q_x: p.x < q.x := by linarith [h.h₁]
-  have q_lt_r_x: q.x < r.x := by linarith [h.h₂]
-  have p_lt_r_x: p.x < r.x := by linarith
+  have p_lt_q_x : p.x < q.x := by linarith [h.h₁]
+  have q_lt_r_x : q.x < r.x := by linarith [h.h₂]
+  have p_lt_r_x : p.x < r.x := by linarith
   unfold Point.slope at slope_eq
   rw [Commute.div_eq_div_iff] at slope_eq
-  have det_0: det p q r = 0 := by
-    rw [det_eq]
+  · have det_0 : det p q r = 0 := by rw [det_eq]; linarith
+    unfold InGeneralPosition₃ at gp
+    tauto
+  · unfold Commute
+    unfold SemiconjBy
     linarith
-  unfold InGeneralPosition₃ at hGp
-  tauto
-  unfold Commute
-  unfold SemiconjBy
-  linarith
-  linarith
-  linarith
+  · linarith
+  · linarith
 
-theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPosition₃ p q r) :
+theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPosition₃ p q r) :
     σ p q r = cw ↔ slope p q > slope p r := by
-    rw [←Point.InGeneralPosition₃.σ_iff]
-    apply Iff.intro
-    { intro hσ
-      have: ¬(σ p q r = ccw) :=  by
-        {aesop}
-      rw [slope_iff_orientation h hGp] at this
-      have: Point.slope p q ≥ Point.slope p r := by
-        {aesop}
-      have not_eq: Point.slope p q ≠ Point.slope p r := by
-        {
-          exact no_equal_slopes h hGp
-        }
-      have not_eq': Point.slope p r ≠ Point.slope p q := by
-        {
-          exact Ne.symm not_eq
-        }
-      apply lt_of_le_of_ne this not_eq'
-    }
-    {
-      intro hS
-      suffices: ¬(σ p q r = ccw)
-      { aesop }
-      {
-        rw [slope_iff_orientation h hGp]
-        linarith
-      }
-    }
-    exact hGp
+    rw [← gp.σ_iff]
+    constructor
+    · intro hσ
+      have : ¬(σ p q r = ccw) := by aesop
+      rw [slope_iff_orientation h gp] at this
+      have : Point.slope p q ≥ Point.slope p r := by aesop
+      have not_eq : Point.slope p q ≠ Point.slope p r := no_equal_slopes h gp
+      exact lt_of_le_of_ne this not_eq.symm
+    · intro hS
+      suffices ¬(σ p q r = ccw) by aesop
+      rw [slope_iff_orientation h gp]
+      linarith
 
-@[deprecated]
-structure σ_equivalence (pts pts' : List Point) : Prop where
-    same_length : pts.length = pts'.length
-    same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
-        σ (pts.get ⟨i, hi⟩) (pts.get ⟨j, hj⟩) (pts.get ⟨k, hk⟩) =
-        σ (pts'.get ⟨i, by rw [←same_length] ; exact hi⟩)
-                      (pts'.get ⟨j, by rw [←same_length] ; exact hj⟩)
-                      (pts'.get ⟨k, by rw [←same_length] ; exact hk⟩)
-
-theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
     σ p q r = ccw → σ q r s = ccw → σ p r s = ccw := by
-  rw [slope_iff_orientation h.h₁ hGp.gp₁,
-    slope_iff_orientation h.sorted₃ hGp.gp₃,
-    slope_iff_orientation h.sorted₄ hGp.gp₄]
+  rw [slope_iff_orientation h.h₁ gp.gp₁,
+    slope_iff_orientation h.sorted₃ gp.gp₃,
+    slope_iff_orientation h.sorted₄ gp.gp₄]
   rw [slope_lt_iff_lt h.sorted₁]
   intro h₁ h₂
   rw [← slope_lt_iff_lt' h.sorted₁] at h₁
@@ -420,35 +387,32 @@ theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPos
   rw [← slope_lt_iff_lt h.sorted₃] at this
   exact this
 
-theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
     σ p q r = ccw → σ p r s = ccw → σ p q s = ccw := by
-  rw [slope_iff_orientation h.h₁ hGp.gp₁,
-    slope_iff_orientation h.sorted₃ hGp.gp₃,
-    slope_iff_orientation h.sorted₂ hGp.gp₂]
-  intro h₁ h₂
-  linarith
+  rw [slope_iff_orientation h.h₁ gp.gp₁,
+    slope_iff_orientation h.sorted₃ gp.gp₃,
+    slope_iff_orientation h.sorted₂ gp.gp₂]
+  exact lt_trans
 
-theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
     σ p q r = cw → σ q r s = cw → σ p r s = cw := by
   intro h₁ h₂
-  rw [slope_iff_orientation' h.h₁ hGp.gp₁] at h₁
-  rw [slope_iff_orientation' h.sorted₄ hGp.gp₄] at h₂
-  rw [slope_iff_orientation' h.sorted₃ hGp.gp₃]
+  rw [slope_iff_orientation' h.h₁ gp.gp₁] at h₁
+  rw [slope_iff_orientation' h.sorted₄ gp.gp₄] at h₂
+  rw [slope_iff_orientation' h.sorted₃ gp.gp₃]
   rw [slope_gt_iff_gt h.sorted₃]
   rw [slope_gt_iff_gt h.sorted₁] at h₁
-  have hh: Point.slope p q > Point.slope q s := by linarith
+  have hh : Point.slope p q > Point.slope q s := by linarith
   rw [slope_gt_iff_gt h.sorted₄] at h₂
-  have h2: Point.slope p r > Point.slope q r := by
-    rw [slope_gt_iff_gt' h.sorted₁]
-    exact h₁
+  have h2 : Point.slope p r > Point.slope q r := by rwa [slope_gt_iff_gt' h.sorted₁]
   linarith
 
-theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
     σ p q r = cw → σ p r s = cw → σ p q s = cw := by
   intro h₁ h₂
-  rw [slope_iff_orientation' h.h₁ hGp.gp₁] at h₁
-  rw [slope_iff_orientation' h.sorted₃ hGp.gp₃] at h₂
-  rw [slope_iff_orientation' h.sorted₂ hGp.gp₂]
+  rw [slope_iff_orientation' h.h₁ gp.gp₁] at h₁
+  rw [slope_iff_orientation' h.sorted₃ gp.gp₃] at h₂
+  rw [slope_iff_orientation' h.sorted₂ gp.gp₂]
   linarith
 
 theorem σ_prop₁' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
