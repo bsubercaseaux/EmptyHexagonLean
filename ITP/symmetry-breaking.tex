@@ -10,7 +10,7 @@ A list $L = (p_1,\ldots, p_{n})$ of points is said to be in canonical position i
     \item \textbf{(Left-Right order,~\Cref{eq:constraint-9})} The list of orientations $\left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)$ is lexicographically smaller than the list $\left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right)$.
 \end{itemize}
 \end{definition}
-    While the first 3 conditions are now a standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
+    While the first 3 conditions are now arguably standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
     Interestingly, in the process of verifying the correctness of this symmetry-breaking assumption, we found a small error in the proof presented in~\cite{scheucherTwoDisjoint5holes2020} for the first $3$ conditions. 
 The concrete theorem we prove is the following:
 
@@ -21,33 +21,11 @@ The concrete theorem we prove is the following:
   
 
 \begin{proof}[Proof Sketch]
-Let $\pi$ be an \emph{orientation property} of a set of points. We want to show that if $\pi$ holds for a set of points $S$ in general position, then it holds for a list of points $L$ in \emph{structured} position.    
-Label the points so that $p_0$ is the leftmost point (i.e., $x_0 \leq x_i$ for all $i$), and define $\theta_i \in \left[0, \pi\right)$ as \emph{angle} of the line segment $\vec{p_0p_i}$ with respect to the projective segment from $(x(p_0), \infty)$ to $p_0$. 
-Then, we can sort the points by their angles, so that $0 < i < j$ implies $\theta_i < \theta_j$.
-As a result, we have that $\sigma(p_0, p_i, p_j) = \text{CCW}$, for all $0 < i < j$, by the slope-orientation equivalence. Then, through a series of transformations that preserve ortientations, we will ensure all coordinates $x(p_i), y(p_i)$ are non-negative and that $x(p_0) = y(p_0) = 0$. We can then apply a projective transformation 
-\[
-    (x, y) \mapsto \left(x' := \frac{y}{x}, \, y' := \frac{1}{x}\right),   
-\]
-and use the slope-orientation equivalence to show that  $\frac{y(p_i)}{x(p_i)}$ is now increasing over $i$, thus implying sortnedness along the $x$-axis. 
-
+\todo[inline]{...}
 \end{proof}
 
 
 \begin{lstlisting}
-  structure gp_point_list (pts: List Point) : Prop :=
-    no_three_collinear: ∀ p1 p2 p3: Point, List.Sublist [p1, p2, p3] pts
-                          → σ p1 p2 p3 ≠ Orientation.Collinear
-  
-  structure structured_point_list (pts: List Point) : Prop :=
-    x_order: ∀ i j: (Fin pts.length), i < j → (pts.get i).x < (pts.get j).x
-    general_position: gp_point_list pts
-    ccw_order: ∀ p1 p2 p3: Point, List.Sublist [p1, p2, p3] pts
-                          → σ (pts.get 0) p2 p3 = Orientation.CCW
-
-
-  theorem symmetry_breaking (π : OrientationProperty) :
-    ∃ (pts: List Point), GeneralPosition pts ∧ π pts
-    → ∃ (pts': List Point), structured_point_list pts' ∧ π pts' := by sorry
-
+....
 
 \end{lstlisting}
