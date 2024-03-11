@@ -22,6 +22,18 @@ def eval (τ : v → Prop) : PropForm v → Prop
   | lit false a => ¬τ a
   | atomic' a => eval τ a
 
+protected partial def repr [Repr α] : PropForm α → Std.Format
+  | .all' fs => .paren <| Std.Format.joinSep (fs.toList.map PropForm.repr) (" ∧" ++ Std.Format.line)
+  | .any' fs => .paren <| Std.Format.joinSep (fs.toList.map PropForm.repr) (" ∨" ++ Std.Format.line)
+  | .atomic' f => f!"atomic({PropForm.repr f})"
+  | .lit true f => repr f
+  | .lit false f => f!"!{repr f}"
+  | .iff' a b => f!"({PropForm.repr a} ↔ {PropForm.repr b})"
+  | .not' f => f!"¬{PropForm.repr f}"
+
+instance [Repr α] : Repr (PropForm α) where
+  reprPrec f _ := PropForm.repr f
+
 @[match_pattern] protected def true : PropForm v := .all' #[]
 @[simp] theorem eval_true (τ : v → Prop) : eval τ .true := by simp [PropForm.true, eval]
 

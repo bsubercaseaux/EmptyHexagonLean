@@ -15,6 +15,15 @@ inductive Var (n : Nat)
   | capF   (a d e : Fin n)
   deriving DecidableEq
 
+instance : Repr (Var n) where
+  reprPrec
+  | .sigma a b c, _ => f!"σ {a} {b} {c}"
+  | .inside x a b c, _ => f!"inside {x} {a} {b} {c}"
+  | .hole a b c, _ => f!"hole {a} {b} {c}"
+  | .cap a b c, _ => f!"cap {a} {b} {c}"
+  | .cup a b c, _ => f!"cup {a} {b} {c}"
+  | .capF a b c, _ => f!"capF {a} {b} {c}"
+
 -- TODO: make a deriving instance for `LinearOrder`
 instance : LinearOrder (Var n) :=
   LinearOrder.lift'

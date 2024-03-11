@@ -143,12 +143,12 @@ theorem Arc.join (H1 : Arc w .CCW (a::l₁++[b])) (H2 : Arc w .CW (a::l₂++[b])
         σ_prop₁' sorted gp h (by rw [σ_perm₁, ← σ_perm₂, cbf])] at bfe; cases bfe
   · refine (Pairwise.and_mem.1 <| S1.1.2.and A1).imp₂ (fun c d ⟨hc, hd, cd, acd⟩ cdb => ?_) A4
     have ⟨ade, dbe⟩ := O hd he
-    obtain ce | ec := lt_or_gt_of_ne (ne hc he)
     obtain de | ed := lt_or_gt_of_ne (ne hd he)
     · have sorted := w.sorted₄ cd de (S2.2.2 _ he)
       have gp := w.gp₄ cd de (S2.2.2 _ he)
       rw [gp.gp₁.σ_iff'.1 fun h => ?_]
       rw [σ_prop₃' sorted gp h (by rw [σ_perm₂, dbe]; rfl)] at cdb; cases cdb
+    obtain ce | ec := lt_or_gt_of_ne (ne hc he)
     · have sorted := w.sorted₄ (S1.1.1 _ hc) ce ed
       have gp := w.gp₄ (S1.1.1 _ hc) ce ed
       rw [σ_perm₂, gp.gp₄.σ_iff.1 fun h => ?_]; rfl

@@ -147,7 +147,7 @@ def revLexClausesCore (F : Fin n → PropForm α) (a b : Fin n) (acc : PropForm 
     revLexClausesCore F
         ⟨a + 1, Nat.lt_of_le_of_lt h b.2⟩
         ⟨b - 1, Nat.lt_of_le_of_lt (Nat.sub_le ..) b.2⟩ <|
-      .or (.imp (F b) (F a)) <|
+      .or (.and (F a) (.not (F b))) <|
       .and (.imp (F a) (F b)) acc
   else
     acc

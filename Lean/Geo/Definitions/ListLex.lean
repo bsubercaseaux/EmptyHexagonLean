@@ -7,7 +7,7 @@ def RevLexMid (F : Fin n → Prop) (a b : Fin n) (acc : Prop) : Prop :=
     RevLexMid F
         ⟨a + 1, Nat.lt_of_le_of_lt h b.2⟩
         ⟨b - 1, Nat.lt_of_le_of_lt (Nat.sub_le ..) b.2⟩ <|
-      (F b → F a) ∨ (F a → F b) ∧ acc
+      (F a ∧ ¬F b) ∨ (F a → F b) ∧ acc
   else
     acc
 
@@ -17,7 +17,7 @@ theorem RevLexMid_total (F : Fin n → Prop) (hb : b = a.rev) (H : acc ∨ acc')
   apply RevLexMid_total
   · simp [Fin.rev, hb]; omega
   · subst hb; simp
-    by_cases F a <;> simp [*]
+    by_cases F a <;> by_cases F (Fin.rev a) <;> simp [*]
 
 def RevLexMid3 (F : Fin n → Fin n → Fin n → Prop) : Prop :=
   ∀ h : 3 ≤ n,
