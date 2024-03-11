@@ -6,7 +6,7 @@ A list $L = (p_1,\ldots, p_{n})$ of points is said to be in canonical position i
 \begin{itemize}
     \item \textbf{($x$-order)} The points are sorted with respect to their $x$-coordinates, i.e., $x(p_i) < x(p_j)$ for all $1 \leq i < j \leq n$.
     \item \textbf{(General Position)} No three points are collinear, i.e., for all $1 \leq i < j < k \leq n$, we have $\sigma(p_i, p_j, p_k) \neq 0$. 
-    \item \textbf{(CCW-order,~\Cref{eq:constraint-8})} All orientations $\sigma(p_0, p_i, p_j)$, with $1 \leq i < j \leq n$, are counterclockwise.
+    \item \textbf{(CCW-order,~\Cref{eq:constraint-8})} All orientations $\sigma(p_1, p_i, p_j)$, with $1 < i < j \leq n$, are counterclockwise.
     \item \textbf{(Left-Right order,~\Cref{eq:constraint-9})} The list of orientations $\left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)$ is lexicographically smaller than the list $\left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right)$.
 \end{itemize}
 \end{definition}
