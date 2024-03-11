@@ -114,7 +114,7 @@ int main (int argc, char** argv) {
     int ty, x, a, b, c, i = 1;
     while (fscanf(ptr, "%d %d %d %d %d ", &ty, &x, &a, &b, &c) == 5) {
       if (ty == 0)
-        p[orient(a+1, b+1, c+1)] = i++;
+        p[orient(a+2, b+2, c+2)] = i++;
     }
     varLookup = p;
   }
