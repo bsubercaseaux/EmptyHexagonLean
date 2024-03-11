@@ -61,24 +61,17 @@ lemma xBounded_of_PtInTriangle' {x a b c : Point} :
   simpa only [Set.mem_inter_iff, Set.mem_setOf_eq] using this
 
 theorem PtInTriangle.perm₁ : PtInTriangle a p q r → PtInTriangle a q p r := by
-  unfold PtInTriangle
-  intro
-  have : ({q, p, r} : Set Point) = {p, q, r} := Set.insert_comm q p {r}
-  rwa [this]
+  simp [PtInTriangle, Set.insert_comm]
 
 theorem PtInTriangle.perm₂ : PtInTriangle a p q r → PtInTriangle a p r q := by
-  unfold PtInTriangle
-  intro
-  have : ({r, q} : Set Point) = {q, r} := Set.pair_comm r q
-  have : ({p, r, q} : Set Point) = {p, q, r} := congrArg (insert p) this
-  rwa [this]
+  simp [PtInTriangle, Set.pair_comm]
 
 /-- `σPtInTriangle a p q r` means that `a` is in the triangle `pqr` strictly,
 i.e., not on the boundary. -/
 def σPtInTriangle (a p q r : Point) : Prop :=
   σ p q a = σ p q r ∧
-  σ p r a = σ p r q ∧
-  σ q r a = σ q r p
+  σ p a r = σ p q r ∧
+  σ a q r = σ p q r
 
 theorem not_mem_σPtInTriangle {p q r : Point} :
     InGeneralPosition₃ p q r → ¬σPtInTriangle q p q r := by
@@ -91,16 +84,14 @@ theorem not_mem_σPtInTriangle {p q r : Point} :
 theorem σPtInTriangle.perm₁ : σPtInTriangle a p q r → σPtInTriangle a q p r := by
   unfold σPtInTriangle
   intro ⟨h₁, h₂, h₃⟩
-  conv in σ q p a => rw [σ_perm₁]
-  conv in σ q p r => rw [σ_perm₁]
-  simp [*]
+  rw [σ_perm₁ p q r, σ_perm₁, neg_inj] at h₁ h₂ h₃
+  exact ⟨h₁, h₃, h₂⟩
 
 theorem σPtInTriangle.perm₂ : σPtInTriangle a p q r → σPtInTriangle a p r q := by
   unfold σPtInTriangle
   intro ⟨h₁, h₂, h₃⟩
-  conv in σ r q a => rw [σ_perm₁]
-  conv in σ r q p => rw [σ_perm₁]
-  simp [*]
+  rw [σ_perm₂ p q r, σ_perm₂, neg_inj] at h₁ h₂ h₃
+  exact ⟨h₂, h₁, h₃⟩
 
 theorem σPtInTriangle.perm (h : [p, q, r].Perm [p', q', r']) :
     σPtInTriangle a p q r ↔ σPtInTriangle a p' q' r' :=
@@ -109,25 +100,12 @@ theorem σPtInTriangle.perm (h : [p, q, r].Perm [p', q', r']) :
 theorem σPtInTriangle.gp₄_of_gp₃ :
     InGeneralPosition₃ p q r → σPtInTriangle a p q r → InGeneralPosition₄ a p q r := by
   intro gp ⟨tri₁, tri₂, tri₃⟩
-  constructor <;> rw [InGeneralPosition₃.iff_ne_collinear] at gp ⊢
-  . rw [σ_perm₁, σ_perm₂, neg_neg]
-    intro h
-    rw [h] at tri₁
-    rw [← tri₁] at gp
-    contradiction
-  . rw [σ_perm₁, σ_perm₂, neg_neg]
-    intro h
-    rw [h, σ_perm₂] at tri₂
-    have tri₂ := congrArg (-·) tri₂
-    simp only [neg_neg] at tri₂
-    rw [← tri₂] at gp
-    contradiction
-  . rw [σ_perm₁, σ_perm₂, neg_neg]
-    intro h
-    rw [h, σ_perm₂, σ_perm₁, neg_neg] at tri₃
-    rw [← tri₃] at gp
-    contradiction
-  . assumption
+  have gp := gp.σ_ne
+  constructor
+  · rwa [InGeneralPosition₃.iff_ne_collinear, σ_perm₁, ← σ_perm₂, tri₁]
+  · apply InGeneralPosition₃.perm₁; rwa [InGeneralPosition₃.iff_ne_collinear, tri₂]
+  · rwa [InGeneralPosition₃.iff_ne_collinear, tri₃]
+  · assumption
 
 /-! ## Proof of equivalence between σPtInTriangle and PtInTriangle -/
 
@@ -358,21 +336,12 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     rw [det_perm₁] at det_pqr_pos
     linarith
 
-  have anti : σ p q r = - σ p r q := by rw [σ_perm₂]
-  have : σ p a r = σ p q r := by rw [σ_perm₂, anti]; simp [h2]
-
   have det_qar_neg : det q a r < 0 := by
     rw [← σ_CW_iff_neg_det] at det_qpr_neg ⊢
-    rw [σ_perm₂] at h3
-    have : σ q r p = - σ q a r := by aesop
-    rw [σ_perm₂] at this
-    simp at this
-    aesop
+    rw [σ_perm₁, h3, ← σ_perm₁]; exact det_qpr_neg
 
   have det_par_pos : det p a r > 0 := by
-    rw [σ_perm₂] at h2
-    rw [← σ_CCW_iff_pos_det]
-    aesop
+    rw [← σ_CCW_iff_pos_det, h2, symm]
 
   let aProjXPt : Point := ![arProjX_p_q a r, 0]
 
@@ -542,29 +511,18 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have goal1 : σ p q a = σ p q r := Eq.trans pqa_CCW (Eq.symm symm)
   use goal1
 
-  have pra_neg : det p r a < 0 := by
+  have goal2 : σ p a r = σ p q r := by
+    rw [σ_CCW_iff_pos_det.2 pqr_pos, σ_CCW_iff_pos_det, GT.gt, ← neg_lt_zero, ← det_perm₂]
     apply lt_of_le_of_ne
     rw [detIffHalfPlaneCCW] at aInHalfRP
     rw [det_perm₁] at aInHalfRP
     linarith
     exact pra_non_0
-  have prq_neg : det p r q < 0 := by
-    rw [det_perm₂] at pqr_pos
-    linarith
-  have goal2 : σ p r a = σ p r q := by
-    rw [← σ_CW_iff_neg_det] at pra_neg
-    rw [← σ_CW_iff_neg_det] at prq_neg
-    aesop
   use goal2
 
-  have qrp_pos : det q r p > 0 := by
-    rw [det_perm₂, ← det_perm₁]; exact pqr_pos
-  have qra_pos : det q r a > 0 := by
-    rw [detIffHalfPlaneCCW] at aInHalfQR
-    apply lt_of_le_of_ne aInHalfQR (Ne.symm qra_non_0)
-  rw [← σ_CCW_iff_pos_det] at qrp_pos
-  rw [← σ_CCW_iff_pos_det] at qra_pos
-  exact Eq.trans qra_pos (Eq.symm qrp_pos)
+  rw [σ_CCW_iff_pos_det.2 pqr_pos, σ_perm₁, ← σ_perm₂, σ_CCW_iff_pos_det]
+  rw [detIffHalfPlaneCCW] at aInHalfQR
+  apply lt_of_le_of_ne aInHalfQR (Ne.symm qra_non_0)
 
 theorem PtInTriangleInvariantUnderTransform {a p q r : Point} (t : Point) (θ : ℝ) :
     PtInTriangle a p q r ↔

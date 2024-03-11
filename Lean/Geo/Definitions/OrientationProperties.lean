@@ -195,9 +195,9 @@ theorem σIsEmptyTriangleFor_exists (gp : Point.PointListInGeneralPosition S)
   have gp4 := hn.gp₄_of_gp₃ abc'
   have zb' : z ≤ b' := (σPtInTriangle_iff gp4).1 hn
   have := (σPtInTriangle_iff gp4.perm₁.perm₂.perm₁).2 <|
-    hb2 _ hz (by rw [σ_perm₂, hn.2.1, ← σ_perm₂, hb1.2.1]) (zb'.trans hb1.2.2) zb'
+    hb2 _ hz (by rw [hn.2.1, hb1.2.1]) (zb'.trans hb1.2.2) zb'
   refine Point.InGeneralPosition₃.iff_ne_collinear.1 abc' <| (Orientation.eq_neg_self _).1 ?_
-  rw [← σ_perm₂, ← hn.1, ← hn.2.1, σ_perm₂, this.1, ← σ_perm₂]
+  rw [← neg_inj.2 hn.1, ← σ_perm₂, this.1, hn.2.1]
 
 def σCCWPoints : List Point → Prop
   | [] => True
@@ -275,10 +275,10 @@ theorem σCCWPoints.convex (H : σCCWPoints l) : ConvexPoints l.toFinset := by
   have := (σPtInTriangle_iff <| H.gp.subperm₄ (.cons₂ sp)).2 hn
   let ⟨l₂, hp, sp⟩ := sp
   match l₂, hp.length_eq with | [a, b, c], _ => ?_
-  have acp := ((σPtInTriangle.perm hp).2 this).2.1
+  have apc := ((σPtInTriangle.perm hp).2 this).2.1
   have abc := σCCWPoints.iff_sublist.1 H.2 sp
   have pac := pairwise_iff_forall_sublist.1 H.1 (.trans (.cons₂ _ (.cons _ (.refl _))) sp)
-  rw [σ_perm₁, ← σ_perm₂, acp, σ_perm₂, abc] at pac; cases pac
+  rw [σ_perm₁, apc, abc] at pac; cases pac
 
 theorem σCCWPoints.split_l (H : σCCWPoints (a::l₁++b::l₂)) : σCCWPoints (a::l₁++[b]) :=
   H.sublist <| .append_left (.cons₂ _ <| nil_sublist _) _
