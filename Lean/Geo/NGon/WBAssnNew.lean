@@ -28,18 +28,18 @@ def isCapF (w : WBPoints) (a c d : Fin w.length) :=
 theorem satisfies_signotopeClauses (w : WBPoints) :
     (signotopeClauses w.length).eval w.toPropAssn := by
   simp [signotopeClauses]
-  intro i j hij k hjk l hkl
+  intro i _ j hij k hjk l hkl
   have s : Sorted₄ w[i] w[j] w[k] w[l] := w.sorted₄ hij hjk hkl
   have gp : InGeneralPosition₄ w[i] w[j] w[k] w[l] := w.gp₄ hij hjk hkl
   constructor
   . exact σ_prop₂ s gp
-  constructor
-  . exact σ_prop₁ s gp
-  constructor
+  -- constructor
+  -- . exact σ_prop₁ s gp
+  -- constructor
   . simp_rw [gp.gp₁.σ_iff, gp.gp₂.σ_iff, gp.gp₃.σ_iff]
     exact σ_prop₄ s gp
-  . simp_rw [gp.gp₁.σ_iff, gp.gp₄.σ_iff, gp.gp₃.σ_iff]
-    exact σ_prop₃ s gp
+  -- . simp_rw [gp.gp₁.σ_iff, gp.gp₄.σ_iff, gp.gp₃.σ_iff]
+  --   exact σ_prop₃ s gp
 
 theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPosition₄ a x b c →
     (σPtInTriangle x a b c ↔
@@ -82,7 +82,7 @@ theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPos
 
 theorem satisfies_insideClauses (w : WBPoints) : (insideClauses w.length).eval w.toPropAssn := by
   simp [insideClauses]
-  intro a b hab c hbc x
+  intro a _ b hab c hbc x
   constructor
   · intro hax hxb
     exact (insideDefs_aux₁ (w.sorted₄ hax hxb hbc) (w.gp₄ hax hxb hbc)).1
@@ -91,7 +91,7 @@ theorem satisfies_insideClauses (w : WBPoints) : (insideClauses w.length).eval w
 
 theorem satisfies_holeDefClauses (w : WBPoints) : (holeDefClauses w.length).eval w.toPropAssn := by
   simp [holeDefClauses, σIsEmptyTriangleFor, mem_toFinset_iff]
-  intro a b ab c bc H i tri
+  intro a _ b ab c bc H i tri
   have gp₄ : InGeneralPosition₄ w[i] w[a] w[b] w[c] := tri.gp₄_of_gp₃ (w.gp₃ ab bc)
   have ib : i ≠ b := mt (congrArg (w[·])) gp₄.gp₃.ne₁
   have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle' (w.sorted₃ ab bc) ((σPtInTriangle_iff gp₄).mp tri)

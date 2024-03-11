@@ -81,6 +81,7 @@ The contraints are:
 def signotopeClauses (n : Nat) : PropForm (Var n) :=
   -- for all `a`, `b`, `c` with `a < b < c`
   .forAll (Fin n) fun a =>
+  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
@@ -90,17 +91,18 @@ def signotopeClauses (n : Nat) : PropForm (Var n) :=
   .all #[
     -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d} -- 1.2
     .imp (.and (sigma a b c) (sigma a c d)) (sigma a b d)
-  , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d} -- 2.2
-    .imp (.and (sigma a b c) (sigma b c d)) (sigma a c d)
+  -- , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d} -- 2.2
+  --   .imp (.and (sigma a b c) (sigma b c d)) (sigma a c d)
   , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d} -- 1.1
     .imp (.and (.not (sigma a b c)) (.not (sigma a c d))) (.not (sigma a b d))
-  , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d} -- 2.1
-    .imp (.and (.not (sigma a b c)) (.not (sigma b c d))) (.not (sigma a c d))
+  -- , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d} -- 2.1
+  --   .imp (.and (.not (sigma a b c)) (.not (sigma b c d))) (.not (sigma a c d))
   ]
 
 def insideClauses (n : Nat) : PropForm (Var n) :=
   -- for all `a`, `b`, `c` with `a < b < c`
   .forAll (Fin n) fun a =>
+  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
@@ -122,6 +124,7 @@ def insideClauses (n : Nat) : PropForm (Var n) :=
 
 def holeDefClauses (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
+  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
