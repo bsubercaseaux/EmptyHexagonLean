@@ -47,9 +47,9 @@ lemma TMatrix.rotateByAffine (θ : ℝ) : TMatrix (Matrix.rotateByAffine θ) whe
   det_pos := by simp [Matrix.det_fin_three, Matrix.rotateByAffine, ← Real.cos_sub]
   third_row := by simp [Matrix.rotateByAffine]; rfl
 
-lemma pt_transform_rotateByAffine (p : Point) :
-    pt_transform (Matrix.rotateByAffine θ) p = rotationMap θ p := by
-  ext <;> simp [pt_transform, Matrix.rotateByAffine, Point.x, Point.y, vec_to_pt, pt_to_vec]; ring
+lemma ptTransform_rotateByAffine (p : Point) :
+    ptTransform (Matrix.rotateByAffine θ) p = rotationMap θ p := by
+  ext <;> simp [ptTransform, Matrix.rotateByAffine, Point.x, Point.y, vecToPt, ptToVec]; ring
 
 /-- Given two distinct points `P, Q`,
 if there is an angle `θ ∈ (-π/2, π/2)` rotating by which results
@@ -131,20 +131,20 @@ theorem distinct_rotate_list (l : List Point) (hNodup : l.Nodup) :
 --   sorry
   -- have ⟨θ, hθ⟩ := distinct_rotate_list l hDistinct
   -- refine ⟨_, ?_, hθ⟩
-  -- simp_rw [← funext pt_transform_rotateByAffine]
+  -- simp_rw [← funext ptTransform_rotateByAffine]
   -- apply transform_returns_omega_equivalent
   -- exact TMatrix.rotateByAffine θ
 
 /-! ## Translation -/
 
-def translation_matrix (s t : Real) : Matrix (Fin 3) (Fin 3) Real :=
+def translationMatrix (s t : Real) : Matrix (Fin 3) (Fin 3) Real :=
   ![![1, 0, s], ![0, 1, t], ![0, 0, 1]]
 
-def translation_transform (s t : Real) : TMatrix (translation_matrix s t) where
-  det_pos := by simp [Matrix.det_fin_three, translation_matrix, Matrix.vecHead, Matrix.vecTail]
+def translationTransform (s t : Real) : TMatrix (translationMatrix s t) where
+  det_pos := by simp [Matrix.det_fin_three, translationMatrix, Matrix.vecHead, Matrix.vecTail]
   third_row := rfl
 
 lemma translation_translates (p : Point) (s t : Real) :
-  pt_transform (translation_matrix s t) p = ![p.x + s, p.y + t] := by
-  simp [pt_transform, translation_matrix, pt_to_vec, vec_to_pt, Matrix.mul_apply,
+  ptTransform (translationMatrix s t) p = ![p.x + s, p.y + t] := by
+  simp [ptTransform, translationMatrix, ptToVec, vecToPt, Matrix.mul_apply,
       Finset.univ, Fintype.elems, List.finRange]

@@ -6,23 +6,23 @@ import Geo.ToMathlib
 
 namespace Geo
 
-def pt_to_vec (p : Point) : Matrix (Fin 3) (Fin 1) Real :=
+def ptToVec (p : Point) : Matrix (Fin 3) (Fin 1) Real :=
   !![p.x; p.y; 1]
 
-def vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real) : Point :=
+def vecToPt (v : Matrix (Fin 3) (Fin 1) Real) : Point :=
   ![v 0 0, v 1 0]
 
-def pt_transform (M : Matrix (Fin 3) (Fin 3) Real) (p : Point) : Point :=
-  let A := M * (pt_to_vec p)
-  vec_to_pt A
+def ptTransform (M : Matrix (Fin 3) (Fin 3) Real) (p : Point) : Point :=
+  let A := M * (ptToVec p)
+  vecToPt A
 
 -- CC: Since we unfold a lot of definitions, having a computation can help
-theorem pt_transform_eq (M : Matrix (Fin 3) (Fin 3) Real) (p : Point) :
-    pt_transform M p = ![M 0 0 * p.x + M 0 1 * p.y + M 0 2, M 1 0 * p.x + M 1 1 * p.y + M 1 2] := by
-  simp [pt_transform, pt_to_vec, vec_to_pt, Matrix.mul_apply, Finset.univ, Fintype.elems, List.finRange, add_assoc]
+theorem ptTransform_eq (M : Matrix (Fin 3) (Fin 3) Real) (p : Point) :
+    ptTransform M p = ![M 0 0 * p.x + M 0 1 * p.y + M 0 2, M 1 0 * p.x + M 1 1 * p.y + M 1 2] := by
+  simp [ptTransform, ptToVec, vecToPt, Matrix.mul_apply, Finset.univ, Fintype.elems, List.finRange, add_assoc]
   rfl
-lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real)  (last1 : v 2 0 = 1 ): pt_to_vec (vec_to_pt v) = v := by
-  simp [pt_to_vec, vec_to_pt]
+lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real)  (last1 : v 2 0 = 1 ): ptToVec (vecToPt v) = v := by
+  simp [ptToVec, vecToPt]
   apply Matrix.ext ; intro i j
   fin_cases i
   simp ; fin_cases j ; simp
@@ -31,15 +31,15 @@ lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real)  (last1 : v 2 0 
   exact Eq.symm last1
 
 
-lemma pt_transform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
+lemma ptTransform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
   (third_row: M₂ ⟨2, by trivial⟩ = ![0, 0, 1]) :
-  pt_transform (M₁ * M₂) p = pt_transform M₁ (pt_transform M₂ p) := by
-  unfold pt_transform
+  ptTransform (M₁ * M₂) p = ptTransform M₁ (ptTransform M₂ p) := by
+  unfold ptTransform
   simp [Matrix.mul_assoc]
-  let v := M₂ * pt_to_vec p
+  let v := M₂ * ptToVec p
   have t : v 2 0 = 1 := by
     dsimp
-    unfold pt_to_vec
+    unfold ptToVec
     rw [Matrix.mul_apply]
     rw [Fin.sum_univ_three]
     have : M₂ 2 = ![0,0,1] := third_row
@@ -53,7 +53,7 @@ structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop where
 
 namespace TMatrix
 
-def toLinearMatrix (T : TMatrix M) : Matrix (Fin 2) (Fin 2) Real :=
+def toLinearMatrix (_T : TMatrix M) : Matrix (Fin 2) (Fin 2) Real :=
   !![M 0 0, M 0 1 ; M 1 0 , M 1 1]
 
 theorem det_eq_det_toLinearMatrix (T : TMatrix M) : M.det = T.toLinearMatrix.det := by
@@ -64,28 +64,29 @@ theorem det_eq_det_toLinearMatrix (T : TMatrix M) : M.det = T.toLinearMatrix.det
   simp [htr]
 
 noncomputable def toAffineMap (T : TMatrix M) : Point →ᵃ[ℝ] Point where
-  toFun := pt_transform M
+  toFun := ptTransform M
   linear := Matrix.toEuclideanLin T.toLinearMatrix
   map_vadd' := by
     intro p1 p2
-    simp_rw [vadd_eq_add, pt_transform_eq]
+    simp_rw [vadd_eq_add, ptTransform_eq]
     simp [toLinearMatrix, Matrix.toEuclideanLin_eq_toLin]
     show _ = Matrix.mulVec !![M 0 0, M 0 1 ; M 1 0 , M 1 1] p2 + _
     simp [Matrix.mulVec, Matrix.vecHead, Matrix.vecTail, mul_add]
     ring_nf
 
-theorem pts_to_matrix_pt_transform (p q r : Point) {M : Matrix (Fin 3) (Fin 3) Real} (T : TMatrix M) :
-    pts_to_matrix (pt_transform M p) (pt_transform M q) (pt_transform M r) = M * pts_to_matrix p q r := by
-  simp_rw [pt_transform_eq, pts_to_matrix]
+theorem Point.toMatrix_ptTransform (p q r : Point) {M : Matrix (Fin 3) (Fin 3) Real} (T : TMatrix M) :
+    Point.toMatrix (ptTransform M p) (ptTransform M q) (ptTransform M r) = M * Point.toMatrix p q r := by
+  simp_rw [ptTransform_eq, Point.toMatrix]
   ext i j
   fin_cases i
   <;> simp [Matrix.mul_apply, Finset.univ, Fintype.elems, List.finRange, T.third_row]
   <;> fin_cases j <;> simp [add_assoc] <;> rfl
 
-theorem pt_transform_preserves_sigma (p q r : Point) (T : TMatrix M) :
-    σ (pt_transform M p) (pt_transform M q) (pt_transform M r) = σ p q r := by
-  unfold σ matrix_det
-  simp [pts_to_matrix_pt_transform p q r T, Matrix.det_mul, mul_pos_iff_of_pos_left T.det_pos, Orientation.ofReal]
+theorem ptTransform_preserves_sigma (p q r : Point) (T : TMatrix M) :
+    σ (ptTransform M p) (ptTransform M q) (ptTransform M r) = σ p q r := by
+  unfold σ Point.det
+  simp [Point.toMatrix_ptTransform p q r T,
+    Matrix.det_mul, mul_pos_iff_of_pos_left T.det_pos, Orientation.ofReal]
   congr 2  -- Cayden TODO: There's a better way to do this through mul_neg_iff
   rw [mul_neg_iff, eq_iff_iff]
   constructor

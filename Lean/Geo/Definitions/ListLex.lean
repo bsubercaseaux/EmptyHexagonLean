@@ -45,7 +45,7 @@ def σRevLex (l : List Point) : Prop :=
 def flipX (pt : Point) : Point := ![-pt.x, pt.y]
 
 theorem σ_flipX : σ (flipX a) (flipX b) (flipX c) = -σ a b c := by
-  simp [flipX, σ, matrix_det_eq_det_pts, Point.det, ← Orientation.ofReal_neg]
+  simp [flipX, σ, Point.det_eq, ← Orientation.ofReal_neg]
   congr 1; ring
 
 theorem σRevLex_total (l : List Point) : σRevLex l ∨ σRevLex (l.reverse.map flipX) := by

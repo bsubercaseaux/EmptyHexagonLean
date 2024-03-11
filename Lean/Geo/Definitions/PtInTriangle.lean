@@ -151,8 +151,8 @@ theorem injective_rotateTranslateMap (θ : ℝ) (p : Point) : Function.Injective
   . exact fun x y h => add_left_cancel h
   . simp [injective_rotationMap]
 
-lemma pt_transform_translateMap (p  t: Point) : pt_transform (translation_matrix t.x t.y) p = translateMap t p := by
-  ext <;> simp [pt_transform, translation_matrix, Point.x, Point.y, vec_to_pt, pt_to_vec];
+lemma ptTransform_translateMap (p  t: Point) : ptTransform (translationMatrix t.x t.y) p = translateMap t p := by
+  ext <;> simp [ptTransform, translationMatrix, Point.x, Point.y, vecToPt, ptToVec];
   ring_nf
   rw [translateMap_apply]
   simp
@@ -172,19 +172,19 @@ noncomputable def rotateTranslateSet (S : Set Point) (θ : ℝ) (tx ty : ℝ) : 
   {rotateTranslate p θ tx ty | p ∈ S}
 
 theorem rotateTranslateTransform (θ : ℝ) (t p : Point) :
-    (rotateTranslateMap θ t p) = pt_transform ((translation_matrix t.x t.y)*(Matrix.rotateByAffine θ)) p := by
-  rw [pt_transform_by_prod]
+    (rotateTranslateMap θ t p) = ptTransform ((translationMatrix t.x t.y)*(Matrix.rotateByAffine θ)) p := by
+  rw [ptTransform_by_prod]
   unfold rotateTranslateMap
   simp
-  rw [←pt_transform_rotateByAffine]
-  rw [pt_transform_translateMap]
+  rw [←ptTransform_rotateByAffine]
+  rw [ptTransform_translateMap]
   unfold Matrix.rotateByAffine
   rfl
 
 lemma rotateTranslateTMatrix (θ : ℝ) (t : Point) :
-    TMatrix (translation_matrix t.x t.y * Matrix.rotateByAffine θ) := by
-  have : TMatrix (translation_matrix t.x t.y) := by {
-    exact translation_transform t.x t.y
+    TMatrix (translationMatrix t.x t.y * Matrix.rotateByAffine θ) := by
+  have : TMatrix (translationMatrix t.x t.y) := by {
+    exact translationTransform t.x t.y
   }
   exact TMatrix.mul this (TMatrix.rotateByAffine θ)
 
@@ -194,16 +194,16 @@ def ptInsideHalfPlaneCCW (p q a : Point) : Prop :=
 def halfPlaneCCW (p q : Point) : Set Point :=
   {a | ptInsideHalfPlaneCCW p q a}
 
-theorem σ_CCW_iff_pos_det : σ p q r = .CCW ↔ matrix_det p q r > 0 := by
+theorem σ_CCW_iff_pos_det : σ p q r = .CCW ↔ det p q r > 0 := by
   rw [σ, ofReal_eq_ccw]
 
-theorem σ_CW_iff_neg_det : σ p q r = .CW ↔ matrix_det p q r < 0 := by
+theorem σ_CW_iff_neg_det : σ p q r = .CW ↔ det p q r < 0 := by
   rw [σ, ofReal_eq_cw]
 
-theorem σ_Co_iff_pos_0 : σ p q r = .Collinear ↔ matrix_det p q r = 0 := by
+theorem σ_Co_iff_pos_0 : σ p q r = .Collinear ↔ det p q r = 0 := by
   rw [σ, ofReal_eq_collinear]
 
-theorem detIffHalfPlaneCCW : a ∈ halfPlaneCCW p q ↔ matrix_det p q a ≥ 0 := by
+theorem detIffHalfPlaneCCW : a ∈ halfPlaneCCW p q ↔ det p q a ≥ 0 := by
   simp [halfPlaneCCW, ptInsideHalfPlaneCCW]
   constructor
   · rintro (h | h)
@@ -218,34 +218,22 @@ theorem HalfPlanesAreConvex : Convex ℝ (halfPlaneCCW p q) := by
   convert convex_halfspace_le (𝕜 := ℝ) (E := Point)
       (f := fun r => (q.y - p.y) * r.x + (p.x - q.x) * r.y) _ (p.x * q.y - p.y * q.x) using 1
   · ext r
-    simp only [detIffHalfPlaneCCW, matrix_det_eq_det_pts, Point.det,
+    simp only [detIffHalfPlaneCCW, det_eq,
       Matrix.vec2_dotProduct, PiLp.sub_apply, Set.mem_setOf_eq]
     simp (config := {singlePass := true}) [← sub_nonneg]; ring_nf
   constructor <;> intros <;> simp [Point.x, Point.y] <;> ring
 
-theorem det_symmetry (a b c : Point) : matrix_det a b c = -matrix_det b a c := by
-  rw [matrix_det_eq_det_pts]
-  rw [matrix_det_eq_det_pts]
-  unfold Point.det
-  linarith
+theorem det_symmetry (a b c : Point) : det a b c = -det b a c := by
+  simp only [det_eq]; linarith
 
-theorem det_symmetry' (a b c : Point) : matrix_det a b c = matrix_det b c a := by
-  rw [matrix_det_eq_det_pts]
-  rw [matrix_det_eq_det_pts]
-  unfold Point.det
-  linarith
+theorem det_symmetry' (a b c : Point) : det a b c = det b c a := by
+  simp only [det_eq]; linarith
 
-theorem  det_antisymmetry (a b c : Point) : matrix_det a b c = -matrix_det b a c := by
-  rw [matrix_det_eq_det_pts]
-  rw [matrix_det_eq_det_pts]
-  unfold Point.det
-  linarith
+theorem  det_antisymmetry (a b c : Point) : det a b c = -det b a c := by
+  simp only [det_eq]; linarith
 
-theorem det_antisymmetry' (a b c : Point) : matrix_det a b c = -matrix_det a c b := by
-  rw [matrix_det_eq_det_pts]
-  rw [matrix_det_eq_det_pts]
-  unfold Point.det
-  linarith
+theorem det_antisymmetry' (a b c : Point) : det a b c = -det a c b := by
+  simp only [det_eq]; linarith
 
 theorem convex3combo (S : Set Point) (CS: Convex ℝ S) :
     ∀ (a b c : Point), a ∈ S → b ∈ S → c ∈ S →
@@ -315,7 +303,7 @@ noncomputable def arProjX_p_q (a r : Point) : ℝ :=
 
 theorem arProjX_between_p_q {a p q r : Point}
     (py0: p.y = 0) (qy0: q.y = 0)
-    (det_qar_neg : matrix_det q a r < 0) (det_par_pos : matrix_det p a r > 0)
+    (det_qar_neg : det q a r < 0) (det_par_pos : det p a r > 0)
     (ar_y_order : r.y > a.y) :
     p.x <  (arProjX_p_q a r) ∧ (arProjX_p_q a r) < q.x := by
   have order_aProjX_qX : (arProjX_p_q a r) < q.x := by {
@@ -327,10 +315,7 @@ theorem arProjX_between_p_q {a p q r : Point}
        linarith
        linarith only [ar_y_order]
      }
-     rw [matrix_det_eq_det_pts] at det_qar_neg
-     unfold Point.det at det_qar_neg
-     rw [qy0] at det_qar_neg
-     simp at det_qar_neg
+     simp [det_eq, qy0] at det_qar_neg
      linarith
   }
 
@@ -342,15 +327,13 @@ theorem arProjX_between_p_q {a p q r : Point}
        linarith
        linarith only [ar_y_order]
      }
-     rw [matrix_det_eq_det_pts] at det_par_pos
-     unfold Point.det at det_par_pos
-     rw [py0] at det_par_pos
-     simp at det_par_pos
+     simp [det_eq, py0] at det_par_pos
      linarith
   }
   exact ⟨order_aProjX_pX, order_aProjX_qX⟩
 
-theorem convexComboOfCollinearAndXOrdered (p q x : Point) (collinear: matrix_det p q x = 0) (xOrder1: p.x < x.x) (xOrder2: x.x < q.x) :
+theorem convexComboOfCollinearAndXOrdered (p q x : Point)
+    (collinear: det p q x = 0) (xOrder1: p.x < x.x) (xOrder2: x.x < q.x) :
     ∃ (α β : ℝ), α + β = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ α • p + β • q = x := by
   -- because they're on the same line and a is between their y coordinates
   let α := (q.x - x.x) / (q.x - p.x)
@@ -375,8 +358,7 @@ theorem convexComboOfCollinearAndXOrdered (p q x : Point) (collinear: matrix_det
   use αNN
   use βNN
   simp
-  rw [matrix_det_eq_det_pts] at collinear
-  unfold Point.det at collinear
+  rw [det_eq] at collinear
   have : q.x - p.x ≠ 0 := by linarith
   ext
 
@@ -386,7 +368,7 @@ theorem convexComboOfCollinearAndXOrdered (p q x : Point) (collinear: matrix_det
   field_simp [this]
   linarith [collinear]
 
-theorem convexComboOfCollinearAndYOrdered (p q x : Point) (collinear: matrix_det p q x = 0) (yOrder1: p.y < x.y) (yOrder2: x.y < q.y) :
+theorem convexComboOfCollinearAndYOrdered (p q x : Point) (collinear: det p q x = 0) (yOrder1: p.y < x.y) (yOrder2: x.y < q.y) :
     ∃ (α β : ℝ), α + β = 1 ∧ α ≥ 0 ∧ β ≥ 0 ∧ α • p + β • q = x := by
   -- because they're on the same line and a is between their y coordinates
   let α := (q.y - x.y) / (q.y - p.y)
@@ -411,8 +393,7 @@ theorem convexComboOfCollinearAndYOrdered (p q x : Point) (collinear: matrix_det
   use αNN
   use βNN
   simp
-  rw [matrix_det_eq_det_pts] at collinear
-  unfold Point.det at collinear
+  rw [det_eq] at collinear
   have : q.y - p.y ≠ 0 := by linarith
   ext
 
@@ -456,11 +437,11 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     σPtInTriangle a p q r → PtInTriangle a p q r  := by
   unfold PtInTriangle
   intro ⟨h1, h2, h3⟩
-  have det_pqr_pos : matrix_det p q r > 0 := by {
+  have det_pqr_pos : det p q r > 0 := by {
     rw [σ_CCW_iff_pos_det] at symm
     linarith
   }
-  have det_qpr_neg : matrix_det q p r < 0 := by {
+  have det_qpr_neg : det q p r < 0 := by {
     rw [det_antisymmetry] at det_pqr_pos
     linarith
   }
@@ -474,7 +455,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     simp [h2]
   }
 
-  have det_qar_neg : matrix_det q a r < 0 := by {
+  have det_qar_neg : det q a r < 0 := by {
     rw [←σ_CW_iff_neg_det]
     rw [←σ_CW_iff_neg_det] at det_qpr_neg
     rw [σ_perm₂] at h3
@@ -486,7 +467,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     aesop
   }
 
-  have det_par_pos : matrix_det p a r > 0 := by {
+  have det_par_pos : det p a r > 0 := by {
     rw [σ_perm₂] at h2
     rw [←σ_CCW_iff_pos_det]
     aesop
@@ -494,7 +475,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
 
   let aProjXPt : Point := ![(arProjX_p_q a r), 0]
 
-  have pqa_pos : matrix_det p q a > 0 := by {
+  have pqa_pos : det p q a > 0 := by {
 
     have : σ p q a = Orientation.CCW := by {
       rw [h1]
@@ -506,19 +487,11 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
   have y_order : aProjXPt.y = 0 ∧ a.y > 0 ∧ r.y > a.y := by {
     use rfl
     constructor
-    . rw [matrix_det_eq_det_pts] at pqa_pos
-      unfold Point.det at pqa_pos
-      rw [py0, qy0] at pqa_pos
+    . rw [det_eq, py0, qy0] at pqa_pos
       simp at pqa_pos
       nlinarith
-    . rw [matrix_det_eq_det_pts] at det_par_pos
-      rw [matrix_det_eq_det_pts] at det_qar_neg
-      unfold Point.det at det_par_pos
-      unfold Point.det at det_qar_neg
-      rw [py0] at det_par_pos
-      rw [qy0] at det_qar_neg
-      simp at det_par_pos
-      simp at det_qar_neg
+    · simp [det_eq, py0] at det_par_pos
+      simp [det_eq, qy0] at det_qar_neg
       nlinarith
   }
 
@@ -528,10 +501,8 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     exact arProjX_bet_p_q
   }
 
-  have p_q_arProjXPt_collinear : matrix_det p q aProjXPt = 0 := by {
-    rw [matrix_det_eq_det_pts]
-    unfold Point.det
-    rw [py0, qy0]
+  have p_q_arProjXPt_collinear : det p q aProjXPt = 0 := by {
+    rw [det_eq, py0, qy0]
     simp
   }
 
@@ -539,9 +510,8 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     convexComboOfCollinearAndXOrdered p q aProjXPt p_q_arProjXPt_collinear arProjXPt_p_q_XOrdered.1 arProjXPt_p_q_XOrdered.2
 
 
-  have aProjX_r_a_collinear : matrix_det aProjXPt r a = 0 := by {
-    rw [matrix_det_eq_det_pts]
-    unfold Point.det
+  have aProjX_r_a_collinear : det aProjXPt r a = 0 := by {
+    rw [det_eq]
     dsimp
     unfold arProjX_p_q
     have : r.y - a.y ≠ 0 := by linarith
@@ -600,13 +570,13 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have pInPQ: p ∈ halfPlanePQ := by
     {
       simp; rw [detIffHalfPlaneCCW]
-      rw [matrix_det_eq_det_pts]; unfold Point.det
+      rw [det_eq]
       linarith
     }
   have pInRP: p ∈ halfPlaneRP := by
     {
       simp; rw [detIffHalfPlaneCCW]
-      rw [matrix_det_eq_det_pts]; unfold Point.det
+      rw [det_eq]
       linarith
     }
   have pInQR: p ∈ halfPlaneQR := by
@@ -619,13 +589,13 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have qInPQ: q ∈ halfPlanePQ := by
     {
       simp; rw [detIffHalfPlaneCCW]
-      rw [matrix_det_eq_det_pts]; unfold Point.det
+      rw [det_eq]
       linarith
     }
   have qInQR: q ∈ halfPlaneQR := by
     {
       simp; rw [detIffHalfPlaneCCW]
-      rw [matrix_det_eq_det_pts]; unfold Point.det
+      rw [det_eq]
       linarith
     }
   have qInRP: q ∈ halfPlaneRP := by
@@ -646,13 +616,13 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have rInQR: r ∈ halfPlaneQR := by
     {
       simp; rw [detIffHalfPlaneCCW]
-      rw [matrix_det_eq_det_pts]; unfold Point.det
+      rw [det_eq]
       linarith
     }
   have rInRP: r ∈ halfPlaneRP := by
     {
       simp; rw [detIffHalfPlaneCCW]
-      rw [matrix_det_eq_det_pts]; unfold Point.det
+      rw [det_eq]
       linarith
     }
 
@@ -683,32 +653,29 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have aInHalfRP: a ∈ halfPlaneRP := by aesop
   have aInHalfQR: a ∈ halfPlaneQR := by aesop
 
-  have pqa_non_0 : matrix_det p q a ≠ 0 := by
+  have pqa_non_0 : det p q a ≠ 0 := by
     {
       have l := gp.1
       unfold Point.InGeneralPosition₃ at l
-      rw [←matrix_det_eq_det_pts] at l
       rw [det_symmetry'] at l
       exact l
     }
-  have pra_non_0 : matrix_det p r a ≠ 0 := by
+  have pra_non_0 : det p r a ≠ 0 := by
     {
       have l := gp.2
       unfold Point.InGeneralPosition₃ at l
-      rw [←matrix_det_eq_det_pts] at l
       rw [det_symmetry'] at l
       exact l
     }
-  have qra_non_0 : matrix_det q r a ≠ 0 := by
+  have qra_non_0 : det q r a ≠ 0 := by
     {
       have l := gp.3
       unfold Point.InGeneralPosition₃ at l
-      rw [←matrix_det_eq_det_pts] at l
       rw [det_symmetry'] at l
       exact l
     }
 
-  have pqr_pos : matrix_det p q r > 0 := by
+  have pqr_pos : det p q r > 0 := by
     {
       rw [σ_CCW_iff_pos_det] at symm
       linarith
@@ -723,7 +690,7 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have goal1: σ p q a = σ p q r := Eq.trans pqa_CCW (Eq.symm symm)
   use goal1
 
-  have pra_neg : matrix_det p r a < 0 := by
+  have pra_neg : det p r a < 0 := by
       {
         apply lt_of_le_of_ne
         rw [detIffHalfPlaneCCW] at aInHalfRP
@@ -731,7 +698,7 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
         linarith
         exact pra_non_0
       }
-  have prq_neg : matrix_det p r q < 0 := by
+  have prq_neg : det p r q < 0 := by
       {
         rw [det_antisymmetry'] at pqr_pos
         linarith
@@ -744,11 +711,11 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
     }
   use goal2
 
-  have qrp_pos : matrix_det q r p > 0 := by
+  have qrp_pos : det q r p > 0 := by
     {
       rw [←det_symmetry']; exact pqr_pos
     }
-  have qra_pos : matrix_det q r a > 0 := by
+  have qra_pos : det q r a > 0 := by
     {
       rw [detIffHalfPlaneCCW] at aInHalfQR
       apply lt_of_le_of_ne aInHalfQR (Ne.symm qra_non_0)
@@ -773,10 +740,10 @@ theorem rotateTranslatePreserveσ (θ : ℝ) (t p q r : Point) :
   rw [rotateTranslateTransform]
   rw [rotateTranslateTransform]
   rw [rotateTranslateTransform]
-  set T := (translation_matrix (Point.x t) (Point.y t) * Matrix.rotateByAffine θ)
+  set T := (translationMatrix (Point.x t) (Point.y t) * Matrix.rotateByAffine θ)
   have : TMatrix T := by exact rotateTranslateTMatrix θ t
   symm
-  apply TMatrix.pt_transform_preserves_sigma p q r this
+  apply TMatrix.ptTransform_preserves_sigma p q r this
 
 theorem σPtInTriangleInvariantUnderTransform {a p q r : Point}  (t : Point) (θ : ℝ) :
     σPtInTriangle a p q r ↔ σPtInTriangle (rotateTranslateMap θ t a) (rotateTranslateMap θ t p) (rotateTranslateMap θ t q) (rotateTranslateMap θ t r) := by
@@ -1005,7 +972,7 @@ theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralP
   have p_neq_q : p ≠ q := by {
     have l := gp.4
     unfold Point.InGeneralPosition₃ at l
-    unfold Point.det at l
+    rw [Point.det_eq] at l
     by_contra C
     simp [C] at l
     ring_nf at l

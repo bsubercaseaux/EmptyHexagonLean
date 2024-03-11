@@ -37,8 +37,17 @@ instance : IsTotal Point (fun P Q => P.x <= Q.x) :=
 instance : IsTrans Point fun P Q => P.x <= Q.x :=
   ⟨fun _ _ _ _ _ => by linarith⟩
 
-def det (p q r : Point) : ℝ :=
-  p.x * q.y + q.x * r.y + r.x * p.y - p.y * q.x - q.y * r.x - r.y * p.x
+def toMatrix (a b c : Point) : Matrix (Fin 3) (Fin 3) ℝ :=
+  !![a.x, b.x, c.x ; a.y, b.y, c.y ; 1, 1, 1]
+
+def det (a b c : Point) : Real := (toMatrix a b c).det
+
+lemma det_eq (a b c : Point) :
+    det a b c = a.x * b.y + b.x * c.y + c.x * a.y - a.y * b.x - b.y * c.x - c.y * a.x := by
+  unfold det toMatrix
+  rw [Matrix.det_fin_three]
+  simp [Matrix.vecHead, Matrix.vecTail]
+  ring_nf
 
 /-! # In general position -/
 

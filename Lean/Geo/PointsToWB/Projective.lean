@@ -18,13 +18,13 @@ theorem orientWithInfty_swap : -orientWithInfty p1 p2 = orientWithInfty p2 p1 :=
 
 theorem orientWithInfty_preserved {p1 p2 : Point} (h1 : p1.x > 0) (h2 : p2.x > 0) :
     σ 0 p1 p2 = orientWithInfty (projectiveMap p1) (projectiveMap p2) := by
-  simp [projectiveMap, σ, orientWithInfty, matrix_det_eq_det_pts, Point.det]
+  simp [projectiveMap, σ, orientWithInfty, Point.det_eq]
   convert Orientation.ofReal_mul_left _ _ (mul_pos h1 h2) using 2
   field_simp; ring
 
 theorem orientations_preserved {p1 p2 p3 : Point} (h1 : p1.x > 0) (h2 : p2.x > 0) (h3 : p3.x > 0) :
     σ p1 p2 p3 = σ (projectiveMap p1) (projectiveMap p2) (projectiveMap p3) := by
-  simp [projectiveMap, σ, matrix_det_eq_det_pts, Point.det]
+  simp [projectiveMap, σ, Point.det_eq]
   convert Orientation.ofReal_mul_left _ _ (mul_pos h1 <| mul_pos h2 h3) using 2
   field_simp; ring
 
@@ -45,11 +45,11 @@ theorem exists_pt_st_orientations_preserved (pts : List Point) (hsort : pts.Sort
     · rw [← orientWithInfty_swap, σ_perm₂, this _ h2 _ h1 h]
     · by_cases eq : p1 = p2
       · subst eq
-        simp [orientWithInfty, σ, matrix_det_eq_det_pts, Point.det]; ring_nf
+        simp [orientWithInfty, σ, Point.det_eq]; ring_nf
       · have : IsIrrefl Point (·.x < ·.x) := ⟨fun _ => lt_irrefl _⟩
         have := hsort.imp (S := fun a b : Point => a.x ≠ b.x) ne_of_lt
         cases this.forall (fun _ _ => Ne.symm) h1 h2 eq h.symm
-  simp [σ, orientWithInfty, matrix_det_eq_det_pts, Point.det]
+  simp [σ, orientWithInfty, Point.det_eq]
   simp at hb
   have := hb _ _ h1 _ h2 rfl
   unfold Orientation.ofReal

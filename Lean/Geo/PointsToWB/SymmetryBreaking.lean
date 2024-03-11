@@ -19,7 +19,7 @@ def σEmbed.reverse (S : List Point) : S ≼σ S.reverse :=
 
 def σEmbed.flipX (S : List Point) : S ≼σ S.map flipX :=
   ⟨Geo.flipX, by simp, true, by
-    simp [Geo.σ, Geo.flipX, matrix_det_eq_det_pts, Point.det, Orientation.true_xor, ← Orientation.ofReal_neg]
+    simp [Geo.σ, Geo.flipX, Point.det_eq, Orientation.true_xor, ← Orientation.ofReal_neg]
     intros; congr 1; ring⟩
 
 lemma sorted_reverse_flipX {S : List Point} :
@@ -36,8 +36,8 @@ theorem σEmbed_rotate (l : List Point) (h : l.Nodup) :
   have ⟨θ, hDistinct⟩ := distinct_rotate_list _ h
   refine have σ := ⟨rotationMap θ, .rfl, false, fun p q r _ _ _ => ?hσ⟩; ⟨_, σ, hDistinct⟩
   case hσ =>
-    simpa [pt_transform_rotateByAffine] using
-      (TMatrix.rotateByAffine θ).pt_transform_preserves_sigma p q r
+    simpa [ptTransform_rotateByAffine] using
+      (TMatrix.rotateByAffine θ).ptTransform_preserves_sigma p q r
 
 variable {l : List Point} (hl : 3 ≤ l.length) (gp : Point.PointListInGeneralPosition l)
 
@@ -60,10 +60,10 @@ theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
     let f := (· - a)
     have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp), σ_eq := ?σ_eq }
     case σ_eq =>
-      have eq (p) : pt_transform (translation_matrix (-a.x) (-a.y)) p = p - a := by
+      have eq (p) : ptTransform (translationMatrix (-a.x) (-a.y)) p = p - a := by
         ext <;> simp [translation_translates] <;> rfl
       intro p q r _ _ _
-      simpa [eq] using (translation_transform (-a.x) (-a.y)).pt_transform_preserves_sigma p q r
+      simpa [eq] using (translationTransform (-a.x) (-a.y)).ptTransform_preserves_sigma p q r
     have ⟨ha, _hl1'⟩ := List.pairwise_cons.1 (hl1.perm p1 Ne.symm)
     refine ⟨_, σ1.trans σ2, ?_ /- , hl1'.map _ fun _ _ => mt sub_left_inj.1 -/⟩
     simp; intro a h'

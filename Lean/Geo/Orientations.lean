@@ -104,40 +104,28 @@ theorem Orientation.ofReal_eq_cw (r : ℝ) : ofReal r = .CW ↔ r < 0 := by
 
 open Orientation Point
 
-def pts_to_matrix (a b c : Point) : Matrix (Fin 3) (Fin 3) Real :=
-  !![a.x, b.x, c.x ; a.y, b.y, c.y ; 1, 1, 1]
-
--- TODO: deduplicate det and matrix_det
-def matrix_det (a b c : Point) : Real :=
-  Matrix.det (pts_to_matrix a b c)
-
-lemma matrix_det_eq_det_pts (a b c : Point) :
-  matrix_det a b c = det a b c := by
-    unfold matrix_det det pts_to_matrix
-    rw [Matrix.det_fin_three]
-    simp [Matrix.vecHead, Matrix.vecTail]
-    ring_nf
-
 noncomputable def σ (p q r : Point) : Orientation :=
-  .ofReal (matrix_det p q r)
+  .ofReal (det p q r)
 
 def detAffineMap (p q : Point) : Point →ᵃ[ℝ] ℝ where
   toFun r := det p q r
   linear.toFun r := q.x * r.y + r.x * p.y - q.y * r.x - r.y * p.x
   linear.map_add' a b := by simp [x, y]; ring
   linear.map_smul' a b := by simp [x, y]; ring
-  map_vadd' a b := by simp [det, x, y]; ring
+  map_vadd' a b := by simp [det_eq, x, y]; ring
 
 @[simp] theorem detAffineMap_apply : detAffineMap p q r = det p q r := rfl
 
-theorem det_perm₁ (p q r) : det p q r = -det q p r := by unfold det; ring
+theorem det_perm₁ (p q r) : det p q r = -det q p r := by simp only [det_eq]; ring
+
 theorem σ_perm₁ (p q r : Point) : σ p q r = -σ q p r := by
-  simp only [σ, matrix_det_eq_det_pts, det_perm₁ p q r, ofReal]
+  simp only [σ, det_eq, det_perm₁ p q r, ofReal]
   split_ifs <;> first | rfl | exfalso; linarith
 
-theorem det_perm₂ (p q r) : det p q r = -det p r q := by unfold det; ring
+theorem det_perm₂ (p q r) : det p q r = -det p r q := by simp only [det_eq]; ring
+
 theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q := by
-  simp only [σ, matrix_det_eq_det_pts, det_perm₂ p q r, ofReal]
+  simp only [σ, det_eq, det_perm₂ p q r, ofReal]
   split_ifs <;> first | rfl | exfalso; linarith
 
 -- NOTE(WN): This is annoying to have to prove.
@@ -156,11 +144,11 @@ theorem σ_self₃ (p q : Point) : σ q q p = .Collinear := by
   simpa using this
 
 theorem det_add_det (a b c d) : det a b c + det a c d = det a b d + det b c d := by
-  unfold det; ring
+  simp only [det_eq]; ring
 
 theorem σ_trans (h1 : σ a b c = .CCW) (h2 : σ a c d = .CCW) (h3 : σ a d b = .CCW) :
     σ b c d = .CCW := by
-  rw [σ, matrix_det_eq_det_pts, Orientation.ofReal_eq_ccw] at *
+  rw [σ, Orientation.ofReal_eq_ccw] at *
   rw [det_perm₂] at h3
   linarith [det_add_det a b c d]
 
@@ -168,12 +156,12 @@ theorem Point.InGeneralPosition₃.not_mem_seg :
     InGeneralPosition₃ p q r → p ∉ convexHull ℝ {q, r} := mt fun h => by
   rw [convexHull_pair] at h
   obtain ⟨a, b, _, _, eq, rfl⟩ := h
-  simp [det]
+  simp [det_eq]
   linear_combination eq * (q 1 * r 0 - q 0 * r 1)
 
 theorem Point.InGeneralPosition₃.iff_ne_collinear {p q r : Point} :
     InGeneralPosition₃ p q r ↔ σ p q r ≠ .Collinear := by
-  rw [InGeneralPosition₃, σ, matrix_det_eq_det_pts, ofReal]
+  rw [InGeneralPosition₃, σ, det_eq, ofReal]
   split
   . simp; linarith
   . split
@@ -274,14 +262,14 @@ theorem Point.InGeneralPosition₃.ne₃ {p q r : Point} (h : InGeneralPosition�
 
 open scoped Matrix
 theorem collinear_iff : σ p q r = .Collinear ↔ _root_.Collinear ℝ {p, q, r} := by
-  rw [σ, Orientation.ofReal_eq_collinear, matrix_det_eq_det_pts]
+  rw [σ, Orientation.ofReal_eq_collinear]
   constructor <;> intro H
   · if h : q = r then subst r; simp [collinear_pair] else
     apply collinear_insert_of_mem_affineSpan_pair
     have : ⟪r - q, r - q⟫_ℝ ≠ 0 := mt inner_self_eq_zero.1 <| sub_ne_zero.2 <| Ne.symm h
     convert AffineMap.lineMap_mem_affineSpan_pair (k := ℝ)
       (⟪r - q, p - q⟫_ℝ / ⟪r - q, r - q⟫_ℝ) _ _ using 1
-    simp only [AffineMap.lineMap_apply_module']; rw [Point.det] at H
+    simp only [AffineMap.lineMap_apply_module']; rw [det_eq] at H
     rw [← sub_eq_iff_eq_add, ← sub_eq_zero, ← smul_eq_zero_iff_right this,
       smul_sub, smul_smul, mul_div_cancel' _ this]
     ext <;> simp [norm_sq_eq_inner]
@@ -289,7 +277,7 @@ theorem collinear_iff : σ p q r = .Collinear ↔ _root_.Collinear ℝ {p, q, r}
     · linear_combination H * (r 0 - q 0)
   · let ⟨v, H⟩ := (collinear_iff_of_mem (p₀ := p) (by simp)).1 H
     simp at H; obtain ⟨⟨a, rfl⟩, b, rfl⟩ := H
-    simp [Point.det]; ring
+    simp [det_eq]; ring
 
 theorem Point.InGeneralPosition₃.iff_collinear :
     InGeneralPosition₃ p q r ↔ ¬_root_.Collinear ℝ {p, q, r} := by
@@ -355,8 +343,7 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGen
   {
     next det_pqr_pos =>
       simp only [true_iff]
-      rw [matrix_det_eq_det_pts] at det_pqr_pos
-      unfold det at det_pqr_pos
+      rw [det_eq] at det_pqr_pos
       have : (r.x - p.x) * (q.y - p.y) < (r.y - p.y) * (q.x - p.x) := by linarith
       rw [div_lt_div_iff qp_dx_pos rp_dx_pos]
       linarith
@@ -367,15 +354,13 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (hGp : InGen
       {
         next det_pqr_neg =>
           simp only [false_iff, not_lt]
-          rw [matrix_det_eq_det_pts] at det_pqr_neg
-          unfold det at det_pqr_neg
+          rw [det_eq] at det_pqr_neg
           rw [div_le_div_iff rp_dx_pos qp_dx_pos]
           linarith
       }
       {
         next det_pqr_nonneg =>
           simp only [false_iff, not_lt]
-          rw [matrix_det_eq_det_pts] at det_pqr_nonneg det_pqr_not_pos
           have det_pqr_zero : det p q r = 0 := by linarith
           contradiction
       }
@@ -390,7 +375,7 @@ theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (hGp : InGeneralPo
   unfold Point.slope at slope_eq
   rw [Commute.div_eq_div_iff] at slope_eq
   have det_0: det p q r = 0 := by
-    unfold det
+    rw [det_eq]
     linarith
   unfold InGeneralPosition₃ at hGp
   tauto

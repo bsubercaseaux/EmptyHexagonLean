@@ -198,11 +198,11 @@ theorem split_convexHull (cvx : ConvexPoints S) :
   have hu0 : detAffineMap a b u ≤ 0 := by
     refine convexHull_min ?_ ((convex_Iic 0).affine_preimage (detAffineMap a b)) hu
     intro x ⟨_, hx⟩
-    simpa [σ, matrix_det_eq_det_pts, Orientation.ofReal_eq_ccw] using hx
+    simpa [σ, Orientation.ofReal_eq_ccw] using hx
   have hv0 : 0 ≤ detAffineMap a b v := by
     refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (detAffineMap a b)) hv
     intro x ⟨_, hx⟩
-    simpa [σ, matrix_det_eq_det_pts, Orientation.ofReal_eq_cw] using hx
+    simpa [σ, Orientation.ofReal_eq_cw] using hx
   have ⟨z, hz1, hz2⟩ : 0 ∈ detAffineMap a b '' segment ℝ u v := by
     rw [image_segment]; apply Icc_subset_segment
     exact ⟨hu0, hv0⟩
@@ -216,7 +216,7 @@ theorem split_convexHull (cvx : ConvexPoints S) :
     refine (hp2.trans_left_right <| (hz1.wbtw_or_wbtw hp2).resolve_right fun h => ?_).symm
     rw [← mem_segment_iff_wbtw] at h
     have := ((convex_Iic 0).affine_preimage (detAffineMap a b)).segment_subset hu0 hz2.le h
-    simp [σ, matrix_det_eq_det_pts, Orientation.ofReal_eq_cw] at hp this
+    simp [σ, Orientation.ofReal_eq_cw] at hp this
     exact hp' <| this.antisymm hp
   right; refine (convex_convexHull ..).segment_subset hv ?_ this
   simp at zab; refine segment_subset_convexHull ?_ ?_ zab <;> simp [ha, hb, σ_self₁, σ_self₂]

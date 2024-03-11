@@ -338,12 +338,12 @@ theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.PointList
   have cvx {e f} (sp : [e, f, b'] <+~ a::b'::c::l)
       (ss : σ e f a ≠ .CW ∧ σ e f b ≠ .CW ∧ σ e f c ≠ .CW) : σ e f b' = .CCW := by
     rw [← (Point.PointListInGeneralPosition.subperm.1 gp3 sp).σ_iff']
-    rw [σ, Ne, Orientation.ofReal_eq_cw, not_lt, matrix_det_eq_det_pts]
+    rw [σ, Ne, Orientation.ofReal_eq_cw, not_lt]
     refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (detAffineMap e f)) <|
       (σPtInTriangle_iff (gp.subperm₄ ((sublist_append_left _ l).subperm.trans sp4))).1 h1
     replace ss : ∀ d ∈ ({a, b, c}:Set _), σ e f d ≠ .CW := by simpa using ss
     intro d hd
-    simpa [σ, Orientation.ofReal_eq_cw, matrix_det_eq_det_pts] using ss d hd
+    simpa [σ, Orientation.ofReal_eq_cw] using ss d hd
   simp [σCCWPoints] at H; simp [H, ab'c, σCCWPoints]
   obtain ⟨⟨⟨-, abd⟩, acd, ade⟩, ⟨bcd, bde⟩, cde, -⟩ := H
   refine ⟨⟨fun d hd => ?_, acd⟩, fun d hd => ?_, ?_⟩
