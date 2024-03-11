@@ -15,6 +15,14 @@
           texlab
           fontconfig
         ];
+
+        FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [
+            "/Library/Fonts"
+            "/System/Library/Fonts"
+            "/Users/wojtek/Library/Fonts"
+            pkgs.iosevka
+          ];
+        };
       };
     });
 }
