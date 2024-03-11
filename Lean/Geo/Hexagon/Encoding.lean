@@ -44,7 +44,6 @@ def no6Hole4Above (a b c d : Fin n) : PropForm (Var n) :=
 
 def no6HoleClauses1 (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
-  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
@@ -61,7 +60,6 @@ def no6HoleClauses1 (n : Nat) : PropForm (Var n) :=
 
 def no6HoleClauses2 (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
-  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun c =>
   .guard (a.1+1 < c.1) fun _ =>
   .forAll (Fin n) fun d =>
@@ -84,7 +82,6 @@ def no6Hole1Below (a b c p : Fin n) : PropForm (Var n) :=
 
 def no6HoleClauses3 (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
-  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
@@ -100,7 +97,7 @@ def no6HoleClauses3 (n : Nat) : PropForm (Var n) :=
 def hexagonEncoding (n : Nat) : PropForm (Var n) :=
   .all #[baseEncoding n, no6HoleClauses1 n, no6HoleClauses2 n, no6HoleClauses3 n]
 
-def hexagonCNF (n : Nat) : ICnf := (Geo.hexagonEncoding n |>.toICnf compare).2
+def hexagonCNF (rlen : Nat) : ICnf := (Geo.hexagonEncoding rlen |>.toICnf compare).2
 
 -- set_option profiler true in
 -- #eval let cnf := Geo.hexagonCNF 30; (cnf.size, cnf.maxVar)

@@ -2,13 +2,19 @@ import Geo.Definitions.CanonicalPoints
 import Geo.Definitions.OrientationProperties
 
 namespace Geo
-open List
+open List CanonicalPoints
 
 attribute [-simp] getElem_fin
 
 inductive Arc (w : CanonicalPoints) (o : Orientation) : List (Fin w.length) → Prop where
   | one : a < b → Arc w o [a, b]
   | cons : a < b → σ w[a] w[b] w[c] = o → Arc w o (b::c::l) → Arc w o (a::b::c::l)
+
+theorem Arc.one' {w o} {a b : Fin w.rlen} (h : a < b) : Arc w o [a.succ, b.succ] := .one h.succ₂
+
+theorem Arc.cons' {w o} {a b c : Fin w.rlen} {l} (h1 : a < b) (h2 : σ w+[a] w+[b] w+[c] = o) :
+    Arc w o (b.succ::c.succ::l) → Arc w o (a.succ::b.succ::c.succ::l) :=
+  .cons h1.succ₂ h2
 
 theorem Arc.sorted (H : Arc w o l) : l.Sorted (·<·) := by
   apply chain'_iff_pairwise.1

@@ -81,7 +81,6 @@ The contraints are:
 def signotopeClauses (n : Nat) : PropForm (Var n) :=
   -- for all `a`, `b`, `c` with `a < b < c`
   .forAll (Fin n) fun a =>
-  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
@@ -102,7 +101,6 @@ def signotopeClauses (n : Nat) : PropForm (Var n) :=
 def insideClauses (n : Nat) : PropForm (Var n) :=
   -- for all `a`, `b`, `c` with `a < b < c`
   .forAll (Fin n) fun a =>
-  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
@@ -124,7 +122,6 @@ def insideClauses (n : Nat) : PropForm (Var n) :=
 
 def holeDefClauses (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
-  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
@@ -134,13 +131,6 @@ def holeDefClauses (n : Nat) : PropForm (Var n) :=
       .guard (a < x ∧ x < c ∧ x ≠ b) fun _ =>
       .not (Var.inside x a b c))
     (Var.hole a b c)
-
-def leftmostCCWClauses (n : Nat) : PropForm (Var n) :=
-  .forAll (Fin n) fun a =>
-  .guard (⟨0, Fin.size_positive a⟩ < a) fun _ =>
-  .forAll (Fin n) fun b =>
-  .guard (a < b) fun _ =>
-    Var.sigma ⟨0, Fin.size_positive a⟩ a b
 
 def revLexClausesCore (F : Fin n → PropForm α) (a b : Fin n) (acc : PropForm α) : PropForm α :=
   if h : a < b then
@@ -153,10 +143,9 @@ def revLexClausesCore (F : Fin n → PropForm α) (a b : Fin n) (acc : PropForm 
     acc
 
 def revLexClauses (n : Nat) : PropForm (Var n) :=
-  .guard (5 ≤ n) fun _ =>
-  revLexClausesCore (n := n-2) ⟨1, by omega⟩ ⟨n - 3, by omega⟩ .true
+  .guard (4 ≤ n) fun _ =>
+  revLexClausesCore (n := n-2) ⟨0, by omega⟩ ⟨n - 3, by omega⟩ .true
     (F := fun ⟨a, _⟩ => Var.sigma ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
 
 def baseEncoding (n : Nat) : PropForm (Var n) :=
-  .all #[signotopeClauses n, insideClauses n, holeDefClauses n, leftmostCCWClauses n,
-    revLexClauses n]
+  .all #[signotopeClauses n, insideClauses n, holeDefClauses n, revLexClauses n]

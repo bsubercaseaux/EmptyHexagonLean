@@ -19,7 +19,7 @@ def noHoleClauses (n : Nat) : PropForm (Var n) :=
 def triangleEncoding (n : Nat) : PropForm (Var n) :=
   .and (baseEncoding n) (noHoleClauses n)
 
-def triangleCNF (n : Nat) : ICnf := (Geo.triangleEncoding n |>.toICnf compare).2
+def triangleCNF (rlen : Nat) : ICnf := (Geo.triangleEncoding rlen |>.toICnf compare).2
 
 -- set_option profiler true in
 -- #eval let cnf := Geo.triangleCNF 10; (cnf.size, cnf.maxVar)

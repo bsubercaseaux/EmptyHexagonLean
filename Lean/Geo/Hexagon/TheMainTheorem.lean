@@ -5,7 +5,7 @@ import Geo.Hexagon.Encoding
 namespace Geo
 open Classical LeanSAT Model
 
-axiom hexagonCnfUnsat : (Geo.hexagonCNF 30).isUnsat
+axiom hexagonCnfUnsat : (Geo.hexagonCNF (rlen := 29)).isUnsat
 
 theorem EmptyHexagon30TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts)
     (h : pts.length ≥ 30) : HasEmptyKGon 6 pts.toFinset := by
@@ -15,11 +15,11 @@ theorem EmptyHexagon30TheoremLists (pts : List Point) (gp : Point.PointListInGen
   have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ by decide) gp
   have noσtri' : ¬σHasEmptyKGon 6 w.toFinset :=
     OrientationProperty_σHasEmptyKGon.not (hw.toEquiv w.nodup) noσtri
-  have len10 : w.length = 30 := hw.length_eq.symm.trans h
+  have rlen29 : w.rlen = 29 := Nat.succ_inj.1 <| hw.length_eq.symm.trans h
   apply hexagonCnfUnsat
   with_reducible
     have := (PropForm.toICnf_sat _).2 ⟨w.toPropAssn, w.satisfies_hexagonEncoding noσtri'⟩
-    rw [len10] at this
+    rw [rlen29] at this
     rwa [hexagonCNF]
 
 /-

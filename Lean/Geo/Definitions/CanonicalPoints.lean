@@ -38,16 +38,16 @@ theorem nodupX (w : CanonicalPoints) : w.points.Pairwise (·.x ≠ ·.x) :=
 theorem nodup (w : CanonicalPoints) : w.points.Nodup :=
   w.nodupX.imp fun hx h => by rw [h] at hx; contradiction
 
-abbrev length (w : CanonicalPoints) : Nat := w.points.length
+abbrev rlen (w : CanonicalPoints) : Nat := w.rest.length
+
+abbrev length (w : CanonicalPoints) : Nat := w.rlen + 1
 
 instance : GetElem CanonicalPoints Nat Point (fun w i => i < w.length) where
   getElem w i h := w.points[i]'h
 
-instance {w : CanonicalPoints} : Zero (Fin w.length) where
-  zero := (0 : Fin (w.rest.length + 1))
-
 theorem mem_points_iff {w : CanonicalPoints} {a : Point} :
-    a ∈ w.points ↔ ∃ i : Fin w.length, w[i] = a := by simp [GetElem.getElem, List.mem_iff_get]
+    a ∈ w.points ↔ ∃ i : Fin w.length, w[i] = a := by
+  simp [GetElem.getElem, List.mem_iff_get]; rfl
 
 theorem mem_toFinset_iff {w : CanonicalPoints} {a : Point} :
     a ∈ w.toFinset ↔ ∃ i : Fin w.length, w[i] = a := by simp [mem_points_iff, toFinset]
@@ -81,8 +81,8 @@ theorem eq_iff' (w : CanonicalPoints) {i j : Fin w.length} :
 
 theorem sublist_of_chain (w : CanonicalPoints) {l : List (Fin w.length)} (hl : Chain' (· < ·) l) :
     l.map (w[·]) <+ w.points :=
-  have : IsTrans (Fin w.length) (↑· < ↑·) := ⟨fun _ _ _ => Nat.lt_trans⟩
-  map_get_sublist (chain'_iff_pairwise.1 hl)
+  have : IsTrans (Fin w.points.length) (↑· < ↑·) := ⟨fun _ _ _ => Nat.lt_trans⟩
+  map_get_sublist (l := w.points) (chain'_iff_pairwise.1 hl)
 
 theorem sublist (w : CanonicalPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
     [w[i], w[j], w[k]] <+ w.points := sublist_of_chain w <| .cons ij <| .cons jk <| .nil
@@ -90,12 +90,14 @@ theorem sublist (w : CanonicalPoints) {i j k : Fin w.length} (ij : i < j) (jk : 
 theorem subset_map (w : CanonicalPoints) (l : List (Fin w.length)) :
     l.map (w[·]) ⊆ w.points := by simp [List.subset_def, mem_points_iff]
 
-theorem σ_0 (w : CanonicalPoints) {i j : Fin w.length}
-    (i0 : 0 < i) (ij : i < j) : σ w[(0:Fin _)] w[i] w[j] = .ccw := by
-  let ⟨i+1,hi⟩ := i
-  let ⟨j+1,hj⟩ := j
-  exact pairwise_iff_get.1 w.oriented
-    ⟨_, Nat.lt_of_succ_lt_succ hi⟩ ⟨_, Nat.lt_of_succ_lt_succ hj⟩ (Nat.lt_of_succ_lt_succ ij)
+scoped macro:1200 w:term:max noWs "+[" a:term "]" : term => `($w[$(a).succ])
+
+theorem subset_map' (w : CanonicalPoints) (l : List (Fin w.rlen)) : l.map (w+[·]) ⊆ w.points := by
+  simp [List.subset_def, mem_points_iff]; exact fun i _ => ⟨i.succ, rfl⟩
+
+theorem σ_0 (w : CanonicalPoints) {i j : Fin w.rlen}
+    (ij : i < j) : σ w[0] w+[i] w+[j] = .ccw := by
+  exact pairwise_iff_get.1 w.oriented i j ij
 
 theorem gp₃ (w : CanonicalPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
     InGeneralPosition₃ w[i] w[j] w[k] := w.gp <| w.sublist ij jk
@@ -109,3 +111,17 @@ theorem sorted₃ (w : CanonicalPoints) {i j k : Fin w.length} (ij : i < j) (jk 
 
 theorem sorted₄ (w : CanonicalPoints) {i j k l : Fin w.length} (ij : i < j) (jk : j < k) (kl : k < l) :
     Sorted₄ w[i] w[j] w[k] w[l] := ⟨w.sorted₃ ij jk, w.lt_iff.2 kl⟩
+
+alias _root_.LT.lt.succ₂ := Nat.succ_lt_succ -- HACK
+
+theorem sorted₃' (w : CanonicalPoints) {i j k : Fin w.rlen} (ij : i < j) (jk : j < k) :
+    Sorted₃ w+[i] w+[j] w+[k] := w.sorted₃ ij.succ₂ jk.succ₂
+
+theorem sorted₄' (w : CanonicalPoints) {i j k l : Fin w.rlen} (ij : i < j) (jk : j < k) (kl : k < l) :
+    Sorted₄ w+[i] w+[j] w+[k] w+[l] := w.sorted₄ ij.succ₂ jk.succ₂ kl.succ₂
+
+theorem gp₃' (w : CanonicalPoints) {i j k : Fin w.rlen} (ij : i < j) (jk : j < k) :
+    InGeneralPosition₃ w+[i] w+[j] w+[k] := w.gp₃ ij.succ₂ jk.succ₂
+
+theorem gp₄' (w : CanonicalPoints) {i j k l : Fin w.rlen} (ij : i < j) (jk : j < k) (kl : k < l) :
+    InGeneralPosition₄ w+[i] w+[j] w+[k] w+[l] := w.gp₄ ij.succ₂ jk.succ₂ kl.succ₂

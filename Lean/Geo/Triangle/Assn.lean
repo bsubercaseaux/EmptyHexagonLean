@@ -12,9 +12,10 @@ attribute [-simp] getElem_fin
 
 theorem satisfies_triangleEncoding (w : CanonicalPoints) :
     ¬σHasEmptyKGon 3 w.toFinset →
-    (triangleEncoding w.length).eval w.toPropAssn := by
+    (triangleEncoding w.rlen).eval w.toPropAssn := by
   simp [triangleEncoding, satisfies_baseEncoding, noHoleClauses]
-  intro noholes a b hab c hbc h
-  refine noholes <| (σHasEmptyKGon_3_iff w.gp).2 ⟨w[a], w[b], w[c], (w.sublist hab hbc).subperm, h⟩
+  intro noholes a b ab c bc h
+  refine noholes <| (σHasEmptyKGon_3_iff w.gp).2
+    ⟨w+[a], w+[b], w+[c], (w.sublist ab.succ₂ bc.succ₂).subperm, h⟩
 
 end CanonicalPoints

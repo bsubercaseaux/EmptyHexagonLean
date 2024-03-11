@@ -5,7 +5,7 @@ import Geo.Triangle.Encoding
 namespace Geo
 open Classical LeanSAT Model
 
-axiom triangleCnfUnsat : (Geo.triangleCNF 10).isUnsat
+axiom triangleCnfUnsat : (Geo.triangleCNF (rlen := 9)).isUnsat
 
 theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts)
     (h : pts.length ≥ 10) : HasEmptyKGon 3 pts.toFinset := by
@@ -15,11 +15,11 @@ theorem EmptyTriangle10TheoremLists (pts : List Point) (gp : Point.PointListInGe
   have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ by decide) gp
   have noσtri' : ¬σHasEmptyKGon 3 w.toFinset :=
     OrientationProperty_σHasEmptyKGon.not (hw.toEquiv w.nodup) noσtri
-  have len10 : w.length = 10 := hw.length_eq.symm.trans h
+  have rlen9 : w.rlen = 9 := Nat.succ_inj.1 <| hw.length_eq.symm.trans h
   apply triangleCnfUnsat
   with_reducible
     have := (LeanSAT.PropForm.toICnf_sat _).2 ⟨w.toPropAssn, w.satisfies_triangleEncoding noσtri'⟩
-    rw [len10] at this
+    rw [rlen9] at this
     rwa [triangleCNF]
 
 /-
