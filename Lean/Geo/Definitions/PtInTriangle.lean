@@ -8,8 +8,7 @@ import Geo.PointsToWB.Affine
 and show their equivalence for points in general position. -/
 
 namespace Geo
-open Point
-open List Orientation
+open Point List Orientation
 
 noncomputable section
 open Classical
@@ -220,18 +219,6 @@ theorem HalfPlanesAreConvex : Convex ℝ (halfPlaneCCW p q) := by
     simp (config := {singlePass := true}) [← sub_nonneg]; ring_nf
   constructor <;> intros <;> simp [Point.x, Point.y] <;> ring
 
-theorem det_symmetry (a b c : Point) : det a b c = -det b a c := by
-  simp only [det_eq]; linarith
-
-theorem det_symmetry' (a b c : Point) : det a b c = det b c a := by
-  simp only [det_eq]; linarith
-
-theorem  det_antisymmetry (a b c : Point) : det a b c = -det b a c := by
-  simp only [det_eq]; linarith
-
-theorem det_antisymmetry' (a b c : Point) : det a b c = -det a c b := by
-  simp only [det_eq]; linarith
-
 theorem convex3combo (S : Set Point) (CS : Convex ℝ S) (a b c : Point)
     (aS : a ∈ S) (bS : b ∈ S) (cS : c ∈ S) (α β γ : ℝ) (sum1 : α + β + γ = 1)
     (α0 : α ≥ 0) (β0 : β ≥ 0) (γ0 : γ ≥ 0) : α • a + β • b + γ • c ∈ S := by
@@ -360,7 +347,7 @@ theorem convexComboTransitive {p q r a x : Point}
 
 theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     (spq : p.x < q.x)
-    (symm : σ p q r = Orientation.ccw) (py0 : p.y = 0) (qy0 : q.y = 0) :
+    (symm : σ p q r = .ccw) (py0 : p.y = 0) (qy0 : q.y = 0) :
     σPtInTriangle a p q r → PtInTriangle a p q r := by
   unfold PtInTriangle
   intro ⟨h1, h2, h3⟩
@@ -368,7 +355,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     rw [σ_CCW_iff_pos_det] at symm
     linarith
   have det_qpr_neg : det q p r < 0 := by
-    rw [det_antisymmetry] at det_pqr_pos
+    rw [det_perm₁] at det_pqr_pos
     linarith
 
   have anti : σ p q r = - σ p r q := by rw [σ_perm₂]
@@ -390,7 +377,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
   let aProjXPt : Point := ![arProjX_p_q a r, 0]
 
   have pqa_pos : det p q a > 0 := by
-    have : σ p q a = Orientation.ccw := by rw [h1]; exact symm
+    have : σ p q a = .ccw := by rw [h1]; exact symm
     rwa [σ_CCW_iff_pos_det] at this
   have y_order : aProjXPt.y = 0 ∧ a.y > 0 ∧ r.y > a.y := by
     use rfl
@@ -456,7 +443,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
   exact this
 
 theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
-    (symm : σ p q r = Orientation.ccw) :
+    (symm : σ p q r = .ccw) :
     PtInTriangle a p q r → σPtInTriangle a p q r := by
   intro h
   unfold PtInTriangle at h
@@ -475,7 +462,7 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have pInQR : p ∈ halfPlaneQR := by
     simp; rw [detIffHalfPlaneCCW]
     rw [σ_CCW_iff_pos_det] at symm
-    rw [← det_symmetry']
+    rw [det_perm₂, ← det_perm₁]
     linarith
   have qInPQ : q ∈ halfPlanePQ := by
     simp; rw [detIffHalfPlaneCCW]
@@ -488,7 +475,7 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have qInRP : q ∈ halfPlaneRP := by
     simp; rw [detIffHalfPlaneCCW]
     rw [σ_CCW_iff_pos_det] at symm
-    rw [det_symmetry']
+    rw [det_perm₁, ← det_perm₂]
     linarith
 
   have rInPQ : r ∈ halfPlanePQ := by
@@ -531,24 +518,24 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have pqa_non_0 : det p q a ≠ 0 := by
     have l := gp.1
     unfold Point.InGeneralPosition₃ at l
-    rw [det_symmetry'] at l
+    rw [det_perm₁, ← det_perm₂] at l
     exact l
   have pra_non_0 : det p r a ≠ 0 := by
     have l := gp.2
     unfold Point.InGeneralPosition₃ at l
-    rw [det_symmetry'] at l
+    rw [det_perm₁, ← det_perm₂] at l
     exact l
   have qra_non_0 : det q r a ≠ 0 := by
     have l := gp.3
     unfold Point.InGeneralPosition₃ at l
-    rw [det_symmetry'] at l
+    rw [det_perm₁, ← det_perm₂] at l
     exact l
 
   have pqr_pos : det p q r > 0 := by
     rw [σ_CCW_iff_pos_det] at symm
     linarith
 
-  have pqa_CCW : σ p q a = Orientation.ccw := by
+  have pqa_CCW : σ p q a = .ccw := by
     rw [detIffHalfPlaneCCW] at aInHalfPQ
     rw [σ_CCW_iff_pos_det]
     apply lt_of_le_of_ne aInHalfPQ (Ne.symm pqa_non_0)
@@ -558,11 +545,11 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   have pra_neg : det p r a < 0 := by
     apply lt_of_le_of_ne
     rw [detIffHalfPlaneCCW] at aInHalfRP
-    rw [det_antisymmetry] at aInHalfRP
+    rw [det_perm₁] at aInHalfRP
     linarith
     exact pra_non_0
   have prq_neg : det p r q < 0 := by
-    rw [det_antisymmetry'] at pqr_pos
+    rw [det_perm₂] at pqr_pos
     linarith
   have goal2 : σ p r a = σ p r q := by
     rw [← σ_CW_iff_neg_det] at pra_neg
@@ -571,7 +558,7 @@ theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPo
   use goal2
 
   have qrp_pos : det q r p > 0 := by
-    rw [← det_symmetry']; exact pqr_pos
+    rw [det_perm₂, ← det_perm₁]; exact pqr_pos
   have qra_pos : det q r a > 0 := by
     rw [detIffHalfPlaneCCW] at aInHalfQR
     apply lt_of_le_of_ne aInHalfQR (Ne.symm qra_non_0)
@@ -778,7 +765,7 @@ theorem existsNiceRotTrans {p q : Point} (diff : p ≠ q) : ∃ (θ : ℝ) (t : 
       exact ⟨g1, g2, g3⟩
 
 theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
-    (symm : σ p q r = Orientation.ccw) :
+    (symm : σ p q r = .ccw) :
     σPtInTriangle a p q r → PtInTriangle a p q r  := by
   intro h
   have p_neq_q : p ≠ q := by
@@ -798,7 +785,7 @@ theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralP
   have a'inTri : σPtInTriangle a' p' q' r' := by
     rw [← σPtInTriangleInvariantUnderTransform]
     exact h
-  have symm' : σ p' q' r' = Orientation.ccw := by
+  have symm' : σ p' q' r' = .ccw := by
     rw [← rotateTranslatePreserveσ]
     exact symm
   have := PtInTriangle_of_σPtInTriangle h3 symm' h1 h2 a'inTri
@@ -806,7 +793,7 @@ theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralP
   exact this
 
 theorem σPtInTriangle_iff_of_CCW {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
-    (symm : σ p q r = Orientation.ccw) :
+    (symm : σ p q r = .ccw) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
   apply Iff.intro
   exact PtInTriangle_of_σPtInTriangle' gp symm
