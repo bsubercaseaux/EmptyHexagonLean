@@ -14,8 +14,6 @@ require «lean-sat» from git
 
 @[default_target]
 lean_lib «Geo» where
-  -- FIXME: this compiles all the exploratory stuff, remove it once the proof is done
-  globs := #[.andSubmodules `Geo]
 
 lean_exe run_geo where
   root := `Geo
