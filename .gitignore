@@ -2,7 +2,6 @@
 .DS_Store
 *.cnf
 .direnv/
-*.vtc
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
@@ -24,3 +23,5 @@
 *.synctex.gz
 *.out
 *.pdf
+*.xdv
+*.vtc
