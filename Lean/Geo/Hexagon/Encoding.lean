@@ -2,7 +2,7 @@ import Mathlib.Data.Fin.Basic
 import Mathlib.Data.List.Range
 import Geo.SAT.ToLeanSAT.EncodeProof
 import Geo.NGon.Var
-import Geo.NGon.EncodingNew
+import Geo.NGon.Encoding
 
 namespace Geo
 

@@ -1,4 +1,4 @@
-import Geo.Hexagon.EncodingNew
+import Geo.Hexagon.Encoding
 import LeanSAT.Solver.Dimacs
 
 open LeanSAT

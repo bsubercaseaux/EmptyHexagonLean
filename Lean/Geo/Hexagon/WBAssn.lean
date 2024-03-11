@@ -3,8 +3,8 @@ import Geo.Definitions.PtInTriangle
 import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
 import Geo.Orientations
-import Geo.Hexagon.EncodingNew
-import Geo.NGon.WBAssnNew
+import Geo.Hexagon.Encoding
+import Geo.NGon.WBAssn
 
 namespace Geo.WBPoints
 open List Classical LeanSAT.Model PropFun Point

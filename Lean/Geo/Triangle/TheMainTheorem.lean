@@ -1,6 +1,6 @@
-import Geo.PointsToWB.SymmetryBreakingNew
-import Geo.Triangle.WBAssnNew
-import Geo.Triangle.EncodingNew
+import Geo.PointsToWB.SymmetryBreaking
+import Geo.Triangle.WBAssn
+import Geo.Triangle.Encoding
 
 namespace Geo
 open Classical LeanSAT Model

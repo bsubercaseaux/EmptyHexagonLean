@@ -1,6 +1,6 @@
-import Geo.PointsToWB.SymmetryBreakingNew
-import Geo.Hexagon.WBAssnNew
-import Geo.Hexagon.EncodingNew
+import Geo.PointsToWB.SymmetryBreaking
+import Geo.Hexagon.WBAssn
+import Geo.Hexagon.Encoding
 
 namespace Geo
 open Classical LeanSAT Model
