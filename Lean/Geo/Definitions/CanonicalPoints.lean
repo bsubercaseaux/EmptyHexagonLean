@@ -43,6 +43,9 @@ abbrev length (w : CanonicalPoints) : Nat := w.points.length
 instance : GetElem CanonicalPoints Nat Point (fun w i => i < w.length) where
   getElem w i h := w.points[i]'h
 
+instance {w : CanonicalPoints} : Zero (Fin w.length) where
+  zero := (0 : Fin (w.rest.length + 1))
+
 theorem mem_points_iff {w : CanonicalPoints} {a : Point} :
     a ∈ w.points ↔ ∃ i : Fin w.length, w[i] = a := by simp [GetElem.getElem, List.mem_iff_get]
 
@@ -88,8 +91,7 @@ theorem subset_map (w : CanonicalPoints) (l : List (Fin w.length)) :
     l.map (w[·]) ⊆ w.points := by simp [List.subset_def, mem_points_iff]
 
 theorem σ_0 (w : CanonicalPoints) {i j : Fin w.length}
-    (i0 : (0 : Fin (w.rest.length+1)) < i) (ij : i < j) :
-    σ w[(0 : Fin (w.rest.length+1))] w[i] w[j] = .ccw := by
+    (i0 : 0 < i) (ij : i < j) : σ w[(0:Fin _)] w[i] w[j] = .ccw := by
   let ⟨i+1,hi⟩ := i
   let ⟨j+1,hj⟩ := j
   exact pairwise_iff_get.1 w.oriented

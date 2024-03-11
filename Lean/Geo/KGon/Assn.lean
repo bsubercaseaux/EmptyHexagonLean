@@ -45,13 +45,7 @@ theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPos
     (σPtInTriangle x a b c ↔
       ((σ a b c = .ccw ↔ σ a x c = .ccw) ∧ (σ a x b ≠ .ccw ↔ σ a b c = .ccw))) := by
   intro sorted gp
-  simp only [σPtInTriangle,
-    σ_perm₂ a b x,
-    σ_perm₂ a c x,
-    σ_perm₂ a c b,
-    σ_perm₂ b c x, σ_perm₁ b x c,
-    σ_perm₂ b c a, σ_perm₁ b a c,
-    gp.gp₁.σ_iff]
+  simp only [σPtInTriangle, σ_perm₂ a b x]
   cases gp.gp₁.σ_cases <;> cases gp.gp₂.σ_cases <;> cases gp.gp₃.σ_cases <;>
     cases gp.gp₄.σ_cases <;> simp_all
   next h₁ h₂ h₃ h₄ =>
