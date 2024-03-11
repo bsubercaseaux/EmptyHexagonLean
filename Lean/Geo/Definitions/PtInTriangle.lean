@@ -147,9 +147,6 @@ lemma ptTransform_translateMap (p t : Point) :
 noncomputable def rotate (θ : ℝ) (p : Point) : Point :=
   ![p 0 * (Real.cos θ) - p 1 * (Real.sin θ), p 0 * (Real.sin θ) + p 1 * (Real.cos θ)]
 
-noncomputable def rotateTranslateSet (S : Set Point) (θ : ℝ) (tx ty : ℝ) : Set Point :=
-  {rotateTranslate p θ tx ty | p ∈ S}
-
 theorem rotateTranslateTransform (θ : ℝ) (t p : Point) :
     (rotateTranslateMap θ t p) =
     ptTransform (translationMatrix t.x t.y * Matrix.rotateByAffine θ) p := by
