@@ -18,5 +18,8 @@ lean_lib «Geo» where
 lean_exe run_geo where
   root := `Geo
 
-lean_exe ngon where
-  root := `Geo.NGon.RunEncoding
+lean_exe triangle where
+  root := `Geo.Triangle.RunEncoding
+
+lean_exe hexagon where
+  root := `Geo.Hexagon.RunEncoding
