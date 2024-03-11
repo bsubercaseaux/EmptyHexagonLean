@@ -9,7 +9,13 @@ In 2005, Georges Gonthier formalized a full proof of the four-color theorem in t
 
 The four-color theorem is far from the end of the story when it comes to computer-assisted mathematics.
 An emerging trend is to use SAT solvers (or other automated reasoning tools) to prove mathematical theorems by analyzing finite objects~\cite{avigad2023mathematics}. 
-To name a few examples, one case of the Erd\H{o}s discrepancy conjecture~\cite{konev2014sat}, Keller's conjecture~\cite{brakensiek2023resolution}, the packing chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023}, and the Pythagorean triples problem~\cite{Heule_2016} were all resolved using SAT solvers.
+To name a few examples,
+Keller's conjecture~\cite{brakensiek2023resolution},
+the packing chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023},
+the Pythagorean triples problem~\cite{Heule_2016},
+Lam's problem~\cite{21bright_sat_based_resolution_lams_problem},
+and one case of the Erd\H{o}s discrepancy conjecture~\cite{konev2014sat}
+were all resolved or confirmed using SAT solvers.
 All such SAT-based results follow a common structure: in order to show that a mathematical theorem $\mathcal{T}$ holds, one proves the following:
 
 \begin{enumerate}
@@ -39,21 +45,77 @@ The main contribution of this article is to provide a formally-verified proof of
 All our code is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.
 % \footnote{CC: I'm not sure this characterization is correct. For example, another group of researchers verified in Coq the encoding used in the Pythagorean Triples problem, thus verifying that result. One could say that our contribution is the first \emph{end-to-end} verification, but I don't see how it's inherently distinct from what this other group did with the Pythagorean Triples problem.}
 % BS: Thanks Cayden, you were right.
+
 \subparagraph*{The Empty Hexagon Number.}
-In the 1930s, Stein, Erd\H{o}s, and Szekeres mixed geometry and Ramsey theory by studying how many points in the plane in \emph{general position} (i.e., no three points on a common line) are required for a convex $k$-gon to always appear. 
-%Let $g(k)$ be the minimum number of points in general position to force a convex $k$-gon.
-%The celebrated Erd\H{o}s-Szekeres theorem states that $g(k) \leq \binom{2k-4}{k-2} + 1$~\cite{erdosCombinatorialProblemGeometry2009}. 
-%Moreover, Erd\H{o}s and Szekeres conjectured that $g(k) = 2^{k-2} + 1$, which has only been proven for $k \leq 6$.
-In a similar spirit, Erd\H{o}s defined $h(k)$ as the minimum number of points in general position that is guaranteed to contain a $k$-hole (i.e., a convex $k$-gon without any other point inside).
-It is easy to check that $h(3) = 3$ and $h(4) = 5$. In 1978, Harborth established that $h(5) = 10$~\cite{Harborth1978}, and in a surprising turn of events, Horton proved in 1983 that $h(7) = \infty$~\cite{hortonSetsNoEmpty1983}, 
-% meaning one could always avoid $7$-holes. 
+In the 1930s,
+following a suggestion of Esther Klein,
+Erd\H{o}s and Szekeres showed that for any $k \geq 3$,
+one can find a sufficiently large number $n$
+such that every $n$ points in \emph{general position}
+(i.e., with no three points collinear)
+contain a convex $k$-gon~\cite{35erdos_combinatorial_problem_geometry}.
+The minimal such $n$ is denoted $g(k)$.
+The same authors later showed that $g(k) > 2^{k-2}$
+and conjectured that this bound is tight~\cite{60erdos_some_extremum_problems_elementary_geometry}.
+Indeed, it is known that $g(5) = 9$ and $g(6) = 17$,
+with the latter result obtained by Szekeres and Peters 71 years after the initial conjecture
+via exhaustive computer search~\cite{06szekeres_computer_solution_17_point_erdos_szekeres_problem}.
+Larger cases remain open,
+with $g(k) \leq 2^{k+o(k)}$ the best known upper bound~\cite{suk2017erdos,holmsen2017two}.
+This problem is now known as the \emph{Happy End Problem}
+as it led to the marriage of Klein and Szekeres.
+
+In a similar spirit,
+Erd\H{o}s defined $h(k)$
+to be the minimal number of points in general position
+that is guaranteed to contain a $k$-hole,
+meaning a convex $k$-gon with no other point inside.
+It is easy to check that $h(3) = 3$ and $h(4) = 5$.
+In 1978, Harborth established that $h(5) = 10$~\cite{Harborth1978}.
+Surprisingly, for $k \geq 7$ a point set with no $k$-hole
+can always be constructed
+as demonstrated by Horton in 1983~\cite{hortonSetsNoEmpty1983}.
 The only case left open was thus $h(6)$.
-The \emph{Empty Hexagon Theorem}, establishing $h(6)$ to be finite, was proven independently by Gerken and Nicolás in 2006~\cite{gerkenEmptyConvexHexagons2008,nicolasEmptyHexagonTheorem2007}, and then refined by Valtr in 2008~\cite{valtr}.
-Yet the known range of values for $h(6)$ was quite large, with $29 \leq h(6) \leq 1717$, until Heule and Scheucher used a SAT solver in a recent breakthrough to prove that $h(6) = 30$~\cite{emptyHexagonNumber}, a result we refer to as ``\emph{The Empty Hexagon Number}.''
-Now that all the values of $h$ are known, and especially given the extensive computation involved in its proofs, we believe that the final chapter in the story begun by Stein, Erd\H{o}s, and Szekeres is a formal verification of the Empty Hexagon Number.
+The \emph{Empty Hexagon Theorem},
+establishing $h(6)$ to be finite,
+was proven independently by Gerken and Nicolás in 2006~\cite{gerkenEmptyConvexHexagons2008,nicolasEmptyHexagonTheorem2007}.
+As of last year,
+the known range of values for $h(6)$ was quite large,
+at $29 \leq h(6) \leq 1717$
+as refined by Valtr in 2008~\cite{valtr},
+until a breakthrough by Heule and Scheucher~\cite{emptyHexagonNumber}.
+These authors used a SAT solver
+to prove that $h(6) = 30$,
+a result we refer to as the \emph{Empty Hexagon Number}.
+Now that all the values of $h$ are known,
+and especially given the extensive computation involved in its proofs,
+we propose that the final chapter in the story
+should be a formal verification of the Empty Hexagon Number.
 
-\subparagraph*{Related Work.} Despite the crucial role of formal verification in the SAT community (e.g., verified solvers~\cite{oeVersatVerifiedModern2012,skotam_creusat_2022}, proof checking~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}, etc.), the end-to-end formal verification of mathematical proofs obtained through SAT-solving is very recent. To the best of our knowledge, the first and only instance of a formally verified SAT-based mathematical proof before our work corresponds to the Pythagorean Triples Problem, verified in the \textsf{Coq} proof assistant by Cruz-Filipe and Schneider-Kamp~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}. In terms of verification of SAT encodings in Lean, the work of Codel, Avigad and Heule pioneered~\cite{Cayden}, while other encoding libraries existed in different frameworks, such as the work of Giljeg\r{a}rd and Wennerbreck in \textsf{CakeML}~\cite{GilAndWennerbeck}, which allowed for verifying SAT-based solutions to different math puzzles (e.g., Sudoku, Kakuro, the \emph{N-queens} problem, etc.).
+\subparagraph*{Verification of SAT proofs.}
+Formal verification plays a crucial rule in the SAT community,
+for example in verified solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
+and proof checking~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
+Despite this,
+not many mathematical proofs obtained through SAT-solving
+have been formally verified.
 
+In SAT-based combinatorial geometry,
+formal verification was pioneered by Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}
+who improved on the speed needed to obtain $g(6) = 17$,
+and trustworthiness of this result,
+by replacing bespoke code with a SAT encoding
+and verifying this encoding in \textsf{Isabelle/HOL}.
+We compare this with our work in more detail in~\Cref{sec:related-work}.
+The solution to the Pythagorean triples problem
+was verified in the \textsf{Coq} proof assistant
+by Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}.
+Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} provide a \textsf{CakeML} library
+for verified SAT encodings
+which they demonstrated on different puzzles
+(e.g., Sudoku, Kakuro, the \emph{N-queens} problem).
+As far as verifying SAT encodings in Lean,
+we base our work on that of Codel, Avigad, and Heule~\cite{Cayden}.
 
 \subparagraph*{Lean.} Kickstarted by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015}, the Lean theorem prover has arguably become the most popular for formalizing modern breakthroughs in mathematical research. 
 On the one hand, the recent success of projects such as the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}, or the proof of~the polynomial Freiman–Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023} has brought significant attention to~Lean. % as an interactive theorem prover.
