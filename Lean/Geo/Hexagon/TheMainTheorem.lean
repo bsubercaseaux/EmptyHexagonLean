@@ -1,5 +1,5 @@
-import Geo.PointsToWB.SymmetryBreaking
-import Geo.Hexagon.WBAssn
+import Geo.Canonicalization.SymmetryBreaking
+import Geo.Hexagon.Assn
 import Geo.Hexagon.Encoding
 
 namespace Geo

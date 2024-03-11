@@ -3,12 +3,12 @@ import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
 import Geo.ToMathlib
 import Geo.Definitions.SigmaEmbed
-import Geo.Definitions.WBPoints
+import Geo.Definitions.CanonicalPoints
 import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
-import Geo.PointsToWB.TMatrix
-import Geo.PointsToWB.Affine
-import Geo.PointsToWB.Projective
+import Geo.Canonicalization.TMatrix
+import Geo.Canonicalization.Affine
+import Geo.Canonicalization.Projective
 
 namespace Geo
 open Classical
@@ -43,7 +43,7 @@ variable {l : List Point} (hl : 3 ≤ l.length) (gp : Point.PointListInGeneralPo
 
 theorem σEmbed.len_ge_3 (σ : l ≼σ l') : 3 ≤ l'.length := σ.length_eq ▸ hl
 
-theorem symmetry_breaking : ∃ w : WBPoints, Nonempty (l ≼σ w.points) := by
+theorem symmetry_breaking : ∃ w : CanonicalPoints, Nonempty (l ≼σ w.points) := by
 
   -- step 1: rotate
   have ⟨l1, σ1, hl1⟩ : ∃ l1, ∃ _ : l ≼σ l1, l1.Pairwise (·.x ≠ ·.x) :=

@@ -1,5 +1,5 @@
-import Geo.PointsToWB.SymmetryBreaking
-import Geo.Triangle.WBAssn
+import Geo.Canonicalization.SymmetryBreaking
+import Geo.Triangle.Assn
 import Geo.Triangle.Encoding
 
 namespace Geo

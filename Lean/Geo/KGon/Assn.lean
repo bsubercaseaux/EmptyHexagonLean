@@ -1,23 +1,23 @@
-import Geo.Definitions.WBPoints
+import Geo.Definitions.CanonicalPoints
 import Geo.Definitions.PtInTriangle
 import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
 import Geo.Orientations
 import Geo.KGon.Encoding
 
-namespace Geo.WBPoints
+namespace Geo.CanonicalPoints
 open List Classical LeanSAT.Model PropFun Point
 attribute [-simp] getElem_fin
 
-def isCap (w : WBPoints) (a c d : Fin w.length) (o : Orientation) :=
+def isCap (w : CanonicalPoints) (a c d : Fin w.length) (o : Orientation) :=
   ∃ b, a < b ∧ b < c ∧ c < d ∧
     σ w[a] w[b] w[c] = o ∧ σ w[b] w[c] w[d] = o
 
-def isCapF (w : WBPoints) (a c d : Fin w.length) :=
+def isCapF (w : CanonicalPoints) (a c d : Fin w.length) :=
   c < d ∧ ∃ b : Fin w.length, isCap w a b c .cw ∧
     σ w[b] w[c] w[d] = .cw ∧ σIsEmptyTriangleFor w[a] w[b] w[d] w.toFinset
 
-@[simp] def toPropAssn (w : WBPoints) : Var w.length → Prop
+@[simp] def toPropAssn (w : CanonicalPoints) : Var w.length → Prop
   | .sigma a b c    => σ w[a] w[b] w[c] = .ccw
   | .inside x a b c => σPtInTriangle w[x] w[a] w[b] w[c]
   | .hole a b c     => σIsEmptyTriangleFor w[a] w[b] w[c] w.toFinset
@@ -25,7 +25,7 @@ def isCapF (w : WBPoints) (a c d : Fin w.length) :=
   | .cup a c d      => isCap w a c d .ccw
   | .capF a d e     => isCapF w a d e
 
-theorem satisfies_signotopeClauses (w : WBPoints) :
+theorem satisfies_signotopeClauses (w : CanonicalPoints) :
     (signotopeClauses w.length).eval w.toPropAssn := by
   simp [signotopeClauses]
   intro i _ j hij k hjk l hkl
@@ -75,7 +75,7 @@ theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPos
     rw [σ_prop₃ sorted gp h₁ h₄] at h₃
     contradiction
 
-theorem satisfies_insideClauses (w : WBPoints) : (insideClauses w.length).eval w.toPropAssn := by
+theorem satisfies_insideClauses (w : CanonicalPoints) : (insideClauses w.length).eval w.toPropAssn := by
   simp [insideClauses]
   intro a _ b hab c hbc x
   constructor
@@ -84,7 +84,7 @@ theorem satisfies_insideClauses (w : WBPoints) : (insideClauses w.length).eval w
   · intro hbx hxc
     exact (insideDefs_aux₂ (w.sorted₄ hab hbx hxc) (w.gp₄ hab hbx hxc)).1
 
-theorem satisfies_holeDefClauses (w : WBPoints) : (holeDefClauses w.length).eval w.toPropAssn := by
+theorem satisfies_holeDefClauses (w : CanonicalPoints) : (holeDefClauses w.length).eval w.toPropAssn := by
   simp [holeDefClauses, σIsEmptyTriangleFor, mem_toFinset_iff]
   intro a _ b ab c bc H i tri
   have gp₄ : InGeneralPosition₄ w[i] w[a] w[b] w[c] := tri.gp₄_of_gp₃ (w.gp₃ ab bc)
@@ -100,7 +100,7 @@ theorem satisfies_holeDefClauses (w : WBPoints) : (holeDefClauses w.length).eval
     exact gp₄.gp₃.ne₂ <| w.eq_iff.1 h ▸ rfl
   exact H i ai ic ib tri
 
-theorem satisfies_leftmostCCWDefs (w : WBPoints) :
+theorem satisfies_leftmostCCWDefs (w : CanonicalPoints) :
     (leftmostCCWClauses w.length).eval w.toPropAssn := by
   simp [leftmostCCWClauses]
   intro i h0i j hij
@@ -121,7 +121,7 @@ theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
       exact .imp_right <| .imp_right hacc
   · exact hacc
 
-theorem satisfies_revLexClauses (w : WBPoints) : (revLexClauses w.length).eval w.toPropAssn := by
+theorem satisfies_revLexClauses (w : CanonicalPoints) : (revLexClauses w.length).eval w.toPropAssn := by
   simp [revLexClauses, length, points]
   intro h5w
   have := w.lex (by omega)
@@ -129,8 +129,8 @@ theorem satisfies_revLexClauses (w : WBPoints) : (revLexClauses w.length).eval w
   refine satisfies_revLexClausesCore ?_ (by simp) (by simp; omega) (by simp) this
   rintro ⟨a, ha⟩ ⟨_, ha'⟩ ⟨⟩; simp [getElem, points]
 
-theorem satisfies_baseEncoding (w : WBPoints) : (baseEncoding w.length).eval w.toPropAssn := by
+theorem satisfies_baseEncoding (w : CanonicalPoints) : (baseEncoding w.length).eval w.toPropAssn := by
   simp [baseEncoding, satisfies_signotopeClauses, satisfies_insideClauses, satisfies_holeDefClauses,
     satisfies_leftmostCCWDefs, satisfies_revLexClauses]
 
-end WBPoints
+end CanonicalPoints

@@ -1,8 +1,8 @@
 import Geo.Definitions.Point
-import Geo.Definitions.WBPoints
+import Geo.Definitions.CanonicalPoints
 import Geo.Orientations
-import Geo.PointsToWB.TMatrix
-import Geo.PointsToWB.Affine
+import Geo.Canonicalization.TMatrix
+import Geo.Canonicalization.Affine
 
 /-! We define `PtInTriangle`, `σPtInTriangle`,
 and show their equivalence for points in general position. -/
@@ -109,7 +109,7 @@ theorem σPtInTriangle.gp₄_of_gp₃ :
 
 /-! ## Proof of equivalence between σPtInTriangle and PtInTriangle -/
 
--- TODO: deduplicate with PointsToWB.Affine
+-- TODO: deduplicate with Canonicalization.Affine
 noncomputable def rotateTranslate (p : Point) (θ : ℝ) (tx ty : ℝ) : Point :=
   ![p 0 * (Real.cos θ) - p 1 * (Real.sin θ) + tx, p 0 * (Real.sin θ) + p 1 * (Real.cos θ) + ty]
 

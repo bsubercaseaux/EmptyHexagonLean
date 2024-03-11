@@ -3,7 +3,7 @@ import Mathlib.Data.Real.Basic
 import Mathlib.Data.Set.Intervals.IsoIoo
 import Mathlib.Analysis.InnerProductSpace.PiL2
 import Mathlib.Analysis.SpecialFunctions.Trigonometric.Arctan
-import Geo.PointsToWB.TMatrix
+import Geo.Canonicalization.TMatrix
 
 namespace Geo
 noncomputable section
