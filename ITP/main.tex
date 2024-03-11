@@ -146,7 +146,7 @@
 \begin{abstract}
   A recent breakthrough in computer-assisted mathematics showed that every set of $30$ points in the plane in general position (i.e., without three on a common line) contains an empty convex hexagon, thus closing a line of research dating back to the 1930s.
   Through a combination of geometric insights and automated reasoning techniques, Heule and Scheucher constructed a CNF formula $\phi_n$, with $O(n^4)$ clauses, whose unsatisfiability implies that no set of $n$ points in general position can avoid an empty convex hexagon.
-  An unsatisfiability proof for $n = 30$ was then found with a SAT solver using 16\,000 CPU hours of parallel computation, thus implying that the empty hexagon number $h(6)$ is equal to 30.
+  An unsatisfiability proof for $n = 30$ was then found with a SAT solver using 17\,300 CPU hours of parallel computation, thus implying that the empty hexagon number $h(6)$ is equal to 30.
   In this paper, we formalize and verify this result in the Lean theorem prover. Our formalization covers discrete computational geometry ideas and SAT encoding techniques that have been successfully applied to similar Erd\H{o}s-Szekeres-type problems.
   In particular, our framework provides tools to connect standard mathematical objects to propositional assignments, which represents a key step towards the formal verification of other SAT-based mathematical results.
   Overall, we hope that this work sets a new standard for verification when extensive computation is used for discrete geometry problems, and that it increases the trust the mathematical community has in computer-assisted proofs in this area.
