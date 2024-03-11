@@ -21,6 +21,7 @@ int lookup(int index) {
 }
 
 unsigned int orient (int a, int b, int c) {
+  assert (1 < a);
   assert (a < b);
   assert (b < c);
 
