@@ -98,7 +98,7 @@ We start by relating a \textsf{mathlib}-like definition of what it means for a p
 def PtInTriangle (a p q r : Point) : Prop := a ∈ convexHull ℝ {p, q, r}
 
 def σPtInTriangle (a p q r : Point) : Prop :=
-  σ p q r = σ p a r ∧ σ p a q = σ p r q ∧  σ q a r = σ q p r
+  σ p q r = σ p a r ∧ σ p a q = σ p r q ∧ σ q a r = σ q p r
 
 theorem σPtInTriangle_iff {a p q r : Point} (gp : PtFinsetInGenPos {a,p,q,r}) :
   σPtInTriangle a p q r ↔ PtInTriangle a p q r -- not trivial.
