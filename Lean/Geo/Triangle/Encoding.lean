@@ -1,8 +1,8 @@
 import Mathlib.Data.Fin.Basic
 import Mathlib.Data.List.Range
 import Geo.SAT.ToLeanSAT.EncodeProof
-import Geo.NGon.Var
-import Geo.NGon.Encoding
+import Geo.KGon.Var
+import Geo.KGon.Encoding
 
 namespace Geo
 

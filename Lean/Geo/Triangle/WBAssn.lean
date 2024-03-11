@@ -4,7 +4,7 @@ import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
 import Geo.Orientations
 import Geo.Triangle.Encoding
-import Geo.NGon.WBAssn
+import Geo.KGon.WBAssn
 
 namespace Geo.WBPoints
 open List Classical Point
