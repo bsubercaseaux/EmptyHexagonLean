@@ -11,7 +11,7 @@ namespace Geo
 noncomputable section
 open Classical
 
-inductive Orientation : Type
+inductive Orientation : Type where
   | CW -- clockwise :=  -
   | CCW -- counter clockwise:= +
   | Collinear -- := 0
@@ -432,7 +432,7 @@ theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (hGp : InGe
     exact hGp
 
 @[deprecated]
-structure σ_equivalence (pts pts' : List Point) : Prop :=
+structure σ_equivalence (pts pts' : List Point) : Prop where
     same_length : pts.length = pts'.length
     same_orientation : ∀ {i j k} (hi : i < pts.length) (hj : j < pts.length) (hk : k < pts.length),
         σ (pts.get ⟨i, hi⟩) (pts.get ⟨j, hj⟩) (pts.get ⟨k, hk⟩) =

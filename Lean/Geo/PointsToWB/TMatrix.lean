@@ -47,7 +47,7 @@ lemma pt_transform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
   rw [pt_to_vec_inv_vec_to_pt v t]
 
 /-- `M` is an affine transformation matrix. -/
-structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop :=
+structure TMatrix (M : Matrix (Fin 3) (Fin 3) Real) : Prop where
   det_pos : (0 : ℝ) < Matrix.det M
   third_row : M ⟨2, by trivial⟩ = ![0, 0, 1]
 

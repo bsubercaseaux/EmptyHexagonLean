@@ -10,11 +10,11 @@ open List
 -- that is sets S equipped with an operation S³ → Orientation
 -- which satisfy antisymmetry and some other axioms.
 -- Sets of points are examples of signotope algebras.
-structure σEquiv (S T : Set Point) :=
-  (f : Point → Point)
-  (bij' : Set.BijOn f S T)
-  (parity : Bool)
-  (σ_eq' : ∀ᵉ (p ∈ S) (q ∈ S) (r ∈ S), σ p q r = parity ^^^ σ (f p) (f q) (f r))
+structure σEquiv (S T : Set Point) where
+  f : Point → Point
+  bij' : Set.BijOn f S T
+  parity : Bool
+  σ_eq' : ∀ᵉ (p ∈ S) (q ∈ S) (r ∈ S), σ p q r = parity ^^^ σ (f p) (f q) (f r)
 
 infix:50 " ≃σ " => σEquiv
 

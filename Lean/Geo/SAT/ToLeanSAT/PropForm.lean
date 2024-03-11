@@ -4,7 +4,7 @@ import LeanSAT.Upstream.ToStd
 
 namespace LeanSAT
 
-inductive PropForm (v : Type) : Type
+inductive PropForm (v : Type) : Type where
   | all' : Array (PropForm v) → PropForm v
   | any' : Array (PropForm v) → PropForm v
   | not' : PropForm v → PropForm v

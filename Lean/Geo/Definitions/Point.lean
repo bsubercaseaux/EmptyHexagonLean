@@ -45,7 +45,7 @@ def det (p q r : Point) : ℝ :=
 def InGeneralPosition₃ (p q r : Point) : Prop :=
   det p q r ≠ 0
 
-structure InGeneralPosition₄ (p q r s : Point) : Prop :=
+structure InGeneralPosition₄ (p q r s : Point) : Prop where
   gp₁ : InGeneralPosition₃ p q r
   gp₂ : InGeneralPosition₃ p q s
   gp₃ : InGeneralPosition₃ p r s
@@ -62,11 +62,11 @@ def PointListInGeneralPosition.to₄ {l : List Point} :
 
 /-! # Sorted (strictly, along x-coordinates) -/
 
-structure Sorted₃ (p q r : Point) : Prop :=
+structure Sorted₃ (p q r : Point) : Prop where
   h₁ : p.x < q.x
   h₂ : q.x < r.x
 
-structure Sorted₄ (p q r s : Point) : Prop :=
+structure Sorted₄ (p q r s : Point) : Prop where
   h₁ : Sorted₃ p q r
   h₂ : r.x < s.x
 

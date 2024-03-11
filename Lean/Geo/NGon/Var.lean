@@ -6,7 +6,7 @@ import Mathlib.Data.Sum.Order
 
 namespace Geo
 
-inductive Var (n : Nat)
+inductive Var (n : Nat) where
   | sigma  (a b c : Fin n)
   | inside (x a b c : Fin n)
   | hole   (a b c : Fin n)
