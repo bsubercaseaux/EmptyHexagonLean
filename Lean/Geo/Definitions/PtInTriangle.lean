@@ -162,41 +162,6 @@ lemma rotateTranslateTMatrix (θ : ℝ) (t : Point) :
     TMatrix (translationMatrix t.x t.y * Matrix.rotateByAffine θ) :=
   TMatrix.mul (translationTransform t.x t.y) (TMatrix.rotateByAffine θ)
 
-def ptInsideHalfPlaneCCW (p q a : Point) : Prop :=
-  (σ p q a = .ccw) ∨ (σ p q a = .collinear)
-
-def halfPlaneCCW (p q : Point) : Set Point :=
-  {a | ptInsideHalfPlaneCCW p q a}
-
-theorem σ_CCW_iff_pos_det : σ p q r = .ccw ↔ det p q r > 0 := by
-  rw [σ, ofReal_eq_ccw]
-
-theorem σ_CW_iff_neg_det : σ p q r = .cw ↔ det p q r < 0 := by
-  rw [σ, ofReal_eq_cw]
-
-theorem σ_Co_iff_pos_0 : σ p q r = .collinear ↔ det p q r = 0 := by
-  rw [σ, ofReal_eq_collinear]
-
-theorem detIffHalfPlaneCCW : a ∈ halfPlaneCCW p q ↔ det p q a ≥ 0 := by
-  simp [halfPlaneCCW, ptInsideHalfPlaneCCW]
-  constructor
-  · rintro (h | h)
-    · exact le_of_lt <| σ_CCW_iff_pos_det.mp h
-    · exact le_of_eq <| symm <| σ_Co_iff_pos_0.mp h
-  · intro h
-    rcases eq_or_lt_of_le h with (h | h)
-    · exact Or.inr <| σ_Co_iff_pos_0.mpr h.symm
-    · exact Or.inl <| σ_CCW_iff_pos_det.mpr h
-
-theorem HalfPlanesAreConvex : Convex ℝ (halfPlaneCCW p q) := by
-  convert convex_halfspace_le (𝕜 := ℝ) (E := Point)
-      (f := fun r => (q.y - p.y) * r.x + (p.x - q.x) * r.y) _ (p.x * q.y - p.y * q.x) using 1
-  · ext r
-    simp only [detIffHalfPlaneCCW, det_eq,
-      Matrix.vec2_dotProduct, PiLp.sub_apply, Set.mem_setOf_eq]
-    simp (config := {singlePass := true}) [← sub_nonneg]; ring_nf
-  constructor <;> intros <;> simp [Point.x, Point.y] <;> ring
-
 theorem convex3combo (S : Set Point) (CS : Convex ℝ S) (a b c : Point)
     (aS : a ∈ S) (bS : b ∈ S) (cS : c ∈ S) (α β γ : ℝ) (sum1 : α + β + γ = 1)
     (α0 : α ≥ 0) (β0 : β ≥ 0) (γ0 : γ ≥ 0) : α • a + β • b + γ • c ∈ S := by
@@ -330,24 +295,24 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
   unfold PtInTriangle
   intro ⟨h1, h2, h3⟩
   have det_pqr_pos : det p q r > 0 := by
-    rw [σ_CCW_iff_pos_det] at symm
+    rw [σ_eq_ccw] at symm
     linarith
   have det_qpr_neg : det q p r < 0 := by
     rw [det_perm₁] at det_pqr_pos
     linarith
 
   have det_qar_neg : det q a r < 0 := by
-    rw [← σ_CW_iff_neg_det] at det_qpr_neg ⊢
+    rw [← σ_eq_cw] at det_qpr_neg ⊢
     rw [σ_perm₁, h3, ← σ_perm₁]; exact det_qpr_neg
 
   have det_par_pos : det p a r > 0 := by
-    rw [← σ_CCW_iff_pos_det, h2, symm]
+    rw [← σ_eq_ccw, h2, symm]
 
   let aProjXPt : Point := ![arProjX_p_q a r, 0]
 
   have pqa_pos : det p q a > 0 := by
     have : σ p q a = .ccw := by rw [h1]; exact symm
-    rwa [σ_CCW_iff_pos_det] at this
+    rwa [σ_eq_ccw] at this
   have y_order : aProjXPt.y = 0 ∧ a.y > 0 ∧ r.y > a.y := by
     use rfl
     constructor
@@ -412,117 +377,11 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
   exact this
 
 theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
-    (symm : σ p q r = .ccw) :
-    PtInTriangle a p q r → σPtInTriangle a p q r := by
-  intro h
-  unfold PtInTriangle at h
-  unfold σPtInTriangle
-  let halfPlanePQ := halfPlaneCCW p q
-  let halfPlaneQR := halfPlaneCCW q r
-  let halfPlaneRP := halfPlaneCCW r p
-  have pInPQ : p ∈ halfPlanePQ := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [det_eq]
-    linarith
-  have pInRP : p ∈ halfPlaneRP := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [det_eq]
-    linarith
-  have pInQR : p ∈ halfPlaneQR := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [σ_CCW_iff_pos_det] at symm
-    rw [det_perm₂, ← det_perm₁]
-    linarith
-  have qInPQ : q ∈ halfPlanePQ := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [det_eq]
-    linarith
-  have qInQR : q ∈ halfPlaneQR := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [det_eq]
-    linarith
-  have qInRP : q ∈ halfPlaneRP := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [σ_CCW_iff_pos_det] at symm
-    rw [det_perm₁, ← det_perm₂]
-    linarith
-
-  have rInPQ : r ∈ halfPlanePQ := by
-    simp
-    rw [detIffHalfPlaneCCW]
-    rw [σ_CCW_iff_pos_det] at symm
-    linarith
-  have rInQR : r ∈ halfPlaneQR := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [det_eq]
-    linarith
-  have rInRP : r ∈ halfPlaneRP := by
-    simp; rw [detIffHalfPlaneCCW]
-    rw [det_eq]
-    linarith
-
-  let inter := halfPlanePQ ∩ (halfPlaneQR ∩ halfPlaneRP)
-  have pInter : p ∈ inter := Set.mem_inter pInPQ (Set.mem_inter pInQR pInRP)
-  have qInter : q ∈ inter := Set.mem_inter qInPQ (Set.mem_inter qInQR qInRP)
-  have rInter : r ∈ inter := Set.mem_inter rInPQ (Set.mem_inter rInQR rInRP)
-
-  have cRP : Convex ℝ (halfPlaneRP) := HalfPlanesAreConvex
-  have cPQ : Convex ℝ (halfPlanePQ) := HalfPlanesAreConvex
-  have cQR : Convex ℝ (halfPlaneQR) := HalfPlanesAreConvex
-  have interConvex : Convex ℝ inter := Convex.inter cPQ (Convex.inter cQR cRP)
-
-  have sub_set_inter : {p, q, r} ⊆ inter := by
-    simp_rw [Set.subset_def]
-    simp; exact ⟨pInter, ⟨qInter, rInter⟩⟩
-
-  have aInInter : a ∈ inter := by
-    unfold convexHull at h
-    simp at h
-    apply h inter sub_set_inter interConvex
-
-  have aInHalfPQ : a ∈ halfPlanePQ := by aesop
-  have aInHalfRP : a ∈ halfPlaneRP := by aesop
-  have aInHalfQR : a ∈ halfPlaneQR := by aesop
-
-  have pqa_non_0 : det p q a ≠ 0 := by
-    have l := gp.1
-    unfold Point.InGeneralPosition₃ at l
-    rw [det_perm₁, ← det_perm₂] at l
-    exact l
-  have pra_non_0 : det p r a ≠ 0 := by
-    have l := gp.2
-    unfold Point.InGeneralPosition₃ at l
-    rw [det_perm₁, ← det_perm₂] at l
-    exact l
-  have qra_non_0 : det q r a ≠ 0 := by
-    have l := gp.3
-    unfold Point.InGeneralPosition₃ at l
-    rw [det_perm₁, ← det_perm₂] at l
-    exact l
-
-  have pqr_pos : det p q r > 0 := by
-    rw [σ_CCW_iff_pos_det] at symm
-    linarith
-
-  have pqa_CCW : σ p q a = .ccw := by
-    rw [detIffHalfPlaneCCW] at aInHalfPQ
-    rw [σ_CCW_iff_pos_det]
-    apply lt_of_le_of_ne aInHalfPQ (Ne.symm pqa_non_0)
-  have goal1 : σ p q a = σ p q r := Eq.trans pqa_CCW (Eq.symm symm)
-  use goal1
-
-  have goal2 : σ p a r = σ p q r := by
-    rw [σ_CCW_iff_pos_det.2 pqr_pos, σ_CCW_iff_pos_det, GT.gt, ← neg_lt_zero, ← det_perm₂]
-    apply lt_of_le_of_ne
-    rw [detIffHalfPlaneCCW] at aInHalfRP
-    rw [det_perm₁] at aInHalfRP
-    linarith
-    exact pra_non_0
-  use goal2
-
-  rw [σ_CCW_iff_pos_det.2 pqr_pos, σ_perm₁, ← σ_perm₂, σ_CCW_iff_pos_det]
-  rw [detIffHalfPlaneCCW] at aInHalfQR
-  apply lt_of_le_of_ne aInHalfQR (Ne.symm qra_non_0)
+    (symm : σ p q r = .ccw) (h : PtInTriangle a p q r) : σ p q a = .ccw := by
+  rw [← gp.gp₁.perm₁.perm₂.σ_iff', Ne, σ_eq_cw, not_lt]
+  refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (detAffineMap p q)) h
+  simp [Set.subset_def]
+  simp [← σ_ne_cw, σ_self₁, σ_self₂, symm]
 
 theorem PtInTriangleInvariantUnderTransform {a p q r : Point} (t : Point) (θ : ℝ) :
     PtInTriangle a p q r ↔
@@ -753,9 +612,14 @@ theorem PtInTriangle_of_σPtInTriangle' {a p q r : Point} (gp : Point.InGeneralP
 theorem σPtInTriangle_iff_of_CCW {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
     (symm : σ p q r = .ccw) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
-  apply Iff.intro
-  exact PtInTriangle_of_σPtInTriangle' gp symm
-  exact σPtInTriangle_of_PtInTriangle gp symm
+  constructor
+  · exact PtInTriangle_of_σPtInTriangle' gp symm
+  · refine fun H => ⟨?_, ?_, ?_⟩ <;> rw [symm]
+    · exact σPtInTriangle_of_PtInTriangle gp symm H
+    · rw [σ_perm₂, ← σ_perm₁, σPtInTriangle_of_PtInTriangle
+        gp.perm₃.perm₂ (by rw [σ_perm₁, ← σ_perm₂, symm]) H.perm₂.perm₁]
+    · rw [σ_perm₁, ← σ_perm₂, σPtInTriangle_of_PtInTriangle
+        gp.perm₂.perm₃ (by rw [σ_perm₂, ← σ_perm₁, symm]) H.perm₁.perm₂]
 
 theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by

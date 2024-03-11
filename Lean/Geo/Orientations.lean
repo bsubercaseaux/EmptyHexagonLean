@@ -102,10 +102,22 @@ theorem Orientation.ofReal_eq_collinear (r : ℝ) : ofReal r = .collinear ↔ r 
 theorem Orientation.ofReal_eq_cw (r : ℝ) : ofReal r = .cw ↔ r < 0 := by
   simp [ofReal]; split_ifs <;> simp [*, le_of_lt]
 
+theorem Orientation.ofReal_ne_ccw (r : ℝ) : ofReal r ≠ .ccw ↔ r ≤ 0 := by simp [ofReal_eq_ccw]
+
+theorem Orientation.ofReal_ne_cw (r : ℝ) : ofReal r ≠ .cw ↔ 0 ≤ r := by simp [ofReal_eq_cw]
+
 open Orientation Point
 
 noncomputable def σ (p q r : Point) : Orientation :=
   .ofReal (det p q r)
+
+theorem σ_eq_ccw : σ p q r = .ccw ↔ det p q r > 0 := by rw [σ, ofReal_eq_ccw]
+
+theorem σ_eq_cw : σ p q r = .cw ↔ det p q r < 0 := by rw [σ, ofReal_eq_cw]
+
+theorem σ_ne_cw : σ p q r ≠ .cw ↔ 0 ≤ det p q r := by rw [σ, ofReal_ne_cw]
+
+theorem σ_eq_co : σ p q r = .collinear ↔ det p q r = 0 := by rw [σ, ofReal_eq_collinear]
 
 def detAffineMap (p q : Point) : Point →ᵃ[ℝ] ℝ where
   toFun r := det p q r
@@ -148,7 +160,7 @@ theorem det_add_det (a b c d) : det a b c + det a c d = det a b d + det b c d :=
 
 theorem σ_trans (h1 : σ a b c = .ccw) (h2 : σ a c d = .ccw) (h3 : σ a d b = .ccw) :
     σ b c d = .ccw := by
-  rw [σ, Orientation.ofReal_eq_ccw] at *
+  rw [σ_eq_ccw] at *
   rw [det_perm₂] at h3
   linarith [det_add_det a b c d]
 
@@ -161,7 +173,7 @@ theorem Point.InGeneralPosition₃.not_mem_seg :
 
 theorem Point.InGeneralPosition₃.iff_ne_collinear {p q r : Point} :
     InGeneralPosition₃ p q r ↔ σ p q r ≠ .collinear := by
-  rw [InGeneralPosition₃, σ, Ne, ← Orientation.ofReal_eq_collinear]
+  rw [InGeneralPosition₃, Ne, ← σ_eq_co]
 
 theorem Point.InGeneralPosition₃.σ_ne {p q r : Point} :
     InGeneralPosition₃ p q r → σ p q r ≠ .collinear := iff_ne_collinear.1
