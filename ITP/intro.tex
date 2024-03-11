@@ -129,22 +129,22 @@ The Empty Hexagon Number requires a much more efficient encoding, for which two 
 Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of Heule and Scheucher, the crucial piece to make the proof of $h(6) = 30$ feasible. We conclude by discussing the next steps towards the formal verification of other Erd\H{o}s-Szekeres-type problems in~\Cref{sec:conclusion}.
 
 \begin{figure}
-  \caption{Encoding of Heule and Scheucher for the Empty Hexagon Number~\cite{emptyHexagonNumber}. In particular, the unsatisfiability of the formula below for $n=30$ implies $h(6) = 30$, as detailed throughout the paper.}
+  \caption{Encoding based on that of Heule and Scheucher for the Empty Hexagon Number~\cite{emptyHexagonNumber}. Unsatisfiability of the formula below for $n=30$ implies $h(6) = 30$, as detailed throughout the paper.}
   \label{fig:full-encoding}
 \begin{framed}
   \begin{spreadlines}{16pt} 
 \begin{gather}
-\tikzmarkin{a}(3.5,-0.3)(-0.5,0.5)
-  \left(\orvar_{a, b, c} \land \orvar_{a, c, d}\right) \rightarrow \orvar_{a, b, d} \text{ for all } 1 \leq a < b < c < d \leq n\\
-  \left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}}\right) \rightarrow \ov{\orvar_{a, b, d}} \text{ for all } 1 \leq a < b < c < d \leq n\\
-  \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \orvar_{a, c, d} \text{ for all } 1 \leq a < b < c < d \leq n\\
-  \left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{b, c, d}}\right) \rightarrow \ov{\orvar_{a, c, d}} \text{ for all } 1 \leq a < b < c < d \leq n \tikzmarkend{a}\\
+\tikzmarkin{a}(1.5,-0.3)(-0.5,0.5)
+  \left(\orvar_{a, b, c} \land \orvar_{a, c, d}\right) \rightarrow \orvar_{a, b, d} \text{ for all } 2 \leq a < b < c < d \leq n\\
+  \left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}}\right) \rightarrow \ov{\orvar_{a, b, d}} \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{a}\\
+  %\left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \orvar_{a, c, d} \text{ for all } 1 \leq a < b < c < d \leq n\\
+  %\left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{b, c, d}}\right) \rightarrow \ov{\orvar_{a, c, d}} \text{ for all } 1 \leq a < b < c < d \leq n \tikzmarkend{a}\\
 \hfsetfillcolor{green!10}
 \hfsetbordercolor{green!60!black}
 \tikzmarkin{b}(4.25,-0.9)(-0.5,0.5)
-  \cvar_{i; a,b, c} \leftrightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{a, i, b}}  \right)\right) \text{ for all } 1 \leq a < i < b < c \leq n\\ 
-  \cvar_{i; a,b, c} \leftrightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{b, i, c}}  \right)\right) \text{ for all } 1 \leq a < b < i < c \leq n\\ 
-  \hvar_{a, b, c} \leftrightarrow \bigwedge_{\substack{a < i < c\\ i \neq b}} \ov{\cvar_{i; a,b,c}} \quad \text{ for all } 1 \leq a < b < c \leq n
+  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{a, i, b}}  \right)\right) \text{ for all } 2 \leq a < i < b < c \leq n\\
+  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{b, i, c}}  \right)\right) \text{ for all } 2 \leq a < b < i < c \leq n\\
+  \bigwedge_{\substack{a < i < c\\ i \neq b}} \ov{\cvar_{i; a,b,c}} \rightarrow \hvar_{a, b, c} \quad \text{ for all } 2 \leq a < b < c \leq n
   \tikzmarkend{b}\\ 
 \hfsetfillcolor{blue!10}
 \hfsetbordercolor{blue!60!black}
@@ -154,17 +154,17 @@ Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of He
 \hfsetfillcolor{orange!10}
 \hfsetbordercolor{orange!60!black}
 \tikzmarkin{d}(3.235,-0.3)(-0.5,0.5)
-  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 1 \leq a < b < c < d\\ 
-  \left(\uvar_{a,c,d} \land \ov{\orvar_{c,d,e}} \land \hvar_{a,c,e}\right)\rightarrow \ufvar_{a, d, e}  \quad \text{ for all } 1 \leq a < b < c < d\\ 
-  \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 1 \leq a < b < c < d \leq n \tikzmarkend{d}\\
+  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d\\
+  \left(\uvar_{a,c,d} \land \ov{\orvar_{c,d,e}} \land \hvar_{a,c,e}\right)\rightarrow \ufvar_{a, d, e} \quad \text{ for all } 2 \leq a < b < c < d\\
+  \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{d}\\
 \hfsetfillcolor{red!10}
 \hfsetbordercolor{red!60!black}
 \tikzmarkin{e}(3.6,-0.5)(-0.5,0.5)
-  \ov{\ufvar_{a,d,e}} \lor \ov{\orvar_{a, b, e}} \quad \text { for all } 1 \leq a < d < e \leq n, \; a < b < e\\
-  \ov{\ufvar_{a,d,e}} \lor \orvar_{d, e, f} \quad \text { for all } 1 \leq a < d < e < f\leq n\\
-  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c,c'}} \quad \text{ for all } 1 \leq a < c < c' < d \leq n\\
-  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c',c}} \quad \text{ for all } 1 \leq a < c' < c < d \leq n\\
-  \ov{\vvar_{a,c,d}} \lor \ov{\orvar_{c, d, e}} \lor \ov{\hvar_{a,c,e}} \quad \text{ for all } 1 < a < c < d < e \leq n
+  \ov{\ufvar_{a,d,e}} \lor \ov{\orvar_{a, b, e}} \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e\\
+  \ov{\ufvar_{a,d,e}} \lor \orvar_{d, e, f} \quad \text { for all } 2 \leq a < d < e < f\leq n\\
+  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c,c'}} \quad \text{ for all } 2 \leq a < c < c' < d \leq n\\
+  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c',c}} \quad \text{ for all } 2 \leq a < c' < c < d \leq n\\
+  \ov{\vvar_{a,c,d}} \lor \ov{\orvar_{c, d, e}} \lor \ov{\hvar_{a,c,e}} \quad \text{ for all } 2 \leq a < c < d < e \leq n
 \tikzmarkend{e}
   \end{gather}
 \end{spreadlines}
