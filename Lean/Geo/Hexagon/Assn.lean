@@ -37,23 +37,15 @@ theorem satisfies_capFDef (w : CanonicalPoints) {a b c d : Fin (length w)} (bc :
   simp [capFDef, isCapF]; intro h1 h2
   exact ⟨cd, _, h2, (w.gp₃ bc cd).σ_iff.1 h1, hh⟩
 
-theorem of_5hole {w : CanonicalPoints} {a b c d e : Fin (length w)}
-    (ha : (0 : Fin (w.rest.length+1)) < a) (ab : a < b) (bc : b < c) (cd : c < d) (de : d < e)
-    (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset)
-    (abc : σ w[a] w[b] w[c] = .ccw)
-    (bcd : σ w[b] w[c] w[d] = .ccw)
-    (cde : σ w[c] w[d] w[e] = .ccw) : σHasEmptyKGon 6 w.toFinset := by
-  refine σCCWPoints.emptyHexagon' ?_ w.gp ace (subset_map w [(0:Fin (_+1)), a, b, c, d, e])
-  refine Arc.join (l₁ := [a,b,c,d]) (l₂ := [])
-    (.cons ha (w.σ_0 ha ab) <| .cons ab abc <| .cons bc bcd <| .cons cd cde <| .one de)
-    (.one <| ha.trans <| ab.trans <| bc.trans <| cd.trans de)
-
 theorem satisfies_no6Hole3Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGon 6 w.toFinset)
     {a c d e : Fin (length w)} (ha : (0 : Fin (w.rest.length+1)) < a) (de : d < e)
     (ace : σIsEmptyTriangleFor w[a] w[c] w[e] w.toFinset) :
     (no6Hole3Below a c d e).eval w.toPropAssn := by
   simp [no6Hole3Below]; intro ⟨b, ab, bc, cd, abc, bcd⟩ cde
-  exact hw <| of_5hole ha ab bc cd de ace abc bcd cde
+  refine hw <| σCCWPoints.emptyHexagon' ?_ w.gp ace (subset_map w [(0:Fin (_+1)), a, b, c, d, e])
+  exact Arc.join (l₁ := [a,b,c,d]) (l₂ := [])
+    (.cons ha (w.σ_0 ha ab) <| .cons ab abc <| .cons bc bcd <| .cons cd cde <| .one de)
+    (.one <| ha.trans <| ab.trans <| bc.trans <| cd.trans de)
 
 theorem satisfies_no6Hole4Above {w : CanonicalPoints} (hw : ¬σHasEmptyKGon 6 w.toFinset)
     {a d e f : Fin (length w)} (ef : e < f) :
