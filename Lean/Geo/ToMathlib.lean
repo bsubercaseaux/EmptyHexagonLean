@@ -2,6 +2,7 @@ import Std.Data.List.Basic
 import Mathlib.Data.Complex.Abs
 import Mathlib.LinearAlgebra.AffineSpace.FiniteDimensional
 import Mathlib.Analysis.Convex.Between
+import Mathlib.Analysis.Convex.Combination
 
 -- Q: Why are `List.get [i]` *and* `l[i.1]` both simp normal forms? Should we have `List.get i = l[i.1]`?
 -- There is also `List.getElem_eq_get : l[i] = l.get i` that never gets applied because `l[i]` is not simp-nf..
@@ -198,3 +199,11 @@ theorem Wbtw.wbtw_or_wbtw [LinearOrderedField R] [AddCommGroup V] [Module R V] [
   obtain ⟨r, ⟨r0, _⟩, rfl⟩ := h₁
   obtain ⟨s, ⟨s0, _⟩, rfl⟩ := h₂
   exact wbtw_or_wbtw_smul_vadd_of_nonneg _ _ r0 s0
+
+open BigOperators in
+theorem linear_combination_mem_convexHull {k V : Type*}
+    [LinearOrderedField k] [AddCommGroup V] [Module k V] {ι : Type*}
+    (s : Finset ι) (v : ι → V) (w : ι → k) (h1 : ∀ i ∈ s, 0 ≤ w i) (h2 : ∑ i in s, w i = 1) :
+    (∑ i in s, w i • v i) ∈ convexHull k (Set.range v) := by
+  rw [← Finset.affineCombination_eq_linear_combination s v w h2]
+  exact affineCombination_mem_convexHull h1 h2
