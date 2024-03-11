@@ -144,10 +144,7 @@ theorem σPtInTriangle_iff_of_CCW {a p q r : Point} (gp : Point.InGeneralPositio
 theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
   rcases gp.gp₄.σ_cases with h | h
-  . exact σPtInTriangle_iff_of_CCW gp h
-  . have hccw : σ p r q = .ccw := by rw [σ_perm₂, h]; rfl
-    have : InGeneralPosition₄ a p r q := ⟨gp.gp₂, gp.gp₁, gp.gp₃.perm₂, gp.gp₄.perm₂⟩
-    have := σPtInTriangle_iff_of_CCW this hccw
-    exact ⟨
-      fun h => PtInTriangle.perm₂ (this.mp (σPtInTriangle.perm₂ h)),
-      fun h => σPtInTriangle.perm₂ (this.mpr (PtInTriangle.perm₂ h))⟩
+  · exact σPtInTriangle_iff_of_CCW gp h
+  · have : InGeneralPosition₄ a p r q := ⟨gp.gp₂, gp.gp₁, gp.gp₃.perm₂, gp.gp₄.perm₂⟩
+    have := σPtInTriangle_iff_of_CCW this (by rw [σ_perm₂, h]; rfl)
+    exact ⟨(this.1 ·.perm₂ |>.perm₂), (this.2 ·.perm₂ |>.perm₂)⟩
