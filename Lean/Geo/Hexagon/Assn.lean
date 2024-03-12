@@ -4,45 +4,17 @@ import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
 import Geo.Orientations
 import Geo.Hexagon.Encoding
-import Geo.Hexagon.Arc
+import Geo.KGon.Arc
 import Geo.KGon.Assn
 
 namespace Geo.CanonicalPoints
 open List Classical LeanSAT.Model PropFun Point
 attribute [-simp] getElem_fin
 
-theorem satisfies_capDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
-    (ab : a < b) (bc : b < c) (cd : c < d) : (capDef a b c d).eval w.toPropAssn := by
-  simp [capDef, isCap]; intro h1 h2
-  exact ⟨_, ab, bc, cd, (w.gp₃' ab bc).σ_iff.1 h1, (w.gp₃' bc cd).σ_iff.1 h2⟩
-
-theorem satisfies_capDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
-    (capDef2 a c d).eval w.toPropAssn := by
-  simp [capDef2, isCap]; intro b ab bc cd h1 h2
-  have gp := w.gp₄' ab bc cd
-  exact gp.gp₃.σ_iff.2 <| σ_prop₃ (w.sorted₄' ab bc cd) gp h1 h2
-
-theorem satisfies_cupDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
-    (ab : a < b) (bc : b < c) (cd : c < d) : (cupDef a b c d).eval w.toPropAssn := by
-  simp [cupDef, isCap]; intro h1 h2
-  exact ⟨_, ab, bc, cd, h1, h2⟩
-
-theorem satisfies_cupDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
-    (cupDef2 a c d).eval w.toPropAssn := by
-  simp [cupDef2, isCap]; intro b ab bc cd h1 h2
-  exact σ_prop₁ (w.sorted₄' ab bc cd) (w.gp₄' ab bc cd) h1 h2
-
-theorem satisfies_capFDef (w : CanonicalPoints) {a b c d : Fin w.rlen} (bc : b < c) (cd : c < d)
-    (hh : σIsEmptyTriangleFor w+[a] w+[b] w+[d] w.toFinset) :
-    (capFDef a b c d).eval w.toPropAssn := by
-  simp [capFDef, isCapF]; intro h1 h2
-  exact ⟨cd, _, h2, (w.gp₃' bc cd).σ_iff.1 h1, hh⟩
-
 theorem satisfies_no6Hole3Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGon 6 w.toFinset)
-    {a c d e : Fin w.rlen} (de : d < e)
-    (ace : σIsEmptyTriangleFor w+[a] w+[c] w+[e] w.toFinset) :
+    {a c d e : Fin w.rlen} (de : d < e) :
     (no6Hole3Below a c d e).eval w.toPropAssn := by
-  simp [no6Hole3Below]; intro ⟨b, ab, bc, cd, abc, bcd⟩ cde
+  simp [no6Hole3Below]; intro ace ⟨b, ab, bc, cd, abc, bcd⟩ cde
   refine hw <| σCCWPoints.emptyHexagon' ?_ w.gp ace
     (subset_map w [0, a.succ, b.succ, c.succ, d.succ, e.succ])
   exact Arc.join (l₁ := [_,_,_,_]) (l₂ := [])
@@ -81,20 +53,14 @@ theorem satisfies_no6Hole1Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGon 6 w
   refine hw <| this.emptyHexagon w.gp acf.perm₂ (subset_map' w [a, e, f, d, c, b])
 
 theorem satisfies_hexagonEncoding (w : CanonicalPoints) (hw : ¬σHasEmptyKGon 6 w.toFinset) :
-    (hexagonEncoding w.rlen).eval w.toPropAssn := by
-  simp [hexagonEncoding, satisfies_baseEncoding, no6HoleClauses1, no6HoleClauses2, no6HoleClauses3]
+    (hexagonEncoding w.rlen).eval w.toPropAssn := by with_reducible
+  simp [hexagonEncoding, satisfies_baseKGonEncoding, no6HoleClauses1, no6HoleClauses2]
   refine ⟨
-    fun a b ab c bc d cd => ⟨?_, ?_, fun _ => ⟨fun hh => ⟨?_, ?_⟩, fun _ => ?_⟩⟩,
-    fun a b _ c _ => ⟨?_, ?_⟩,
-    fun a b _ c _ p ap pc _ => ⟨fun _ _ => ?_, fun _ => ?_⟩⟩
-  · with_reducible exact satisfies_capDef w ab bc cd
-  · with_reducible exact satisfies_cupDef w ab bc cd
-  · with_reducible exact satisfies_capFDef w bc cd hh
-  · with_reducible exact satisfies_no6Hole3Below hw cd hh
-  · with_reducible exact satisfies_no6Hole4Above hw cd
-  · with_reducible exact satisfies_capDef2 w
-  · with_reducible exact satisfies_cupDef2 w
-  · with_reducible exact satisfies_no6Hole2Below hw
-  · with_reducible exact satisfies_no6Hole1Below hw ap pc
+    fun a b _ c _ d cd => ⟨?_, fun _ => ?_⟩,
+    fun a b _ c _ p ap pc _ => ⟨fun _ => ?_, fun _ => ?_⟩⟩
+  · exact satisfies_no6Hole3Below hw cd
+  · exact satisfies_no6Hole4Above hw cd
+  · exact satisfies_no6Hole2Below hw
+  · exact satisfies_no6Hole1Below hw ap pc
 
 end CanonicalPoints

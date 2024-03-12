@@ -149,3 +149,49 @@ def revLexClauses (n : Nat) : PropForm (Var n) :=
 
 def baseEncoding (n : Nat) : PropForm (Var n) :=
   .all #[signotopeClauses n, insideClauses n, holeDefClauses n, revLexClauses n]
+
+-- cap a c d:    b  c
+--            a ------ d
+def capDef (a b c d : Fin n) : PropForm (Var n) :=
+  .imp (.and (.not (Var.sigma a b c)) (.not (Var.sigma b c d))) (Var.cap a c d)
+
+def capDef2 (a c d : Fin n) : PropForm (Var n) :=
+  .imp (Var.cap a c d) (.not (Var.sigma a c d))
+
+--            a ------ d
+-- cup a c d:    b  c
+def cupDef (a b c d : Fin n) : PropForm (Var n) :=
+  .imp (.and (Var.sigma a b c) (Var.sigma b c d)) (Var.cup a c d)
+
+def cupDef2 (a c d : Fin n) : PropForm (Var n) :=
+  .imp (Var.cup a c d) (Var.sigma a c d)
+
+--                .   b
+-- capF a c d:            c      (where a-b-d is a hole)
+--             a ---------- d
+def capFDef (a b c d : Fin n) : PropForm (Var n) :=
+  .imp (.all #[Var.cap a b c, .not (Var.sigma b c d), Var.hole a b d]) (Var.capF a c d)
+
+def capDefClauses1 (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .forAll (Fin n) fun b =>
+  .guard (a < b) fun _ =>
+  .forAll (Fin n) fun c =>
+  .guard (b < c) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
+  .flatCNF <| .all #[
+    capDef a b c d, cupDef a b c d,
+    .guard (a.1+1 < b.1) fun _ => capFDef a b c d
+  ]
+
+def capDefClauses2 (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .forAll (Fin n) fun c =>
+  .guard (a.1+1 < c.1) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
+  .all #[capDef2 a c d, cupDef2 a c d]
+
+def baseKGonEncoding (n : Nat) : PropForm (Var n) :=
+  .all #[baseEncoding n, capDefClauses1 n, capDefClauses2 n]

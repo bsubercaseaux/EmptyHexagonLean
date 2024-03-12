@@ -120,4 +120,42 @@ theorem satisfies_baseEncoding (w : CanonicalPoints) : (baseEncoding w.rlen).eva
   simp [baseEncoding, satisfies_signotopeClauses, satisfies_insideClauses, satisfies_holeDefClauses,
     satisfies_revLexClauses]
 
+theorem satisfies_capDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
+    (ab : a < b) (bc : b < c) (cd : c < d) : (capDef a b c d).eval w.toPropAssn := by
+  simp [capDef, isCap]; intro h1 h2
+  exact ⟨_, ab, bc, cd, (w.gp₃' ab bc).σ_iff.1 h1, (w.gp₃' bc cd).σ_iff.1 h2⟩
+
+theorem satisfies_capDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
+    (capDef2 a c d).eval w.toPropAssn := by
+  simp [capDef2, isCap]; intro b ab bc cd h1 h2
+  have gp := w.gp₄' ab bc cd
+  exact gp.gp₃.σ_iff.2 <| σ_prop₃ (w.sorted₄' ab bc cd) gp h1 h2
+
+theorem satisfies_cupDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
+    (ab : a < b) (bc : b < c) (cd : c < d) : (cupDef a b c d).eval w.toPropAssn := by
+  simp [cupDef, isCap]; intro h1 h2
+  exact ⟨_, ab, bc, cd, h1, h2⟩
+
+theorem satisfies_cupDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
+    (cupDef2 a c d).eval w.toPropAssn := by
+  simp [cupDef2, isCap]; intro b ab bc cd h1 h2
+  exact σ_prop₁ (w.sorted₄' ab bc cd) (w.gp₄' ab bc cd) h1 h2
+
+theorem satisfies_capFDef (w : CanonicalPoints) {a b c d : Fin w.rlen} (bc : b < c) (cd : c < d) :
+    (capFDef a b c d).eval w.toPropAssn := by
+  simp [capFDef, isCapF]; intro h1 h2 hh
+  exact ⟨cd, _, h1, (w.gp₃' bc cd).σ_iff.1 h2, hh⟩
+
+theorem satisfies_baseKGonEncoding (w : CanonicalPoints) :
+    (baseKGonEncoding w.rlen).eval w.toPropAssn := by with_reducible
+  simp [baseKGonEncoding, capDefClauses1, capDefClauses2, satisfies_baseEncoding]
+  refine ⟨
+    fun a b ab c bc d cd => ⟨?_, ?_, fun _ => ?_⟩,
+    fun a b _ c _ => ⟨?_, ?_⟩⟩
+  · exact satisfies_capDef w ab bc cd
+  · exact satisfies_cupDef w ab bc cd
+  · exact satisfies_capFDef w bc cd
+  · exact satisfies_capDef2 w
+  · exact satisfies_cupDef2 w
+
 end CanonicalPoints

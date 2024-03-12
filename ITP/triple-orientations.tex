@@ -67,16 +67,16 @@ noncomputable def σ (p q r : Point) : Orientation :=
 %   else collinear
 
 Through the $\sigma$ function we can immediately define the notion of \emph{general position} for collections (e.g., finite sets, lists, etc.) of points, simply establishing that $\sigma(p, q, r) \neq 0$ for every three distinct points $p, q, r$ in the collection.
-Furthermore, we can start formalizing sets of points that are \emph{equivalent} with respect to their triple orientations, and consequently, properties of pointsets that are fully captured by their triple orientations~(\emph{orientation properties}). 
+Furthermore, we can start formalizing sets of points that are \emph{equivalent} with respect to their triple orientations, and consequently, properties of pointsets that are fully captured by their triple orientations~(\emph{orientation properties}).
 % An illustration is presented in~\Cref{fig:sigma-equiv}.
 % \input{fig-sigma-equiv.tex}
 \begin{lstlisting}
   structure σEquiv (S T : Set Point) where
     f : Point → Point
-    bij : Set.BijOn f S T 
-    parity : Bool -- See Section 4 for a more detialed explanation 
+    bij : Set.BijOn f S T
+    parity : Bool -- See Section 4 for a more detailed explanation
     σ_eq : ∀ (p ∈ S) (q ∈ S) (r ∈ S), σ p q r = parity ^^^ σ (f p) (f q) (f r)
-    
+
   def OrientationProperty (P : List Point → Prop) :=
     ∀ {{S T}}, S ≃σ T → (P S ↔ P T) -- `≃σ` is infix notation for `σEquiv`
 \end{lstlisting}

@@ -184,7 +184,7 @@ theorem split_convexHull (cvx : ConvexPoints S) :
       z ∈ convexHull ℝ {a, b} := by
     by_contra zab
     have {a b} (ha : a ∈ S) (hb : b ∈ S) (ab : a ≠ b) (zab : z ∉ convexHull ℝ {a, b}) :
-        a ∉ (convexHull ℝ) {b, z} := fun h => by
+        a ∉ convexHull ℝ {b, z} := fun h => by
       rw [← Set.insert_eq_of_mem ha, ← Set.insert_diff_singleton,
         convexHull_insert (s := S \ {a}) ⟨b, hb, ab.symm⟩] at this
       have hba : b ∈ convexHull ℝ (S \ {a}) := subset_convexHull _ _ ⟨hb, ab.symm⟩
