@@ -150,22 +150,22 @@ Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of He
 \hfsetfillcolor{blue!10}
 \hfsetbordercolor{blue!60!black}
 \tikzmarkin{c}(0.45,-0.4)(-0.5,0.5)
-    \orvar_{1, b, c} \quad \text{ for all } 2 \leq b < c \leq n \label{eq:constraint-6}\\
-    \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \preceq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\tikzmarkend{c}\label{eq:constraint-7}\\ 
+    % \orvar_{1, b, c} \quad \text{ for all } 2 \leq b < c \leq n \label{eq:constraint-6}\\
+    \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \preceq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\tikzmarkend{c}\label{eq:constraint-6}\\ 
 \hfsetfillcolor{orange!10}
 \hfsetbordercolor{orange!60!black}
 \tikzmarkin{d}(3.235,-0.3)(-0.5,0.5)
-  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d\label{eq:constraint-8}\\
-  \left(\uvar_{a,c,d} \land \ov{\orvar_{c,d,e}} \land \hvar_{a,c,e}\right)\rightarrow \ufvar_{a, d, e} \quad \text{ for all } 2 \leq a < b < c < d\label{eq:constraint-9}\\
-  \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{d}\label{eq:constraint-10}\\
+  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d\label{eq:constraint-7}\\
+  \left(\uvar_{a,c,d} \land \ov{\orvar_{c,d,e}} \land \hvar_{a,c,e}\right)\rightarrow \ufvar_{a, d, e} \quad \text{ for all } 2 \leq a < b < c < d\label{eq:constraint-8}\\
+  \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{d}\label{eq:constraint-9}\\
 \hfsetfillcolor{red!10}
 \hfsetbordercolor{red!60!black}
 \tikzmarkin{e}(3.6,-0.5)(-0.5,0.5)
-  \ov{\ufvar_{a,d,e}} \lor \ov{\orvar_{a, b, e}} \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e\label{eq:constraint-11}\\
-  \ov{\ufvar_{a,d,e}} \lor \orvar_{d, e, f} \quad \text { for all } 2 \leq a < d < e < f\leq n\label{eq:constraint-12}\\
-  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c,c'}} \quad \text{ for all } 2 \leq a < c < c' < d \leq n\label{eq:constraint-13}\\
-  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c',c}} \quad \text{ for all } 2 \leq a < c' < c < d \leq n\label{eq:constraint-14}\\
-  \ov{\vvar_{a,c,d}} \lor \ov{\orvar_{c, d, e}} \lor \ov{\hvar_{a,c,e}} \quad \text{ for all } 2 \leq a < c < d < e \leq n\label{eq:constraint-15}
+  \ov{\ufvar_{a,d,e}} \lor \ov{\orvar_{a, b, e}} \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e\label{eq:constraint-10}\\
+  \ov{\ufvar_{a,d,e}} \lor \orvar_{d, e, f} \quad \text { for all } 2 \leq a < d < e < f\leq n\label{eq:constraint-11}\\
+  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c,c'}} \quad \text{ for all } 2 \leq a < c < c' < d \leq n\label{eq:constraint-12}\\
+  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c',c}} \quad \text{ for all } 2 \leq a < c' < c < d \leq n\label{eq:constraint-13}\\
+  \ov{\vvar_{a,c,d}} \lor \ov{\orvar_{c, d, e}} \lor \ov{\hvar_{a,c,e}} \quad \text{ for all } 2 \leq a < c < d < e \leq n\label{eq:constraint-14}
 \tikzmarkend{e}
   \end{gather}
 \end{spreadlines}
