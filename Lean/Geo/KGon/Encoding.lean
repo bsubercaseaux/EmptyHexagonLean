@@ -78,7 +78,7 @@ The contraints are:
 -/
 
 
-def signotopeClauses (n : Nat) : PropForm (Var n) :=
+def signotopeClauses1 (n : Nat) : PropForm (Var n) :=
   -- for all `a`, `b`, `c` with `a < b < c`
   .forAll (Fin n) fun a =>
   .forAll (Fin n) fun b =>
@@ -89,13 +89,25 @@ def signotopeClauses (n : Nat) : PropForm (Var n) :=
   .guard (c < d) fun _ =>
   .all #[
     -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d} -- 1.2
-    .imp (.and (sigma a b c) (sigma a c d)) (sigma a b d)
-  -- , -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d} -- 2.2
-  --   .imp (.and (sigma a b c) (sigma b c d)) (sigma a c d)
-  , -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d} -- 1.1
+    .imp (.and (sigma a b c) (sigma a c d)) (sigma a b d),
+    -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d} -- 1.1
     .imp (.and (.not (sigma a b c)) (.not (sigma a c d))) (.not (sigma a b d))
-  -- , -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d} -- 2.1
-  --   .imp (.and (.not (sigma a b c)) (.not (sigma b c d))) (.not (sigma a c d))
+  ]
+
+def signotopeClauses2 (n : Nat) : PropForm (Var n) :=
+  -- for all `a`, `b`, `c` with `a < b < c`
+  .forAll (Fin n) fun a =>
+  .forAll (Fin n) fun b =>
+  .guard (a < b) fun _ =>
+  .forAll (Fin n) fun c =>
+  .guard (b < c) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
+  .all #[
+    -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d} -- 2.2
+    .imp (.and (sigma a b c) (sigma b c d)) (sigma a c d),
+    -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d} -- 2.1
+    .imp (.and (.not (sigma a b c)) (.not (sigma b c d))) (.not (sigma a c d))
   ]
 
 def insideClauses (n : Nat) : PropForm (Var n) :=
@@ -120,7 +132,17 @@ def insideClauses (n : Nat) : PropForm (Var n) :=
         .and (.iff (sigma a b c) (sigma a x c)) (.iff (.not (sigma b x c)) (sigma a b c)))
   ]
 
-def holeDefClauses (n : Nat) : PropForm (Var n) :=
+def holeDefClauses0 (n : Nat) : PropForm (Var n) :=
+  .forAll (Fin n) fun b =>
+  .forAll (Fin n) fun c =>
+  .guard (b < c) fun _ =>
+  .flatCNF <| .imp
+    (.forAll (Fin n) fun x =>
+      .guard (b < x ∧ x < c) fun _ =>
+      Var.sigma b x c)
+    (Var.hole₀ 0 b c)
+
+def holeDefClauses1 (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
@@ -148,7 +170,7 @@ def revLexClauses (n : Nat) : PropForm (Var n) :=
     (F := fun ⟨a, _⟩ => Var.sigma ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
 
 def baseEncoding (n : Nat) : PropForm (Var n) :=
-  .all #[signotopeClauses n, insideClauses n, holeDefClauses n, revLexClauses n]
+  .all #[signotopeClauses1 n, insideClauses n, holeDefClauses1 n, revLexClauses n]
 
 -- cap a c d:    b  c
 --            a ------ d

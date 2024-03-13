@@ -23,7 +23,9 @@ def eval (τ : v → Prop) : PropForm v → Prop
   | atomic' a => eval τ a
 
 protected partial def repr [Repr α] : PropForm α → Std.Format
+  | .all' #[] => f!"true"
   | .all' fs => .paren <| Std.Format.joinSep (fs.toList.map PropForm.repr) (" ∧" ++ Std.Format.line)
+  | .any' #[] => f!"false"
   | .any' fs => .paren <| Std.Format.joinSep (fs.toList.map PropForm.repr) (" ∨" ++ Std.Format.line)
   | .atomic' f => f!"atomic({PropForm.repr f})"
   | .lit true f => repr f
@@ -144,12 +146,18 @@ attribute [-simp] eval_all' eval_any' in
 def atomic : PropForm v → PropForm v
   | .atomic' a => .atomic' a
   | .lit pos a => .lit pos a
+  | .true => .true
+  | .false => .false
   | a => .atomic' a
 
 @[simp] theorem eval_atomic' (τ : v → Prop) : eval τ (.atomic' a) ↔ eval τ a := by simp [eval]
 
 @[simp] theorem eval_atomic (τ : v → Prop) : eval τ (.atomic a) ↔ eval τ a := by
-  simp [atomic]; split <;> (try cases ‹Bool›) <;> simp
+  unfold atomic atomic.match_1 -- terrible proof, pending lean4#3843
+  cases a <;> simp <;> (try split_ifs)
+    <;> (try rename Array.size _ = 0 => h; have := Array.eq_empty_of_size_eq_zero h
+             subst this)
+    <;> simp
 
 def forAll (as : σ) [ToArray as α] (f : α → PropForm v) : PropForm v :=
   .all <| ToArray.toArray as f

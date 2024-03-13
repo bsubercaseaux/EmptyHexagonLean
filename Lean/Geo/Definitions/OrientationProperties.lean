@@ -13,6 +13,11 @@ theorem σIsEmptyTriangleFor.perm₁ : σIsEmptyTriangleFor p q r S → σIsEmpt
 theorem σIsEmptyTriangleFor.perm₂ : σIsEmptyTriangleFor p q r S → σIsEmptyTriangleFor p r q S :=
   fun H s hs hn => H s hs hn.perm₂
 
+theorem σIsEmptyTriangleFor.perm (h : [p, q, r].Perm [p', q', r']) :
+    σIsEmptyTriangleFor p q r S ↔ σIsEmptyTriangleFor p' q' r' S :=
+  perm₃_induction (P := (σIsEmptyTriangleFor · · · S))
+    (fun _ _ _ => (·.perm₁)) (fun _ _ _ => (·.perm₂)) h
+
 -- def σHasEmptyTriangle (S : Set Point) : Prop :=
 --   ∃ᵉ (a ∈ S) (b ∈ S) (c ∈ S),
 --     a ≠ b ∧ a ≠ c ∧ b ≠ c ∧ σIsEmptyTriangleFor a b c S

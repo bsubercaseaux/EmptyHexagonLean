@@ -20,26 +20,32 @@ def isCapF (w : CanonicalPoints) (a c d : Fin w.rlen) :=
 @[simp] def toPropAssn (w : CanonicalPoints) : Var w.rlen → Prop
   | .sigma a b c    => σ w+[a] w+[b] w+[c] = .ccw
   | .inside x a b c => σPtInTriangle w+[x] w+[a] w+[b] w+[c]
-  | .hole a b c     => σIsEmptyTriangleFor w+[a] w+[b] w+[c] w.toFinset
+  | .hole₀ a b c    => σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset
   | .cap a c d      => isCap w a c d .cw
   | .cup a c d      => isCap w a c d .ccw
   | .capF a d e     => isCapF w a d e
 
-theorem satisfies_signotopeClauses (w : CanonicalPoints) :
-    (signotopeClauses w.rlen).eval w.toPropAssn := by
-  simp [signotopeClauses]
+theorem satisfies_signotopeClauses1 (w : CanonicalPoints) :
+    (signotopeClauses1 w.rlen).eval w.toPropAssn := by
+  simp [signotopeClauses1]
   intro i j hij k hjk l hkl
   have s := w.sorted₄' hij hjk hkl
   have gp := w.gp₄' hij hjk hkl
   constructor
-  . exact σ_prop₂ s gp
-  -- constructor
-  -- . exact σ_prop₁ s gp
-  -- constructor
-  . simp_rw [gp.gp₁.σ_iff, gp.gp₂.σ_iff, gp.gp₃.σ_iff]
+  · exact σ_prop₂ s gp
+  · simp_rw [gp.gp₁.σ_iff, gp.gp₂.σ_iff, gp.gp₃.σ_iff]
     exact σ_prop₄ s gp
-  -- . simp_rw [gp.gp₁.σ_iff, gp.gp₄.σ_iff, gp.gp₃.σ_iff]
-  --   exact σ_prop₃ s gp
+
+theorem satisfies_signotopeClauses2 (w : CanonicalPoints) :
+    (signotopeClauses2 w.rlen).eval w.toPropAssn := by
+  simp [signotopeClauses2]
+  intro i j hij k hjk l hkl
+  have s := w.sorted₄' hij hjk hkl
+  have gp := w.gp₄' hij hjk hkl
+  constructor
+  · exact σ_prop₁ s gp
+  · simp_rw [gp.gp₁.σ_iff, gp.gp₄.σ_iff, gp.gp₃.σ_iff]
+    exact σ_prop₃ s gp
 
 theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPosition₄ a x b c →
     (σPtInTriangle x a b c ↔
@@ -78,13 +84,16 @@ theorem satisfies_insideClauses (w : CanonicalPoints) : (insideClauses w.rlen).e
   · intro hbx hxc
     exact (insideDefs_aux₂ (w.sorted₄' hab hbx hxc) (w.gp₄' hab hbx hxc)).1
 
-theorem satisfies_holeDefClauses (w : CanonicalPoints) : (holeDefClauses w.rlen).eval w.toPropAssn := by
-  simp [holeDefClauses, σIsEmptyTriangleFor, mem_toFinset_iff]
-  intro a b ab c bc H i tri
-  have gp₄ : InGeneralPosition₄ w[i] w+[a] w+[b] w+[c] := tri.gp₄_of_gp₃ (w.gp₃' ab bc)
+theorem holeDefs_aux (w : CanonicalPoints) {b c : Fin (rlen w)} {a i : Fin (length w)}
+    (ab : a < b.succ) (bc : b < c)
+    (H : ∀ i, a < i.succ → i < c → ¬i = b → ¬σPtInTriangle w+[i] w[a] w+[b] w+[c]) :
+    ¬σPtInTriangle w[i] w[a] w+[b] w+[c] := fun tri => by
+  have gp₃ := CanonicalPoints.gp₃ (k := c.succ) ab bc.succ₂
+  have sorted₃ := CanonicalPoints.sorted₃ (k := c.succ) ab bc.succ₂
+  have gp₄ : InGeneralPosition₄ w[i] w[a] w+[b] w+[c] := tri.gp₄_of_gp₃ gp₃
   have ib : i ≠ b.succ := mt (congrArg (w[·])) gp₄.gp₃.ne₁
-  have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle' (w.sorted₃' ab bc) ((σPtInTriangle_iff gp₄).mp tri)
-  have ai : a.succ < i := w.lt_iff.1 <| by
+  have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle' sorted₃ ((σPtInTriangle_iff gp₄).mp tri)
+  have ai : a < i := w.lt_iff.1 <| by
     apply lt_of_le_of_ne wawi
     intro h
     exact gp₄.gp₁.ne₁ <| w.eq_iff.1 h.symm ▸ rfl
@@ -94,7 +103,27 @@ theorem satisfies_holeDefClauses (w : CanonicalPoints) : (holeDefClauses w.rlen)
     exact gp₄.gp₃.ne₂ <| w.eq_iff.1 h ▸ rfl
   obtain rfl | ⟨i,rfl⟩ := i.eq_zero_or_eq_succ
   · cases ai
-  · exact H i (Fin.succ_lt_succ_iff.1 ai) (Fin.succ_lt_succ_iff.1 ic) (mt Fin.succ_inj.2 ib) tri
+  · exact H i ai (Fin.succ_lt_succ_iff.1 ic) (mt Fin.succ_inj.2 ib) tri
+
+theorem satisfies_holeDefClauses0 (w : CanonicalPoints) :
+    (holeDefClauses0 w.rlen).eval w.toPropAssn := by
+  simp [holeDefClauses0, σIsEmptyTriangleFor, mem_toFinset_iff]
+  intro b c bc H i
+  refine holeDefs_aux w (Fin.succ_pos _) bc fun i _ ic ib ⟨h1, h2, h3⟩ => ?_
+  obtain ib | ib := lt_or_gt_of_ne ib
+  · rw [σ_perm₂] at h1
+    have h1 := (congrArg (-·) (w.σ_0 ib)).symm.trans h1 -- FIXME: rw
+    have h1 := h1.trans (w.σ_0 bc) -- FIXME: rw
+    cases h1
+  · rw [σ_perm₁, H i ib ic] at h3
+    have h3 := h3.trans (w.σ_0 bc) -- FIXME: rw
+    cases h3
+
+theorem satisfies_holeDefClauses1 (w : CanonicalPoints) :
+    (holeDefClauses1 w.rlen).eval w.toPropAssn := by
+  simp [holeDefClauses1, σIsEmptyTriangleFor, mem_toFinset_iff]
+  intro a b ab c bc H i
+  exact holeDefs_aux w ab.succ₂ bc (fun i h => H i (Fin.succ_lt_succ_iff.1 h))
 
 theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
     (hF : ∀ a a', a'.1 = a.1 → ((F' a').eval τ ↔ F a))
@@ -108,7 +137,8 @@ theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
     exact .imp_right <| .imp_right hacc
   · exact hacc
 
-theorem satisfies_revLexClauses (w : CanonicalPoints) : (revLexClauses w.rlen).eval w.toPropAssn := by
+theorem satisfies_revLexClauses (w : CanonicalPoints) :
+    (revLexClauses w.rlen).eval w.toPropAssn := by
   simp [revLexClauses, length, points]
   intro h4w
   have := w.lex (by omega)
@@ -117,8 +147,8 @@ theorem satisfies_revLexClauses (w : CanonicalPoints) : (revLexClauses w.rlen).e
   rintro ⟨a, ha⟩ ⟨_, ha'⟩ ⟨⟩; simp [getElem, points]
 
 theorem satisfies_baseEncoding (w : CanonicalPoints) : (baseEncoding w.rlen).eval w.toPropAssn := by
-  simp [baseEncoding, satisfies_signotopeClauses, satisfies_insideClauses, satisfies_holeDefClauses,
-    satisfies_revLexClauses]
+  simp [baseEncoding, satisfies_signotopeClauses1, satisfies_insideClauses,
+    satisfies_holeDefClauses1, satisfies_revLexClauses]
 
 theorem satisfies_capDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
     (ab : a < b) (bc : b < c) (cd : c < d) : (capDef a b c d).eval w.toPropAssn := by

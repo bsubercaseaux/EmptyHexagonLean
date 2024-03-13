@@ -5,9 +5,9 @@ import Geo.Hexagon.Encoding
 namespace Geo
 open Classical LeanSAT Model
 
-axiom hexagonCnfUnsat : (Geo.hexagonCNF (rlen := 29)).isUnsat
+axiom unsat_6hole_cnf : (Geo.hexagonCNF (rlen := 30-1)).isUnsat
 
-theorem EmptyHexagon30TheoremLists (pts : List Point) (gp : Point.PointListInGeneralPosition pts)
+theorem hole_6_theorem (pts : List Point) (gp : Point.PointListInGeneralPosition pts)
     (h : pts.length ≥ 30) : HasEmptyKGon 6 pts.toFinset := by
   refine HasEmptyKGon_extension gp (fun pts gp h => ?_) (by decide) h
   by_contra h'
@@ -16,17 +16,14 @@ theorem EmptyHexagon30TheoremLists (pts : List Point) (gp : Point.PointListInGen
   have noσtri' : ¬σHasEmptyKGon 6 w.toFinset :=
     OrientationProperty_σHasEmptyKGon.not (hw.toEquiv w.nodup) noσtri
   have rlen29 : w.rlen = 29 := Nat.succ_inj.1 <| hw.length_eq.symm.trans h
-  apply hexagonCnfUnsat
+  apply unsat_6hole_cnf
   with_reducible
     have := (PropForm.toICnf_sat _).2 ⟨w.toPropAssn, w.satisfies_hexagonEncoding noσtri'⟩
     rw [rlen29] at this
     rwa [hexagonCNF]
 
-/-
-'Geo.EmptyHexagon30TheoremLists' depends on axioms: [propext,
- Classical.choice,
- Quot.sound,
- Geo.hexagonCnfUnsat,
- mathlibSorry]
+/--
+info: 'Geo.hole_6_theorem' depends on axioms:
+[propext, Classical.choice, Quot.sound, Geo.unsat_6hole_cnf, mathlibSorry]
 -/
-#print axioms EmptyHexagon30TheoremLists
+#guard_msgs in #print axioms hole_6_theorem
