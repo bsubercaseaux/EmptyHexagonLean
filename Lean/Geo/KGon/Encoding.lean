@@ -170,7 +170,7 @@ def revLexClauses (n : Nat) : PropForm (Var n) :=
     (F := fun ⟨a, _⟩ => Var.sigma ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
 
 def baseEncoding (n : Nat) : PropForm (Var n) :=
-  .all #[signotopeClauses1 n, insideClauses n, holeDefClauses1 n, revLexClauses n]
+  .all #[revLexClauses n]
 
 -- cap a c d:    b  c
 --            a ------ d
@@ -216,4 +216,4 @@ def capDefClauses2 (n : Nat) : PropForm (Var n) :=
   .all #[capDef2 a c d, cupDef2 a c d]
 
 def baseKGonEncoding (n : Nat) : PropForm (Var n) :=
-  .all #[baseEncoding n, capDefClauses1 n, capDefClauses2 n]
+  .all #[baseEncoding n] -- capDefClauses1 n, capDefClauses2 n]

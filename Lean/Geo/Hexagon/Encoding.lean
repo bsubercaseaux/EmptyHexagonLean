@@ -62,7 +62,7 @@ def no6HoleClauses2 (n : Nat) : PropForm (Var n) :=
 
 
 def hexagonEncoding (n : Nat) : PropForm (Var n) :=
-  .all #[baseKGonEncoding n, no6HoleClauses1 n, no6HoleClauses2 n]
+  .all #[baseKGonEncoding n] --, no6HoleClauses1 n, no6HoleClauses2 n]
 
 def hexagonCNF (rlen : Nat) : ICnf := (Geo.hexagonEncoding rlen |>.toICnf compare).2
 
