@@ -1,0 +1,84 @@
+-- def σHasEmptyTriangle (S : Set Point) : Prop :=
+--   ∃ᵉ (a ∈ S) (b ∈ S) (c ∈ S),
+--     a ≠ b ∧ a ≠ c ∧ b ≠ c ∧ σIsEmptyTriangleFor a b c S
+
+-- lemma σHasEmptyTriangle_iff_HasEmptyTriangle (gp : Point.PointListInGeneralPosition pts) :
+--     σHasEmptyTriangle pts.toFinset ↔ HasEmptyTriangle pts.toFinset := by
+--   rw [HasEmptyTriangle.iff]
+--   constructor
+--   . intro ⟨a, ha, b, hb, c, hc, ab, ac, bc, empty⟩
+--     use a, ha, b, hb, c, hc
+--     have gp₃ : Point.InGeneralPosition₃ a b c := by
+--       apply Point.PointListInGeneralPosition.subperm.mp gp
+--       apply List.subperm_of_subset (by simp [*])
+--       sublist_tac
+--     refine ⟨gp₃, ?_⟩
+--     intro s hs tri
+--     simp only [List.coe_toFinset, Set.mem_diff, Set.mem_setOf_eq, Set.mem_insert_iff,
+--       Set.mem_singleton_iff, not_or] at hs
+--     have ⟨hs, _, _, _⟩ := hs
+--     apply empty s (by simp [hs])
+--     rwa [σPtInTriangle_iff]
+--     apply gp.subperm₄
+--     apply List.subperm_of_subset (by simp [*])
+--     sublist_tac
+--   . intro ⟨a, ha, b, hb, c, hc, gp', empty⟩
+--     use a, ha, b, hb, c, hc, gp'.ne₁, gp'.ne₂, gp'.ne₃
+--     intro s hs
+--     by_cases sb : s = b
+--     . rw [sb]
+--       apply not_mem_σPtInTriangle gp'
+--     by_cases sa : s = a
+--     . intro h
+--       apply not_mem_σPtInTriangle gp'.perm₁
+--       apply σPtInTriangle.perm₁
+--       rwa [sa] at h
+--     by_cases sc : s = c
+--     . intro h
+--       apply not_mem_σPtInTriangle gp'.perm₂
+--       apply σPtInTriangle.perm₂
+--       rwa [sc] at h
+--     have gp₄ : Point.InGeneralPosition₄ s a b c := by
+--       apply gp.subperm₄
+--       apply List.subperm_of_subset (by simp [*, gp'.ne₁, gp'.ne₂, gp'.ne₃])
+--       sublist_tac
+--     rw [σPtInTriangle_iff gp₄]
+--     apply empty
+--     simp at hs
+--     simp [hs, not_or, *]
+
+-- lemma σIsEmptyTriangleFor_congr (e : S ≃σ T) :
+--     ∀ (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),
+--       σIsEmptyTriangleFor (e.f p) (e.f q) (e.f r) T ↔ σIsEmptyTriangleFor p q r S  := by
+--   simp [σIsEmptyTriangleFor]
+--   intro hp hq hr
+--   refine ⟨fun h => ?_, fun h => ?_⟩
+--   . intro s hs
+--     simp at h hs
+--     have := h (e.f s) (e.mem hs)
+--     rwa [σPtInTriangle_congr e hs hp hq hr] at this
+--   . intro t ht
+--     have ⟨s, hs, est⟩ := e.mem_iff.mp ht
+--     rw [← est, σPtInTriangle_congr e hs hp hq hr]
+--     apply h s hs
+
+-- theorem σCCWPoints.join
+--     (H1 : σCCWPoints (b :: a :: l₁))
+--     (H2 : σCCWPoints (a :: b :: l₂))
+--     (hj : ∀ᵉ (c ∈ l₁) (d ∈ l₂), σ a c d = .ccw ∧ σ c b d = .ccw) :
+--     σCCWPoints (a :: l₁ ++ b :: l₂) := by
+--   simp [σCCWPoints, σCCWPoints_append, pairwise_append] at H1 H2 ⊢; simp [H1, H2]
+--   obtain ⟨⟨bac, bcc⟩, acc, -⟩ := H1
+--   obtain ⟨⟨abd, add⟩, bdd, -⟩ := H2
+--   refine ⟨⟨abd, fun c hc => ⟨?_, fun d hd => ?_⟩⟩,
+--     fun c hc => ⟨fun d hd => ?_, ?_⟩, ?_, fun d hd => ?_⟩
+--   · rw [σ_perm₂, ← σ_perm₁]; exact bac _ hc
+--   · exact (hj _ hc _ hd).1
+--   · exact (hj _ hc _ hd).2
+--   · refine (Pairwise.and_mem.1 add).imp₂ (fun d e ⟨hd, he, ade⟩ bdd => ?_) bdd
+--     have abe := abd _ he
+--     have ⟨dac, cbd⟩ := hj _ hc _ hd
+--     have ⟨eac, cbe⟩ := hj _ hc _ he
+--     sorry
+--   · sorry
+--   · sorry
