@@ -10,8 +10,6 @@ cube_file = args.cubes
 symmetry_breaking_file = args.symmetry
 
 encoding = modeler.Modeler()
-encoding.load(symmetry_breaking_file)
-
 
 def itokenize(line):
     if line[:-1] == '\n':
@@ -31,6 +29,13 @@ def itokenize(line):
 with open(cube_file, 'r') as cb_file:
     for line in cb_file.readlines():
         tkns = itokenize(line)
+        assert len(tkns) > 0
         encoding.add_clause([-t for t in tkns])
+
+with open(symmetry_breaking_file, 'r') as sb_file:
+    for line in sb_file.readlines():
+        tkns = itokenize(line)
+        assert len(tkns) > 0
+        encoding.add_clause(tkns)
 
 encoding.serialize("cube_tautology.cnf")
