@@ -4,7 +4,7 @@ import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
 import Geo.Orientations
 import Geo.Hexagon.Encoding
-import Geo.KGon.Arc
+import Geo.Hexagon.Arc
 import Geo.KGon.Assn
 
 namespace Geo.CanonicalPoints
