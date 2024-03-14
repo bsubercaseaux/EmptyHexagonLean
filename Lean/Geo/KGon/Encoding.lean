@@ -159,14 +159,14 @@ def revLexClausesCore (F : Fin n → PropForm α) (a b : Fin n) (acc : PropForm 
     revLexClausesCore F
         ⟨a + 1, Nat.lt_of_le_of_lt h b.2⟩
         ⟨b - 1, Nat.lt_of_le_of_lt (Nat.sub_le ..) b.2⟩ <|
-      .or (.and (.not (F a)) (F b)) <|
-      .and (.imp (F a) (F b)) acc
+      .or (.and (F a) (.not (F b))) <|
+      .and (.imp (F b) (F a)) acc
   else
     acc
 
 def revLexClauses (n : Nat) : PropForm (Var n) :=
   .guard (4 ≤ n) fun _ =>
-  revLexClausesCore (n := n-2) ⟨0, by omega⟩ ⟨n - 3, by omega⟩ .true
+  .flatCNF <| revLexClausesCore (n := n-2) ⟨0, by omega⟩ ⟨n - 3, by omega⟩ .true
     (F := fun ⟨a, _⟩ => Var.sigma ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
 
 def baseEncoding (n : Nat) : PropForm (Var n) :=
