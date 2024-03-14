@@ -166,7 +166,7 @@ def revLexClausesCore (F : Fin n → PropForm α) (a b : Fin n) (acc : PropForm 
 
 def revLexClauses (n : Nat) : PropForm (Var n) :=
   .guard (4 ≤ n) fun _ =>
-  .flatCNF <| revLexClausesCore (n := n-2) ⟨0, by omega⟩ ⟨n - 3, by omega⟩ .true
+  revLexClausesCore (n := n-2) ⟨0, by omega⟩ ⟨n - 3, by omega⟩ .true
     (F := fun ⟨a, _⟩ => Var.sigma ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
 
 def baseEncoding (n : Nat) : PropForm (Var n) :=

@@ -57,7 +57,7 @@ def main (args : List String) : IO Unit := do
         | some var => toNat var
       let enc : ICnf := enc.map <| Array.map fun l =>
         LitVar.mkLit ILit (m (LitVar.toVar l).natPred - 1).succPNat (LitVar.polarity l)
-      for v in vars do
-        IO.eprintln s!"{repr v}: {toNat v}"
+      -- for v in vars do
+      --   IO.eprintln s!"{repr v}: {toNat v}"
       Solver.Dimacs.printFormula IO.print enc
   | _ => help
