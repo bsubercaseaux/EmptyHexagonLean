@@ -85,7 +85,7 @@ at $30 \leq h(6) \leq 1717$
 as refined by Valtr in 2008~\cite{valtr},
 until a breakthrough by Heule and Scheucher~\cite{emptyHexagonNumber}.
 These authors used a SAT solver
-to prove that $h(6) = 30$,
+to prove that $h(6) \leq 30$,
 a result we refer to as the \emph{Empty Hexagon Number}.
 Now that all the values of $h$ are known,
 and especially given the extensive computation involved in its proofs,
@@ -132,7 +132,7 @@ The Empty Hexagon Number requires a sophisticated encoding, presented in~\Cref{f
 Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of Heule and Scheucher, the crucial piece to make the proof of $h(6) = 30$ feasible. Next,~\Cref{sec:leansat} presents the preliminary \textsf{LeanSAT} library, which is used to create a SAT encoding that is provably connected to the geometric properties it describes. We conclude in~\Cref{sec:related-work-and-conclusions} by comparing our work with its closest precedent due to Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}, and discussing the next steps towards the formal verification of other Erd\H{o}s-Szekeres-type problems.
 
 \begin{figure}
-  \caption{Encoding based on that of Heule and Scheucher for the Empty Hexagon Number~\cite{emptyHexagonNumber}. Unsatisfiability of the formula below for $n=30$ implies $h(6) = 30$, as detailed throughout the paper. }
+  \caption{Encoding based on that of Heule and Scheucher for the Empty Hexagon Number~\cite{emptyHexagonNumber}. Unsatisfiability of the formula below for $n=30$ implies $h(6) \leq 30$, as detailed throughout the paper. }
   \label{fig:full-encoding}
 % \begin{framed}
   \begin{spreadlines}{16pt} 
