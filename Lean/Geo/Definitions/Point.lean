@@ -10,6 +10,7 @@ i.e., `List.Sublist` between two concrete lists. -/
 macro "sublist_tac" : tactic => `(tactic| aesop (add safe List.Sublist.refl, safe List.Sublist.cons_cons, unsafe List.Sublist.cons))
 macro "subfinset_tac" : tactic => `(tactic| aesop (add safe Finset.mem_singleton, safe Finset.mem_insert_self, unsafe Finset.mem_insert_of_mem))
 macro "subperm_tac" : tactic => `(tactic| aesop (add safe List.Subperm.refl, safe List.subperm.cons, unsafe List.Subperm.cons_right, unsafe List.Subperm.cons_left))
+macro "subset_tac" : tactic => `(tactic| aesop (add safe subset_refl, safe Set.insert_subset_insert, unsafe Set.insert_subset))
 
 namespace Geo
 open List
@@ -142,8 +143,46 @@ theorem ListInGenPos.perm (h : l.Perm l') :
   exact ListInGenPos.subperm.1 gp <| List.subperm_iff.2 ⟨_, p.symm, h⟩
 
 def SetInGenPos (S : Set Point) : Prop :=
-  ∀ {{p q r : Point}}, p ∈ S → q ∈ S → r ∈ S → p ≠ q → p ≠ r → q ≠ r →
+  ∀ {{p q r : Point}}, {p,q,r} ⊆ S → List.Nodup [p,q,r] →
     InGenPos₃ p q r
+
+theorem SetInGenPos.to₄ {S : Set Point} :
+    SetInGenPos S →
+    ∀ {{p q r s : Point}}, {p,q,r,s} ⊆ S → List.Nodup [p,q,r,s] →
+      InGenPos₄ p q r s := by
+  intro h _ _ _ _ pqrsS nd
+  constructor <;>
+    { apply h (subset_trans ?_ pqrsS); aesop; subset_tac }
+
+def SetInGenPos.mono {S T : Set Point} : S ⊆ T →
+    SetInGenPos T → SetInGenPos S :=
+  fun ST gp _ _ _ pqrS => gp (pqrS.trans ST)
+
+open Classical in
+theorem ListInGenPos.toFinset {l : List Point} :
+    ListInGenPos l → SetInGenPos l.toFinset := by
+  intro h p q r
+  intros
+  apply ListInGenPos.subperm.mp h
+  apply List.subperm_of_subset
+  assumption
+  aesop
+
+open Classical in
+theorem SetInGenPos.of_nodup {l : List Point} :
+    SetInGenPos l.toFinset → l.Nodup → ListInGenPos l := by
+  intro h nd p q r pqrl
+  apply h
+  intro; have := pqrl.subset; aesop
+  exact nd.sublist pqrl
+
+open Classical in
+theorem SetInGenPos.toList {s : Finset Point} :
+    SetInGenPos s → ListInGenPos s.toList := by
+  intro h
+  apply of_nodup
+  simp [h]
+  apply Finset.nodup_toList
 
 /-! # Sorted (strictly, along x-coordinates) -/
 

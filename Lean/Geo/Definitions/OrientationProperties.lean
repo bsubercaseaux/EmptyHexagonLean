@@ -23,6 +23,11 @@ def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
     ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
       σIsEmptyTriangleFor a b c S
 
+def σHasConvexKGon (n : Nat) (S : Set Point) : Prop :=
+  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧
+    ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
+      σIsEmptyTriangleFor a b c s -- spot the difference
+
 theorem σIsEmptyTriangleFor_iff_diff (gp : Point.InGenPos₃ a b c) :
     σIsEmptyTriangleFor a b c S ↔ σIsEmptyTriangleFor a b c (S\{a,b,c}) := by
   refine ⟨fun H x h => H x h.1, fun H x h hn => H x ⟨h, ?_⟩ hn⟩
@@ -31,16 +36,24 @@ theorem σIsEmptyTriangleFor_iff_diff (gp : Point.InGenPos₃ a b c) :
   · exact not_mem_σPtInTriangle gp hn
   · exact not_mem_σPtInTriangle gp.perm₂ hn.perm₂
 
-theorem σIsEmptyTriangleFor_iff (gp : Point.ListInGenPos S)
-  (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (ab : a ≠ b) (ac : a ≠ c) (bc : b ≠ c) :
-  σIsEmptyTriangleFor a b c S.toFinset ↔ EmptyShapeIn {a, b, c} S.toFinset := by
+theorem σIsEmptyTriangleFor_iff'' (gp : Point.SetInGenPos S)
+    (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (ab : a ≠ b) (ac : a ≠ c) (bc : b ≠ c) :
+    σIsEmptyTriangleFor a b c S ↔ EmptyShapeIn {a, b, c} S := by
   rw [σIsEmptyTriangleFor_iff_diff]
   · simp [not_or, σIsEmptyTriangleFor, EmptyShapeIn]
     repeat refine forall_congr' fun _ => ?_
-    rw [σPtInTriangle_iff, PtInTriangle]; apply gp.subperm₄
-    simp [*, List.subperm_of_subset]
-  · apply Point.ListInGenPos.subperm.1 gp
-    simp [*, List.subperm_of_subset]
+    rw [σPtInTriangle_iff, PtInTriangle]
+    apply gp.to₄
+    subset_tac
+    simp [*]
+  · apply gp
+    subset_tac
+    simp [*]
+
+theorem σIsEmptyTriangleFor_iff (gp : Point.ListInGenPos S)
+    (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (ab : a ≠ b) (ac : a ≠ c) (bc : b ≠ c) :
+    σIsEmptyTriangleFor a b c S.toFinset ↔ EmptyShapeIn {a, b, c} S.toFinset := by
+  apply σIsEmptyTriangleFor_iff'' gp.toFinset <;> simp [*]
 
 theorem σIsEmptyTriangleFor_iff' {a b c : Point} (gp : Point.ListInGenPos S)
     (hs : [a, b, c] <+~ S) :
@@ -56,6 +69,15 @@ theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : Point.ListInGenPos pts) :
   simp [Set.subset_def] at spts
   iterate 9 refine forall_congr' fun _ => ?_
   rw [σIsEmptyTriangleFor_iff gp] <;> simp [EmptyShapeIn, PtInTriangle, *]
+
+theorem σHasConvexKGon_iff_HasConvexKGon (gp : Point.ListInGenPos pts) :
+    σHasConvexKGon n pts.toFinset ↔ HasConvexKGon n pts.toFinset := by
+  unfold σHasConvexKGon HasConvexKGon
+  refine exists_congr fun s => and_congr_right' <| and_congr_right fun spts => ?_
+  have gp' := gp.toFinset
+  rw [ConvexPoints.iff_triangles'' (gp'.mono spts)]
+  iterate 9 refine forall_congr' fun _ => ?_
+  rw [σIsEmptyTriangleFor_iff'' (gp'.mono spts)] <;> simp [EmptyShapeIn, PtInTriangle, *]
 
 lemma σPtInTriangle_congr (e : S ≃σ T) :
     ∀ (_ : a ∈ S) (_ : p ∈ S) (_ : q ∈ S) (_ : r ∈ S),

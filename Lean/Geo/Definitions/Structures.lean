@@ -13,6 +13,10 @@ other than those already in `S`. -/
 def EmptyShapeIn (S P : Set Point) : Prop :=
   ∀ p ∈ P \ S, p ∉ convexHull ℝ S
 
+theorem EmptyShapeIn.rfl {S : Set Point} : EmptyShapeIn S S := by
+  intro _ h
+  simp at h
+
 /-- `ConvexPoints S` means that `S` consists of extremal points of its convex hull,
 i.e. the point set encloses a convex polygon. -/
 def ConvexPoints (S : Set Point) : Prop :=
@@ -73,6 +77,11 @@ theorem ConvexEmptyIn.antitone_left {S₁ S₂ P : Set Point} (S₁S₂ : S₁ �
   refine empty p ⟨pPS₁.left, ?_⟩ (convexHull_mono S₁S₂ pCH)
   refine fun pS₂ => convex p pS₂ (convexHull_mono ?_ pCH)
   exact fun x xS₁ => ⟨S₁S₂ xS₁, fun xp => pPS₁.right (xp ▸ xS₁)⟩
+
+@[simp]
+theorem ConvexEmptyIn.refl_iff {S : Set Point} :
+    ConvexEmptyIn S S ↔ ConvexPoints S :=
+  ⟨(·.left), (⟨·, EmptyShapeIn.rfl⟩)⟩
 
 theorem ConvexEmptyIn.iff {S P : Set Point} (SP : S ⊆ P) :
     ConvexEmptyIn S P ↔ ∀ S' ⊆ S, EmptyShapeIn S' P := by
@@ -148,6 +157,24 @@ theorem ConvexEmptyIn.iff_triangles'' {s : Finset Point} {S : List Point}
     apply h a (ts (by subfinset_tac)) b (ts (by subfinset_tac)) c (ts (by subfinset_tac)) ab ac bc
     simp at hp ⊢
     assumption
+
+theorem ConvexPoints.iff_triangles' {s : Finset Point} (gp : Point.SetInGenPos s) :
+    ConvexPoints s ↔ ∀ (t : Finset Point), t.card = 3 → t ⊆ s → EmptyShapeIn t s := by
+  have : s = s.toList.toFinset := s.toList_toFinset.symm
+  rw [← ConvexEmptyIn.refl_iff, this, ← ConvexEmptyIn.iff_triangles' subset_rfl]
+  apply Point.SetInGenPos.of_nodup
+  simp [gp]
+  exact Finset.nodup_toList s
+
+theorem ConvexPoints.iff_triangles'' {s : Finset Point} (gp : Point.SetInGenPos s) :
+    ConvexPoints s ↔
+    ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
+      ∀ p ∈ s \ {a,b,c}, ¬PtInTriangle p a b c := by
+  have : s = s.toList.toFinset := s.toList_toFinset.symm
+  rw [← ConvexEmptyIn.refl_iff, this, ← ConvexEmptyIn.iff_triangles'' subset_rfl]
+  apply Point.SetInGenPos.of_nodup
+  simp [gp]
+  exact Finset.nodup_toList s
 
 open Point in
 theorem split_convexHull (cvx : ConvexPoints S) :
@@ -230,6 +257,7 @@ theorem EmptyShapeIn.split (cvx : ConvexPoints S) (ha : a ∈ S) (hb : b ∈ S)
 def HasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 
-def HasEmptyHexagon : Set Point → Prop := HasEmptyKGon 6
+def HasConvexKGon (n : Nat) (S : Set Point) : Prop :=
+  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexPoints s
 
 end Geo
