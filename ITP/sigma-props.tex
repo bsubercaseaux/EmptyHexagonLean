@@ -1,0 +1,110 @@
+We now prove that, assuming points will be sorted left to right (which is justified in~\Cref{sec:symmetry-breaking}), then the clauses in~\Cref{eq:constraint-4,eq:constraint-5} are justified.
+Consider four points $p, q, r, s$ that are sorted from left to right. If $p, q, r$ are oriented counterclockwise, and $q, r, s$ are oriented counterclockwise as well, then it follows that $p, r, s$ must be oriented counterclockwise too (see~\Cref{fig:orientation-implication}). Different \emph{$\sigma$-implication-properties} of this form are used to reduce the search space in SAT encodings~\cite{emptyHexagonNumber,scheucherTwoDisjoint5holes2020,subercaseaux2023minimizing, szekeres_peters_2006}, as they can be easily added in clausal form:
+\begin{align}
+  &\left(\neg \orvar_{a, b, c} \lor \neg \orvar_{a, c, d} \lor \orvar_{a, b, d}\right) \land \left(\orvar_{a, b, c} \lor \orvar_{a, c, d} \lor  \neg \orvar_{a, b, d}\right)
+\end{align}
+
+We prove these properties of the $\sigma$ function, justifying the addition of~\Cref{eq:constraint-4,eq:constraint-5}, as well as other similar properties that are useful for other proofs, even if not explicitly added to the encoding.
+\begin{lstlisting}
+theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGenPos₄ p q r s) :
+    σ p q r = ccw → σ q r s = ccw → σ p r s = ccw
+
+ [...]
+
+theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+    σ p q r = cw → σ q r s = cw → σ p r s = cw
+\end{lstlisting}
+
+
+The proofs of these properties are based on an equivalence between the orientation of a triple of points and the \emph{slopes} of the lines that connect them. Namely, if $p, q, r$  are sorted from left to right, then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pq}) < \textsf{slope}(\vec{pr})$  and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pr}) < \textsf{slope}(\vec{qr})$. By proving first these \emph{slope-orientation} equivalences we can then easily prove e.g.,~\lstinline|σ_prop₁|, as illustrated in~\Cref{fig:orientation-implication}.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \newcommand{\localspacing}{4.5}
+
+    \foreach \i in {0, 1, 2} {
+
+      \coordinate (p\i) at ( \i*\localspacing +0.5,0);
+      \coordinate (q\i) at ( \i*\localspacing +2.5, 0.75);
+      \coordinate (r\i) at ( \i*\localspacing +3.25, 1.5);
+      \coordinate (s\i) at ( \i*\localspacing +4.0, 3.25);
+    }
+    \coordinate (0p) at (13,0);
+    \coordinate (0q) at (13, 0.75);
+    \coordinate (0r) at (13, 1.5);
+    \coordinate (0s) at (13, 3.25);
+
+    \pic [draw, <->,
+    angle radius=9mm, angle eccentricity=0.8, fill=blue!20!white,
+    "$\text{\tiny{\(\theta_1\)}}$"] {angle = 0p--p0--q0};
+
+    \pic [draw, <->,
+    angle radius=7mm, angle eccentricity=0.6, fill=orange!20!white,
+    "$\text{\tiny{\(\theta_2\)}}$"] {angle = 0q--q0--r0};
+
+
+    \pic [draw, <->,
+    angle radius=7mm, angle eccentricity=0.6, fill=orange!20!white,
+    "$\text{\tiny{\(\theta_2\)}}$"] {angle = 0q--q1--r1};
+
+    \pic [draw, <->,
+    angle radius=6mm, angle eccentricity=0.6, fill=yellow!20!white,
+    "$\text{\tiny{\(\theta_3\)}}$"] {angle = 0r--r1--s1};
+
+
+    \pic [draw, <->,
+    angle radius=9mm, angle eccentricity=0.8, fill=purple!20!white,
+    "$\text{\tiny{\(\theta_4\)}}$"] {angle = 0p--p2--r2};
+
+
+    \pic [draw, <->,
+    angle radius=6mm, angle eccentricity=0.6, fill=yellow!20!white,
+    "$\text{\tiny{\(\theta_3\)}}$"] {angle = 0r--r2--s2};
+
+
+
+    \foreach \i in {0, 1, 2} {
+
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (p\i) at ( \i*\localspacing +0.5,0) {};
+      \node[] at ( \i*\localspacing + 0.3, -0.25) {$p$};
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (q\i) at ( \i*\localspacing +2.5, 0.75) {};
+      \node[] at ( \i*\localspacing +2.6, 0.5) {$q$};
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (r\i) at ( \i*\localspacing +3.25, 1.5) {};
+      \node[] at ( \i*\localspacing +3.4, 1.3) {$r$};
+
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (s\i) at ( \i*\localspacing +4.0, 3.25) {};
+      \node[] at ( \i*\localspacing +4.05, 3) {$s$};
+    }
+
+    % \newcommand{\localdx}{0.25}
+    % \newcommand{\localdy}{-0.5}
+    \draw[thick, green!60!black] (p0) -- (q0);
+    \draw[thick, green!60!black, ->] (q0) -- (r0);
+
+    \draw[ thick, green!60!black] (q1) -- (r1);
+    \draw[ thick, green!60!black, ->] (r1) -- (s1);
+
+    \draw[ thick, green!60!black] (p2) -- (r2);
+    \draw[ thick, green!60!black, ->] (r2) -- (s2);
+    % \draw[  dashed, green!60!black] (0 + \localdx, 0 + \localdy) -- (2.5 + \localdx, 0.75 + \localdy);
+    % \draw[ dashed, green!60!black, ->] (2.5 + \localdx, 0.75 + \localdy) -- (3.25 + \localdx, 1.5 + \localdy);
+
+
+    % \draw[  dashed, green!60!black] (2.5  - \localdx, 0.75 - \localdy) -- (3.25 - \localdx, 1.5 - \localdy);
+    % \draw[ dashed, green!60!black, ->] (3.25 - \localdx, 1.5 - \localdy) -- (4.25  - \localdx, 3.25 - \localdy);
+
+    % \draw[ thick, dashed, green!60!black] (p) -- (r);
+    % \draw[ thick, dashed, green!60!black, ->] (r) -- (s);
+
+
+    \draw[dashed] (p0) -- (0p);
+    \draw[dashed] (q0) -- (0q);
+    \draw[dashed] (r0) -- (0r);
+    \draw[dashed] (s0) -- (0s);
+
+
+
+  \end{tikzpicture}
+  \caption{Illustration for $\sigma(p,q,r) = 1 \; \land \; \sigma(q,r,s) = 1 \implies \sigma(p, r, s) = 1$. As we have assumptions $\theta_3 > \theta_2 > \theta_4$  by the forward direction of the \emph{slope-orientation equivalence}, we deduce $\theta_3 > \theta_4$, and then conclude $\sigma(p, r, s) = 1$ by the backward direction of the \emph{slope-orientation equivalence}.  }\label{fig:orientation-implication}
+\end{figure}

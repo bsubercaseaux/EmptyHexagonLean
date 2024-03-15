@@ -7,12 +7,15 @@ A list $L = (p_1,\ldots, p_{n})$ of points is said to be in canonical position i
     \item \textbf{($x$-order)} The points are sorted with respect to their $x$-coordinates, i.e., $x(p_i) < x(p_j)$ for all $1 \leq i < j \leq n$.
     \item \textbf{(General Position)} No three points are collinear, i.e., for all $1 \leq i < j < k \leq n$, we have $\sigma(p_i, p_j, p_k) \neq 0$.
     \item \textbf{(CCW-order,~\Cref{eq:constraint-6})} All orientations $\sigma(p_1, p_i, p_j)$, with $1 < i < j \leq n$, are counterclockwise.
-    \item \textbf{(Left-Right order,~\Cref{eq:constraint-7})} The list of orientations \[\textsf{Left} := \left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)\] is lexicographically smaller than the list \[ \textsf{Right} := \left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right).\] Given the general position condition, all orientations are in $\{-1, 1\}$, and thus the lexicographic condition is equivalent to stating that there is an index $i$ such that $\forall j < i$, $\textsf{Left}[j] = \textsf{Right}[j]$, and $\textsf{Left}[i] = -1$ but $\textsf{Right}[i] = 1$.
+    \item \textbf{(Left-Right order,~\Cref{eq:constraint-7})} The list of orientations \[\textsf{Left} := \left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)\] is not lexicographically smaller than the list \[ \textsf{Right} := \left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right).\] Given the general position condition, all orientations are in $\{-1, 1\}$, and thus the lexicographic condition is equivalent to stating that there is an index $i$ such that $\forall j < i$, $\textsf{Left}[j] = \textsf{Right}[j]$, and $\textsf{Left}[i] = -1$ but $\textsf{Right}[i] = 1$.
 \end{itemize}
 \end{definition}
-    While the first 3 conditions are now arguably standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
-    Interestingly, in the process of verifying the correctness of this symmetry-breaking assumption, we found a small error in the proof presented in~\cite{scheucherTwoDisjoint5holes2020} for the first $3$ conditions.
-The concrete theorem we prove is the following:
+This symmetry breaking assumption not only reduces the search space of the SAT solver, but it is required for the correctness of the encoding, as~\Cref{eq:constraint-1,eq:constraint-2,eq:constraint-3,eq:constraint-4,eq:constraint-5} relied on points being sorted from left to right.
+
+
+%     While the first 3 conditions are now arguably standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
+%     Interestingly, in the process of verifying the correctness of this symmetry-breaking assumption, we found a small error in the proof presented in~\cite{scheucherTwoDisjoint5holes2020} for the first $3$ conditions.
+% The concrete theorem we prove is the following:
 
 \begin{lstlisting}
   theorem symmetry_breaking (l : GenPosPointList):
