@@ -149,6 +149,7 @@ theorem ConvexEmptyIn.iff_triangles'' {s : Finset Point} {S : List Point}
     simp at hp ⊢
     assumption
 
+open Point in
 theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
     convexHull ℝ S ⊆
@@ -228,7 +229,6 @@ theorem EmptyShapeIn.split (cvx : ConvexPoints S) (ha : a ∈ S) (hb : b ∈ S)
 
 def HasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
-
 
 def HasEmptyHexagon : Set Point → Prop := HasEmptyKGon 6
 

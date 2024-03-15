@@ -119,22 +119,9 @@ theorem σ_ne_cw : σ p q r ≠ .cw ↔ 0 ≤ det p q r := by rw [σ, ofReal_ne_
 
 theorem σ_eq_co : σ p q r = .collinear ↔ det p q r = 0 := by rw [σ, ofReal_eq_collinear]
 
-def detAffineMap (p q : Point) : Point →ᵃ[ℝ] ℝ where
-  toFun r := det p q r
-  linear.toFun r := q.x * r.y + r.x * p.y - q.y * r.x - r.y * p.x
-  linear.map_add' a b := by simp [x, y]; ring
-  linear.map_smul' a b := by simp [x, y]; ring
-  map_vadd' a b := by simp [det_eq, x, y]; ring
-
-@[simp] theorem detAffineMap_apply : detAffineMap p q r = det p q r := rfl
-
-theorem det_perm₁ (p q r) : det p q r = -det q p r := by simp only [det_eq]; ring
-
 theorem σ_perm₁ (p q r : Point) : σ p q r = -σ q p r := by
   simp only [σ, det_eq, det_perm₁ p q r, ofReal]
   split_ifs <;> first | rfl | exfalso; linarith
-
-theorem det_perm₂ (p q r) : det p q r = -det p r q := by simp only [det_eq]; ring
 
 theorem σ_perm₂ (p q r : Point) : σ p q r = -σ p r q := by
   simp only [σ, det_eq, det_perm₂ p q r, ofReal]
@@ -164,86 +151,12 @@ theorem σ_trans (h1 : σ a b c = .ccw) (h2 : σ a c d = .ccw) (h3 : σ a d b = 
   rw [det_perm₂] at h3
   linarith [det_add_det a b c d]
 
-theorem Point.InGenPos₃.not_mem_seg :
-    InGenPos₃ p q r → p ∉ convexHull ℝ {q, r} := mt fun h => by
-  rw [convexHull_pair] at h
-  obtain ⟨a, b, _, _, eq, rfl⟩ := h
-  simp [det_eq]
-  linear_combination eq * (q 1 * r 0 - q 0 * r 1)
-
 theorem Point.InGenPos₃.iff_ne_collinear {p q r : Point} :
     InGenPos₃ p q r ↔ σ p q r ≠ .collinear := by
   rw [InGenPos₃, Ne, ← σ_eq_co]
 
 theorem Point.InGenPos₃.σ_ne {p q r : Point} :
     InGenPos₃ p q r → σ p q r ≠ .collinear := iff_ne_collinear.1
-
-theorem Point.InGenPos₃.perm₁ {p q r : Point} :
-    InGenPos₃ p q r → InGenPos₃ q p r := by
-  simp [InGenPos₃, det_perm₁ p q r]
-
-theorem Point.InGenPos₃.perm₂ {p q r : Point} :
-    InGenPos₃ p q r → InGenPos₃ p r q := by
-  simp [InGenPos₃, det_perm₂ p q r]
-
-theorem perm₃_induction {P : α → α → α → Prop}
-    (H1 : ∀ {{a b c}}, P a b c → P b a c)
-    (H2 : ∀ {{a b c}}, P a b c → P a c b)
-    (h : [p, q, r].Perm [p', q', r']) : P p q r ↔ P p' q' r' := by
-  suffices ∀ {p q r p' q' r'}, [p, q, r].Perm [p', q', r'] →
-    P p q r → P p' q' r' from ⟨this h, this h.symm⟩
-  clear p q r p' q' r' h; intro p q r p' q' r' h gp
-  rw [← List.mem_permutations] at h; change _ ∈ [_,_,_,_,_,_] at h; simp at h
-  obtain h|h|h|h|h|h := h <;> obtain ⟨rfl,rfl,rfl⟩ := h
-  · exact gp
-  · exact H1 gp
-  · exact H1 <| H2 <| H1 gp
-  · exact H1 <| H2 gp
-  · exact H2 <| H1 gp
-  · exact H2 gp
-
-theorem Point.InGenPos₃.of_perm (h : [p, q, r].Perm [p', q', r']) :
-    InGenPos₃ p q r ↔ InGenPos₃ p' q' r' :=
-  perm₃_induction (fun _ _ _ => (·.perm₁)) (fun _ _ _ => (·.perm₂)) h
-
-theorem Point.ListInGenPos.subperm : ListInGenPos l ↔
-    ∀ {{p q r : Point}}, [p, q, r].Subperm l → InGenPos₃ p q r := by
-  refine ⟨fun H _ _ _ ⟨l, p, h⟩ => ?_, fun H _ _ _ h => H h.subperm⟩
-  match l, p.length_eq with
-  | [p',q',r'], _ => exact (Point.InGenPos₃.of_perm p).1 (H h)
-
-theorem Point.ListInGenPos.subperm₄ : ListInGenPos l →
-    ∀ {{p q r s : Point}}, [p, q, r, s].Subperm l → InGenPos₄ p q r s := by
-  intro gp p q r s sub
-  constructor <;> {
-    apply subperm.mp gp
-    refine List.Subperm.trans ?_ sub -- `trans` doesn't seem to work?
-    subperm_tac
-  }
-
-theorem Point.InGenPos₄.perm₁ : InGenPos₄ p q r s → InGenPos₄ q p r s
-  | ⟨H1, H2, H3, H4⟩ => ⟨H1.perm₁, H2.perm₁, H4, H3⟩
-
-theorem Point.InGenPos₄.perm₂ : InGenPos₄ p q r s → InGenPos₄ p r q s
-  | ⟨H1, H2, H3, H4⟩ => ⟨H1.perm₂, H3, H2, H4.perm₁⟩
-
-theorem Point.InGenPos₄.perm₃ : InGenPos₄ p q r s → InGenPos₄ p q s r
-  | ⟨H1, H2, H3, H4⟩ => ⟨H2, H1, H3.perm₂, H4.perm₂⟩
-
-theorem Point.ListInGenPos.mono_subperm : List.Subperm l l' →
-    Point.ListInGenPos l' → Point.ListInGenPos l :=
-  fun sp H _ _ _ h => subperm.1 H (h.subperm.trans sp)
-
-theorem Point.ListInGenPos.mono_sublist : List.Sublist l l' →
-    Point.ListInGenPos l' → Point.ListInGenPos l :=
-  fun lsub => mono_subperm lsub.subperm
-
-theorem Point.ListInGenPos.perm (h : l.Perm l') :
-    ListInGenPos l ↔ ListInGenPos l' := by
-  suffices ∀ {l l'}, l.Perm l' →
-    ListInGenPos l → ListInGenPos l' from ⟨this h, this h.symm⟩
-  clear l l' h; intro l l' p gp _ _ _ h
-  exact ListInGenPos.subperm.1 gp <| List.subperm_iff.2 ⟨_, p.symm, h⟩
 
 theorem Point.InGenPos₃.ne₁ {p q r : Point} (h : InGenPos₃ p q r) : p ≠ q := by
   rintro rfl; exact h.σ_ne (σ_self₃ _ _)

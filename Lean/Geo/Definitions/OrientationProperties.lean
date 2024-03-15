@@ -259,7 +259,7 @@ theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.ListInGen
       (ss : σ e f a ≠ .cw ∧ σ e f b ≠ .cw ∧ σ e f c ≠ .cw) : σ e f b' = .ccw := by
     rw [← (Point.ListInGenPos.subperm.1 gp3 sp).σ_iff']
     rw [σ, Ne, Orientation.ofReal_eq_cw, not_lt]
-    refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (detAffineMap e f)) <|
+    refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (Point.detAffineMap e f)) <|
       (σPtInTriangle_iff (gp.subperm₄ ((sublist_append_left _ l).subperm.trans sp4))).1 h1
     replace ss : ∀ d ∈ ({a, b, c}:Set _), σ e f d ≠ .cw := by simpa using ss
     intro d hd

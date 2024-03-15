@@ -207,3 +207,19 @@ theorem linear_combination_mem_convexHull {k V : Type*}
     (∑ i in s, w i • v i) ∈ convexHull k (Set.range v) := by
   rw [← Finset.affineCombination_eq_linear_combination s v w h2]
   exact affineCombination_mem_convexHull h1 h2
+
+theorem perm₃_induction {P : α → α → α → Prop}
+    (H1 : ∀ {{a b c}}, P a b c → P b a c)
+    (H2 : ∀ {{a b c}}, P a b c → P a c b)
+    (h : [p, q, r].Perm [p', q', r']) : P p q r ↔ P p' q' r' := by
+  suffices ∀ {p q r p' q' r'}, [p, q, r].Perm [p', q', r'] →
+    P p q r → P p' q' r' from ⟨this h, this h.symm⟩
+  clear p q r p' q' r' h; intro p q r p' q' r' h gp
+  rw [← List.mem_permutations] at h; change _ ∈ [_,_,_,_,_,_] at h; simp at h
+  obtain h|h|h|h|h|h := h <;> obtain ⟨rfl,rfl,rfl⟩ := h
+  · exact gp
+  · exact H1 gp
+  · exact H1 <| H2 <| H1 gp
+  · exact H1 <| H2 gp
+  · exact H2 <| H1 gp
+  · exact H2 gp
