@@ -51,21 +51,21 @@ lemma det_eq (a b c : Point) :
 
 /-! # In general position -/
 
-def InGeneralPosition₃ (p q r : Point) : Prop :=
+def InGenPos₃ (p q r : Point) : Prop :=
   det p q r ≠ 0
 
-structure InGeneralPosition₄ (p q r s : Point) : Prop where
-  gp₁ : InGeneralPosition₃ p q r
-  gp₂ : InGeneralPosition₃ p q s
-  gp₃ : InGeneralPosition₃ p r s
-  gp₄ : InGeneralPosition₃ q r s
+structure InGenPos₄ (p q r s : Point) : Prop where
+  gp₁ : InGenPos₃ p q r
+  gp₂ : InGenPos₃ p q s
+  gp₃ : InGenPos₃ p r s
+  gp₄ : InGenPos₃ q r s
 
-def PointListInGeneralPosition (l : List Point) : Prop :=
-  ∀ {{p q r : Point}}, [p, q, r] <+ l → InGeneralPosition₃ p q r
+def ListInGenPos (l : List Point) : Prop :=
+  ∀ {{p q r : Point}}, [p, q, r] <+ l → InGenPos₃ p q r
 
-def PointListInGeneralPosition.to₄ {l : List Point} :
-    PointListInGeneralPosition l →
-    ∀ {p q r s : Point}, [p, q, r, s] <+ l → InGeneralPosition₄ p q r s := by
+def ListInGenPos.to₄ {l : List Point} :
+    ListInGenPos l →
+    ∀ {p q r s : Point}, [p, q, r, s] <+ l → InGenPos₄ p q r s := by
   intro h _ _ _ _ h'
   constructor <;> { refine h (Sublist.trans ?_ h'); sublist_tac }
 
@@ -99,10 +99,8 @@ theorem Sorted₃.ne₂ : Sorted₃ p q r → q ≠ r := by
   rintro h rfl
   exact LT.lt.false h.h₂
 
-def PointListSorted (l : List Point) : Prop := l.Sorted (·.x < ·.x)
-
-theorem PointListSorted.to₃ {l : List Point} :
-    PointListSorted l →
+theorem Sorted₃.ofList {l : List Point} :
+    l.Sorted (·.x < ·.x) →
     ∀ {p q r : Point}, [p, q, r] <+ l → Sorted₃ p q r := by
   intro h _ _ _ h'
   have := h.sublist h'
@@ -114,18 +112,18 @@ theorem PointListSorted.to₃ {l : List Point} :
     . simpa using this
     all_goals { simp; try constructor }
 
-theorem PointListSorted.to₄ {l : List Point} :
-    PointListSorted l →
+theorem Sorted₄.ofList {l : List Point} :
+    l.Sorted (·.x < ·.x) →
     ∀ {p q r s : Point}, [p, q, r, s] <+ l → Sorted₄ p q r s := by
   intro h p q r s h'
   have : [p, q, r] <+ l := by
     refine Sublist.trans ?_ h'
     sublist_tac
-  have h₁ := h.to₃ this
+  have h₁ := Sorted₃.ofList h this
   have : [q, r, s] <+ l := by
     refine Sublist.trans ?_ h'
     sublist_tac
-  have := h.to₃ this
+  have := Sorted₃.ofList h this
   exact ⟨h₁, this.h₂⟩
 
 end Geo.Point

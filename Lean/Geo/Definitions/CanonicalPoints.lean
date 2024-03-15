@@ -14,8 +14,8 @@ open Point
 structure CanonicalPoints where
   leftmost : Point
   rest : List Point
-  sorted' : PointListSorted (leftmost :: rest)
-  gp' : PointListInGeneralPosition (leftmost :: rest)
+  sorted' : (leftmost :: rest).Sorted (·.x < ·.x)
+  gp' : ListInGenPos (leftmost :: rest)
   oriented : rest.Pairwise (σ leftmost · · = .ccw)
   lex : σRevLex rest
 
@@ -26,10 +26,10 @@ def points (w : CanonicalPoints) := w.leftmost :: w.rest
 
 noncomputable def toFinset (w : CanonicalPoints) : Finset Point := w.points.toFinset
 
-theorem sorted (w : CanonicalPoints) : PointListSorted w.points :=
+theorem sorted (w : CanonicalPoints) : w.points.Sorted (·.x < ·.x) :=
   w.sorted'
 
-theorem gp (w : CanonicalPoints) : PointListInGeneralPosition w.points :=
+theorem gp (w : CanonicalPoints) : ListInGenPos w.points :=
   w.gp'
 
 theorem nodupX (w : CanonicalPoints) : w.points.Pairwise (·.x ≠ ·.x) :=
@@ -100,10 +100,10 @@ theorem σ_0 (w : CanonicalPoints) {i j : Fin w.rlen}
   exact pairwise_iff_get.1 w.oriented i j ij
 
 theorem gp₃ (w : CanonicalPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
-    InGeneralPosition₃ w[i] w[j] w[k] := w.gp <| w.sublist ij jk
+    InGenPos₃ w[i] w[j] w[k] := w.gp <| w.sublist ij jk
 
 theorem gp₄ (w : CanonicalPoints) {i j k l : Fin w.length} (ij : i < j) (jk : j < k) (kl : k < l) :
-    InGeneralPosition₄ w[i] w[j] w[k] w[l] :=
+    InGenPos₄ w[i] w[j] w[k] w[l] :=
   ⟨w.gp₃ ij jk, w.gp₃ ij (jk.trans kl), w.gp₃ (ij.trans jk) kl, w.gp₃ jk kl⟩
 
 theorem sorted₃ (w : CanonicalPoints) {i j k : Fin w.length} (ij : i < j) (jk : j < k) :
@@ -121,7 +121,7 @@ theorem sorted₄' (w : CanonicalPoints) {i j k l : Fin w.rlen} (ij : i < j) (jk
     Sorted₄ w+[i] w+[j] w+[k] w+[l] := w.sorted₄ ij.succ₂ jk.succ₂ kl.succ₂
 
 theorem gp₃' (w : CanonicalPoints) {i j k : Fin w.rlen} (ij : i < j) (jk : j < k) :
-    InGeneralPosition₃ w+[i] w+[j] w+[k] := w.gp₃ ij.succ₂ jk.succ₂
+    InGenPos₃ w+[i] w+[j] w+[k] := w.gp₃ ij.succ₂ jk.succ₂
 
 theorem gp₄' (w : CanonicalPoints) {i j k l : Fin w.rlen} (ij : i < j) (jk : j < k) (kl : k < l) :
-    InGeneralPosition₄ w+[i] w+[j] w+[k] w+[l] := w.gp₄ ij.succ₂ jk.succ₂ kl.succ₂
+    InGenPos₄ w+[i] w+[j] w+[k] w+[l] := w.gp₄ ij.succ₂ jk.succ₂ kl.succ₂

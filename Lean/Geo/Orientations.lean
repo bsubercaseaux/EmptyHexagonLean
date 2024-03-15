@@ -164,27 +164,27 @@ theorem σ_trans (h1 : σ a b c = .ccw) (h2 : σ a c d = .ccw) (h3 : σ a d b = 
   rw [det_perm₂] at h3
   linarith [det_add_det a b c d]
 
-theorem Point.InGeneralPosition₃.not_mem_seg :
-    InGeneralPosition₃ p q r → p ∉ convexHull ℝ {q, r} := mt fun h => by
+theorem Point.InGenPos₃.not_mem_seg :
+    InGenPos₃ p q r → p ∉ convexHull ℝ {q, r} := mt fun h => by
   rw [convexHull_pair] at h
   obtain ⟨a, b, _, _, eq, rfl⟩ := h
   simp [det_eq]
   linear_combination eq * (q 1 * r 0 - q 0 * r 1)
 
-theorem Point.InGeneralPosition₃.iff_ne_collinear {p q r : Point} :
-    InGeneralPosition₃ p q r ↔ σ p q r ≠ .collinear := by
-  rw [InGeneralPosition₃, Ne, ← σ_eq_co]
+theorem Point.InGenPos₃.iff_ne_collinear {p q r : Point} :
+    InGenPos₃ p q r ↔ σ p q r ≠ .collinear := by
+  rw [InGenPos₃, Ne, ← σ_eq_co]
 
-theorem Point.InGeneralPosition₃.σ_ne {p q r : Point} :
-    InGeneralPosition₃ p q r → σ p q r ≠ .collinear := iff_ne_collinear.1
+theorem Point.InGenPos₃.σ_ne {p q r : Point} :
+    InGenPos₃ p q r → σ p q r ≠ .collinear := iff_ne_collinear.1
 
-theorem Point.InGeneralPosition₃.perm₁ {p q r : Point} :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ q p r := by
-  simp [InGeneralPosition₃, det_perm₁ p q r]
+theorem Point.InGenPos₃.perm₁ {p q r : Point} :
+    InGenPos₃ p q r → InGenPos₃ q p r := by
+  simp [InGenPos₃, det_perm₁ p q r]
 
-theorem Point.InGeneralPosition₃.perm₂ {p q r : Point} :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ p r q := by
-  simp [InGeneralPosition₃, det_perm₂ p q r]
+theorem Point.InGenPos₃.perm₂ {p q r : Point} :
+    InGenPos₃ p q r → InGenPos₃ p r q := by
+  simp [InGenPos₃, det_perm₂ p q r]
 
 theorem perm₃_induction {P : α → α → α → Prop}
     (H1 : ∀ {{a b c}}, P a b c → P b a c)
@@ -202,18 +202,18 @@ theorem perm₃_induction {P : α → α → α → Prop}
   · exact H2 <| H1 gp
   · exact H2 gp
 
-theorem Point.InGeneralPosition₃.of_perm (h : [p, q, r].Perm [p', q', r']) :
-    InGeneralPosition₃ p q r ↔ InGeneralPosition₃ p' q' r' :=
+theorem Point.InGenPos₃.of_perm (h : [p, q, r].Perm [p', q', r']) :
+    InGenPos₃ p q r ↔ InGenPos₃ p' q' r' :=
   perm₃_induction (fun _ _ _ => (·.perm₁)) (fun _ _ _ => (·.perm₂)) h
 
-theorem Point.PointListInGeneralPosition.subperm : PointListInGeneralPosition l ↔
-    ∀ {{p q r : Point}}, [p, q, r].Subperm l → InGeneralPosition₃ p q r := by
+theorem Point.ListInGenPos.subperm : ListInGenPos l ↔
+    ∀ {{p q r : Point}}, [p, q, r].Subperm l → InGenPos₃ p q r := by
   refine ⟨fun H _ _ _ ⟨l, p, h⟩ => ?_, fun H _ _ _ h => H h.subperm⟩
   match l, p.length_eq with
-  | [p',q',r'], _ => exact (Point.InGeneralPosition₃.of_perm p).1 (H h)
+  | [p',q',r'], _ => exact (Point.InGenPos₃.of_perm p).1 (H h)
 
-theorem Point.PointListInGeneralPosition.subperm₄ : PointListInGeneralPosition l →
-    ∀ {{p q r s : Point}}, [p, q, r, s].Subperm l → InGeneralPosition₄ p q r s := by
+theorem Point.ListInGenPos.subperm₄ : ListInGenPos l →
+    ∀ {{p q r s : Point}}, [p, q, r, s].Subperm l → InGenPos₄ p q r s := by
   intro gp p q r s sub
   constructor <;> {
     apply subperm.mp gp
@@ -221,37 +221,37 @@ theorem Point.PointListInGeneralPosition.subperm₄ : PointListInGeneralPosition
     subperm_tac
   }
 
-theorem Point.InGeneralPosition₄.perm₁ : InGeneralPosition₄ p q r s → InGeneralPosition₄ q p r s
+theorem Point.InGenPos₄.perm₁ : InGenPos₄ p q r s → InGenPos₄ q p r s
   | ⟨H1, H2, H3, H4⟩ => ⟨H1.perm₁, H2.perm₁, H4, H3⟩
 
-theorem Point.InGeneralPosition₄.perm₂ : InGeneralPosition₄ p q r s → InGeneralPosition₄ p r q s
+theorem Point.InGenPos₄.perm₂ : InGenPos₄ p q r s → InGenPos₄ p r q s
   | ⟨H1, H2, H3, H4⟩ => ⟨H1.perm₂, H3, H2, H4.perm₁⟩
 
-theorem Point.InGeneralPosition₄.perm₃ : InGeneralPosition₄ p q r s → InGeneralPosition₄ p q s r
+theorem Point.InGenPos₄.perm₃ : InGenPos₄ p q r s → InGenPos₄ p q s r
   | ⟨H1, H2, H3, H4⟩ => ⟨H2, H1, H3.perm₂, H4.perm₂⟩
 
-theorem Point.PointListInGeneralPosition.mono_subperm : List.Subperm l l' →
-    Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l :=
+theorem Point.ListInGenPos.mono_subperm : List.Subperm l l' →
+    Point.ListInGenPos l' → Point.ListInGenPos l :=
   fun sp H _ _ _ h => subperm.1 H (h.subperm.trans sp)
 
-theorem Point.PointListInGeneralPosition.mono_sublist : List.Sublist l l' →
-    Point.PointListInGeneralPosition l' → Point.PointListInGeneralPosition l :=
+theorem Point.ListInGenPos.mono_sublist : List.Sublist l l' →
+    Point.ListInGenPos l' → Point.ListInGenPos l :=
   fun lsub => mono_subperm lsub.subperm
 
-theorem Point.PointListInGeneralPosition.perm (h : l.Perm l') :
-    PointListInGeneralPosition l ↔ PointListInGeneralPosition l' := by
+theorem Point.ListInGenPos.perm (h : l.Perm l') :
+    ListInGenPos l ↔ ListInGenPos l' := by
   suffices ∀ {l l'}, l.Perm l' →
-    PointListInGeneralPosition l → PointListInGeneralPosition l' from ⟨this h, this h.symm⟩
+    ListInGenPos l → ListInGenPos l' from ⟨this h, this h.symm⟩
   clear l l' h; intro l l' p gp _ _ _ h
-  exact PointListInGeneralPosition.subperm.1 gp <| List.subperm_iff.2 ⟨_, p.symm, h⟩
+  exact ListInGenPos.subperm.1 gp <| List.subperm_iff.2 ⟨_, p.symm, h⟩
 
-theorem Point.InGeneralPosition₃.ne₁ {p q r : Point} (h : InGeneralPosition₃ p q r) : p ≠ q := by
+theorem Point.InGenPos₃.ne₁ {p q r : Point} (h : InGenPos₃ p q r) : p ≠ q := by
   rintro rfl; exact h.σ_ne (σ_self₃ _ _)
 
-theorem Point.InGeneralPosition₃.ne₂ {p q r : Point} (h : InGeneralPosition₃ p q r) : p ≠ r :=
+theorem Point.InGenPos₃.ne₂ {p q r : Point} (h : InGenPos₃ p q r) : p ≠ r :=
   h.perm₂.ne₁
 
-theorem Point.InGeneralPosition₃.ne₃ {p q r : Point} (h : InGeneralPosition₃ p q r) : q ≠ r :=
+theorem Point.InGenPos₃.ne₃ {p q r : Point} (h : InGenPos₃ p q r) : q ≠ r :=
   h.perm₁.ne₂
 
 open scoped Matrix
@@ -273,30 +273,30 @@ theorem collinear_iff : σ p q r = .collinear ↔ Collinear ℝ {p, q, r} := by
     simp at H; obtain ⟨⟨a, rfl⟩, b, rfl⟩ := H
     simp [det_eq]; ring
 
-theorem Point.InGeneralPosition₃.iff_collinear :
-    InGeneralPosition₃ p q r ↔ ¬Collinear ℝ {p, q, r} := by
-  rw [Point.InGeneralPosition₃.iff_ne_collinear, Ne, collinear_iff]
+theorem Point.InGenPos₃.iff_collinear :
+    InGenPos₃ p q r ↔ ¬Collinear ℝ {p, q, r} := by
+  rw [Point.InGenPos₃.iff_ne_collinear, Ne, collinear_iff]
 
-theorem Point.InGeneralPosition₃.iff_not_mem_seg : InGeneralPosition₃ p q r ↔
+theorem Point.InGenPos₃.iff_not_mem_seg : InGenPos₃ p q r ↔
     p ∉ convexHull ℝ {q, r} ∧ q ∉ convexHull ℝ {p, r} ∧ r ∉ convexHull ℝ {p, q} := by
   constructor
   · intro h
     exact ⟨h.not_mem_seg, h.perm₁.not_mem_seg, h.perm₂.perm₁.not_mem_seg⟩
-  · rw [Point.InGeneralPosition₃.iff_collinear, ← not_or, ← not_or]; refine mt fun h => ?_
+  · rw [Point.InGenPos₃.iff_collinear, ← not_or, ← not_or]; refine mt fun h => ?_
     simp; obtain h | h | h := h.wbtw_or_wbtw_or_wbtw
     · right; left; exact mem_segment_iff_wbtw.2 h
     · right; right; exact mem_segment_iff_wbtw.2 h.symm
     · left; exact mem_segment_iff_wbtw.2 h.symm
 
-theorem Point.InGeneralPosition₃.σ_cases {p q r : Point} :
-    InGeneralPosition₃ p q r → σ p q r = .ccw ∨ σ p q r = .cw := by
+theorem Point.InGenPos₃.σ_cases {p q r : Point} :
+    InGenPos₃ p q r → σ p q r = .ccw ∨ σ p q r = .cw := by
   intro h
   cases h' : σ p q r <;> try tauto
   have := h.σ_ne
   contradiction
 
-theorem Point.PointListInGeneralPosition.nodup {l : List Point}
-    (h : 3 ≤ l.length) (gp : PointListInGeneralPosition l) : l.Nodup := by
+theorem Point.ListInGenPos.nodup {l : List Point}
+    (h : 3 ≤ l.length) (gp : ListInGenPos l) : l.Nodup := by
   let a :: l := l
   simp; constructor
   · let b :: l := l
@@ -307,29 +307,29 @@ theorem Point.PointListInGeneralPosition.nodup {l : List Point}
       exact (gp <| .cons₂ _ <| .cons₂ _ <| List.singleton_sublist.2 ha).ne₂ rfl
   · refine List.nodup_iff_sublist.2 fun b h => (gp <| .cons₂ _ h).ne₃ rfl
 
-theorem Point.InGeneralPosition₃.σ_iff {p q r : Point} :
-    InGeneralPosition₃ p q r → (σ p q r ≠ .ccw ↔ σ p q r = .cw) := by
+theorem Point.InGenPos₃.σ_iff {p q r : Point} :
+    InGenPos₃ p q r → (σ p q r ≠ .ccw ↔ σ p q r = .cw) := by
   intro h; cases h.σ_cases <;> simp_all
 
-theorem Point.InGeneralPosition₃.σ_iff' {p q r : Point} :
-    InGeneralPosition₃ p q r → (σ p q r ≠ .cw ↔ σ p q r = .ccw) := by
+theorem Point.InGenPos₃.σ_iff' {p q r : Point} :
+    InGenPos₃ p q r → (σ p q r ≠ .cw ↔ σ p q r = .ccw) := by
   intro h; cases h.σ_cases <;> simp_all
 
 -- NOTE(WN): These lemmas are a bit upsetting.
 -- Ideally we'd redefine `σ : Point³ → Bool` by arbitrarily mapping `.collinear` to `true`.
-theorem Point.InGeneralPosition₃.σ_iff₂ :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u →
+theorem Point.InGenPos₃.σ_iff₂ :
+    InGenPos₃ p q r → InGenPos₃ s t u →
     ((σ p q r = .ccw ↔ σ s t u = .ccw) ↔ σ p q r = σ s t u) := by
   intro h h'
   cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
 
-theorem Point.InGeneralPosition₃.σ_iff₂' :
-    InGeneralPosition₃ p q r → InGeneralPosition₃ s t u →
+theorem Point.InGenPos₃.σ_iff₂' :
+    InGenPos₃ p q r → InGenPos₃ s t u →
     ((σ p q r ≠ .ccw ↔ σ s t u = .ccw) ↔ σ p q r ≠ σ s t u) := by
   intro h h'
   cases h.σ_cases <;> cases h'.σ_cases <;> simp_all
 
-theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPosition₃ p q r) :
+theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (gp : InGenPos₃ p q r) :
     σ p q r = ccw ↔ slope p q < slope p r := by
   unfold σ Point.slope
   have qp_dx_pos : 0 < q.x - p.x := by linarith [h.h₁]
@@ -354,7 +354,7 @@ theorem slope_iff_orientation {p q r : Point} (h : Sorted₃ p q r) (gp : InGene
       have det_pqr_zero : det p q r = 0 := by linarith
       contradiction
 
-theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPosition₃ p q r) :
+theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (gp : InGenPos₃ p q r) :
     slope p q ≠ slope p r := by
   by_contra slope_eq
   have p_lt_q_x : p.x < q.x := by linarith [h.h₁]
@@ -363,7 +363,7 @@ theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPos
   unfold Point.slope at slope_eq
   rw [Commute.div_eq_div_iff] at slope_eq
   · have det_0 : det p q r = 0 := by rw [det_eq]; linarith
-    unfold InGeneralPosition₃ at gp
+    unfold InGenPos₃ at gp
     tauto
   · unfold Commute
     unfold SemiconjBy
@@ -371,7 +371,7 @@ theorem no_equal_slopes {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPos
   · linarith
   · linarith
 
-theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (gp : InGeneralPosition₃ p q r) :
+theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (gp : InGenPos₃ p q r) :
     σ p q r = cw ↔ slope p q > slope p r := by
     rw [← gp.σ_iff]
     constructor
@@ -386,7 +386,7 @@ theorem slope_iff_orientation' {p q r : Point} (h : Sorted₃ p q r) (gp : InGen
       rw [slope_iff_orientation h gp]
       linarith
 
-theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = ccw → σ q r s = ccw → σ p r s = ccw := by
   rw [slope_iff_orientation h.h₁ gp.gp₁,
     slope_iff_orientation h.sorted₃ gp.gp₃,
@@ -399,14 +399,14 @@ theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosi
   rw [← slope_lt_iff_lt h.sorted₃] at this
   exact this
 
-theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₂ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = ccw → σ p r s = ccw → σ p q s = ccw := by
   rw [slope_iff_orientation h.h₁ gp.gp₁,
     slope_iff_orientation h.sorted₃ gp.gp₃,
     slope_iff_orientation h.sorted₂ gp.gp₂]
   exact lt_trans
 
-theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = cw → σ q r s = cw → σ p r s = cw := by
   intro h₁ h₂
   rw [slope_iff_orientation' h.h₁ gp.gp₁] at h₁
@@ -419,7 +419,7 @@ theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosi
   have h2 : Point.slope p r > Point.slope q r := by rwa [slope_gt_iff_gt' h.sorted₁]
   linarith
 
-theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = cw → σ p r s = cw → σ p q s = cw := by
   intro h₁ h₂
   rw [slope_iff_orientation' h.h₁ gp.gp₁] at h₁
@@ -427,22 +427,22 @@ theorem σ_prop₄ {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosi
   rw [slope_iff_orientation' h.sorted₂ gp.gp₂]
   linarith
 
-theorem σ_prop₁' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₁' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = ccw → σ q r s = ccw → σ p q s = ccw :=
   fun h₁ h₂ => σ_prop₂ h gp h₁ (σ_prop₁ h gp h₁ h₂)
 
-theorem σ_prop₂' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₂' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q s = ccw → σ q r s = ccw → σ p r s = ccw := by
   intro h₁ h₂; by_contra h₃
   have := σ_prop₄ h gp
   simp_rw [← gp.gp₁.σ_iff, ← gp.gp₂.σ_iff, ← gp.gp₃.σ_iff] at this
   refine this (h₃ <| σ_prop₁ h gp · h₂) h₃ h₁
 
-theorem σ_prop₃' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₃' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = cw → σ q r s = cw → σ p q s = cw :=
   fun h₁ h₂ => σ_prop₄ h gp h₁ (σ_prop₃ h gp h₁ h₂)
 
-theorem σ_prop₄' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₄' {p q r s : Point} (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q s = cw → σ q r s = cw → σ p r s = cw := by
   intro h₁ h₂; by_contra h₃
   have := σ_prop₂ h gp

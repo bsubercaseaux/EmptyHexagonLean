@@ -72,10 +72,10 @@ def OrientationProperty' (P : List Point → Prop) :=
 theorem OrientationProperty'.not : OrientationProperty' P → OrientationProperty' (¬P ·) :=
   fun h _ _ hσ => not_congr (h hσ)
 
-theorem OrientationProperty'.gp : OrientationProperty' Point.PointListInGeneralPosition := fun S T f => by
-  rw [← Point.PointListInGeneralPosition.perm f.perm]
-  simp only [Point.PointListInGeneralPosition, ← List.mem_sublists, List.sublists_map]
-  simp [Point.InGeneralPosition₃.iff_ne_collinear, -IsEmpty.forall_iff]
+theorem OrientationProperty'.gp : OrientationProperty' Point.ListInGenPos := fun S T f => by
+  rw [← Point.ListInGenPos.perm f.perm]
+  simp only [Point.ListInGenPos, ← List.mem_sublists, List.sublists_map]
+  simp [Point.InGenPos₃.iff_ne_collinear, -IsEmpty.forall_iff]
   constructor
   · intro | H, _, _, _, [p',q',r'], sl, rfl => ?_
     have := sl.subset; simp at this

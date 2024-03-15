@@ -6,7 +6,7 @@ namespace Geo
 open Classical LeanSAT Model
 
 theorem empty_kgon_naive (rlen_le : 2 ≤ rlen) (unsat : (Geo.naiveCNF k rlen).isUnsat)
-    (pts : List Point) (gp : Point.PointListInGeneralPosition pts)
+    (pts : List Point) (gp : Point.ListInGenPos pts)
     (h : pts.length ≥ rlen+1) : HasEmptyKGon k pts.toFinset := by
   refine HasEmptyKGon_extension gp (fun pts gp h => ?_) (Nat.succ_le_succ rlen_le) h
   by_contra h'
@@ -24,19 +24,19 @@ theorem empty_kgon_naive (rlen_le : 2 ≤ rlen) (unsat : (Geo.naiveCNF k rlen).i
 axiom unsat_3hole_cnf : (Geo.naiveCNF (k := 3) (rlen := 3-1)).isUnsat
 
 theorem hole_3_theorem : ∀ (pts : List Point),
-    Point.PointListInGeneralPosition pts → pts.length ≥ 3 → HasEmptyKGon 3 pts.toFinset :=
+    Point.ListInGenPos pts → pts.length ≥ 3 → HasEmptyKGon 3 pts.toFinset :=
   empty_kgon_naive (by decide) unsat_3hole_cnf
 
 axiom unsat_4hole_cnf : (Geo.naiveCNF (k := 4) (rlen := 5-1)).isUnsat
 
 theorem hole_4_theorem : ∀ (pts : List Point),
-    Point.PointListInGeneralPosition pts → pts.length ≥ 5 → HasEmptyKGon 4 pts.toFinset :=
+    Point.ListInGenPos pts → pts.length ≥ 5 → HasEmptyKGon 4 pts.toFinset :=
   empty_kgon_naive (by decide) unsat_4hole_cnf
 
 axiom unsat_5hole_cnf : (Geo.naiveCNF (k := 5) (rlen := 10-1)).isUnsat
 
 theorem hole_5_theorem : ∀ (pts : List Point),
-    Point.PointListInGeneralPosition pts → pts.length ≥ 10 → HasEmptyKGon 5 pts.toFinset :=
+    Point.ListInGenPos pts → pts.length ≥ 10 → HasEmptyKGon 5 pts.toFinset :=
   empty_kgon_naive (by decide) unsat_5hole_cnf
 
 /--

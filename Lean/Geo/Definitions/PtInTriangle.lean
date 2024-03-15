@@ -74,7 +74,7 @@ def σPtInTriangle (a p q r : Point) : Prop :=
   σ a q r = σ p q r
 
 theorem not_mem_σPtInTriangle {p q r : Point} :
-    InGeneralPosition₃ p q r → ¬σPtInTriangle q p q r := by
+    InGenPos₃ p q r → ¬σPtInTriangle q p q r := by
   intro h ⟨h', _, _⟩
   rw [σ_self₁] at h'
   have := h.σ_ne
@@ -98,18 +98,18 @@ theorem σPtInTriangle.perm (h : [p, q, r].Perm [p', q', r']) :
   perm₃_induction (fun _ _ _ => (·.perm₁)) (fun _ _ _ => (·.perm₂)) h
 
 theorem σPtInTriangle.gp₄_of_gp₃ :
-    InGeneralPosition₃ p q r → σPtInTriangle a p q r → InGeneralPosition₄ a p q r := by
+    InGenPos₃ p q r → σPtInTriangle a p q r → InGenPos₄ a p q r := by
   intro gp ⟨tri₁, tri₂, tri₃⟩
   have gp := gp.σ_ne
   constructor
-  · rwa [InGeneralPosition₃.iff_ne_collinear, σ_perm₁, ← σ_perm₂, tri₁]
-  · apply InGeneralPosition₃.perm₁; rwa [InGeneralPosition₃.iff_ne_collinear, tri₂]
-  · rwa [InGeneralPosition₃.iff_ne_collinear, tri₃]
+  · rwa [InGenPos₃.iff_ne_collinear, σ_perm₁, ← σ_perm₂, tri₁]
+  · apply InGenPos₃.perm₁; rwa [InGenPos₃.iff_ne_collinear, tri₂]
+  · rwa [InGenPos₃.iff_ne_collinear, tri₃]
   · assumption
 
 /-! ## Proof of equivalence between σPtInTriangle and PtInTriangle -/
 
-theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
+theorem σPtInTriangle_of_PtInTriangle {a p q r : Point} (gp : Point.InGenPos₄ a p q r)
     (symm : σ p q r = .ccw) (h : PtInTriangle a p q r) : σ p q a = .ccw := by
   rw [← gp.gp₁.perm₁.perm₂.σ_iff', Ne, σ_eq_cw, not_lt]
   refine convexHull_min ?_ ((convex_Ici 0).affine_preimage (detAffineMap p q)) h
@@ -129,7 +129,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
     ext <;> simp [det_eq, x, y] <;> ring
   · rw [det_add_det, det_perm₁ a, add_neg_cancel_right, div_self (ne_of_gt symm)]
 
-theorem σPtInTriangle_iff_of_CCW {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r)
+theorem σPtInTriangle_iff_of_CCW {a p q r : Point} (gp : Point.InGenPos₄ a p q r)
     (symm : σ p q r = .ccw) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
   constructor
@@ -141,10 +141,10 @@ theorem σPtInTriangle_iff_of_CCW {a p q r : Point} (gp : Point.InGeneralPositio
     · rw [σ_perm₁, ← σ_perm₂, σPtInTriangle_of_PtInTriangle
         gp.perm₂.perm₃ (by rw [σ_perm₂, ← σ_perm₁, symm]) H.perm₁.perm₂]
 
-theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.InGeneralPosition₄ a p q r) :
+theorem σPtInTriangle_iff {a p q r : Point} (gp : Point.InGenPos₄ a p q r) :
     σPtInTriangle a p q r ↔ PtInTriangle a p q r := by
   rcases gp.gp₄.σ_cases with h | h
   · exact σPtInTriangle_iff_of_CCW gp h
-  · have : InGeneralPosition₄ a p r q := ⟨gp.gp₂, gp.gp₁, gp.gp₃.perm₂, gp.gp₄.perm₂⟩
+  · have : InGenPos₄ a p r q := ⟨gp.gp₂, gp.gp₁, gp.gp₃.perm₂, gp.gp₄.perm₂⟩
     have := σPtInTriangle_iff_of_CCW this (by rw [σ_perm₂, h]; rfl)
     exact ⟨(this.1 ·.perm₂ |>.perm₂), (this.2 ·.perm₂ |>.perm₂)⟩

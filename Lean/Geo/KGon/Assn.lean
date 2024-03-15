@@ -47,7 +47,7 @@ theorem satisfies_signotopeClauses2 (w : CanonicalPoints) :
   · simp_rw [gp.gp₁.σ_iff, gp.gp₄.σ_iff, gp.gp₃.σ_iff]
     exact σ_prop₃ s gp
 
-theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPosition₄ a x b c →
+theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGenPos₄ a x b c →
     (σPtInTriangle x a b c ↔
       ((σ a b c = .ccw ↔ σ a x c = .ccw) ∧ (σ a x b ≠ .ccw ↔ σ a b c = .ccw))) := by
   intro sorted gp
@@ -61,7 +61,7 @@ theorem insideDefs_aux₁ {a x b c : Point} : Sorted₄ a x b c → InGeneralPos
     rw [σ_prop₃ sorted gp h₁ h₄] at h₃
     contradiction
 
-theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGeneralPosition₄ a b x c →
+theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGenPos₄ a b x c →
     (σPtInTriangle x a b c ↔
       ((σ a b c = .ccw ↔ σ a x c = .ccw) ∧ (σ b x c ≠ .ccw ↔ σ a b c = .ccw))) := by
   intro sorted gp
@@ -90,7 +90,7 @@ theorem holeDefs_aux (w : CanonicalPoints) {b c : Fin (rlen w)} {a i : Fin (leng
     ¬σPtInTriangle w[i] w[a] w+[b] w+[c] := fun tri => by
   have gp₃ := CanonicalPoints.gp₃ (k := c.succ) ab bc.succ₂
   have sorted₃ := CanonicalPoints.sorted₃ (k := c.succ) ab bc.succ₂
-  have gp₄ : InGeneralPosition₄ w[i] w[a] w+[b] w+[c] := tri.gp₄_of_gp₃ gp₃
+  have gp₄ : InGenPos₄ w[i] w[a] w+[b] w+[c] := tri.gp₄_of_gp₃ gp₃
   have ib : i ≠ b.succ := mt (congrArg (w[·])) gp₄.gp₃.ne₁
   have ⟨wawi, wiwc⟩ := xBounded_of_PtInTriangle' sorted₃ ((σPtInTriangle_iff gp₄).mp tri)
   have ai : a < i := w.lt_iff.1 <| by

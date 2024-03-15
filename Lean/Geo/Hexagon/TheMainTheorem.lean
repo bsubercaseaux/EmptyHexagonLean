@@ -7,7 +7,7 @@ open Classical LeanSAT Model
 
 axiom unsat_6hole_cnf : (Geo.hexagonCNF (rlen := 30-1)).isUnsat
 
-theorem hole_6_theorem (pts : List Point) (gp : Point.PointListInGeneralPosition pts)
+theorem hole_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
     (h : pts.length ≥ 30) : HasEmptyKGon 6 pts.toFinset := by
   refine HasEmptyKGon_extension gp (fun pts gp h => ?_) (by decide) h
   by_contra h'

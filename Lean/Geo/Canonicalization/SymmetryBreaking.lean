@@ -39,7 +39,7 @@ theorem σEmbed_rotate (l : List Point) (h : l.Nodup) :
     simpa [ptTransform_rotateByAffine] using
       (TMatrix.rotateByAffine θ).ptTransform_preserves_sigma p q r
 
-variable {l : List Point} (hl : 3 ≤ l.length) (gp : Point.PointListInGeneralPosition l)
+variable {l : List Point} (hl : 3 ≤ l.length) (gp : Point.ListInGenPos l)
 
 theorem σEmbed.len_ge_3 (σ : l ≼σ l') : 3 ≤ l'.length := σ.length_eq ▸ hl
 
@@ -82,7 +82,7 @@ theorem symmetry_breaking : ∃ w : CanonicalPoints, Nonempty (l ≼σ w.points)
     · refine List.pairwise_map.2 <| List.pairwise_iff_forall_sublist.2 fun h => Ne.symm ?_
       have := (OrientationProperty'.gp σ2).1 gp <| .cons₂ _ h
       have h := h.subset; simp at h horient
-      rwa [Point.InGeneralPosition₃.iff_ne_collinear, ← horient _ _ h.1 h.2,
+      rwa [Point.InGenPos₃.iff_ne_collinear, ← horient _ _ h.1 h.2,
         orientWithInfty, Ne, Orientation.ofReal_eq_collinear, sub_eq_zero] at this
 
   -- step 4: sort
@@ -147,7 +147,7 @@ theorem symmetry_breaking : ∃ w : CanonicalPoints, Nonempty (l ≼σ w.points)
 
 -- WN: I put this here since it uses some σEmbed lemmas.
 theorem HasEmptyKGon_extension :
-    (∀ l : List Point, Point.PointListInGeneralPosition l → l.length = n → HasEmptyKGon k l.toFinset) →
+    (∀ l : List Point, Point.ListInGenPos l → l.length = n → HasEmptyKGon k l.toFinset) →
     3 ≤ n → n ≤ l.length → HasEmptyKGon k l.toFinset := by
   intro H threen llength
   rw [← σHasEmptyKGon_iff_HasEmptyKGon gp]
@@ -161,7 +161,7 @@ theorem HasEmptyKGon_extension :
 
   let l₂ := l₁.insertionSort (·.x ≤ ·.x)
   have l₂l₁ : l₂ ~ l₁ := l₁.perm_insertionSort _
-  replace gp := Point.PointListInGeneralPosition.perm l₂l₁ |>.mpr gp
+  replace gp := Point.ListInGenPos.perm l₂l₁ |>.mpr gp
   replace llength : n ≤ l₂.length := l₂l₁.length_eq ▸ llength
   replace distinct := distinct.perm l₂l₁.symm Ne.symm
   have l₂sorted : l₂.Sorted (·.x < ·.x) :=

@@ -20,17 +20,17 @@ def ConvexPoints (S : Set Point) : Prop :=
 
 open Classical
 theorem ConvexPoints.triangle_iff {a b c : Point} {h : [a, b, c].Nodup} :
-    ConvexPoints (Finset.mk (α := Point) [a,b,c] h) ↔ Point.InGeneralPosition₃ a b c := by
+    ConvexPoints (Finset.mk (α := Point) [a,b,c] h) ↔ Point.InGenPos₃ a b c := by
   constructor <;> intro h2
   · simp [not_or, Set.subset_def] at h ⊢
-    refine Point.InGeneralPosition₃.iff_not_mem_seg.2 ⟨?_, ?_, ?_⟩ <;>
+    refine Point.InGenPos₃.iff_not_mem_seg.2 ⟨?_, ?_, ?_⟩ <;>
       refine (h2 _ (by simp) <| convexHull_mono ?_ ·) <;> simp [Set.subset_def]
     · exact ⟨Ne.symm h.1.1, Ne.symm h.1.2⟩
     · exact ⟨h.1.1, Ne.symm h.2⟩
     · exact ⟨h.1.2, h.2⟩
   · have s_eq : Finset.mk (α := Point) [a,b,c] h = {a,b,c} := by ext; simp
     simp [s_eq]; intro p hp hp2; simp at hp
-    rw [Point.InGeneralPosition₃.iff_not_mem_seg] at h2
+    rw [Point.InGenPos₃.iff_not_mem_seg] at h2
     obtain h|h|h := hp <;> subst p
     · exact h2.1 (convexHull_mono (by simp) hp2)
     · exact h2.2.1 (convexHull_mono (by simp [Set.subset_def]) hp2)
@@ -48,14 +48,14 @@ theorem ConvexPoints.lt_3 {s : Finset Point} (hs : s.card < 3) : ConvexPoints s 
     simpa using congrArg (a ∈ ·) e1
 
 theorem ConvexPoints.triangle' {s : Finset Point} {S : List Point}
-    (hs : s.card ≤ 3) (sS : s ⊆ S.toFinset) (gp : Point.PointListInGeneralPosition S) :
+    (hs : s.card ≤ 3) (sS : s ⊆ S.toFinset) (gp : Point.ListInGenPos S) :
     ConvexPoints s := by
   cases lt_or_eq_of_le hs with
   | inl hs => exact ConvexPoints.lt_3 hs
   | inr hs =>
     match s, s.exists_mk with | _, ⟨[a,b,c], h1, rfl⟩ => ?_
     rw [ConvexPoints.triangle_iff]
-    apply Point.PointListInGeneralPosition.subperm.1 gp
+    apply Point.ListInGenPos.subperm.1 gp
     exact List.subperm_of_subset h1 (by simpa [Finset.subset_iff] using sS)
 
 theorem ConvexPoints.antitone {S₁ S₂ : Set Point} (S₁S₂ : S₁ ⊆ S₂)
@@ -103,7 +103,7 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
     exact this.1 p pu (convexHull_mono (Set.subset_diff_singleton tu (mt (tS' ·) pn)) ht)
 
 theorem ConvexEmptyIn.iff_triangles' {s : Finset Point} {S : List Point}
-    (sS : s ⊆ S.toFinset) (gp : Point.PointListInGeneralPosition S) :
+    (sS : s ⊆ S.toFinset) (gp : Point.ListInGenPos S) :
     ConvexEmptyIn s S.toFinset ↔
     ∀ (t : Finset Point), t.card = 3 → t ⊆ s → EmptyShapeIn t S.toFinset := by
   if sz : 3 ≤ s.card then
@@ -121,13 +121,13 @@ theorem ConvexEmptyIn.iff_triangles' {s : Finset Point} {S : List Point}
       | ⟨[a], _, (eq : s = {a})⟩, _ => subst eq; simpa using pS'
       | ⟨[a,b], h1, eq⟩, _ =>
         have : s = {a, b} := eq ▸ by ext; simp
-        have gp' := Point.PointListInGeneralPosition.subperm.1 gp <|
+        have gp' := Point.ListInGenPos.subperm.1 gp <|
           List.subperm_of_subset (.cons (a := p) (by simpa [this] using pn) h1) <|
           List.cons_subset.2 ⟨by simpa using pS, by simpa [this, Finset.insert_subset_iff] using sS⟩
         cases gp'.not_mem_seg (by simpa [this] using pS')
 
 theorem ConvexEmptyIn.iff_triangles'' {s : Finset Point} {S : List Point}
-    (sS : s ⊆ S.toFinset) (gp : Point.PointListInGeneralPosition S) :
+    (sS : s ⊆ S.toFinset) (gp : Point.ListInGenPos S) :
     ConvexEmptyIn s S.toFinset ↔
     ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
       ∀ p ∈ S.toFinset \ {a,b,c}, ¬PtInTriangle p a b c := by
@@ -180,7 +180,7 @@ theorem split_convexHull (cvx : ConvexPoints S) :
   replace := congrArg (convexHull ℝ) this
   rw [convexHull_union ne1 ne2] at this
   let ⟨u, hu, v, hv, hp2⟩ := mem_convexJoin.1 <| this ▸ hn
-  have hcvx {z} (this : z ∈ convexHull ℝ S) (ngp : ¬Point.InGeneralPosition₃ a b z) :
+  have hcvx {z} (this : z ∈ convexHull ℝ S) (ngp : ¬Point.InGenPos₃ a b z) :
       z ∈ convexHull ℝ {a, b} := by
     by_contra zab
     have {a b} (ha : a ∈ S) (hb : b ∈ S) (ab : a ≠ b) (zab : z ∉ convexHull ℝ {a, b}) :
@@ -193,7 +193,7 @@ theorem split_convexHull (cvx : ConvexPoints S) :
       rw [mem_segment_iff_wbtw] at hw2 h
       have := h.trans_ne_left hw2 (zab <| · ▸ subset_convexHull _ _ (by simp))
       exact cvx _ ha <| (convex_convexHull ..).segment_subset hba hw1 (mem_segment_iff_wbtw.2 this)
-    exact ngp <| Point.InGeneralPosition₃.iff_not_mem_seg.2
+    exact ngp <| Point.InGenPos₃.iff_not_mem_seg.2
       ⟨this ha hb ab zab, this hb ha (Ne.symm ab) (Set.pair_comm .. ▸ zab), zab⟩
   have hu0 : detAffineMap a b u ≤ 0 := by
     refine convexHull_min ?_ ((convex_Iic 0).affine_preimage (detAffineMap a b)) hu
@@ -208,8 +208,8 @@ theorem split_convexHull (cvx : ConvexPoints S) :
     exact ⟨hu0, hv0⟩
   have zab : z ∈ convexHull ℝ {a, b} := hcvx
     (by rw [this, mem_convexJoin]; exact ⟨_, hu, _, hv, hz1⟩)
-    (by simpa [Point.InGeneralPosition₃] using hz2)
-  if hp' : Point.InGeneralPosition₃ a b p then ?_ else
+    (by simpa [Point.InGenPos₃] using hz2)
+  if hp' : Point.InGenPos₃ a b p then ?_ else
     right; exact convexHull_mono (by simp [Set.subset_def, ha, hb, σ_self₁, σ_self₂]) (hcvx hn hp')
   have : p ∈ segment ℝ v z := by
     simp [mem_segment_iff_wbtw] at hp2 hz1 ⊢
@@ -233,7 +233,7 @@ def HasEmptyTriangle : Set Point → Prop := HasEmptyKGon 3
 
 theorem HasEmptyTriangle.iff (S : Set Point) :
     HasEmptyTriangle S ↔
-    ∃ᵉ (a ∈ S) (b ∈ S) (c ∈ S), Point.InGeneralPosition₃ a b c ∧
+    ∃ᵉ (a ∈ S) (b ∈ S) (c ∈ S), Point.InGenPos₃ a b c ∧
       ∀ s ∈ S \ {a,b,c}, ¬PtInTriangle s a b c := by
   simp [HasEmptyTriangle, HasEmptyKGon, PtInTriangle]
   constructor
