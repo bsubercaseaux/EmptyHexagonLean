@@ -154,9 +154,9 @@ Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of He
     \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \succeq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\tikzmarkend{c}\label{eq:constraint-6}\\
 \hfsetfillcolor{orange!10}
 \hfsetbordercolor{orange!60!black}
-\tikzmarkin{d}(3.235,-0.3)(-0.5,0.5)
-  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d\label{eq:constraint-7}\\
-  \left(\uvar_{a,b,c} \land \ov{\orvar_{b,c,d}} \land \hvar_{a,b,d}\right)\rightarrow \ufvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d\label{eq:constraint-8}\\
+\tikzmarkin{d}(3.235,-0.3)(-0.5,0. 5)
+  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:constraint-7}\\
+  \left(\uvar_{a,b,c} \land \ov{\orvar_{b,c,d}} \land \hvar_{a,b,d}\right)\rightarrow \ufvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n,\; a+1<b\label{eq:constraint-8}\\
   \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{d}\label{eq:constraint-9}\\
 \hfsetfillcolor{red!10}
 \hfsetbordercolor{red!60!black}
