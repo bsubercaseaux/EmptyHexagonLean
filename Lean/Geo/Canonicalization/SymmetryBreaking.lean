@@ -203,3 +203,12 @@ theorem HasEmptyKGon_extension :
     rw [leftlength] at ilt
     apply List.pairwise_iff_get.mp l₂sorted
     simp; omega
+
+theorem HasConvexKGon_extension :
+    (∀ l : List Point, Point.ListInGenPos l → l.length = n → HasConvexKGon k l.toFinset) →
+    n ≤ l.length → HasConvexKGon k l.toFinset := by
+  intro H llength
+  let left := l.take n
+  have leftl : left <+ l := List.take_sublist ..
+  have ⟨s, scard, sleft, convex⟩ := H left (gp.mono_sublist leftl) (List.length_take_of_le llength)
+  use s, scard, sleft.trans leftl.toFinset_subset, convex

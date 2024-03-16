@@ -127,6 +127,24 @@ lemma OrientationProperty_σHasEmptyKGon : OrientationProperty (σHasEmptyKGon n
     rw [this, σPtInTriangle_congr e (e.symm.bij.left hp) (sS ha) (sS hb) (sS hc)]
     exact h a ha b hb c hc ab ac bc (e.symm p) (e.symm.bij.left hp)
 
+lemma OrientationProperty_σHasConvexKGon : OrientationProperty (σHasConvexKGon n) := by
+  unfold σHasConvexKGon
+  intro S T e ⟨s, scard, sS, h⟩
+  refine ⟨s.image e, ?_, ?_, ?_⟩
+  . rwa [s.card_image_of_injOn (e.bij.right.left.mono sS)]
+  . intro x; simp
+    rintro _ hx rfl
+    exact e.bij.left (sS hx)
+  . have injs : Set.InjOn e s := e.bij.right.left.mono sS
+    simp (config := { contextual := true }) only [injs.eq_iff,
+      Finset.mem_image, Finset.mem_coe, σIsEmptyTriangleFor,
+      and_imp, forall_exists_index, forall_apply_eq_imp_iff₂, ne_eq, not_or,
+      Set.mem_diff, Set.mem_insert_iff, Set.mem_singleton_iff] at h ⊢
+    -- The part below is very explicit, maybe could be automated.
+    intro a ha b hb c hc ab ac bc p hp
+    rw [σPtInTriangle_congr e (sS hp) (sS ha) (sS hb) (sS hc)]
+    exact h a ha b hb c hc ab ac bc p hp
+
 theorem σIsEmptyTriangleFor_exists (gp : Point.ListInGenPos S)
     (abc : [a, b, c] <+~ S) :
     ∃ b' ∈ S, σ a b' c = σ a b c ∧ (b' = b ∨ σPtInTriangle b' a b c) ∧
