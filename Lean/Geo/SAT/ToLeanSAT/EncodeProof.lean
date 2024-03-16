@@ -134,9 +134,9 @@ theorem binSearch_wf (sorted : vars.1.Sorted (· < ·)) (h : i < vars.size) :
       rw [if_neg this]
       exact go lo (m - 1) hlo (Nat.le_pred_of_lt eq) ((Nat.pred_le _).trans_lt mhi')
     · rwa [getElem_inj sorted] at eq
+  termination_by hi + 1 - lo
+  decreasing_by all_goals decreasing_with omega
   exact go 0 (vars.size - 1) (Nat.zero_le _) (Nat.le_pred_of_lt h) (Nat.pred_lt' h)
-termination_by _ => hi + 1 - lo
-decreasing_by decreasing_with omega
 
 def WFCtx (v) [LinearOrder v] := {vars : Array v // vars.1.Sorted (· < ·)}
 
@@ -192,8 +192,8 @@ theorem forM'.evalsTo (as : Array α) (f : (a : α) → a ∈ as → M v Unit)
       exact ⟨s', M.evalsTo.bind h₁ h₂, hs⟩
     · cases le_antisymm hi (not_lt.1 ‹_›)
       exact ⟨_, .pure, hs⟩
+  termination_by as.size - i
   exact go 0 (Nat.zero_le _) zero
-termination_by _ => as.size - i
 
 def WFState.Evaluates (s : WFState (v := v) c) (F : PropFun v) (G : PropFun IVar) : Prop :=
   Bounded G s.s.nextVar ∧
@@ -330,11 +330,11 @@ theorem toLit.any_wf (c) (G : α → PropFun v)
       exact ⟨s2, ls', et1.bind et2, f2.trans f1, ev2⟩
     · refine ⟨s, ls, .pure, rfl, ?_⟩; convert hl
       simp [Array.mem_iff_getElem, fun j : Fin as.size => j.2.trans_le (not_lt.1 ‹_›)]
+  termination_by as.size - i
   let ⟨s1, ls, et1, f1, ev1⟩ := go 0 s #[] (by simp [WFState.Evaluates, Bounded])
   let ⟨s2, i, et2, f2, ev2⟩ := getAny.wf ls s1 _ ev1
   refine ⟨s2, _, et1.bind <| et2.bind <| .pure, f2.trans f1, ?_⟩
   convert ev2.apply (· ↔ pos); simp [Literal.eval]; cases pos <;> simp
-termination_by _ => as.size - i
 
 theorem toLit.wf (f : PropForm v) (pos) (hf : f.onVars (· ∈ c.1)) (s) :
     ∃ s' l, (toLit compare f pos).evalsTo c s s' l ∧ s'.f = s.f ∧
@@ -369,8 +369,8 @@ theorem toLit.wf (f : PropForm v) (pos) (hf : f.onVars (· ∈ c.1)) (s) :
     refine ⟨s5, _, et1.bind <| et2.bind <| et3.bind <| et4.bind <| et5.bind .pure, ?_, ?_⟩
     · rw [f5, f4, f3, f2, f1]
     · convert ev5.apply (· ↔ !pos) using 2 <;> cases pos <;> simp [Literal.eval]
-termination_by _ => f
-decreasing_by decreasing_with subst_vars; first | decreasing_trivial | simp_wf
+termination_by f
+decreasing_by all_goals decreasing_with subst_vars; first | decreasing_trivial
 
 theorem pushClause.wf (cl s F) (hcl : s.Evaluates (v := v) F (Clause.eval · cl)) :
     ∃ s', (pushClause cl).evalsTo c s s' () ∧ ∀ τ, s'.f τ ↔ s.f τ ∧ F τ :=
@@ -422,8 +422,8 @@ theorem pushFmla.foldlM'_wf (as : Array (α))
       exact ⟨s2, ocl2, et1.bind et2, f2.trans f1, ev2⟩
     · refine ⟨_, _, .pure, rfl, ?_⟩
       simpa [Array.mem_iff_getElem, fun j : Fin as.size => j.2.trans_le (not_lt.1 ‹_›)] using ev
+  termination_by as.size - i
   go 0 s <| by simpa using ev
-termination_by _ => as.size - i
 
 -- Only needed because of lean4#3843
 theorem pushFmla.induction {cmp}
@@ -566,7 +566,7 @@ theorem pushICnf.wf (f : PropForm v) (pos) (hf : f.onVars (· ∈ c.1)) (s) :
     refine ⟨s4, et1.bind <| et2.bind <| et3.bind et4, fun τ => ?_⟩
     simp [f4, f3, f2, f1, and_assoc, ← iff_def]; tauto
   next /-other-/ => simpa using toICnfAny.wf #[f] pos (by simpa using hf) s
-decreasing_by decreasing_with subst_vars; decreasing_trivial
+decreasing_by all_goals decreasing_with subst_vars; decreasing_trivial
 
 end Encode
 open Encode

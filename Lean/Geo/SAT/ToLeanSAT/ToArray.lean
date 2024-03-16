@@ -33,6 +33,7 @@ instance : LawfulToArray (Fin n) (Fin n) fun _ => True where
         (Array.ofFn.go f i acc).data = List.map f (Array.ofFn.go id i acc').data := by
       simp (config := {singlePass := true}) only [Array.ofFn.go]
       split <;> [apply go; skip] <;> simp [*]
+    termination_by n - i
     exact go rfl
   mem_base {j} := by
     simp [Array.ofFn, Array.mem_def]
@@ -43,8 +44,8 @@ instance : LawfulToArray (Fin n) (Fin n) fun _ => True where
       · apply go'; intro h2; simp [Fin.ext_iff]
         exact (Nat.lt_succ_iff_lt_or_eq.1 h2).imp_left h
       · exact h (Nat.lt_of_lt_of_le j.2 (Nat.not_lt.1 h1))
+    termination_by n - i
     apply go'; simp
-termination_by _ => n - i
 
 instance (as : Array α) : ToArray as α where
   toArray f := as.map f

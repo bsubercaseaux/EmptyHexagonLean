@@ -23,9 +23,9 @@ def collectVars : PropForm v → RBSet v cmp → RBSet v cmp
       | .gt => if m = 0 then 0 else go lo (m-1)
       | .eq => m
     else unreachable!
+  termination_by hi + 1 - lo
+  decreasing_by all_goals decreasing_with omega
   go 0 (as.size - 1)
-termination_by _ => hi + 1 - lo
-decreasing_by decreasing_with omega
 
 namespace Encode
 

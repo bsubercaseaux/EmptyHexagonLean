@@ -247,7 +247,7 @@ theorem goAny {α} (as : Array α) {FF : ∀ a ∈ as, (R → R → R) → R →
   iterate 2 next /-atom-/ a =>
     unfold evals at *
     simp [hF, or_imp, forall_and, or_and_right, exists_or, or_assoc, or_comm]
-decreasing_by decreasing_with subst_vars; first | decreasing_trivial | simp_wf
+decreasing_by all_goals decreasing_with subst_vars; decreasing_trivial
 
 end eval_flatCNF
 

@@ -19,8 +19,8 @@ def noKHoleClausesCore (n k : Nat) (i : Nat)
     noKHoleClausesCore n k (i+1) G1 G2
   else
     .false
-termination_by _ => n - i
-decreasing_by decreasing_with omega
+termination_by n - i
+decreasing_by all_goals decreasing_with omega
 
 def noKHoleClauses (k n : Nat) : PropForm (Var n) :=
   .guard (0 < k) fun _ =>

@@ -117,8 +117,8 @@ def foldlM' [Monad m]
       go (i+1) (← f acc (as.get ⟨i, h⟩) (by simp [mem_def, getElem_mem_data]))
     else
       pure acc
+  termination_by as.size - i
   go 0 init
-termination_by _ => as.size - i
 
 @[inline] def foldl' {α : Type u} {β : Type v}
     (as : Array α) (f : β → (a : α) → a ∈ as → β) (init : β) : β :=
@@ -150,8 +150,8 @@ theorem SatisfiesM_foldlM' [Monad m] [LawfulMonad m]
     · next hi =>
       exact (hf ⟨i, hi⟩ b H).bind fun _ => go hi
     · next hi => exact Nat.le_antisymm h₁ (Nat.ge_of_not_lt hi) ▸ .pure H
+  termination_by as.size - i
   simp [foldlM']; exact go (Nat.zero_le _) h0
-termination_by _ => as.size - i
 
 theorem foldl'_induction
     {as : Array α} (motive : Nat → β → Prop) {init : β} (h0 : motive 0 init)

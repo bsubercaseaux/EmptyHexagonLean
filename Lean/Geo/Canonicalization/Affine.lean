@@ -22,7 +22,7 @@ def rotationMap (θ : ℝ) : Point →ₗ[ℝ] Point :=
 lemma rotationMap_x (θ : ℝ) (P : Point) : (rotationMap θ P).x = cos θ * P.x - sin θ * P.y := by
   -- such beautiful formal proofs
   simp [Matrix.vecHead, Matrix.vecTail, rotationMap, Matrix.toEuclideanLin,
-    Matrix.toLin', Matrix.rotateBy, Point.x, Point.y]
+    Matrix.rotateBy, Point.x, Point.y]
   ring
 
 @[simp]

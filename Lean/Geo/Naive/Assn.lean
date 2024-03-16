@@ -63,8 +63,8 @@ theorem satisfies_noKHoleClausesCore {w : CanonicalPoints}
         (fun b c ib => hG1 _ _ (Nat.le_of_lt ib))
         (fun c ic => hG2 _ (Nat.le_of_lt ic))
   · simp at k0; simp [k0, hh] at hs
-termination_by _ => w.rlen - i
-decreasing_by decreasing_with omega
+termination_by w.rlen - i
+decreasing_by all_goals decreasing_with omega
 
 theorem satisfies_naiveEncoding (w : CanonicalPoints) (k : Nat) :
     ¬σHasEmptyKGon k w.toFinset →
