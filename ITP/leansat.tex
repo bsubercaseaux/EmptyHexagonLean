@@ -1,16 +1,16 @@
-This section describes the bridge between mathematical objects and the propositional variables representing them in the context of a CNF formula. 
-Consider the following theorem: 
+This section describes the bridge between mathematical objects and the propositional variables representing them in the context of a CNF formula.
+Consider the following theorem:
 
 \begin{lstlisting}
-theorem EmptyTriangle10TheoremLists 
+theorem EmptyTriangle10TheoremLists
     (pts : List Point) (gp : PtListInGP pts) (h : pts.length = 10) :
     HasEmptyTriangle pts.toFinset
 \end{lstlisting}
 
 % We wish to prove that no list of $10$ points in general position can avoid an empty triangle.
-% Consider the propositional formula $\varphi$ over variables $\orvar_{p, q, r}$, with $1 \leq p  < q < r \leq 10$.  
+% Consider the propositional formula $\varphi$ over variables $\orvar_{p, q, r}$, with $1 \leq p  < q < r \leq 10$.
 % \begin{enumerate}
-%     % \item $\left(\neg \orvar_{p, q, r} \lor \neg \orvar_{p, r, t} \lor \orvar_{p, q, t}\right) \land \left(\orvar_{p, q, r} \lor \orvar_{p, r, t} \lor  \neg \orvar_{p, q, t}\right)$  
+%     % \item $\left(\neg \orvar_{p, q, r} \lor \neg \orvar_{p, r, t} \lor \orvar_{p, q, t}\right) \land \left(\orvar_{p, q, r} \lor \orvar_{p, r, t} \lor  \neg \orvar_{p, q, t}\right)$
 %     % &\left(\neg \orvar_{p, q, r} \lor \neg \orvar_{q, r, t} \lor  \orvar_{p, r, t}\right) \land \left(\orvar_{p, q, r} \lor \orvar_{q, r, t} \lor  \neg \orvar_{p, r, t}\right).
 % \end{enumerate}
 
@@ -27,7 +27,7 @@ theorem EmptyTriangle10TheoremLists
 
 % Given this pipeline, we have two distinct concerns for correctness:
 % \begin{itemize}
-%     \item[(1)] \textbf{Is the CNF formula correct?}    
+%     \item[(1)] \textbf{Is the CNF formula correct?}
 %     We want to formally verify that our ``encoder'' program
 %     generates DIMACS output which
 %     correctly represent the abstract formula we wish to show UNSAT.

@@ -25,7 +25,7 @@ With this we can already state the main theorem of our paper.
 
 \begin{lstlisting}
 theorem hole_6_theorem (pts : List Point) (gp : PointListInGeneralPosition pts)
-    (h : pts.length ≥ 30) : HasConvexEmptyKGon 6 pts.toFinset 
+    (h : pts.length ≥ 30) : HasConvexEmptyKGon 6 pts.toFinset
 \end{lstlisting}
 
 At the root  of the encoding of Heule and Scheucher is the idea that the~\lstinline|ConvexEmptyIn| predicate can be determined by analyzing only triangles. In particular, that a set $s$ of $k$ points in a pointset $S$ form an empty convex $k$-gon if and only if all the ${k choose 3}$ triangles induced by vertices in $s$ are empty with respect to $S$. This is discussed informally in~\cite[Section 3, Eq. 4]{emptyHexagonNumber}.
@@ -33,7 +33,7 @@ Concretely, we prove the following theorem:
 \begin{lstlisting}
 theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
     (sS : ↑s ⊆ S) (sz : 3 ≤ s.card) :
-    ConvexEmptyIn s S ↔ 
+    ConvexEmptyIn s S ↔
     ∀ (t : Finset Point), t.card = 3 → t ⊆ s → ConvexEmptyIn t S
 \end{lstlisting}
 \input{fig_triangulation.tex}
@@ -43,8 +43,8 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
     Let $T = \{t_1, \ldots, t_{{k \choose 3}}\}$ be all the triangles induced by vertices of $s$.
    For the backward direction we will need a \emph{triangulation lemma} stating that the convex hull of $s$ can be partitioned into triangles $P = \{t_i, \ldots, t_j\}$, and $P \subseteq T$.
     To see that if every $t \in T$ is empty w.r.t. $S$ then $s$ is also empty w.r.t. $S$ we can use the contrapositive statement.
-     Indeed, assume $s$ is not empty w.r.t. $S$, there is a point $p \in S \setminus s$ that lies inside the convex hull of $s$. Because $P$ is a partition of the convex hull of $s$, point $p$ must be inside some $t \in P \subseteq T$. 
-     To see convexity, we can reason contrapositively again. If $s$ is not convex, then there is a point $p \in s$ that lies inside the convex hull of $s$, and thus lies inside a triangle $t \in P$. 
+     Indeed, assume $s$ is not empty w.r.t. $S$, there is a point $p \in S \setminus s$ that lies inside the convex hull of $s$. Because $P$ is a partition of the convex hull of $s$, point $p$ must be inside some $t \in P \subseteq T$.
+     To see convexity, we can reason contrapositively again. If $s$ is not convex, then there is a point $p \in s$ that lies inside the convex hull of $s$, and thus lies inside a triangle $t \in P$.
 \end{proof}
 
 The next section shows how boolean variables can be used to encode which triangles are empty w.r.t. a pointset, which as the previous theorem shows, can be used to encode the presence or abscence of $k$-holes.

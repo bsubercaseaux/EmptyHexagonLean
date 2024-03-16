@@ -1,14 +1,14 @@
 Mathematicians are often skeptical of proofs relying on extensive computation.
-A landmark example is the \emph{four-color theorem}, which states that any planar graph can be colored with at most four colors. 
+A landmark example is the \emph{four-color theorem}, which states that any planar graph can be colored with at most four colors.
 In 1879, Alfred Kempe published a proof attempt that was discovered to be incorrect 11 years later by Headwood~\cite{Walters2004ItAT,Wilson2002GraphsCA}.
-% \footnote{The main idea of Kempe's proof was salvaged by Headwood to prove the weaker \emph{five-color theorem}, and it is still a building block in the theory of planar colorings~\cite{Walters2004ItAT}.} 
+% \footnote{The main idea of Kempe's proof was salvaged by Headwood to prove the weaker \emph{five-color theorem}, and it is still a building block in the theory of planar colorings~\cite{Walters2004ItAT}.}
 A full proof was not found until 1976, when Kenneth Appel and Wolfgang Haken used a computer to check the 1\,834 cases that might contain a counterexample~\cite{appelFourColorProblem1978}.
 Their proof was controversial, and small errors were indeed found in their initial calculations~\cite{Walters2004ItAT,Wilson2002GraphsCA}.
 In 2005, Georges Gonthier formalized a full proof of the four-color theorem in the \textsf{Coq} proof assistant~\cite{gonthierFourColourTheorem2008a}, thus laying to rest any lingering doubts about the correctness of the result.
 % To this day, all proofs known for this theorem require the assistance of computers.
 
 The four-color theorem is far from the end of the story when it comes to computer-assisted mathematics.
-An emerging trend is to use SAT solvers (or other automated reasoning tools) to prove mathematical theorems by analyzing finite objects~\cite{avigad2023mathematics}. 
+An emerging trend is to use SAT solvers (or other automated reasoning tools) to prove mathematical theorems by analyzing finite objects~\cite{avigad2023mathematics}.
 To name a few examples,
 Keller's conjecture~\cite{brakensiek2023resolution},
 the packing chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023},
@@ -41,7 +41,7 @@ This raises a fundamental question for computational mathematics:
 
 The main contribution of this article is to provide a formally-verified proof of such a theorem in Lean, thus tackling several aspects of the question above in the particular context of discrete geometry.
 % the context of discrete geometry, addressing different aspects of the question above.
-% Our proof pipeline involves several components, as illustrated in~\Cref{fig:proof-structure} and described in the rest of the paper. 
+% Our proof pipeline involves several components, as illustrated in~\Cref{fig:proof-structure} and described in the rest of the paper.
 All our code is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.
 % \footnote{CC: I'm not sure this characterization is correct. For example, another group of researchers verified in Coq the encoding used in the Pythagorean Triples problem, thus verifying that result. One could say that our contribution is the first \emph{end-to-end} verification, but I don't see how it's inherently distinct from what this other group did with the Pythagorean Triples problem.}
 % BS: Thanks Cayden, you were right.
@@ -117,25 +117,25 @@ which they demonstrated on different puzzles
 As far as verifying SAT encodings in Lean,
 we base our work on that of Codel, Avigad, and Heule~\cite{Cayden}.
 
-\subparagraph*{Lean.} Kickstarted by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015}, the Lean theorem prover has arguably become the most popular for formalizing modern breakthroughs in mathematical research. 
+\subparagraph*{Lean.} Kickstarted by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015}, the Lean theorem prover has arguably become the most popular for formalizing modern breakthroughs in mathematical research.
 On the one hand, the recent success of projects such as the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}, or the proof of~the polynomial Freiman–Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023} has brought significant attention to~Lean. % as an interactive theorem prover.
 On the the other hand, the \textsf{mathlib} project~\cite{The_mathlib_Community_2020} has already cemented the foundations of many areas of mathematics, thus allowing modern results to be formalized much more easily by relying on hundreds of thousands of existing lines of code. In this spirit, we connect our formalization to~\textsf{mathlib} as much as possible.
 
-\subparagraph*{Outline of the paper.} 
+\subparagraph*{Outline of the paper.}
 \Cref{sec:geometry} discusses the basic geometric aspects of the problem.  Then,~\Cref{sec:triple-orientations} is devoted to \emph{triple orientations}, a fundamental tool in computational geometry to discretely represent problems involving an a priori continuous space (i.e., $\mathbb{R}^2$).
- Triple orientations are the basis of Heule and Scheucher's SAT encoding. 
+ Triple orientations are the basis of Heule and Scheucher's SAT encoding.
  Next,~\Cref{sec:properties-of-sigma} proves properties of orientations that reduce the search space,
 and correspond to~\Cref{eq:constraint-4,eq:constraint-5}.
 % Then,~\Cref{sec:empty-triangle} presents how the previous elements are already enough to formalize a SAT-based proof for the \emph{Empty Triangle Theorem}, a much simpler problem involving only triangles.
-The Empty Hexagon Number requires a sophisticated encoding, presented in~\Cref{fig:full-encoding}, for which two main ingredients are required. First,~\Cref{sec:symmetry-breaking} deals with symmetry breaking, proving that one can assume, without loss of generality, that points are in \emph{canonical position}, a definition that includes points being simultaneously sorted from left-to-right and by angle with respect to the leftmost point. 
-%  Namely, that one can assume without loss of generality the following two properties at the same time: (i) points are labeled from left to right without two of them having the same $x$-coordinate, and (ii) the triples $(p_1, p_i, p_j)$ are always oriented counterclockwise for $i < j$. 
+The Empty Hexagon Number requires a sophisticated encoding, presented in~\Cref{fig:full-encoding}, for which two main ingredients are required. First,~\Cref{sec:symmetry-breaking} deals with symmetry breaking, proving that one can assume, without loss of generality, that points are in \emph{canonical position}, a definition that includes points being simultaneously sorted from left-to-right and by angle with respect to the leftmost point.
+%  Namely, that one can assume without loss of generality the following two properties at the same time: (i) points are labeled from left to right without two of them having the same $x$-coordinate, and (ii) the triples $(p_1, p_i, p_j)$ are always oriented counterclockwise for $i < j$.
 Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of Heule and Scheucher, the crucial piece to make the proof of $h(6) = 30$ feasible. Next,~\Cref{sec:leansat} presents the preliminary \textsf{LeanSAT} library, which is used to create a SAT encoding that is provably connected to the geometric properties it describes. We conclude in~\Cref{sec:related-work-and-conclusions} by comparing our work with its closest precedent due to Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}, and discussing the next steps towards the formal verification of other Erd\H{o}s-Szekeres-type problems.
 
 \begin{figure}
   \caption{Encoding based on that of Heule and Scheucher for the Empty Hexagon Number~\cite{emptyHexagonNumber}. Unsatisfiability of the formula below for $n=30$ implies $h(6) \leq 30$, as detailed throughout the paper. }
   \label{fig:full-encoding}
 % \begin{framed}
-  \begin{spreadlines}{16pt} 
+  \begin{spreadlines}{16pt}
 \begin{gather}
 \hfsetfillcolor{green!10}
 \hfsetbordercolor{green!60!black}
@@ -146,12 +146,12 @@ Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of He
   \tikzmarkend{b}\\
 \tikzmarkin{a}(3.5,-0.3)(-0.5,0.5)
 \left(\orvar_{a, b, c} \land \orvar_{a, c, d}\right) \rightarrow \orvar_{a, b, d} \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:constraint-4}\\
-\left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}}\right) \rightarrow \ov{\orvar_{a, b, d}} \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{a}\label{eq:constraint-5}\\ 
+\left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}}\right) \rightarrow \ov{\orvar_{a, b, d}} \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{a}\label{eq:constraint-5}\\
 \hfsetfillcolor{blue!10}
 \hfsetbordercolor{blue!60!black}
 \tikzmarkin{c}(0.45,-0.4)(-0.5,0.5)
     % \orvar_{1, b, c} \quad \text{ for all } 2 \leq b < c \leq n \label{eq:constraint-6}\\
-    \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \succeq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\tikzmarkend{c}\label{eq:constraint-6}\\ 
+    \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \succeq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\tikzmarkend{c}\label{eq:constraint-6}\\
 \hfsetfillcolor{orange!10}
 \hfsetbordercolor{orange!60!black}
 \tikzmarkin{d}(3.235,-0.3)(-0.5,0.5)

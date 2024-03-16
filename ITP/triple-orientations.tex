@@ -116,20 +116,20 @@ theorem σPtInTriangle_iff {a p q r : Point} (gp : InGeneralPosition₄ a p q r)
 % theorem OrientationProperty_HasEmptyTriangle : OrientationProperty HasEmptyTriangle
 
 
-% Let us now discuss the previous steps. First,~\lstinline|(PtInTriangle a p q r)| presents a \emph{ground-truth}  definition for membership in a triangle, in terms of~\textsf{mathlib}'s \lstinline|ConvexHull| definition,  whereas~\lstinline|(σPtInTriangle a p q r)| is based on orientations. 
-Heule and Scheucher used the orientation-based definition~\cite{emptyHexagonNumber}, and as it is common in the area, its equivalence to the \emph{ground-truth} mathematical definition was left implicit. This equivalence, proven in~\lstinline|theorem σPtInTriangle_iff| is not trivial to prove, in particular the forward direction requires reasoning about convex combinations and determinants. 
+% Let us now discuss the previous steps. First,~\lstinline|(PtInTriangle a p q r)| presents a \emph{ground-truth}  definition for membership in a triangle, in terms of~\textsf{mathlib}'s \lstinline|ConvexHull| definition,  whereas~\lstinline|(σPtInTriangle a p q r)| is based on orientations.
+Heule and Scheucher used the orientation-based definition~\cite{emptyHexagonNumber}, and as it is common in the area, its equivalence to the \emph{ground-truth} mathematical definition was left implicit. This equivalence, proven in~\lstinline|theorem σPtInTriangle_iff| is not trivial to prove, in particular the forward direction requires reasoning about convex combinations and determinants.
 Using the previous theorem, we can generalize to $k$-gons as follows.
 \begin{lstlisting}
 def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧
     ∀ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
       σIsEmptyTriangleFor a b c S
-  
+
 theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : PointListInGeneralPosition pts) :
       σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset
 \end{lstlisting}
 
-Then, because \lstinline|σHasEmptyKGon| is ultimately defined in terms of $\sigma$, we can prove 
+Then, because \lstinline|σHasEmptyKGon| is ultimately defined in terms of $\sigma$, we can prove
 \begin{lstlisting}
 lemma OrientationProperty_σHasEmptyKGon : OrientationProperty (σHasEmptyKGon n)
 \end{lstlisting}
@@ -147,14 +147,14 @@ Let us discuss why the previous theorem is relevant, as it plays an important ro
 
 \subsection{Base variables}
 % \subsection{Some key properties of the $\sigma$ function}
-Ranging from the initial work of Peters and Szekeres~\cite{szekeres_peters_2006} to the recent work of Heule and Scheucher~\cite{emptyHexagonNumber}, the base variables are defined as follows. Assuming a list of points $L = (p_1, \ldots, p_n)$, 
+Ranging from the initial work of Peters and Szekeres~\cite{szekeres_peters_2006} to the recent work of Heule and Scheucher~\cite{emptyHexagonNumber}, the base variables are defined as follows. Assuming a list of points $L = (p_1, \ldots, p_n)$,
 we construct boolean variables $\orvar_{a, b, c}$ that represent $\sigma(p, q, r) = 1$, provided $L[a] = p, L[b] = q, L[c] =r$.\footnote{Given that pointsets are assumed to be in general position we have $\neg \orvar_{i,j,k} \iff \sigma(p, q, r) = -1$.} If one were to create a variable $\orvar_{a,b,c}$ for every triple of points $p \neq q \neq r$, that would amount to $n(n-1)(n-2)$ variables for $n$ points. However, the orientations of triples $(p, q, r)$ and $(q, r, p)$ or $(r, q, p)$ contain redundant information: if $p,q,r$ are oriented counterclockwise, then $q,r,p$ and $r,p,q$ are also oriented counterclockwise, whereas $p,r,q$ is oriented clockwise. This is captured by the following two fundamental asymmetries:
 \begin{lstlisting}
   lemma σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
   lemma σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
 \end{lstlisting}
 As a result, it suffices to have variables $\orvar(a, b, c)$ with $1 \leq a < b < c n$, thus reducing the number of variables by a factor of $3! = 6$.
-Next, variables $\cvar_{i;a,b,c}$ correspond to whether point $i$ is inside the triangle $abc$, with $a < b < c$. 
+Next, variables $\cvar_{i;a,b,c}$ correspond to whether point $i$ is inside the triangle $abc$, with $a < b < c$.
 If we assume that points will be sorted from left to right (which will be justified in~\Cref{sec:symmetry-breaking}), then we only need to consider $a < i < c$,
 and by combining the definition of \lstinline|σPtInTriangle| with the \lstinline|σ_perm| lemmas, we obtain precisely the definition of $\cvar_{i;a,b,c}$ of~\Cref{eq:constraint-1,eq:constraint-2}.
 Finally, the variables $\hvar_{a, b, c}$ correspond to whether the triangle $abc$ is empty, and are defined in terms of $\cvar_{i;a,b,c}$ as in~\Cref{eq:constraint-3}.
