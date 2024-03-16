@@ -60,7 +60,6 @@ def no6HoleClauses2 (n : Nat) : PropForm (Var n) :=
     .guard (a.1 + 2 < b.1) fun _ => no6Hole1Below a b c p
   ]
 
-
 def hexagonEncoding (n : Nat) : PropForm (Var n) :=
   .all #[baseKGonEncoding n, no6HoleClauses1 n, no6HoleClauses2 n]
 

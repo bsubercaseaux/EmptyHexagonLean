@@ -310,6 +310,14 @@ theorem σCCWPoints.flatten (H : σCCWPoints (a::b::c::l)) (gp : Point.ListInGen
     · rw [σ_perm₂, ← σ_perm₁, bde de]; decide
     · rw [σ_perm₂, ← σ_perm₁, cde de]; decide
 
+theorem σCCWPoints.convexHexagon
+    (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S) (sp : [a, b, c, d, e, f] ⊆ S) :
+    σHasConvexKGon 6 S.toFinset := by
+  have sp := subperm_of_subset (H.gp.nodup (by show 3 ≤ 6; decide)) sp
+  refine (σHasConvexKGon_iff_HasConvexKGon gp).2
+    ⟨[a, b, c, d, e, f].toFinset, ?_, by simpa [Set.subset_def] using sp.subset, H.convex⟩
+  · exact congrArg length (dedup_eq_self.2 (H.gp.nodup (by show 3 ≤ 6; decide)))
+
 theorem σCCWPoints.emptyHexagon
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S)
     (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
