@@ -106,7 +106,7 @@ who improved on the speed needed to obtain $g(6) = 17$,
 and trustworthiness of this result,
 by replacing bespoke code with a SAT encoding
 and verifying this encoding in \textsf{Isabelle/HOL}.
-We compare this with our work in more detail in~\Cref{sec:related-work-and-conclusions}.
+We compare this with our work in more detail in~\Cref{sec:related-work}.
 The solution to the Pythagorean triples problem
 was verified in the \textsf{Coq} proof assistant
 by Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}.
@@ -129,7 +129,7 @@ and correspond to~\Cref{eq:constraint-4,eq:constraint-5}.
 % Then,~\Cref{sec:empty-triangle} presents how the previous elements are already enough to formalize a SAT-based proof for the \emph{Empty Triangle Theorem}, a much simpler problem involving only triangles.
 The Empty Hexagon Number requires a sophisticated encoding, presented in~\Cref{fig:full-encoding}, for which two main ingredients are required. First,~\Cref{sec:symmetry-breaking} deals with symmetry breaking, proving that one can assume, without loss of generality, that points are in \emph{canonical position}, a definition that includes points being simultaneously sorted from left-to-right and by angle with respect to the leftmost point.
 %  Namely, that one can assume without loss of generality the following two properties at the same time: (i) points are labeled from left to right without two of them having the same $x$-coordinate, and (ii) the triples $(p_1, p_i, p_j)$ are always oriented counterclockwise for $i < j$.
-Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of Heule and Scheucher, the crucial piece to make the proof of $h(6) = 30$ feasible. Next,~\Cref{sec:leansat} presents the preliminary \textsf{LeanSAT} library, which is used to create a SAT encoding that is provably connected to the geometric properties it describes. We conclude in~\Cref{sec:related-work-and-conclusions} by comparing our work with its closest precedent due to Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}, and discussing the next steps towards the formal verification of other Erd\H{o}s-Szekeres-type problems.
+Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of Heule and Scheucher, the crucial piece to make the proof of $h(6) = 30$ feasible. Next,~\Cref{sec:leansat} presents the preliminary \textsf{LeanSAT} library, which is used to create a SAT encoding that is provably connected to the geometric properties it describes. We compare our work with its closest precedent due to Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points} in~\Cref{sec:conclusions}. We conclude in~\Cref{sec:conclusions} by discussing next steps towards the formal verification of other Erd\H{o}s-Szekeres-type problems.
 
 \begin{figure}
   \caption{Encoding based on that of Heule and Scheucher for the Empty Hexagon Number~\cite{emptyHexagonNumber}. Unsatisfiability of the formula below for $n=30$ implies $h(6) \leq 30$, as detailed throughout the paper. }
