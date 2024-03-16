@@ -1,6 +1,5 @@
 import Geo.Naive.Encoding
 import Geo.Hexagon.Encoding
-import Geo.Hexagon.GonEncoding
 import LeanSAT.Solver.Dimacs
 
 open LeanSAT
@@ -17,21 +16,24 @@ def main (args : List String) : IO Unit := do
   let some k := String.toNat? k | help
   let some n := String.toNat? n | help
   let rlen + 1 := n | throw (.userError "n must be positive")
-  if kind == "gon" && k != 6 then
+  let holes ← match kind with
+  | "gon" => pure false
+  | "hole" => pure true
+  | _ => help
+  let (vars, enc) ← if k == 6 then
+    pure <| (Geo.hexagonEncoding rlen holes).toICnf compare
+  else if holes then
+    pure <| (Geo.naiveEncoding k rlen).toICnf compare
+  else
     IO.println "TODO: k-gon encoding only supported for k=6"
     IO.Process.exit 1
-  let (vars, enc) ← if k == 6 && kind == "hole" then
-    pure <| (Geo.hexagonEncoding rlen).toICnf compare
-  else if k == 6 && kind == "gon" then
-    pure <| (Geo.hexagonEncoding' rlen).toICnf compare
-  else
-    pure <| (Geo.naiveEncoding k rlen).toICnf compare
   if let out::_ := rest then
     let h ← IO.FS.Handle.mk out IO.FS.Mode.write
     for v in vars do
       h.putStrLn v.toCode
     Solver.Dimacs.printFormula IO.print enc
   else
+    -- FOR TESTING PURPOSES ONLY, the variable renaming is unverified
     let r4 (a b c d : Nat) : Nat :=
       a + (b-2)*(b-1)/2 + (c-3)*(c-2)*(c-1)/6 + (d-4)*(d-3)*(d-2)*(d-1)/24
     let r3 a b c := r4 a b c 0

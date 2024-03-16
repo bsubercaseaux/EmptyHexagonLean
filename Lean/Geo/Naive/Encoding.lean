@@ -28,7 +28,7 @@ def noKHoleClauses (k n : Nat) : PropForm (Var n) :=
     noKHoleClausesCore n k 0 (fun _ _ => .true) (fun _ => .true)
 
 def naiveEncoding (k n : Nat) : PropForm (Var n) :=
-  .flatCNF <| .all #[baseEncoding n, signotopeClauses2 n, holeDefClauses0 n, noKHoleClauses k n]
+  .flatCNF <| .all #[baseEncoding n true, signotopeClauses2 n, holeDefClauses0 n, noKHoleClauses k n]
 
 def naiveCNF (k rlen : Nat) : ICnf := (Geo.naiveEncoding k rlen |>.toICnf compare).2
 

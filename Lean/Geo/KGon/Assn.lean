@@ -13,17 +13,22 @@ def isCap (w : CanonicalPoints) (a c d : Fin w.rlen) (o : Orientation) :=
   ∃ b, a < b ∧ b < c ∧ c < d ∧
     σ w+[a] w+[b] w+[c] = o ∧ σ w+[b] w+[c] w+[d] = o
 
-def isCapF (w : CanonicalPoints) (a c d : Fin w.rlen) (holes := True) :=
+def isCapF (w : CanonicalPoints) (a c d : Fin w.rlen) (holes := true) :=
   c < d ∧ ∃ b : Fin w.rlen, isCap w a b c .cw ∧
-    σ w+[b] w+[c] w+[d] = .cw ∧ (¬holes ∨ σIsEmptyTriangleFor w+[a] w+[b] w+[d] w.toFinset)
+    σ w+[b] w+[c] w+[d] = .cw ∧ (holes → σIsEmptyTriangleFor w+[a] w+[b] w+[d] w.toFinset)
 
-@[simp] def toPropAssn (w : CanonicalPoints) (holes := True) : Var w.rlen → Prop
+@[simp] def toPropAssn (w : CanonicalPoints) (holes := true) : Var w.rlen → Prop
   | .sigma a b c    => σ w+[a] w+[b] w+[c] = .ccw
   | .inside x a b c => σPtInTriangle w+[x] w+[a] w+[b] w+[c]
-  | .hole₀ a b c    => if holes then σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset else True
+  | .hole₀ a b c    => holes → σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset
   | .cap a c d      => isCap w a c d .cw
   | .cup a c d      => isCap w a c d .ccw
   | .capF a d e     => isCapF w a d e holes
+
+@[simp] theorem eval_holeIf (w : CanonicalPoints) {a b c : Fin w.rlen} :
+    (holeIf holes a b c).eval (w.toPropAssn holes) ↔
+    (holes → σIsEmptyTriangleFor w+[a] w+[b] w+[c] w.toFinset) := by
+  simp [holeIf, Var.hole]; cases holes <;> simp
 
 theorem satisfies_signotopeClauses1 (w : CanonicalPoints) :
     (signotopeClauses1 w.rlen).eval (w.toPropAssn holes) := by
@@ -108,8 +113,7 @@ theorem holeDefs_aux (w : CanonicalPoints) {b c : Fin (rlen w)} {a i : Fin (leng
 theorem satisfies_holeDefClauses0 (w : CanonicalPoints) :
     (holeDefClauses0 w.rlen).eval (w.toPropAssn holes) := by
   simp [holeDefClauses0, σIsEmptyTriangleFor, mem_toFinset_iff]
-  intro b c bc H
-  apply Or.inr
+  intro b c bc H _
   intro i
   refine holeDefs_aux w (Fin.succ_pos _) bc fun i _ ic ib ⟨h1, h2, h3⟩ => ?_
   obtain ib | ib := lt_or_gt_of_ne ib
@@ -124,9 +128,7 @@ theorem satisfies_holeDefClauses0 (w : CanonicalPoints) :
 theorem satisfies_holeDefClauses1 (w : CanonicalPoints) :
     (holeDefClauses1 w.rlen).eval (w.toPropAssn holes) := by
   simp [holeDefClauses1, σIsEmptyTriangleFor, mem_toFinset_iff]
-  intro a b ab c bc H
-  apply Or.inr
-  intro i
+  intro a b ab c bc H _ i
   exact holeDefs_aux w ab.succ₂ bc (fun i h => H i (Fin.succ_lt_succ_iff.1 h))
 
 theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
@@ -150,7 +152,8 @@ theorem satisfies_revLexClauses (w : CanonicalPoints) :
   refine satisfies_revLexClausesCore ?_ rfl rfl (by simp) this
   rintro ⟨a, ha⟩ ⟨_, ha'⟩ ⟨⟩; simp [getElem, points]
 
-theorem satisfies_baseEncoding (w : CanonicalPoints) : (baseEncoding w.rlen).eval (w.toPropAssn holes) := by
+theorem satisfies_baseEncoding (w : CanonicalPoints) :
+    (baseEncoding w.rlen holes).eval (w.toPropAssn holes) := by
   simp [baseEncoding, satisfies_signotopeClauses1, satisfies_insideClauses,
     satisfies_holeDefClauses1, satisfies_revLexClauses]
 
@@ -176,12 +179,12 @@ theorem satisfies_cupDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
   exact σ_prop₁ (w.sorted₄' ab bc cd) (w.gp₄' ab bc cd) h1 h2
 
 theorem satisfies_capFDef (w : CanonicalPoints) {a b c d : Fin w.rlen} (bc : b < c) (cd : c < d) :
-    (capFDef a b c d).eval (w.toPropAssn holes) := by
+    (capFDef holes a b c d).eval (w.toPropAssn holes) := by
   simp [capFDef, isCapF]; intro h1 h2 hh
   exact ⟨cd, _, h1, (w.gp₃' bc cd).σ_iff.1 h2, hh⟩
 
 theorem satisfies_baseKGonEncoding (w : CanonicalPoints) :
-    (baseKGonEncoding w.rlen).eval (w.toPropAssn holes) := by with_reducible
+    (baseKGonEncoding w.rlen holes).eval (w.toPropAssn holes) := by with_reducible
   simp [baseKGonEncoding, capDefClauses1, capDefClauses2, satisfies_baseEncoding]
   refine ⟨
     fun a b ab c bc d cd => ⟨?_, ?_, fun _ => ?_⟩,

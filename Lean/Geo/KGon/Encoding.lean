@@ -98,8 +98,12 @@ def revLexClauses (n : Nat) : PropForm (Var n) :=
   revLexClausesCore (n := n-2) ⟨0, by omega⟩ ⟨n - 3, by omega⟩ .true
     (F := fun ⟨a, _⟩ => Var.sigma ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
 
-def baseEncoding (n : Nat) : PropForm (Var n) :=
-  .all #[signotopeClauses1 n, insideClauses n, holeDefClauses1 n, revLexClauses n]
+def baseEncoding (n : Nat) (holes : Bool) : PropForm (Var n) :=
+  .all #[signotopeClauses1 n, revLexClauses n,
+    .guard holes fun _ => .and (insideClauses n) (holeDefClauses1 n)]
+
+def holeIf (holes : Bool) (a b c : Fin n) : PropForm (Var n) :=
+  .guard holes fun _ => Var.hole a b c
 
 -- cap a c d:    b  c
 --            a ------ d
@@ -120,10 +124,10 @@ def cupDef2 (a c d : Fin n) : PropForm (Var n) :=
 --                .   b
 -- capF a c d:            c      (where a-b-d is a hole)
 --             a ---------- d
-def capFDef (a b c d : Fin n) : PropForm (Var n) :=
-  .imp (.all #[Var.cap a b c, .not (Var.sigma b c d), Var.hole a b d]) (Var.capF a c d)
+def capFDef (holes : Bool) (a b c d : Fin n) : PropForm (Var n) :=
+  .imp (.all #[Var.cap a b c, .not (Var.sigma b c d), holeIf holes a b d]) (Var.capF a c d)
 
-def capDefClauses1 (n : Nat) : PropForm (Var n) :=
+def capDefClauses1 (n : Nat) (holes : Bool) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
   .forAll (Fin n) fun b =>
   .guard (a < b) fun _ =>
@@ -133,7 +137,7 @@ def capDefClauses1 (n : Nat) : PropForm (Var n) :=
   .guard (c < d) fun _ =>
   .flatCNF <| .all #[
     capDef a b c d, cupDef a b c d,
-    .guard (a.1+1 < b.1) fun _ => capFDef a b c d
+    .guard (a.1+1 < b.1) fun _ => capFDef holes a b c d
   ]
 
 def capDefClauses2 (n : Nat) : PropForm (Var n) :=
@@ -144,5 +148,5 @@ def capDefClauses2 (n : Nat) : PropForm (Var n) :=
   .guard (c < d) fun _ =>
   .all #[capDef2 a c d, cupDef2 a c d]
 
-def baseKGonEncoding (n : Nat) : PropForm (Var n) :=
-  .all #[baseEncoding n, capDefClauses1 n, capDefClauses2 n]
+def baseKGonEncoding (n : Nat) (holes : Bool) : PropForm (Var n) :=
+  .all #[baseEncoding n holes, capDefClauses1 n holes, capDefClauses2 n]

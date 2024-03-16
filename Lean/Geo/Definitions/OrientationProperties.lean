@@ -358,11 +358,22 @@ theorem σCCWPoints.emptyHexagon
     refine σCCWPoints.split_emptyShapeIn c [d'] e [a] H cde ?_
     refine (EmptyShapeIn.perm <| @perm_append_comm _ [a, c] [e]).1 hole
 
-theorem σCCWPoints.emptyHexagon'
+def σHasEmptyKGonIf (n : Nat) (holes : Bool) (S : Set Point) : Prop :=
+  if holes then σHasEmptyKGon n S else σHasConvexKGon n S
+
+theorem σCCWPoints.emptyHexagonIf {holes : Bool}
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S)
-    (hole : σIsEmptyTriangleFor b d f S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
-    σHasEmptyKGon 6 S.toFinset :=
-  σCCWPoints.emptyHexagon (H.cycle (l₁ := [a])) gp hole <|
+    (hole : holes → σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
+    σHasEmptyKGonIf 6 holes S.toFinset := by
+  cases holes <;> simp only [σHasEmptyKGonIf]
+  · exact σCCWPoints.convexHexagon H gp sp
+  · exact σCCWPoints.emptyHexagon H gp (hole rfl) sp
+
+theorem σCCWPoints.emptyHexagonIf' {holes : Bool}
+    (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S)
+    (hole : holes → σIsEmptyTriangleFor b d f S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
+    σHasEmptyKGonIf 6 holes S.toFinset :=
+  σCCWPoints.emptyHexagonIf (H.cycle (l₁ := [a])) gp hole <|
     (@perm_append_comm _ _ [a]).subset.trans sp
 
 end Geo
