@@ -9,11 +9,12 @@
         \coordinate (e) at (0.8, -1);
         \coordinate (f) at (2, -1.2);
 
+        \fill[blue, opacity=0.15] (a) -- (b) -- (c) -- (d) -- (f) -- (e) -- cycle;
         \fill[orange, opacity=0.3] (a) -- (b) -- (e) -- (a) -- cycle;
-        \fill[blue, opacity=0.3] (b) -- (f) -- (e) -- (b) -- cycle;
-        \fill[green!60!black, opacity=0.3] (b) -- (c) -- (f) -- (b) -- cycle;
-        \fill[yellow!60!black, opacity=0.3] (c) -- (d) -- (f) -- (c) -- cycle;
-
+        % \fill[blue, opacity=0.3] (b) -- (f) -- (e) -- (b) -- cycle;
+        % \fill[green!60!black, opacity=0.3] (b) -- (c) -- (f) -- (b) -- cycle;
+        % \fill[yellow!60!black, opacity=0.3] (c) -- (d) -- (f) -- (c) -- cycle;
+       
         \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (pA) at (0, 0) {};
         \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (pB) at (1, 1) {};
         \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (pC) at (2.5, 1.3) {};
@@ -31,7 +32,7 @@
 
 
         \end{tikzpicture}
-        \caption{}
+        \caption{}\label{fig:triangulation-a}
     \end{subfigure}
     \begin{subfigure}{0.45\textwidth}
         \begin{tikzpicture}
@@ -41,12 +42,12 @@
             \coordinate (d) at (3, 0);
             \coordinate (e) at (0.8, -1);
             \coordinate (f) at (2, -1.2);
-
-            \fill[orange, opacity=0.3] (a) -- (b) -- (e) -- (a) -- cycle;
-            \fill[blue, opacity=0.3] (b) -- (f) -- (e) -- (b) -- cycle;
+            \fill[blue, opacity=0.15]  (b) -- (c) -- (d) -- (f) -- (e) -- (b) -- cycle;
+            % \fill[orange, opacity=0.3] (a) -- (b) -- (e) -- (a) -- cycle;
+            % \fill[blue, opacity=0.3] (b) -- (f) -- (e) -- (b) -- cycle;
             \fill[green!60!black, opacity=0.3] (b) -- (c) -- (f) -- (b) -- cycle;
-            \fill[yellow!60!black, opacity=0.3] (c) -- (d) -- (f) -- (c) -- cycle;
-
+            % \fill[yellow!60!black, opacity=0.3] (c) -- (d) -- (f) -- (c) -- cycle;
+           
             \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (pA) at (1.75, 0) {};
             \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (pB) at (1, 1) {};
             \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (pC) at (2.5, 1.3) {};
@@ -55,16 +56,14 @@
             \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (pF) at (2, -1.2) {};
 
             % \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (pG) at (0.6, -0.4) {};
-
-
+    
             \draw[thick] (pA) -- (pB) -- (pC) -- (pD) -- (pF) -- (pE) -- (pA);
             % \draw[dashed, thick, red] (pA) -- (pB) -- (pE) -- (pA);
             % \draw[dashed, thick, blue] (pB) -- (pF) -- (pE) -- (pB);
             % \draw[dashed, thick, green!60!black] (pB) -- (pC) -- (pF) -- (pB);
 
-
         \end{tikzpicture}
-        \caption{}
+        \caption{}\label{fig:triangulation-b}
     \end{subfigure}
-    \caption{Illustration of the proof for \lstinline|ConvexEmptyIn.iff_triangles|. The left subfigure shows how a point inside the polygon implies the point is inside one of the triangles of triangulation of its convex hull. The right subfigure shows how non-convexity implies one of the vertices of the polygon will be inside one of the triangles of the convex hull partition.}\label{fig:triangulation}
+    \caption{Illustration of the proof for \lstinline|ConvexEmptyIn.iff_triangles|. The left subfigure shows how a point in $S \setminus s$ that lies inside  $s$ will be inside one of the triangles induced by the convex hull of $s$ (orange triangle).  The right subfigure shows how if $s$ does not hold the $\textsf{ConvexPoints}$ predicate, then a point $a \in s$ will also will be inside one of the triangles induced by the convex hull of $s \setminus \{a\}$.}\label{fig:triangulation}
 \end{figure}
