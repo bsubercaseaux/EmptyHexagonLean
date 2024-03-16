@@ -13,20 +13,20 @@ def isCap (w : CanonicalPoints) (a c d : Fin w.rlen) (o : Orientation) :=
   ∃ b, a < b ∧ b < c ∧ c < d ∧
     σ w+[a] w+[b] w+[c] = o ∧ σ w+[b] w+[c] w+[d] = o
 
-def isCapF (w : CanonicalPoints) (a c d : Fin w.rlen) :=
+def isCapF (w : CanonicalPoints) (a c d : Fin w.rlen) (holes := True) :=
   c < d ∧ ∃ b : Fin w.rlen, isCap w a b c .cw ∧
-    σ w+[b] w+[c] w+[d] = .cw ∧ σIsEmptyTriangleFor w+[a] w+[b] w+[d] w.toFinset
+    σ w+[b] w+[c] w+[d] = .cw ∧ (¬holes ∨ σIsEmptyTriangleFor w+[a] w+[b] w+[d] w.toFinset)
 
-@[simp] def toPropAssn (w : CanonicalPoints) : Var w.rlen → Prop
+@[simp] def toPropAssn (w : CanonicalPoints) (holes := True) : Var w.rlen → Prop
   | .sigma a b c    => σ w+[a] w+[b] w+[c] = .ccw
   | .inside x a b c => σPtInTriangle w+[x] w+[a] w+[b] w+[c]
-  | .hole₀ a b c    => σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset
+  | .hole₀ a b c    => if holes then σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset else True
   | .cap a c d      => isCap w a c d .cw
   | .cup a c d      => isCap w a c d .ccw
-  | .capF a d e     => isCapF w a d e
+  | .capF a d e     => isCapF w a d e holes
 
 theorem satisfies_signotopeClauses1 (w : CanonicalPoints) :
-    (signotopeClauses1 w.rlen).eval w.toPropAssn := by
+    (signotopeClauses1 w.rlen).eval (w.toPropAssn holes) := by
   simp [signotopeClauses1]
   intro i j hij k hjk l hkl
   have s := w.sorted₄' hij hjk hkl
@@ -37,7 +37,7 @@ theorem satisfies_signotopeClauses1 (w : CanonicalPoints) :
     exact σ_prop₄ s gp
 
 theorem satisfies_signotopeClauses2 (w : CanonicalPoints) :
-    (signotopeClauses2 w.rlen).eval w.toPropAssn := by
+    (signotopeClauses2 w.rlen).eval (w.toPropAssn holes) := by
   simp [signotopeClauses2]
   intro i j hij k hjk l hkl
   have s := w.sorted₄' hij hjk hkl
@@ -75,7 +75,7 @@ theorem insideDefs_aux₂ {a b x c : Point} : Sorted₄ a b x c → InGenPos₄ 
     rw [σ_prop₃ sorted gp h₁ h₄] at h₃
     contradiction
 
-theorem satisfies_insideClauses (w : CanonicalPoints) : (insideClauses w.rlen).eval w.toPropAssn := by
+theorem satisfies_insideClauses (w : CanonicalPoints) : (insideClauses w.rlen).eval (w.toPropAssn holes) := by
   simp [insideClauses]
   intro a b hab c hbc x
   constructor
@@ -106,9 +106,11 @@ theorem holeDefs_aux (w : CanonicalPoints) {b c : Fin (rlen w)} {a i : Fin (leng
   · exact H i ai (Fin.succ_lt_succ_iff.1 ic) (mt Fin.succ_inj.2 ib) tri
 
 theorem satisfies_holeDefClauses0 (w : CanonicalPoints) :
-    (holeDefClauses0 w.rlen).eval w.toPropAssn := by
+    (holeDefClauses0 w.rlen).eval (w.toPropAssn holes) := by
   simp [holeDefClauses0, σIsEmptyTriangleFor, mem_toFinset_iff]
-  intro b c bc H i
+  intro b c bc H
+  apply Or.inr
+  intro i
   refine holeDefs_aux w (Fin.succ_pos _) bc fun i _ ic ib ⟨h1, h2, h3⟩ => ?_
   obtain ib | ib := lt_or_gt_of_ne ib
   · rw [σ_perm₂] at h1
@@ -120,9 +122,11 @@ theorem satisfies_holeDefClauses0 (w : CanonicalPoints) :
     cases h3
 
 theorem satisfies_holeDefClauses1 (w : CanonicalPoints) :
-    (holeDefClauses1 w.rlen).eval w.toPropAssn := by
+    (holeDefClauses1 w.rlen).eval (w.toPropAssn holes) := by
   simp [holeDefClauses1, σIsEmptyTriangleFor, mem_toFinset_iff]
-  intro a b ab c bc H i
+  intro a b ab c bc H
+  apply Or.inr
+  intro i
   exact holeDefs_aux w ab.succ₂ bc (fun i h => H i (Fin.succ_lt_succ_iff.1 h))
 
 theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
@@ -138,7 +142,7 @@ theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
   · exact hacc
 
 theorem satisfies_revLexClauses (w : CanonicalPoints) :
-    (revLexClauses w.rlen).eval w.toPropAssn := by
+    (revLexClauses w.rlen).eval (w.toPropAssn holes) := by
   simp [revLexClauses, length, points]
   intro h4w
   have := w.lex (by omega)
@@ -146,38 +150,38 @@ theorem satisfies_revLexClauses (w : CanonicalPoints) :
   refine satisfies_revLexClausesCore ?_ rfl rfl (by simp) this
   rintro ⟨a, ha⟩ ⟨_, ha'⟩ ⟨⟩; simp [getElem, points]
 
-theorem satisfies_baseEncoding (w : CanonicalPoints) : (baseEncoding w.rlen).eval w.toPropAssn := by
+theorem satisfies_baseEncoding (w : CanonicalPoints) : (baseEncoding w.rlen).eval (w.toPropAssn holes) := by
   simp [baseEncoding, satisfies_signotopeClauses1, satisfies_insideClauses,
     satisfies_holeDefClauses1, satisfies_revLexClauses]
 
 theorem satisfies_capDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
-    (ab : a < b) (bc : b < c) (cd : c < d) : (capDef a b c d).eval w.toPropAssn := by
+    (ab : a < b) (bc : b < c) (cd : c < d) : (capDef a b c d).eval (w.toPropAssn holes) := by
   simp [capDef, isCap]; intro h1 h2
   exact ⟨_, ab, bc, cd, (w.gp₃' ab bc).σ_iff.1 h1, (w.gp₃' bc cd).σ_iff.1 h2⟩
 
 theorem satisfies_capDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
-    (capDef2 a c d).eval w.toPropAssn := by
+    (capDef2 a c d).eval (w.toPropAssn holes) := by
   simp [capDef2, isCap]; intro b ab bc cd h1 h2
   have gp := w.gp₄' ab bc cd
   exact gp.gp₃.σ_iff.2 <| σ_prop₃ (w.sorted₄' ab bc cd) gp h1 h2
 
 theorem satisfies_cupDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
-    (ab : a < b) (bc : b < c) (cd : c < d) : (cupDef a b c d).eval w.toPropAssn := by
+    (ab : a < b) (bc : b < c) (cd : c < d) : (cupDef a b c d).eval (w.toPropAssn holes) := by
   simp [cupDef, isCap]; intro h1 h2
   exact ⟨_, ab, bc, cd, h1, h2⟩
 
 theorem satisfies_cupDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
-    (cupDef2 a c d).eval w.toPropAssn := by
+    (cupDef2 a c d).eval (w.toPropAssn holes) := by
   simp [cupDef2, isCap]; intro b ab bc cd h1 h2
   exact σ_prop₁ (w.sorted₄' ab bc cd) (w.gp₄' ab bc cd) h1 h2
 
 theorem satisfies_capFDef (w : CanonicalPoints) {a b c d : Fin w.rlen} (bc : b < c) (cd : c < d) :
-    (capFDef a b c d).eval w.toPropAssn := by
+    (capFDef a b c d).eval (w.toPropAssn holes) := by
   simp [capFDef, isCapF]; intro h1 h2 hh
   exact ⟨cd, _, h1, (w.gp₃' bc cd).σ_iff.1 h2, hh⟩
 
 theorem satisfies_baseKGonEncoding (w : CanonicalPoints) :
-    (baseKGonEncoding w.rlen).eval w.toPropAssn := by with_reducible
+    (baseKGonEncoding w.rlen).eval (w.toPropAssn holes) := by with_reducible
   simp [baseKGonEncoding, capDefClauses1, capDefClauses2, satisfies_baseEncoding]
   refine ⟨
     fun a b ab c bc d cd => ⟨?_, ?_, fun _ => ?_⟩,

@@ -27,6 +27,7 @@ theorem satisfies_no6Hole4Above {w : CanonicalPoints} (hw : ¬σHasEmptyKGon 6 w
     (no6Hole4Above a d e f).eval w.toPropAssn := by
   simp [no6Hole4Above]; intro ⟨de, c, ⟨b, ab, bc, cd, abc, bcd⟩, cde, ace⟩
   refine (w.gp₃' de ef).σ_iff'.1 fun def_ => ?_
+  rw [not_true_eq_false, false_or] at ace
   refine hw <| (σCCWPoints.cycle (l₂ := [_, _, _, _, _]) ?_).emptyHexagon'
     w.gp ace.perm₂.perm₁.perm₂ (subset_map' w [f, e, d, c, b, a])
   exact Arc.join (l₁ := []) (l₂ := [_,_,_,_])
@@ -47,6 +48,7 @@ theorem satisfies_no6Hole1Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGon 6 w
     {a d e f : Fin w.rlen} (ae : a < e) (ef : e < f) :
     (no6Hole1Below a d f e).eval w.toPropAssn := by
   simp [no6Hole1Below]; intro ⟨df, c, ⟨b, ab, bc, cd, abc, bcd⟩, cdf, acf⟩ aef
+  rw [not_true_eq_false, false_or] at acf
   have := Arc.join (l₁ := [_]) (l₂ := [_,_,_])
     (.cons' ae aef <| .one' ef)
     (.cons' ab abc <| .cons' bc bcd <| .cons' cd cdf <| .one' df)
