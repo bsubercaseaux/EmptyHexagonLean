@@ -125,7 +125,7 @@ def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
     ∀ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
       σIsEmptyTriangleFor a b c S
 
-theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : PointListInGeneralPosition pts) :
+theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : Point.ListInGenPos pts) :
       σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset
 \end{lstlisting}
 
