@@ -1,10 +1,10 @@
-We now prove that, assuming points will be sorted left to right (which is justified in~\Cref{sec:symmetry-breaking}), then the clauses in~\Cref{eq:constraint-4,eq:constraint-5} are justified.
+We now prove that, assuming points will be sorted left to right (which is justified in~\Cref{sec:symmetry-breaking}), then the clauses in~\Cref{eq:signotopeClauses11,eq:signotopeClauses12} are justified.
 Consider four points $p, q, r, s$ that are sorted from left to right. If $p, q, r$ are oriented counterclockwise, and $q, r, s$ are oriented counterclockwise as well, then it follows that $p, r, s$ must be oriented counterclockwise too (see~\Cref{fig:orientation-implication}). Different \emph{$\sigma$-implication-properties} of this form are used to reduce the search space in SAT encodings~\cite{emptyHexagonNumber,scheucherTwoDisjoint5holes2020,subercaseaux2023minimizing, szekeres_peters_2006}, as they can be easily added in clausal form:
 \begin{align}
   &\left(\neg \orvar_{a, b, c} \lor \neg \orvar_{a, c, d} \lor \orvar_{a, b, d}\right) \land \left(\orvar_{a, b, c} \lor \orvar_{a, c, d} \lor  \neg \orvar_{a, b, d}\right)
 \end{align}
 
-We prove these properties of the $\sigma$ function, justifying the addition of~\Cref{eq:constraint-4,eq:constraint-5}, as well as other similar properties that are useful for other proofs, even if not explicitly added to the encoding.
+We prove these properties of the $\sigma$ function, justifying the addition of~\Cref{eq:signotopeClauses11,eq:signotopeClauses12}, as well as other similar properties that are useful for other proofs, even if not explicitly added to the encoding.
 \begin{lstlisting}
 theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGenPos₄ p q r s) :
     σ p q r = ccw → σ q r s = ccw → σ p r s = ccw

@@ -156,8 +156,8 @@ we construct boolean variables $\orvar_{a, b, c}$ that represent $\sigma(p, q, r
 As a result, it suffices to have variables $\orvar(a, b, c)$ with $1 \leq a < b < c n$, thus reducing the number of variables by a factor of $3! = 6$.
 Next, variables $\cvar_{i;a,b,c}$ correspond to whether point $i$ is inside the triangle $abc$, with $a < b < c$.
 If we assume that points will be sorted from left to right (which will be justified in~\Cref{sec:symmetry-breaking}), then we only need to consider $a < i < c$,
-and by combining the definition of \lstinline|σPtInTriangle| with the \lstinline|σ_perm| lemmas, we obtain precisely the definition of $\cvar_{i;a,b,c}$ of~\Cref{eq:constraint-1,eq:constraint-2}.
-Finally, the variables $\hvar_{a, b, c}$ correspond to whether the triangle $abc$ is empty, and are defined in terms of $\cvar_{i;a,b,c}$ as in~\Cref{eq:constraint-3}.
+and by combining the definition of \lstinline|σPtInTriangle| with the \lstinline|σ_perm| lemmas, we obtain precisely the definition of $\cvar_{i;a,b,c}$ of~\Cref{eq:insideClauses1,eq:insideClauses2}.
+Finally, the variables $\hvar_{a, b, c}$ correspond to whether the triangle $abc$ is empty, and are defined in terms of $\cvar_{i;a,b,c}$ as in~\Cref{eq:holeDefClauses1}.
 
 
 

@@ -8,17 +8,17 @@ namespace Geo
 
 open LeanSAT Var
 
--- a ----------- d
---   ·         c
---        b
-def no6Hole3Below (holes : Bool) (a b c d : Fin n) : PropForm (Var n) :=
-  .not <| .all #[holeIf holes a b d, Var.cup a b c, Var.sigma b c d]
+-- a ----------- e
+--   ·         d
+--        c
+def no6Hole3Below (holes : Bool) (a c d e : Fin n) : PropForm (Var n) :=
+  .not <| .all #[Var.cup a c d, Var.sigma c d e, holeIf holes a c e]
 
---       .  b
---   ·         c
--- a ----------- d
-def no6Hole4Above (a b c d : Fin n) : PropForm (Var n) :=
-  .imp (Var.capF a b c) (Var.sigma b c d)
+--       .  d
+--   ·         e
+-- a ----------- f
+def no6Hole4Above (a d e f : Fin n) : PropForm (Var n) :=
+  .not <| .all #[Var.capF a d e, .not (Var.sigma d e f)]
 
 def no6HoleClauses1 (n : Nat) (holes : Bool) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
@@ -33,19 +33,19 @@ def no6HoleClauses1 (n : Nat) (holes : Bool) : PropForm (Var n) :=
     .guard (a.1+2 < b.1) fun _ => no6Hole4Above a b c d
   ]
 
---     ·   p
--- a --------- c
---     ·   b
-def no6Hole2Below (holes : Bool) (a b c p : Fin n) : PropForm (Var n) :=
-  .not <| .all #[Var.cup a b c, Var.cap a p c,
-    .guard holes fun _ => if b < p then Var.hole a b p else Var.hole a p b]
+--     ·   c'
+-- a --------- d
+--     ·   c
+def no6Hole2Below (holes : Bool) (a c d c' : Fin n) : PropForm (Var n) :=
+  .not <| .all #[Var.cup a c d, Var.cap a c' d,
+    .guard holes fun _ => if c < c' then Var.hole a c c' else Var.hole a c' c]
 
 --        ·
---   ·         b
--- a ----------- c
---         p
-def no6Hole1Below (a b c p : Fin n) : PropForm (Var n) :=
-  .not <| .all #[Var.capF a b c, Var.sigma a p c]
+--   ·         d
+-- a ----------- e
+--         b
+def no6Hole1Below (a d e b : Fin n) : PropForm (Var n) :=
+  .not <| .all #[Var.capF a d e, Var.sigma a b e]
 
 def no6HoleClauses2 (n : Nat) (holes : Bool) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>

@@ -126,7 +126,7 @@ On the the other hand, the \textsf{mathlib} project~\cite{The_mathlib_Community_
 \Cref{sec:geometry} discusses the basic geometric aspects of the problem.  Then,~\Cref{sec:triple-orientations} is devoted to \emph{triple orientations}, a fundamental tool in computational geometry to discretely represent problems involving an a priori continuous space (i.e., $\mathbb{R}^2$).
  Triple orientations are the basis of Heule and Scheucher's SAT encoding.
  Next,~\Cref{sec:properties-of-sigma} proves properties of orientations that reduce the search space,
-and correspond to~\Cref{eq:constraint-4,eq:constraint-5}.
+and correspond to~\Cref{eq:signotopeClauses11,eq:signotopeClauses12}.
 % Then,~\Cref{sec:empty-triangle} presents how the previous elements are already enough to formalize a SAT-based proof for the \emph{Empty Triangle Theorem}, a much simpler problem involving only triangles.
 The Empty Hexagon Number requires a sophisticated encoding, presented in~\Cref{fig:full-encoding}, for which two main ingredients are required. First,~\Cref{sec:symmetry-breaking} deals with symmetry breaking, proving that one can assume, without loss of generality, that points are in \emph{canonical position}, a definition that includes points being simultaneously sorted from left-to-right and by angle with respect to the leftmost point.
 %  Namely, that one can assume without loss of generality the following two properties at the same time: (i) points are labeled from left to right without two of them having the same $x$-coordinate, and (ii) the triples $(p_1, p_i, p_j)$ are always oriented counterclockwise for $i < j$.
@@ -141,32 +141,32 @@ Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of He
 \hfsetfillcolor{green!10}
 \hfsetbordercolor{green!60!black}
 \tikzmarkin{b}(4.25,-0.9)(-0.5,0.5)
-  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{a, i, b}}  \right)\right) \text{ for all } 2 \leq a < i < b < c \leq n\label{eq:constraint-1}\\
-  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{b, i, c}}  \right)\right) \text{ for all } 2 \leq a < b < i < c \leq n\label{eq:constraint-2}\\
-  \bigwedge_{\substack{a < i < c\\ i \neq b}} \ov{\cvar_{i; a,b,c}} \rightarrow \hvar_{a, b, c} \quad \text{ for all } 2 \leq a < b < c \leq n\label{eq:constraint-3}
+  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{a, i, b}}  \right)\right) \text{ for all } 2 \leq a < i < b < c \leq n\label{eq:insideClauses1}\\
+  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{b, i, c}}  \right)\right) \text{ for all } 2 \leq a < b < i < c \leq n\label{eq:insideClauses2}\\
+  \Big(\bigwedge_{\substack{a < i < c\\ i \neq b}} \ov{\cvar_{i; a,b,c}}\Big) \rightarrow \hvar_{a, b, c} \quad \text{ for all } 2 \leq a < b < c \leq n\label{eq:holeDefClauses1}
   \tikzmarkend{b}\\
 \tikzmarkin{a}(3.5,-0.3)(-0.5,0.5)
-\left(\orvar_{a, b, c} \land \orvar_{a, c, d}\right) \rightarrow \orvar_{a, b, d} \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:constraint-4}\\
-\left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}}\right) \rightarrow \ov{\orvar_{a, b, d}} \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{a}\label{eq:constraint-5}\\
+\left(\orvar_{a, b, c} \land \orvar_{a, c, d}\right) \rightarrow \orvar_{a, b, d} \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:signotopeClauses11}\\
+\left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}}\right) \rightarrow \ov{\orvar_{a, b, d}} \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{a}\label{eq:signotopeClauses12}\\
 \hfsetfillcolor{blue!10}
 \hfsetbordercolor{blue!60!black}
 \tikzmarkin{c}(0.45,-0.4)(-0.5,0.5)
-    % \orvar_{1, b, c} \quad \text{ for all } 2 \leq b < c \leq n \label{eq:constraint-6}\\
-    \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \succeq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\tikzmarkend{c}\label{eq:constraint-6}\\
+    % \orvar_{1, b, c} \quad \text{ for all } 2 \leq b < c \leq n \label{eq:revLexClauses}\\
+    \left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \succeq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\tikzmarkend{c}\label{eq:revLexClauses}\\
 \hfsetfillcolor{orange!10}
 \hfsetbordercolor{orange!60!black}
 \tikzmarkin{d}(3.235,-0.3)(-0.5,0.5)
-  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:constraint-7}\\
-  \left(\uvar_{a,b,c} \land \ov{\orvar_{b,c,d}} \land \hvar_{a,b,d}\right)\rightarrow \ufvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n,\; a+1<b\label{eq:constraint-8}\\
-  \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{d}\label{eq:constraint-9}\\
+  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:capDef}\\
+  \left(\uvar_{a,b,c} \land \ov{\orvar_{b,c,d}} \land \hvar_{a,b,d}\right)\rightarrow \ufvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n,\; a+1<b\label{eq:capFDef}\\
+  \left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \tikzmarkend{d}\label{eq:cupDef}\\
 \hfsetfillcolor{red!10}
 \hfsetbordercolor{red!60!black}
 \tikzmarkin{e}(3.6,-0.5)(-0.5,0.5)
-  \ov{\ufvar_{a,d,e}} \lor \ov{\orvar_{a, b, e}} \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e\label{eq:constraint-10}\\
-  \ov{\ufvar_{a,d,e}} \lor \orvar_{d, e, f} \quad \text { for all } 2 \leq a < d < e < f\leq n\label{eq:constraint-11}\\
-  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c,c'}} \quad \text{ for all } 2 \leq a < c < c' < d \leq n\label{eq:constraint-12}\\
-  \ov{\uvar_{a,c,d}} \lor \ov{\vvar_{a, c', d}} \lor \ov{\hvar_{a,c',c}} \quad \text{ for all } 2 \leq a < c' < c < d \leq n\label{eq:constraint-13}\\
-  \ov{\vvar_{a,c,d}} \lor \ov{\orvar_{c, d, e}} \lor \ov{\hvar_{a,c,e}} \quad \text{ for all } 2 \leq a < c < d < e \leq n\label{eq:constraint-14x}
+  \neg(\ufvar_{a,d,e} \land \orvar_{a, b, e}) \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e\label{eq:no6Hole1Below}\\
+  \neg(\ufvar_{a,d,e} \land \ov{\orvar_{d, e, f}}) \quad \text { for all } 2 \leq a < d < e < f\leq n\label{eq:no6Hole4Above}\\
+  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c,c'}) \quad \text{ for all } 2 \leq a < c < c' < d \leq n\label{eq:no6Hole2Below1}\\
+  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c',c}) \quad \text{ for all } 2 \leq a < c' < c < d \leq n\label{eq:no6Hole2Below2}\\
+  \neg(\vvar_{a,c,d} \land \orvar_{c, d, e} \land \hvar_{a,c,e}) \quad \text{ for all } 2 \leq a < c < d < e \leq n\label{eq:no6Hole3Below}
 \tikzmarkend{e}
   \end{gather}
 \end{spreadlines}

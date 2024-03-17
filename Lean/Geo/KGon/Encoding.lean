@@ -17,9 +17,9 @@ def signotopeClauses1 (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun d =>
   .guard (c < d) fun _ =>
   .all #[
-    -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d} -- 1.2
+    -- (s{a, b, c} ∧ s{a, c, d}) → s{a, b, d} -- 1.1
     .imp (.and (sigma a b c) (sigma a c d)) (sigma a b d),
-    -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d} -- 1.1
+    -- (!s{a, b, c} ∧ !s{a, c, d}) → !s{a, b, d} -- 1.2
     .imp (.and (.not (sigma a b c)) (.not (sigma a c d))) (.not (sigma a b d))
   ]
 
@@ -33,9 +33,9 @@ def signotopeClauses2 (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun d =>
   .guard (c < d) fun _ =>
   .all #[
-    -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d} -- 2.2
+    -- (s{a, b, c} ∧ s{b, c, d}) → s{a, c, d} -- 2.1
     .imp (.and (sigma a b c) (sigma b c d)) (sigma a c d),
-    -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d} -- 2.1
+    -- (!s{a, b, c} ∧ !s{b, c, d}) → !s{a, c, d} -- 2.2
     .imp (.and (.not (sigma a b c)) (.not (sigma b c d))) (.not (sigma a c d))
   ]
 
@@ -46,19 +46,19 @@ def insideClauses (n : Nat) : PropForm (Var n) :=
   .guard (a < b) fun _ =>
   .forAll (Fin n) fun c =>
   .guard (b < c) fun _ =>
-  .forAll (Fin n) fun x =>
+  .forAll (Fin n) fun i =>
   .flatCNF <| .all #[
     -- a < x < b
-    .guard (a < x ∧ x < b) fun _ =>
+    .guard (a < i ∧ i < b) fun _ =>
       -- NOTE(Bernardo): Each of those should be expressible as 8 clauses or so
-      -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{a, x, b} ↔ s{a, b, c}))
-      .imp (inside x a b c) (
-        .and (.iff (sigma a b c) (sigma a x c)) (.iff (.not (sigma a x b)) (sigma a b c)))
-  , -- b < x < c
-    .guard (b < x ∧ x < c) fun _ =>
-      -- I{x, a, b, c} ↔ ((s{a, b, c} ↔ s{a, x, c}) ∧ (!s{b, x, c} ↔ s{a, b, c}))
-      .imp (inside x a b c) (
-        .and (.iff (sigma a b c) (sigma a x c)) (.iff (.not (sigma b x c)) (sigma a b c)))
+      -- I{i, a, b, c} ↔ ((s{a, b, c} ↔ s{a, i, c}) ∧ (!s{a, i, b} ↔ s{a, b, c}))
+      .imp (inside i a b c) (
+        .and (.iff (sigma a b c) (sigma a i c)) (.iff (sigma a b c) (.not (sigma a i b))))
+  , -- b < i < c
+    .guard (b < i ∧ i < c) fun _ =>
+      -- I{i, a, b, c} ↔ ((s{a, b, c} ↔ s{a, i, c}) ∧ (!s{b, i, c} ↔ s{a, b, c}))
+      .imp (inside i a b c) (
+        .and (.iff (sigma a b c) (sigma a i c)) (.iff (sigma a b c) (.not (sigma b i c))))
   ]
 
 def holeDefClauses0 (n : Nat) : PropForm (Var n) :=
@@ -78,9 +78,9 @@ def holeDefClauses1 (n : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun c =>
   .guard (b < c) fun _ =>
   .flatCNF <| .imp
-    (.forAll (Fin n) fun x =>
-      .guard (a < x ∧ x < c ∧ x ≠ b) fun _ =>
-      .not (Var.inside x a b c))
+    (.forAll (Fin n) fun i =>
+      .guard (a < i ∧ i < c ∧ i ≠ b) fun _ =>
+      .not (Var.inside i a b c))
     (Var.hole a b c)
 
 def revLexClausesCore (F : Fin n → PropForm α) (a b : Fin n) (acc : PropForm α) : PropForm α :=
