@@ -1,50 +1,40 @@
-Mathematicians are often skeptical of proofs relying on extensive computation.
-A landmark example is the \emph{four-color theorem}, which states that any planar graph can be colored with at most four colors.
-In 1879, Alfred Kempe published a proof attempt that was discovered to be incorrect 11 years later by Headwood~\cite{Walters2004ItAT,Wilson2002GraphsCA}.
-% \footnote{The main idea of Kempe's proof was salvaged by Headwood to prove the weaker \emph{five-color theorem}, and it is still a building block in the theory of planar colorings~\cite{Walters2004ItAT}.}
-A full proof was not found until 1976, when Kenneth Appel and Wolfgang Haken used a computer to check the 1\,834 cases that might contain a counterexample~\cite{appelFourColorProblem1978}.
-Their proof was controversial, and small errors were indeed found in their initial calculations~\cite{Walters2004ItAT,Wilson2002GraphsCA}.
-In 2005, Georges Gonthier formalized a full proof of the four-color theorem in the \textsf{Coq} proof assistant~\cite{gonthierFourColourTheorem2008a}, thus laying to rest any lingering doubts about the correctness of the result.
-% To this day, all proofs known for this theorem require the assistance of computers.
-
-The four-color theorem is far from the end of the story when it comes to computer-assisted mathematics.
-An emerging trend is to use SAT solvers (or other automated reasoning tools) to prove mathematical theorems by analyzing finite objects~\cite{avigad2023mathematics}.
-To name a few examples,
+Mathematicians are skeptical of proofs relying on extensive computation.
+However, there are many mathematically-interesting theorems that have been resolved by computation.
+Some examples include the proofs of
 Keller's conjecture~\cite{brakensiek2023resolution},
 the packing chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023},
 the Pythagorean triples problem~\cite{Heule_2016},
 Lam's problem~\cite{21bright_sat_based_resolution_lams_problem},
-and one case of the Erd\H{o}s discrepancy conjecture~\cite{konev2014sat}
-were all resolved or confirmed using SAT solvers.
-All such SAT-based results follow a common structure. To show that a mathematical theorem $\mathcal{T}$ holds, one proves the following:
+and one case of the Erd\H{o}s discrepancy conjecture~\cite{konev2014sat}.
 
-\begin{enumerate}
-  \item (\textbf{Reduction Theorem}) There is a finite object $\mathcal{O}$ such that either (\emph{positive case}) if $\mathcal{O}$ exists then $\mathcal{T}$ holds, or (\emph{negative case}) if $\mathcal{O}$ does not exist then $\mathcal{T}$ holds. %\footnote{Note that $\mathcal{T}$ can be a statement concerning infinite objects, as for example in the case of Keller's conjecture~\cite{brakensiek2023resolution}.}
-  \item (\textbf{Encoding Theorem}) There is a CNF formula $\varphi_{\mathcal{O}}$ such that either (\emph{positive case}) if $\varphi_{\mathcal{O}}$ is satisfiable then $\mathcal{O}$ exists, or (\emph{negative case}) if $\varphi_{\mathcal{O}}$ is unsatisfiable then $\mathcal{O}$ does not exist.
-  \item (\textbf{SAT Result}) In the \emph{positive case}, a SAT solver finds a satisfying assignment for $\varphi_{\mathcal{O}}$, and in the \emph{negative case}, a SAT solver finds that $\varphi_{\mathcal{O}}$ is unsatisfiable.
-\end{enumerate}
+All of these proofs follow the same structure:
+\begin{itemize}
+  \item[(i)] Reduce the mathematical theorem to an instance~$P$ of the boolean satisfiability problem (SAT).
+  \item[(ii)] Determine that $P$ has no satisfying truth assignment.\footnote{
+    A variant of this procedure uses \emph{satisfying assignments} for $P$ to construct explicit witnesses for the original theorem, but we focus on the unsatisfiable case.}
+\end{itemize}
 
-% Unfortunately, the formula $\varphi_{\mathcal{O}}$ concerning the existence of $\mathcal{O}$ is often too large or computationally hard to be solved directly, so a fourth step is added to the above method: a \textbf{Re-encoding Theorem} showing that $\varphi_{\mathcal{O}}$ is equisatisfiable with a simpler formula $\phi_{\mathcal{O}}$.
-% All the examples we mentioned above add this step, and so will we.
-% Furthermore,
-% One of the benefits of using a SAT solver for mathematical proofs is that in the \emph{positive case}, it is usually possible to construct the desired object $\mathcal{O}$ from a satisfying assignment to $\phi_{\mathcal{O}}$, and then by exhibiting $\mathcal{O}$, the correctness of theorem $\mathcal{T}$ can be easily verified by humans.
-It is worth noting that the \emph{negative case} of SAT-based mathematical proofs presents a particular challenge for human trust: the unsatisfiability proofs emitted by SAT solvers are usually too large for human verification, and depend crucially on the correctness of the encoding.\footnote{In the positive case, the correctness of the encoding is not even required, as an incorrect encoding might still lead to obtaining a concrete object $\mathcal{O}$ that satisfies the desired properties, proving the intended theorem regardless.}
-% \todo[inline]{CC: I don't like how this paragraph is structured. The negative case isn't inherently \emph{harder}. Instead, the method of verifying the overall result is different: rather than constructing an actual object we can see or compute on, we have to rely on a non-existence result. Thus, the reduction must be correct, as errors can't be caught the same way they can be in a physical construction.\\ BS: I disagree; the NP vs coNP asymmetry is exactly about how easy it is to convince a verifier of existence vs. non-existence results.}
-In particular, the proof by Heule and Scheucher for the \emph{Empty Hexagon Number} uses 180 terabytes in the \textsf{LRAT} format, and around 80 terabytes in the \textsf{DRAT} format~\cite{emptyHexagonNumber}. Most of the other SAT-based proofs mentioned above result in even larger proofs~\cite{Heule_2016,lambTwohundredterabyteMathsProof2016,heule2017schur,Subercaseaux_Heule_2023}.
-% For example, the resolution of the Boolean Pythagorean triples problem required an unsatisfiability proof of 200 terabytes~\cite{Heule_2016,lambTwohundredterabyteMathsProof2016}, and the proof of Schur's number five required 2 petabytes~\cite{heule2017schur}.
-This raises a fundamental question for computational mathematics:
-\begin{center}
-  \emph{How can we enhance trust for a theorem $\mathcal{T}$ that relies on a very long unsatisfiability proof?}
-\end{center}
+Formal methods researchers have created methods and tools for ensuring the correctness of step (ii).
+Modern SAT solvers produce proofs of unsatisfiability in a formal proof system,
+such as DRAT~\cite{drat-trim14},
+that can be checked with verified proof checkers,
+such as \texttt{cake\_lpr}~\cite{tanVerifiedPropagationRedundancy2023}.
+Yet in the literature, less scrutiny has been applied to the correctness of step (i),
+leaving room for doubt that any results relying on such reduction arguments are correct.
 
-% \input{proof-structure-fig.tex}
+A recent result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
+They resolve a variant of the Happy Ending Problem,
+in particular that every set of 30 points in general position contains an empty convex hexagon.
+Their proof relies on a complicated reduction to SAT
+involving numerous nontrivial geometric optimizations and symmetry-breaking arguments.
 
-The main contribution of this article is to provide a formally-verified proof of such a theorem in Lean, thus tackling several aspects of the question above in the particular context of discrete geometry.
-% the context of discrete geometry, addressing different aspects of the question above.
-% Our proof pipeline involves several components, as illustrated in~\Cref{fig:proof-structure} and described in the rest of the paper.
-All our code is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.
-% \footnote{CC: I'm not sure this characterization is correct. For example, another group of researchers verified in Coq the encoding used in the Pythagorean Triples problem, thus verifying that result. One could say that our contribution is the first \emph{end-to-end} verification, but I don't see how it's inherently distinct from what this other group did with the Pythagorean Triples problem.}
-% BS: Thanks Cayden, you were right.
+In this paper, we prove their result in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}
+by connecting existing geometric definitions
+in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2020}.
+to the unsatisfiability of a particular SAT instance.
+This sets a new standard for verifying results which rely on extensive computation.
+
+Our formalization is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.
 
 \subparagraph*{The Empty Hexagon Number.}
 In the 1930s,
@@ -62,7 +52,7 @@ with the latter result obtained by Szekeres and Peters 71 years after the initia
 via exhaustive computer search~\cite{06szekeres_computer_solution_17_point_erdos_szekeres_problem}.
 Larger cases remain open,
 with $g(k) \leq 2^{k+o(k)}$ the best known upper bound~\cite{suk2017erdos,holmsen2017two}.
-This problem is now known as the \emph{Happy End Problem}
+This problem is now known as the \emph{Happy Ending Problem},
 as it led to the marriage of Klein and Szekeres.
 
 In a similar spirit,
@@ -94,7 +84,7 @@ we propose that the final chapter in the story
 should be a formal verification of the Empty Hexagon Number.
 
 \subparagraph*{Verification of SAT proofs.}
-Formal verification plays a crucial rule in the SAT community,
+Formal verification plays a crucial role in the SAT community,
 for example in verified solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
 and proof checking~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
 Despite this,
@@ -118,9 +108,13 @@ which they demonstrated on different puzzles
 As far as verifying SAT encodings in Lean,
 we base our work on that of Codel, Avigad, and Heule~\cite{Cayden}.
 
-\subparagraph*{Lean.} Kickstarted by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015}, the Lean theorem prover has arguably become the most popular for formalizing modern breakthroughs in mathematical research.
+\subparagraph*{Lean.}
+Initially developed by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015}, the Lean theorem prover has arguably become the most popular theorem prover for formalizing modern breakthroughs in mathematical research.
 On the one hand, the recent success of projects such as the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}, or the proof of~the polynomial Freiman–Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023} has brought significant attention to~Lean. % as an interactive theorem prover.
 On the the other hand, the \textsf{mathlib} project~\cite{The_mathlib_Community_2020} has already cemented the foundations of many areas of mathematics, thus allowing modern results to be formalized much more easily by relying on hundreds of thousands of existing lines of code. In this spirit, we connect our formalization to~\textsf{mathlib} as much as possible.
+
+\subparagraph*{Mathlib.}
+% TODO
 
 \subparagraph*{Outline of the paper.}
 \Cref{sec:geometry} discusses the basic geometric aspects of the problem.  Then,~\Cref{sec:triple-orientations} is devoted to \emph{triple orientations}, a fundamental tool in computational geometry to discretely represent problems involving an a priori continuous space (i.e., $\mathbb{R}^2$).
