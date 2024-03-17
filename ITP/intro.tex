@@ -146,8 +146,8 @@ Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of He
   \tikzmarkend{b}\Big(\bigwedge_{\substack{a < i < c\\ i \neq b}} \ov{\cvar_{i; a,b,c}}\Big) \rightarrow \hvar_{a, b, c} \quad \text{ for all } 2 \leq a < b < c \leq n\label{eq:holeDefClauses1}\\
 %
 \tikzmarkin{a}(12.0,-0.3)(-0.5,0.5)
-  \left(\orvar_{a, b, c} \land \orvar_{a, c, d}\right) \rightarrow \orvar_{a, b, d} \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:signotopeClauses11}\\
-  \tikzmarkend{a}\left(\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}}\right) \rightarrow \ov{\orvar_{a, b, d}} \text{ for all } 2 \leq a < b < c < d \leq n \label{eq:signotopeClauses12}\\
+  \orvar_{a, b, c} \land \orvar_{a, c, d} \rightarrow \orvar_{a, b, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:signotopeClauses11}\\
+  \tikzmarkend{a}\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}} \rightarrow \ov{\orvar_{a, b, d}} \quad \text{ for all } 2 \leq a < b < c < d \leq n \label{eq:signotopeClauses12}\\
 %
 \hfsetfillcolor{blue!10}
 \hfsetbordercolor{blue!60!black}
@@ -158,18 +158,20 @@ Then,~\Cref{sec:empty-hexagon-number} deals with the efficient re-encoding of He
 \hfsetfillcolor{orange!10}
 \hfsetbordercolor{orange!60!black}
 \tikzmarkin{d}(12.0,-0.3)(-0.5,0.5)
-  \left(\ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}}\right) \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:capDef}\\
-  \left(\uvar_{a,b,c} \land \ov{\orvar_{b,c,d}} \land \hvar_{a,b,d}\right)\rightarrow \ufvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n,\; a+1<b\label{eq:capFDef}\\
-  \tikzmarkend{d}\left(\orvar_{a, b, c} \land \orvar_{b, c, d}\right) \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \label{eq:cupDef}\\
+  \ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}} \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:capDef}\\
+  \orvar_{a, b, c} \land \orvar_{b, c, d} \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \label{eq:cupDef}\\
+  \uvar_{a,b,c} \land \ov{\orvar_{b,c,d}} \land \hvar_{a,b,d} \rightarrow \ufvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n,\; a+1<b\label{eq:capFDef}\\
+  \uvar_{a, c, d} \rightarrow \ov{\orvar_{a,c,d}} \quad \text{ for all } 2 \leq a < c < d \leq n,\ a+1<c\label{eq:capDef2}\\
+  \tikzmarkend{d}\vvar_{a, c, d} \rightarrow \orvar_{a,c,d} \quad \text{ for all } 2 \leq a < c < d \leq n,\; a+1<c\label{eq:cupDef2}\\
 %
 \hfsetfillcolor{red!10}
 \hfsetbordercolor{red!60!black}
 \tikzmarkin{e}(12.0,-0.5)(-0.5,0.5)
-  \neg(\ufvar_{a,d,e} \land \orvar_{a, b, e}) \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e\label{eq:no6Hole1Below}\\
-  \neg(\ufvar_{a,d,e} \land \ov{\orvar_{d, e, f}}) \quad \text { for all } 2 \leq a < d < e < f\leq n\label{eq:no6Hole4Above}\\
-  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c,c'}) \quad \text{ for all } 2 \leq a < c < c' < d \leq n\label{eq:no6Hole2Below1}\\
-  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c',c}) \quad \text{ for all } 2 \leq a < c' < c < d \leq n\label{eq:no6Hole2Below2}\\
-  \tikzmarkend{e}\neg(\vvar_{a,c,d} \land \orvar_{c, d, e} \land \hvar_{a,c,e}) \quad \text{ for all } 2 \leq a < c < d < e \leq n\label{eq:no6Hole3Below}
+  \neg(\ufvar_{a,d,e} \land \orvar_{a, b, e}) \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e, \; a+2 < d\label{eq:no6Hole1Below}\\
+  \neg(\ufvar_{a,d,e} \land \ov{\orvar_{d, e, f}}) \quad \text { for all } 2 \leq a < d < e < f\leq n, \; a+2 < d\label{eq:no6Hole4Above}\\
+  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c,c'}) \quad \text{ for all } 2 \leq a < c < c' < d \leq n, \; a+1 < c\label{eq:no6Hole2Below1}\\
+  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c',c}) \quad \text{ for all } 2 \leq a < c' < c < d \leq n, \; a+1 < c'\label{eq:no6Hole2Below2}\\
+  \tikzmarkend{e}\neg(\vvar_{a,c,d} \land \orvar_{c, d, e} \land \hvar_{a,c,e}) \quad \text{ for all } 2 \leq a < c < d < e \leq n, \; a+1 < c\label{eq:no6Hole3Below}
   \end{gather}
 \end{spreadlines}
 % \end{framed}
