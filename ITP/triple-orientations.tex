@@ -153,7 +153,7 @@ we construct boolean variables $\orvar_{a, b, c}$ that represent $\sigma(p, q, r
   lemma σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
   lemma σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
 \end{lstlisting}
-As a result, it suffices to have variables $\orvar(a, b, c)$ with $1 \leq a < b < c n$, thus reducing the number of variables by a factor of $3! = 6$.
+As a result, it suffices to have variables $\orvar(a, b, c)$ with $1 \leq a < b < c \leq n$, thus reducing the number of variables by a factor of $3! = 6$.
 Next, variables $\cvar_{i;a,b,c}$ correspond to whether point $i$ is inside the triangle $abc$, with $a < b < c$.
 If we assume that points will be sorted from left to right (which will be justified in~\Cref{sec:symmetry-breaking}), then we only need to consider $a < i < c$,
 and by combining the definition of \lstinline|σPtInTriangle| with the \lstinline|σ_perm| lemmas, we obtain precisely the definition of $\cvar_{i;a,b,c}$ of~\Cref{eq:insideClauses1,eq:insideClauses2}.
