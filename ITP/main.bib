@@ -13,25 +13,24 @@
 
 @book{biereHandbookSatisfiabilityVolume2009,
   title = {Handbook of {{Satisfiability}}: {{Volume}} 185 {{Frontiers}} in {{Artificial Intelligence}} and {{Applications}}},
-  author = {Biere, A. and Biere, A. and Heule, M. and {van Maaren}, H. and Walsh, T.},
+  author = {Biere, A. and Heule, M. and {van Maaren}, H. and Walsh, T.},
   year = {2009},
   publisher = {{IOS Press}},
   address = {{NLD}},
-  abstract = {'Satisfiability (SAT) related topics have attracted researchers from various disciplines: logic, applied areas such as planning, scheduling, operations research and combinatorial optimization, but also theoretical issues on the theme of complexity and much more, they all are connected through SAT. My personal interest in SAT stems from actual solving: The increase in power of modern SAT solvers over the past 15 years has been phenomenal. It has become the key enabling technology in automated verification of both computer hardware and software. Bounded Model Checking (BMC) of computer hardware is now probably the most widely used model checking technique. The counterexamples that it finds are just satisfying instances of a Boolean formula obtained by unwinding to some fixed depth a sequential circuit and its specification in linear temporal logic. Extending model checking to software verification is a much more difficult problem on the frontier of current research. One promising approach for languages like C with finite word-length integers is to use the same idea as in BMC but with a decision procedure for the theory of bit-vectors instead of SAT. All decision procedures for bit-vectors that I am familiar with ultimately make use of a fast SAT solver to handle complex formulas. Decision procedures for more complicated theories, like linear real and integer arithmetic, are also used in program verification. Most of them use powerful SAT solvers in an essential way. Clearly, efficient SAT solving is a key technology for 21st century computer science. I expect this collection of papers on all theoretical and practical aspects of SAT solving will be extremely useful to both students and researchers and will lead to many further advances in the field.' Edmund Clarke (FORE Systems University Professor of Computer Science and Professor of Electrical and Computer Engineering at Carnegie Mellon University)},
   isbn = {1-58603-929-6}
 }
 
 @article{35erdos_combinatorial_problem_geometry,
-author = {Paul Erd{\H{o}}s and Gy{\"o}rgy Szekeres},
-journal = {Compositio Mathematica},
-keywords = {Geometry},
-language = {eng},
-pages = {463-470},
-publisher = {Johnson Reprint Corporation},
-title = {A combinatorial problem in geometry},
-url = {http://eudml.org/doc/88611},
-volume = {2},
-year = {1935},
+  author = {Paul Erd{\H{o}}s and Gy{\"o}rgy Szekeres},
+  journal = {Compositio Mathematica},
+  keywords = {Geometry},
+  language = {eng},
+  pages = {463-470},
+  publisher = {Johnson Reprint Corporation},
+  title = {A combinatorial problem in geometry},
+  url = {http://eudml.org/doc/88611},
+  volume = {2},
+  year = {1935},
 }
 
 @article{60erdos_some_extremum_problems_elementary_geometry,
@@ -61,7 +60,7 @@ year = {1935},
                   Brett Stevens and
                   Ilias S. Kotsireas and
                   Vijay Ganesh},
-  title        = {A SAT-based Resolution of Lam's Problem},
+  title        = {A {SAT}-based Resolution of {L}am's {P}roblem},
   booktitle    = {Thirty-Fifth {AAAI} Conference on Artificial Intelligence, {AAAI}
                   2021, Thirty-Third Conference on Innovative Applications of Artificial
                   Intelligence, {IAAI} 2021, The Eleventh Symposium on Educational Advances
@@ -115,7 +114,6 @@ year = {1935},
   publisher = {{Springer New York}},
   address   = {{New York, NY}},
   doi       = {10.1007/978-1-4613-9435-8_7},
-  abstract  = {In 1976, the Four-Color Problem was solved: every map drawn on a sheet of paper can be colored with only four colors in such a way that countries sharing a common border receive different colors. This result was of interest to the mathematical community since many mathematicians had tried in vain for over a hundred years to prove this simple-sounding statement. Yet among mathematicians who were not aware of the developments leading to the proof, the outcome had rather dismaying aspects, for the proof made unprecedented use of computer computation; the correctness of the proof cannot be checked without the aid of a computer. Moreover, adding to the strangeness of the proof, some of the crucial ideas were perfected by computer experiments. One can never rule out the chance that a short proof of the Four-Color Theorem might some day be found, perhaps by the proverbial bright high-school student. But it is also conceivable that no such proof is possible. In this case a new and interesting type of theorem has appeared, one which has no proof of the traditional type.},
   isbn      = {978-1-4613-9435-8}
 }
 
@@ -226,7 +224,6 @@ year = {1935},
   issn       = {0168-7433},
   url        = {https://doi.org/10.1007/s10817-018-9490-4},
   doi        = {10.1007/s10817-018-9490-4},
-  abstract   = {The Boolean Pythagorean Triples problem asks: does there exist a binary coloring of the natural numbers such that every Pythagorean triple contains an element of each color? This problem was first solved in 2016, when Heule, Kullmann and Marek encoded a finite restriction of this problem as a propositional formula and showed its unsatisfiability. In this work we formalize their development in the theorem prover Coq. We state the Boolean Pythagorean Triples problem in Coq, define its encoding as a propositional formula and establish the relation between solutions to the problem and satisfying assignments to the formula. We verify Heule et al.’s proof by showing that the symmetry breaks they introduced to simplify the propositional formula are sound, and by implementing a correct-by-construction checker for proofs of unsatisfiability based on reverse unit propagation.},
   journal    = {J. Autom. Reason.},
   month      = {oct},
   pages      = {695–722},
@@ -245,7 +242,7 @@ year = {1935},
 @inproceedings{Cayden,
   author    = {Codel, Cayden and Heule, Marijn J. H. and Avigad, Jeremy},
   booktitle = {Proceedings of the 23rd conference on Formal Methods In Computer-Aided Design},
-  editor    = {Nadel, Alexander  and Rozie, Kristin Yvonne},
+  editor    = {Nadel, Alexander  and Rozier, Kristin Yvonne},
   title     = {{Verified Encodings for SAT Solvers}},
   year      = {2023}
 }
@@ -277,7 +274,6 @@ year = {1935},
   pages    = {513--532},
   issn     = {1573-0670},
   doi      = {10.1007/s10817-019-09525-z},
-  abstract = {SAT solvers decide the satisfiability of Boolean formulas in conjunctive normal form. They are commonly used for software and hardware verification. Modern SAT solvers are highly complex and optimized programs. As a single bug in the solver may invalidate the verification of many systems, SAT solvers output certificates for their answer, which are then checked independently. However, even certificate checking requires highly optimized non-trivial programs. This paper presents the first SAT solver certificate checker that is formally verified down to the integer sequence representing the formula. Our tool supports the full DRAT standard, and is even faster than the unverified state-of-the-art tool drat-trim, on a realistic set of benchmarks drawn from the 2016 and 2017 SAT competitions. An optional multi-threaded mode further reduces the runtime, in particular for big certificates.}
 }
 
 
@@ -293,7 +289,7 @@ year = {1935},
 
 @inproceedings{The_mathlib_Community_2020,
   series     = {POPL ’20},
-  title      = {The lean mathematical library},
+  title      = {The {L}ean mathematical library},
   url        = {http://dx.doi.org/10.1145/3372885.3373824},
   doi        = {10.1145/3372885.3373824},
   booktitle  = {Proceedings of the 9th ACM SIGPLAN International Conference on Certified Programs and Proofs},
@@ -313,7 +309,6 @@ year = {1935},
   pages     = {378--388},
   publisher = {{Springer International Publishing}},
   address   = {{Cham}},
-  abstract  = {Lean is a new open source theorem prover being developed at Microsoft Research and Carnegie Mellon University, with a small trusted kernel based on dependent type theory. It aims to bridge the gap between interactive and automated theorem proving, by situating automated tools and methods in a framework that supports user interaction and the construction of fully specified axiomatic proofs. Lean is an ongoing and long-term effort, but it already provides many useful components, integrated development environments, and a rich API which can be used to embed it into other systems. It is currently being used to formalize category theory, homotopy type theory, and abstract algebra. We describe the project goals, system architecture, and main features, and we discuss applications and continuing work.},
   isbn      = {978-3-319-21401-6}
 }
 
@@ -331,7 +326,6 @@ year = {1935},
   issn     = {0166-218X},
   doi      = {10.1016/S0166-218X(00)00232-8},
   urldate  = {2023-10-11},
-  abstract = {Sweeping is an important algorithmic tool in geometry. In the first part of this paper we define sweeps of arrangements and use the ``Sweeping Lemma'' to show that Euclidean arrangements of pseudolines can be represented by wiring diagrams and zonotopal tilings. In the second part we introduce a further representation for Euclidean arrangements of pseudolines. This representation records an ``orientation'' for each triple of lines. It turns out that a ``triple orientation'' corresponds to an arrangement exactly if it obeys a generalized transitivity law. Moreover, the ``triple orientations'' carry a natural order relation which induces an order relation on arrangements. A closer look on the combinatorics behind this leads to a series of signotope orders closely related to higher Bruhat orders. We investigate the structure of higher Bruhat orders and give new purely combinatorial proofs for the main structural properties. Finally, we reconnect the combinatorics of the second part to geometry. In particular, we show that the maximum chains in the higher Bruhat orders correspond to sweeps.},
   keywords = {Arrangement,Higher Bruhat order,Pseudoline,Sweep},
   file     = {/Users/bsuberca/Zotero/storage/GCCQ2FD7/Felsner and Weil - 2001 - Sweeps, arrangements and signotopes.pdf;/Users/bsuberca/Zotero/storage/QBPV8WFJ/S0166218X00002328.html}
 }
@@ -346,7 +340,7 @@ year = {1935},
   publisher = {Cambridge University Press},
   author    = {Szekeres, George and Peters, Lindsay},
   year      = {2006},
-  pages     = {151–164}
+  pages     = {151--164}
 }
 
 @article{scheucherTwoDisjoint5holes2020,
@@ -360,7 +354,6 @@ year = {1935},
   issn     = {0925-7721},
   doi      = {10.1016/j.comgeo.2020.101670},
   urldate  = {2023-10-10},
-  abstract = {Given a set of points S{$\subseteq$}R2, a subset X{$\subseteq$}S with {\textbar}X{\textbar}=k is called k-gon if all points of X lie on the boundary of the convex hull of X, and k-hole if, in addition, no point of S∖X lies in the convex hull of X. We use computer assistance to show that every set of 17 points in general position admits two disjoint 5-holes, that is, holes with disjoint respective convex hulls. This answers a question of Hosono and Urabe (2001). We also provide new bounds for three and more pairwise disjoint holes. In a recent article, Hosono and Urabe (2018) present new results on interior-disjoint holes {\textendash} a variant, which also has been investigated in the last two decades. Using our program, we show that every set of 15 points contains two interior-disjoint 5-holes. Moreover, our program can be used to verify that every set of 17 points contains a 6-gon within significantly smaller computation time than the original program by Szekeres and Peters (2006). Another independent verification of this result was done by Mari{\'c} (2019).},
   keywords = {Boolean satisfiability (SAT),Empty convex polygon,Erdos-Szekeres-type problem},
   file     = {/Users/bsuberca/Zotero/storage/CWGPQDUN/Scheucher - 2020 - Two disjoint 5-holes in point sets.pdf}
 }
@@ -370,7 +363,7 @@ year = {1935},
   title     = {Axioms and {{Hulls}}},
   booktitle = {Axioms and {{Hulls}}},
   editor    = {Knuth, Donald E.},
-  author   = {Knuth, Donald E.},
+  author    = {Knuth, Donald E.},
   year      = {1992},
   series    = {Lecture {{Notes}} in {{Computer Science}}},
   pages     = {1--98},
@@ -394,7 +387,6 @@ year = {1935},
   pages     = {363--378},
   publisher = {{Springer Berlin Heidelberg}},
   address   = {{Berlin, Heidelberg}},
-  abstract  = {This paper presents versat, a formally verified SAT solver incorporating the essential features of modern SAT solvers, including clause learning, watched literals, optimized conflict analysis, non-chronological backtracking, and decision heuristics. Unlike previous related work on SAT-solver verification, our implementation uses efficient low-level data structures like mutable C arrays for clauses and other solver state, and machine integers for literals. The implementation and proofs are written in Guru, a verified-programming language. We compare versat to a state-of-the-art SAT solver that produces certified ``unsat'' answers. We also show through an empirical evaluation that versat can solve SAT problems on the modern scale.},
   isbn      = {978-3-642-27940-9}
 }
 
@@ -410,11 +402,10 @@ year = {1935},
   pages    = {167--184},
   issn     = {1433-2787},
   doi      = {10.1007/s10009-022-00690-y},
-  abstract = {Modern SAT solvers can emit independently-checkable proof certificates to validate their results. The state-of-the-art proof system that allows for compact proof certificates is propagation redundancy (\$\${\textbackslash}textsf\{PR\}\$\$). However, the only existing method to validate proofs in this system with a formally verified tool requires a transformation to a weaker proof system, which can result in a significant blowup in the size of the proof and increased proof validation time. This article describes the first approach to formally verify \$\${\textbackslash}textsf\{PR\}\$\$proofs on a succinct representation. We present (i) a new Linear PR (LPR) proof format, (ii) an extension of the DPR-trim tool to efficiently convert \$\${\textbackslash}textsf\{PR\}\$\$proofs into LPR format, and (iii) cake\_lpr, a verified LPR proof checker developed in CakeML. We also enhance these tools with (iv) a new compositional proof format designed to enable separate (parallel) proof checking. The LPR format is backwards compatible with the existing LRAT format, but extends LRAT with support for the addition of \$\${\textbackslash}textsf\{PR\}\$\$clauses. Moreover, cake\_lpr is verified using CakeML 's binary code extraction toolchain, which yields correctness guarantees for its machine code (binary) implementation. This further distinguishes our clausal proof checker from existing checkers because unverified extraction and compilation tools are removed from its trusted computing base. We experimentally show that: LPR provides efficiency gains over existing proof formats; cake\_lpr 's strong correctness guarantees are obtained without significant sacrifice in its performance; and the compositional proof format enables scalable parallel proof checking for large proofs.}
 }
 
 @mastersthesis{skotam_creusat_2022,
-  title  = {{CreuSAT, Using Rust and Creusot to create the world’s fastest deductively verified SAT solver}},
+  title  = {{CreuSAT, Using Rust and Creusot to create the world's fastest deductively verified SAT solver}},
   url    = {https://www.duo.uio.no/handle/10852/96757},
   school = {University of Oslo},
   author = {Skotåm, Sarek Høverstad},
@@ -422,7 +413,7 @@ year = {1935},
 }
 
 @article{Castelvecchi2021,
-  title     = {Mathematicians welcome computer-assisted proof in ‘grand unification’ theory},
+  title     = {Mathematicians welcome computer-assisted proof in 'grand unification' theory},
   volume    = {595},
   issn      = {1476-4687},
   url       = {http://dx.doi.org/10.1038/d41586-021-01627-2},
@@ -437,7 +428,7 @@ year = {1935},
 }
 
 @misc{gowers2023conjecture,
-  title         = {On a conjecture of Marton},
+  title         = {On a conjecture of {M}arton},
   author        = {W. T. Gowers and Ben Green and Freddie Manners and Terence Tao},
   year          = {2023},
   eprint        = {2311.05762},
@@ -483,7 +474,6 @@ year = {1935},
   issn     = {1432-0444},
   doi      = {10.1007/s00454-007-1343-6},
   urldate  = {2024-02-19},
-  abstract = {Let P be a finite set of points in general position in the plane. Let C(P) be the convex hull of P and  let CiP be the ith convex layer of P. A minimal convex set S of P is a convex subset of P such that every convex set of P {$\cap$} C(S) different from S has cardinality strictly less than {\textbar}S{\textbar}. Our main theorem states that P contains an empty convex hexagon if C1P is minimal and C4P is not empty. Combined with the Erdos-Szekeres theorem, this result implies that every set P with sufficiently many points contains an empty convex hexagon, giving an affirmative answer to a question posed by Erdos in 1977.},
   langid   = {english},
   keywords = {Convex Hull,Convex Subset,Discrete Comput Geom,General Position,Minimal Convex},
   file     = {/Users/bsuberca/Zotero/storage/HDDGKIJK/Nicolas - 2007 - The Empty Hexagon Theorem.pdf}
@@ -494,7 +484,7 @@ year = {1935},
   title    = {{Empty Convex Hexagons in Planar Point Sets}},
   author   = {Gerken, Tobias},
   year     = {2008},
-  month    = mar,
+  month    = {mar},
   journal  = {Discrete \& Computational Geometry},
   volume   = {39},
   number   = {1},
@@ -502,7 +492,6 @@ year = {1935},
   issn     = {1432-0444},
   doi      = {10.1007/s00454-007-9018-x},
   urldate  = {2024-02-19},
-  abstract = {Erd{\H o}s asked whether every sufficiently large set of points in general position in the plane contains six points that form a convex hexagon without any points from the set in its interior. Such a configuration is called an empty convex hexagon. In this paper, we answer the question in the affirmative. We show that every set that contains the vertex set of a convex 9-gon also contains an empty convex hexagon.},
   langid   = {english},
   keywords = {Convex polygons and polyhedra,Empty hexagon problem,Erdos-Szekeres problem,Ramsey theory},
   file     = {/Users/bsuberca/Zotero/storage/SMZUA6QW/Gerken - 2008 - Empty Convex Hexagons in Planar Point Sets.pdf}
@@ -528,17 +517,17 @@ year = {1935},
 }
 
 @misc{heule2017schur,
-      title={Schur Number Five}, 
-      author={Marijn J. H. Heule},
-      year={2017},
-      eprint={1711.08076},
-      archivePrefix={arXiv},
-      primaryClass={cs.LO}
+  title={Schur Number Five}, 
+  author={Marijn J. H. Heule},
+  year={2017},
+  eprint={1711.08076},
+  archivePrefix={arXiv},
+  primaryClass={cs.LO}
 }
 
 @article{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points,
   author       = {Filip Maric},
-  title        = {Fast Formal Proof of the Erd{\H{o}}s-Szekeres Conjecture for Convex
+  title        = {Fast Formal Proof of the {E}rd{\H{o}}s-{S}zekeres Conjecture for Convex
                   Polygons with at Most 6 Points},
   journal      = {J. Autom. Reason.},
   volume       = {62},
@@ -555,7 +544,7 @@ year = {1935},
 @article{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,
   author       = {Filip Maric},
   title        = {Formal verification of a modern {SAT} solver by shallow embedding
-                  into Isabelle/HOL},
+                  into {I}sabelle/{HOL}},
   journal      = {Theor. Comput. Sci.},
   volume       = {411},
   number       = {50},
