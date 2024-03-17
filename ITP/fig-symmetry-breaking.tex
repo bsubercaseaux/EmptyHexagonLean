@@ -1,102 +1,135 @@
 \begin{figure}
-\begin{subfigure}{0.45\textwidth}
+\begin{subfigure}{0.48\textwidth}
 \centering
 \begin{tikzpicture}
-    \draw[help lines, color=gray!30, dashed] (-1.9,-1.9) grid (1.9,1.9);
-    \draw[->,ultra thick] (-2,0)--(2,0) node[right]{$x$};
-    \draw[->,ultra thick] (0,-2)--(0,2) node[above]{$y$};
+    \draw[help lines, color=gray!30, dashed] (-2,-2.3) grid (2,2.3);
+    \draw[->,ultra thick] (-2.4,0)--(2.4,0) node[right]{$x$};
+    \draw[->,ultra thick] (0,-2.4)--(0,2.4) node[above]{$y$};
 
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p1) at (-1.6, 0.4) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p2) at (-1.6, 0.9) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p3) at (-0.7, -0.3) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p4) at (-0.2, 0.6) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p5) at (-0.2, -0.8) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p6) at (0.6, 0.5) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p7) at (1.1, -0.4) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p8) at (1.4, 1.1) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p9) at (0.6, -1.1) {};
-
+    \draw[-, dashed, red] (-1.3, -2.4) -- (-1.3, 2.4);
+    \draw[-, dashed, red] (-0.35, -2.4) -- (-0.35, 2.4);
+    \draw[-, dashed, red] (0.6, -2.4) -- (0.6, 2.4);
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p1) at (-1.3, 0.25) {\scriptsize $1$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p2) at (-1.3, 0.9) {\scriptsize $2$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p3) at (-0.7, -0.45) {\scriptsize $3$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p4) at (-0.35, 0.35) {\scriptsize $4$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p5) at (-0.35, -0.8) {\scriptsize $5$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p6) at (0.6, 0.5) {\scriptsize $6$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p7) at (0.9, -0.6) {\scriptsize $7$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p8) at (1.4, 1.1) {\scriptsize $8$};
+    \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p9) at (0.6, -1.1) {\scriptsize $9$};
 \end{tikzpicture}
 \caption{The original list of points.}\label{fig:symmetry-breaking-1}
 \end{subfigure}
-\begin{subfigure}{0.45\textwidth}
+\begin{subfigure}{0.48\textwidth}
     \begin{tikzpicture}
-        \draw[help lines, color=gray!30, dashed] (-1.9,-1.9) grid (1.9,1.9);
-        \draw[->,ultra thick] (-2,0)--(2,0) node[right]{$x$};
-        \draw[->,ultra thick] (0,-2)--(0,2) node[above]{$y$};
+        \draw[help lines, color=gray!30, dashed] (-2.3,-2.3) grid (2.3,2.3);
+        \draw[->,ultra thick] (-2.4,0)--(2.4,0) node[right]{$x$};
+        \draw[->,ultra thick] (0,-2.4)--(0,2.4) node[above]{$y$};
     
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p1) at (-1.4142137010204086, -0.8485279063449582) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p2) at (-1.7677670338439557, -0.4949744579819674) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p3) at (-0.2828428280140589, -0.7071067349707606) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p4) at (-1.2374368959613027, -0.176776493102608) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p5) at (-0.5656853787334529, 0.2828428049061702) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p6) at (0.4242639531724791, -0.7071068505102043) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p7) at (0.07071080521204193, 0.7778174477512475) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p8) at (1.0606602526574178, 0.4949745735214111) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p9) at (0.21213232320457065, 1.767766918304512) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p10) at (1.202081470247393, -0.3535535870103234) {};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p1) at (-1.09601563215555, -0.7424619411597272) {\scriptsize $1$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p2) at (-1.5556349648261614, -0.28284245828783905) {\scriptsize $2$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p3) at (-0.17677682816699475, -0.8131727694796578) {\scriptsize $3$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p4) at (-0.49497474683057663, 8.087761060870946e-08) {\scriptsize $4$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p5) at (0.3181979186635819, -0.8131728503572684) {\scriptsize $5$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p6) at (0.07071080521204193, 0.7778174477512475) {\scriptsize $6$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p7) at (1.0606602064416402, 0.21213186104679588) {\scriptsize $7$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p8) at (0.21213232320457065, 1.767766918304512) {\scriptsize $8$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p9) at (1.202081470247393, -0.3535535870103234) {\scriptsize $9$};
     \end{tikzpicture}
 
-\caption{After rotating by $45^\circ$ all points have different $x$ coordinates.}\label{fig:symmetry-breaking-2}
+\caption{After rotating by $45^\circ$  all $x$-coords.~are different.\\We show such an angle always exists.}\label{fig:symmetry-breaking-2}
 \end{subfigure}
 
 \vspace{0.5cm}
 
 \begin{subfigure}{0.48\textwidth}
     \begin{tikzpicture}
-        \draw[help lines, color=gray!30, dashed] (-2.9,-2.9) grid (2.9,2.9);
-        \draw[->,ultra thick] (-3,0)--(3,0) node[right]{$x$};
-        \draw[->,ultra thick] (0,-3)--(0,3) node[above]{$y$};
+        \draw[help lines, color=gray!30, dashed] (-1,-0.9) grid (2.9,2.9);
+        \draw[->,ultra thick] (-1,0)--(4,0) node[right]{$x$};
+        \draw[->,ultra thick] (0,-1)--(0,3) node[above]{$y$};
     
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p1) at (0.3535533328235472, -0.35355344836299085) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p2) at (0.0, 0.0) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p3) at (1.3435028033768117, -0.49497496635551974) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p4) at (0.530330137882653, 0.31819796487935936) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p5) at (0.7778174015354699, -0.3535535176866571) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p6) at (1.4849242058298968, -0.21213227698879322) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p7) at (2.262741676689033, -0.14142172596352753) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p8) at (1.8384778390559977, 1.2727919057332149) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p9) at (2.8284272865013733, 0.9899490315033785) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p10) at (1.9798993570485264, 2.2627413762864794) {};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p1) at (0.4596193326706113, -0.45961948287188814) {\scriptsize $1$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p2) at (0.0, 0.0) {\scriptsize $2$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p3) at (1.3788581366591666, -0.5303303111918187) {\scriptsize $3$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p4) at (1.0606602179955846, 0.28284253916544966) {\scriptsize $4$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p5) at (1.8738328834897433, -0.5303303920694293) {\scriptsize $5$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p6) at (1.6263457700382034, 1.0606599060390867) {\scriptsize $6$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p7) at (2.6162951712678018, 0.4949743193346349) {\scriptsize $7$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p8) at (1.767767288030732, 2.0506093765923508) {\scriptsize $8$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p9) at (2.7577164350735544, -0.07071112872248436) {\scriptsize $9$};
     \end{tikzpicture}
 
 \caption{After translating the leftmost point is at $(0,0)$.}\label{fig:symmetry-breaking-3}
 \end{subfigure}
 \begin{subfigure}{0.45\textwidth}
     \begin{tikzpicture}
-        \draw[help lines, color=gray!30, dashed] (-2.9,-2.9) grid (2.9,2.9);
-        \draw[->,ultra thick] (-3,0)--(3,0) node[right]{$x$};
-        \draw[->,ultra thick] (0,-3)--(0,3) node[above]{$y$};
+        \draw[help lines, color=gray!30, dashed] (-1.2,-0.9) grid (2.9,2.9);
+        \draw[->,ultra thick] (-1.2,0)--(3,0) node[right]{$x$};
+        \draw[->,ultra thick] (0,-1)--(0,3) node[above]{$y$};
     
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p1) at (-1.0000003267949498, 2.8284275869040783) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p2) at (-0.36842123820763945, 0.74432297237234) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p3) at (0.5999997777794923, 1.8856178983010607) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p4) at (-0.45454565170272093, 1.285648788553618) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p5) at (-0.14285730958923684, 0.6734350454211354) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p6) at (-0.06250016403572127, 0.4419417427548577) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p7) at (0.692307450595518, 0.5439282316905542) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p8) at (0.34999981658637486, 0.353553370373877) {};
-        \node[draw, circle, fill=blue, inner sep=0pt, minimum size=5pt] (p9) at (1.1428567660426896, 0.5050761779582166) {};
-
-        \node[draw, circle, fill=green, inner sep=0pt, minimum size=5pt, label={[xshift=0.7cm, yshift=-0.4cm]$(0, \infty)$}] (p10) at (0, 3.75) {}; 
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p1) at (-1.00000032679495, 2.1757135283877527) {\scriptsize $1$};
+        \node[draw, circle, fill=green!60!black, text=white, inner sep=0pt, minimum size=5pt, label={[xshift=0.7cm, yshift=-0.4cm]$(0, \infty)$}] (p2) at (0, 3.85) {\scriptsize $2$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p3) at (-0.3846155721840648, 0.7252377698715973) {\scriptsize $3$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p4) at (0.2666664916498519, 0.9428090005013866) {\scriptsize $4$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p5) at (-0.2830190444100679, 0.5336655199142649) {\scriptsize $5$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p6) at (0.6521736801480853, 0.6148753963780468) {\scriptsize $6$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p7) at (0.1891890199433349, 0.3822198699068886) {\scriptsize $7$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p8) at (1.1599996167350177, 0.5656853177286622) {\scriptsize $8$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p9) at (-0.025641189145902285, 0.3626188636662086) {\scriptsize $9$};
+       
     \end{tikzpicture}
 
-\caption{}\label{fig:symmetry-breaking-4}
+\caption{After applying the map $(x, y) \mapsto (y/x, 1/x)$.}\label{fig:symmetry-breaking-4}
 \end{subfigure}
 
+\vspace{0.5cm}
 
 \begin{subfigure}{0.45\textwidth}
+    \begin{tikzpicture}
+        \draw[help lines, color=gray!30, dashed] (-1.5,-0.9) grid (2.9,4.2);
+        \draw[->,ultra thick] (-1.4,0)--(3,0) node[right]{$x$};
+        \draw[->,ultra thick] (0,-1)--(0,4.3) node[above]{$y$};
+    
+           
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p1) at (-1.00000032679495, 2.1757135283877527) {\scriptsize $1$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p2) at (-1.2, 3.85) {\scriptsize $2$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p3) at (-0.3846155721840648, 0.7252377698715973) {\scriptsize $3$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p4) at (0.2666664916498519, 0.9428090005013866) {\scriptsize $4$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p5) at (-0.2830190444100679, 0.5336655199142649) {\scriptsize $5$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p6) at (0.6521736801480853, 0.6148753963780468) {\scriptsize $6$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p7) at (0.1891890199433349, 0.3822198699068886) {\scriptsize $7$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p8) at (1.1599996167350177, 0.5656853177286622) {\scriptsize $8$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p9) at (-0.025641189145902285, 0.3626188636662086) {\scriptsize $9$};
+       
+       
+    \end{tikzpicture}
 
-
-\caption{}\label{fig:symmetry-breaking-3}
+\caption{Point $2$ is brought back into the real plane.}\label{fig:symmetry-breaking-5}
 \end{subfigure}
 \begin{subfigure}{0.45\textwidth}
+    \begin{tikzpicture}
+        \draw[help lines, color=gray!30, dashed] (-1.5,-0.9) grid (2.9,4.2);
+        \draw[->,ultra thick] (-1.4,0)--(3,0) node[right]{$x$};
+        \draw[->,ultra thick] (0,-1)--(0,4.3) node[above]{$y$};
+    
+           
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p1) at (-1.2, 3.85) {\scriptsize $1$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p2) at (-1.00000032679495, 2.1757135283877527) {\scriptsize $2$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p3) at (-0.3846155721840648, 0.7252377698715973) {\scriptsize $3$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p4) at (-0.2830190444100679, 0.5336655199142649) {\scriptsize $4$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p5) at (-0.025641189145902285, 0.3626188636662086) {\scriptsize $5$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p6) at (0.1891890199433349, 0.3822198699068886) {\scriptsize $6$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p7) at (0.2666664916498519, 0.9428090005013866) {\scriptsize $7$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p8) at (0.6521736801480853, 0.6148753963780468) {\scriptsize $8$};
+        \node[draw, circle, fill=blue, text=white, inner sep=0pt, minimum size=5pt] (p9) at (1.1599996167350177, 0.5656853177286622) {\scriptsize $9$};
+       
+    \end{tikzpicture}
 
-
-\caption{}\label{fig:symmetry-breaking-4}
+\caption{Points are relabeled from left to right.}\label{fig:symmetry-breaking-6}
 \end{subfigure}
 
 
 
-\caption{Illustration of the proof of the main symmetry breaking theorem.}\label{fig:symmetry-breaking}
+\caption{Illustration of the proof of the main symmetry breaking theorem. For simplicity we have ommited the illustration of the \emph{left-to-right} property. }\label{fig:symmetry-breaking}
 \end{figure}
