@@ -7,7 +7,7 @@ Lam's problem~\cite{21bright_sat_based_resolution_lams_problem},
 and one case of the Erd\H{o}s discrepancy conjecture~\cite{konev2014sat}.
 All of these proofs rely on the same two-step structure:
 \begin{itemize}
-\item \textbf{(Reduction)} One shows that the mathematical theorem of interest is true if a concrete CNF formula $F$ is unsatisfiable.
+\item \textbf{(Reduction)} Show that the mathematical theorem of interest is true if a concrete CNF formula $F$ is unsatisfiable.
 \item \textbf{(Solving)} Show that $F$ is indeed unsatisfiable.
 \end{itemize}
 
@@ -25,7 +25,7 @@ It is therefore the reduction step that poses the greatest challenge to the trus
 % leaving room for doubt that any results relying on such reduction arguments are correct.
 
 A recent breakthrough from Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry is a perfect example of the complexity of reducing mathematical theorems to propositional formulas that can be solved efficiently. Indeed, they constructed (and solved) a formula $F$ whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon.
-However, as it is common in such results, their reduction argument is only sketched, relying heavily on intuition, and leaving several gaps to be filled.
+However, as it is common in such results, their reduction argument was only sketched, relying heavily on intuition, and leaving several gaps to be filled.
  
 
 % result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
@@ -34,12 +34,12 @@ However, as it is common in such results, their reduction argument is only sketc
 % Their proof relies on a complicated reduction to SAT
 % involving numerous nontrivial geometric optimizations and symmetry-breaking arguments.
 
-In this paper we complete and formalize the reduction of Heule and Scheucher in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}.
+In this paper we complete and formalize the reduction of Heule and Scheucher in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}.\footnote{Our formalization is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.}
 We do so by connecting existing geometric definitions
 in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2020}
 to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation.
 
-Our formalization is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.
+
 
 \subparagraph*{The Empty Hexagon Number.}
 In the 1930s,
