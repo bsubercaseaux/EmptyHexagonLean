@@ -51,7 +51,9 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
     %  To see convexity, we can reason contrapositively again. If $s$ is not convex, then there is a point $p \in s$ that lies inside the convex hull of $s$, and thus lies inside a triangle $t \in P$.
 \end{proof}
 
-Another lemma we need which is key to providing ``triangulations'' is that given any convex point set $S$ and a line $\overleftrightarrow{ab}$ between vertices of $S$, the convex hull of $S$ is contained in the convex hull of points on each side of $\overleftrightarrow{ab}$. That is:
+The next section shows how boolean variables can be used to encode which triangles are empty w.r.t.~a pointset, which as the previous theorem shows, can be used to encode the presence or abscence of $k$-holes.
+
+Another key idea required for the proof is that of ``\emph{triangulations}'': given any convex point set $S$ and a line $\overleftrightarrow{ab}$ between vertices of $S$, the convex hull of $S$ is contained in the convex hull of points on each side of $\overleftrightarrow{ab}$. That is:
 \begin{lstlisting}
 theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
@@ -69,7 +71,7 @@ By using this lemma repeatedly, we can slice up a convex $k$-gon into smaller pi
     To show that $z\in \overline{ab}$, suppose not, so that $a$ lies between $z$ and $b$ (see \Cref{fig:triangulation2-b}). (The case where $z$ is on the $b$ side is similar.) We can decompose $z$ as a convex combination of some $w\in \overline{S\setminus\{a\}}$ and $a$, which means that $w,z,a,b$ are collinear and appear in this order on the line. Therefore $a$ is a convex combination of $w$ and $b$, which means that $a\in \overline{S\setminus\{a\}}$ which violates convexity of $S$.
 \end{proof}
 
-The next section shows how boolean variables can be used to encode which triangles are empty w.r.t.~a pointset, which as the previous theorem shows, can be used to encode the presence or abscence of $k$-holes.
+
 % \begin{proof}[Human proof sketch]
 
 % \end{proof}
