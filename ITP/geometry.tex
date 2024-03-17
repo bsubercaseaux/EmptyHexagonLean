@@ -2,13 +2,13 @@ We start by identifying points with elements of $\mathbb{R}^2$. Concretely,~\lst
 The next step is to define what it means for a $k$-gon to be \emph{empty} (with respect to a set of points) and \emph{convex}, which we do in terms of \textsf{mathlib} primitives.
 
 \begin{lstlisting}
-/-- `EmptyShapeIn S P` means that `S` carves out an empty shape in `P`:
-the convex hull of `S` contains no point of `P`
-other than those already in `S`. -/
+/-- `EmptyShapeIn S P' means that `S' carves out an empty shape in `P':
+the convex hull of `S' contains no point of `P'
+other than those already in `S'. -/
 def EmptyShapeIn (S P : Set Point) : Prop :=
     ∀ p ∈ P \ S, p ∉ convexHull ℝ S
 
-/-- `ConvexPoints S` means that `S` consists of extremal points of its convex hull,
+/-- `ConvexPoints S' means that `S' consists of extremal points of its convex hull,
 i.e. the point set encloses a convex polygon. -/
 def ConvexPoints (S : Set Point) : Prop :=
     ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
@@ -47,8 +47,8 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
 %     Let $T = \{t_1, \ldots, t_{{k \choose 3}}\}$ be all the triangles induced by vertices of $s$.
 %    For the backward direction we will need a \emph{triangulation lemma} stating that the convex hull of $s$ can be partitioned into triangles $P = \{t_i, \ldots, t_j\}$, and $P \subseteq T$.
 %     To see that if every $t \in T$ is empty w.r.t. $S$ then $s$ is also empty w.r.t. $S$ we can use the contrapositive statement.
-    %  Indeed, assume $s$ is not empty w.r.t. $S$, there is a point $p \in S \setminus s$ that lies inside the convex hull of $s$. Because $P$ is a partition of the convex hull of $s$, point $p$ must be inside some $t \in P \subseteq T$. 
-    %  To see convexity, we can reason contrapositively again. If $s$ is not convex, then there is a point $p \in s$ that lies inside the convex hull of $s$, and thus lies inside a triangle $t \in P$. 
+    %  Indeed, assume $s$ is not empty w.r.t. $S$, there is a point $p \in S \setminus s$ that lies inside the convex hull of $s$. Because $P$ is a partition of the convex hull of $s$, point $p$ must be inside some $t \in P \subseteq T$.
+    %  To see convexity, we can reason contrapositively again. If $s$ is not convex, then there is a point $p \in s$ that lies inside the convex hull of $s$, and thus lies inside a triangle $t \in P$.
 \end{proof}
 
 The next section shows how boolean variables can be used to encode which triangles are empty w.r.t.~a pointset, which as the previous theorem shows, can be used to encode the presence or abscence of $k$-holes.

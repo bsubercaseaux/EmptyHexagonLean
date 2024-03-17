@@ -86,12 +86,12 @@ To illustrate how these notions will be used, let us consider the property, corr
 
 Based on \lstinline|ConvexEmptyIn.iff_triangles|, we know that $\pi_k(S)$ can be written in terms of triangles that are empty w.r.t $S$. We can define triangle emptiness using $\sigma$, and prove its equivalence to the geoemetric definition.
 \begin{lstlisting}
-/-- `PtInTriangle a p q r` means that `a` is in the triangle `pqr`,
+/-- `PtInTriangle a p q r' means that `a' is in the triangle `pqr',
 possibly on the boundary. -/
 def PtInTriangle (a : Point) (p q r : Point) : Prop :=
   a ∈ convexHull ℝ {p, q, r}
 
-/-- `σPtInTriangle a p q r` means that `a` is in the triangle `pqr` strictly,
+/-- `σPtInTriangle a p q r' means that `a' is in the triangle `pqr' strictly,
 i.e., not on the boundary. -/
 def σPtInTriangle (a p q r : Point) : Prop :=
   σ p q a = σ p q r ∧
