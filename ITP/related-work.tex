@@ -21,7 +21,11 @@ as a corollary of our development:
 asserting the hole variables $\hvar_{a,b,c}$ as unit clauses,
 leaving the remainder of the encoding in~\Cref{fig:full-encoding} unchanged,
 trivializes constraints that have to do with emptiness
-so that only convexity constraints remain.
+so that only convexity constraints remain.\footnote{
+This modification was performed by an author
+who did not understand this part of the proof,
+nevertheless having full confidence in its correctness
+thanks to the Lean kernel having checked every assertion.}
 The resulting CNF formula
 asserts the existence of a set of $n$ points
 with no convex $6$-gon.
@@ -51,9 +55,9 @@ something we do not have to do.
 The difference in solving time
 can likely be accounted for by differences in the respective encodings,
 in particular their symmetry breaking strategies.
-The encoding of Heule and Scheucher uses $\mathcal O(n^4)$ clauses
+The encoding of Heule and Scheucher uses $O(n^4)$ clauses
 to look for a $6$-hole or $6$-gon in $n$ points,
-whereas the one of Marić uses $\mathcal O(n^6)$ clauses.
+whereas the one of Marić uses $O(n^6)$ clauses.
 They are based on different ideas:
 the former as detailed in~\Cref{sec:symmetry-breaking},
 whereas the latter on nested convex hulls.
