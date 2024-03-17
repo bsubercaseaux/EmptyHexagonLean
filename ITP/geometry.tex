@@ -28,7 +28,7 @@ theorem hole_6_theorem (pts : List Point) (gp : PointListInGeneralPosition pts)
     (h : pts.length ≥ 30) : HasConvexEmptyKGon 6 pts.toFinset
 \end{lstlisting}
 
-At the root  of the encoding of Heule and Scheucher is the idea that the~\lstinline|ConvexEmptyIn| predicate can be determined by analyzing only triangles. In particular, that a set $s$ of $k$ points in a pointset $S$ form an empty convex $k$-gon if and only if all the ${k \choose 3}$ triangles induced by vertices in $s$ are empty with respect to $S$. This is discussed informally in~\cite[Section 3, Eq. 4]{emptyHexagonNumber}.
+At the root  of the encoding of Heule and Scheucher is the idea that the~\lstinline|ConvexEmptyIn| predicate can be determined by analyzing only triangles. In particular, that a set $s$ of $k$ points in a pointset $S$ form an empty convex $k$-gon if and only if all the ${k \choose 3}$ triangles induced by vertices in $s$ are empty with respect to $S$. This is discussed informally in~\cite[Section 3, Eq.~4]{emptyHexagonNumber}.
 Concretely, we prove the following theorem:
 \begin{lstlisting}
 theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
@@ -38,12 +38,12 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
 \end{lstlisting}
 \input{fig_triangulation.tex}
 \begin{proof}[Proof sketch]
-    We first prove a simple monotonicity lemma: if $\textsf{ConvexPoints}(s)$, then convex $\textsf{ConvexPoints}(s')$ for every $s' \subseteq s$, and similarly $\textsf{EmptyShapeIn}(s, S) \Rightarrow \textsf{EmptyShapeIn}(s', S)$ for every set of points $S$.
+    We first prove a simple monotonicity lemma: if $\textsf{ConvexPoints}(s)$, then $\textsf{ConvexPoints}(s')$ for every $s' \subseteq s$, and similarly $\textsf{EmptyShapeIn}(s, S) \Rightarrow \textsf{EmptyShapeIn}(s', S)$ for every set of points $S$.
     By instantiating this monotonicity lemma over all subsets $t \subseteq s$ with $|t| = 3$ we get the forward direction of the theorem.
-    For the backward direction it is easier to reason contrapositively: if $s$ does not hold the~$\textsf{ConvexPoints}$ predicate, or is not empty w.r.t. $S$, then we want to show that there is a traingle $t \subseteq s$ that is also not empty w.r.t. $S$. To see this, let $H$ be the convex hull of $s$, and then by Carath\'eodory's theorem (cf. \lstinline|theorem convexHull_eq_union| from \textsf{mathlib}), every point in $H$ is a convex combination of at most $3$ points in $s$, and consequently, of exactly $3$ points in $s$.
-    If $s$ is non-empty w.r.t. $S$, then there is a point $p \in S \setminus s$ that belongs to $H$, and by Carath\'eodory, $p$ is a convex combination of $3$ points in $s \setminus \{a\}$, and thus lies inside a triangle $t \subseteq s$ (\Cref{fig:triangulation-a}). If $s$ does not hold $\textsf{ConvexPoints}$, then there is a point $a \in s$ such that $a \in \textsf{convexHull}(s \setminus \{a\})$, and by Carath\'eodory again, $a$ is a convex combination of $3$ points in $s$, and thus lies inside a triangle $t \subseteq s \setminus \{a\}$ (\Cref{fig:triangulation-b}).
+    For the backward direction it is easier to reason contrapositively: if $s$ does not hold the~$\textsf{ConvexPoints}$ predicate, or is not empty w.r.t.~$S$, then we want to show that there is a triangle $t \subseteq s$ that is also not empty w.r.t.~$S$. To see this, let $H$ be the convex hull of $s$, and then by Carath\'eodory's theorem (cf. \lstinline|theorem convexHull_eq_union| from \textsf{mathlib}), every point in $H$ is a convex combination of at most $3$ points in $s$, and consequently, of exactly $3$ points in $s$.
+    If $s$ is non-empty w.r.t.~$S$, then there is a point $p \in S \setminus s$ that belongs to $H$, and by Carath\'eodory, $p$ is a convex combination of $3$ points in $s \setminus \{a\}$, and thus lies inside a triangle $t \subseteq s$ (\Cref{fig:triangulation-a}). If $s$ does not hold $\textsf{ConvexPoints}$, then there is a point $a \in s$ such that $a \in \textsf{convexHull}(s \setminus \{a\})$, and by Carath\'eodory again, $a$ is a convex combination of $3$ points in $s$, and thus lies inside a triangle $t \subseteq s \setminus \{a\}$ (\Cref{fig:triangulation-b}).
 %     The
-%     The forward direction is easy to see, as triangles are always convex, and if $s$ is empty w.r.t. $S$, then so are the triangles induced by vertices of $s$.
+%     The forward direction is easy to see, as triangles are always convex, and if $s$ is empty w.r.t.~$S$, then so are the triangles induced by vertices of $s$.
 %     Let $T = \{t_1, \ldots, t_{{k \choose 3}}\}$ be all the triangles induced by vertices of $s$.
 %    For the backward direction we will need a \emph{triangulation lemma} stating that the convex hull of $s$ can be partitioned into triangles $P = \{t_i, \ldots, t_j\}$, and $P \subseteq T$.
 %     To see that if every $t \in T$ is empty w.r.t. $S$ then $s$ is also empty w.r.t. $S$ we can use the contrapositive statement.
