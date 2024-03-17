@@ -1,0 +1,44 @@
+\begin{figure}
+  \caption{Encoding based on that of Heule and Scheucher for the Empty Hexagon Number~\cite{emptyHexagonNumber}. Unsatisfiability of the formula below for $n=30$ implies $h(6) \leq 30$, as detailed throughout the paper. }
+  \label{fig:full-encoding}
+% \begin{framed}
+  \begin{spreadlines}{16pt}
+\begin{gather}
+\hfsetfillcolor{green!10}
+\hfsetbordercolor{green!60!black}
+\tikzmarkin{b}(12.0,-0.9)(-0.5,0.5)
+  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{a, i, b}}  \right)\right) \text{ for all } 2 \leq a < i < b < c \leq n\label{eq:insideClauses1}\\
+  \cvar_{i; a,b, c} \rightarrow \left(\left(\orvar_{a,b,c} \leftrightarrow \orvar_{a, i, c}  \right) \land \left(\orvar_{a,b,c} \leftrightarrow \ov{\orvar_{b, i, c}}  \right)\right) \text{ for all } 2 \leq a < b < i < c \leq n\label{eq:insideClauses2}\\
+  \tikzmarkend{b}\Big(\bigwedge_{\substack{a < i < c\\ i \neq b}} \ov{\cvar_{i; a,b,c}}\Big) \rightarrow \hvar_{a, b, c} \quad \text{ for all } 2 \leq a < b < c \leq n\label{eq:holeDefClauses1}\\
+%
+\tikzmarkin{a}(12.0,-0.3)(-0.5,0.5)
+  \orvar_{a, b, c} \land \orvar_{a, c, d} \rightarrow \orvar_{a, b, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:signotopeClauses11}\\
+  \tikzmarkend{a}\ov{\orvar_{a, b, c}} \land \ov{\orvar_{a, c, d}} \rightarrow \ov{\orvar_{a, b, d}} \quad \text{ for all } 2 \leq a < b < c < d \leq n \label{eq:signotopeClauses12}\\
+%
+\hfsetfillcolor{blue!10}
+\hfsetbordercolor{blue!60!black}
+\tikzmarkin{c}(12.0,-0.4)(-0.5,0.6)
+  % \orvar_{1, b, c} \quad \text{ for all } 2 \leq b < c \leq n \label{eq:revLexClauses}\\
+  \tikzmarkend{c}\left(\orvar_{\lceil \frac{n}{2} \rceil -1, \lceil \frac{n}{2} \rceil,\lceil \frac{n}{2} \rceil+1}, \ldots, \orvar_{2,3,4} \right) \succeq_{\text{lex}} \left(\orvar_{\lfloor \frac{n}{2}\rfloor +1,  \lfloor \frac{n}{2}\rfloor +2, \lfloor \frac{n}{2}\rfloor +3}, \ldots, \orvar_{n-2, n-1, n} \right)\label{eq:revLexClauses}\\
+%
+\hfsetfillcolor{orange!10}
+\hfsetbordercolor{orange!60!black}
+\tikzmarkin{d}(12.0,-0.3)(-0.5,0.5)
+  \ov{\orvar_{a,b,c}} \land \ov{\orvar_{b,c,d}} \rightarrow \uvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n\label{eq:capDef}\\
+  \orvar_{a, b, c} \land \orvar_{b, c, d} \rightarrow \vvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n \label{eq:cupDef}\\
+  \uvar_{a,b,c} \land \ov{\orvar_{b,c,d}} \land \hvar_{a,b,d} \rightarrow \ufvar_{a, c, d} \quad \text{ for all } 2 \leq a < b < c < d \leq n,\; a+1<b\label{eq:capFDef}\\
+  \uvar_{a, c, d} \rightarrow \ov{\orvar_{a,c,d}} \quad \text{ for all } 2 \leq a < c < d \leq n,\ a+1<c\label{eq:capDef2}\\
+  \tikzmarkend{d}\vvar_{a, c, d} \rightarrow \orvar_{a,c,d} \quad \text{ for all } 2 \leq a < c < d \leq n,\; a+1<c\label{eq:cupDef2}\\
+%
+\hfsetfillcolor{red!10}
+\hfsetbordercolor{red!60!black}
+\tikzmarkin{e}(12.0,-0.5)(-0.5,0.5)
+  \neg(\ufvar_{a,d,e} \land \orvar_{a, b, e}) \quad \text { for all } 2 \leq a < d < e \leq n, \; a < b < e, \; a+2 < d\label{eq:no6Hole1Below}\\
+  \neg(\ufvar_{a,d,e} \land \ov{\orvar_{d, e, f}}) \quad \text { for all } 2 \leq a < d < e < f\leq n, \; a+2 < d\label{eq:no6Hole4Above}\\
+  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c,c'}) \quad \text{ for all } 2 \leq a < c < c' < d \leq n, \; a+1 < c\label{eq:no6Hole2Below1}\\
+  \neg(\uvar_{a,c,d} \land \vvar_{a, c', d} \land \hvar_{a,c',c}) \quad \text{ for all } 2 \leq a < c' < c < d \leq n, \; a+1 < c'\label{eq:no6Hole2Below2}\\
+  \tikzmarkend{e}\neg(\vvar_{a,c,d} \land \orvar_{c, d, e} \land \hvar_{a,c,e}) \quad \text{ for all } 2 \leq a < c < d < e \leq n, \; a+1 < c\label{eq:no6Hole3Below}
+  \end{gather}
+\end{spreadlines}
+% \end{framed}
+\end{figure}
