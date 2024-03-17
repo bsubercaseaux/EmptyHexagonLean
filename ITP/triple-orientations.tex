@@ -98,7 +98,7 @@ def σPtInTriangle (a p q r : Point) : Prop :=
   σ p a r = σ p q r ∧
   σ a q r = σ p q r
 
-theorem σPtInTriangle_iff {a p q r : Point} (gp : InGeneralPosition₄ a p q r) :
+theorem σPtInTriangle_iff {a p q r : Point} (gp : InGenPos₄ a p q r) :
   σPtInTriangle a p q r ↔ PtInTriangle a p q r
 \end{lstlisting}
 

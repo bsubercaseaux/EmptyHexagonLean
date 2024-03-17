@@ -56,7 +56,7 @@ Naturally, to use a  SAT-solver we need to parameterize~\Cref{thm:empty-triangle
 
 \begin{lstlisting}
   theorem EmptyTriangle10Theorem (pts : Finset Point)
-    (gp : PointFinsetInGeneralPosition pts)
+    (gp : PointFinsetInGenPos pts)
     (h : pts.card = 10) :
     ∃ (p q r : Point), {p, q, r} ⊆ pts ∧ EmptyTriangleIn p q r pts
 \end{lstlisting}
@@ -75,7 +75,7 @@ To complete the statement of the theorem, we must define~\texttt{EmptyTriangleIn
 
   /-- S is an empty triangle relative to pts -/
   structure EmptyTriangleIn (p q r : Point) (pts : Finset Point) : Prop :=
-    gp : InGeneralPosition₃ p q r
+    gp : InGenPos₃ p q r
     empty: ∀ a ∈ pts, ¬(pt_in_triangle a p q r)
 \end{lstlisting}
 

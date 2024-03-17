@@ -6,17 +6,17 @@ Consider four points $p, q, r, s$ that are sorted from left to right. If $p, q, 
 
 We prove these properties of the $\sigma$ function, justifying the addition of~\Cref{eq:signotopeClauses11,eq:signotopeClauses12}, as well as other similar properties that are useful for other proofs, even if not explicitly added to the encoding.
 \begin{lstlisting}
-theorem σ_prop₁ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGenPos₄ p q r s) :
+theorem σ_prop₁ (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = ccw → σ q r s = ccw → σ p r s = ccw
 
  [...]
 
-theorem σ_prop₃ {p q r s : Point} (h : Sorted₄ p q r s) (hGp : InGeneralPosition₄ p q r s) :
+theorem σ_prop₃ (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = cw → σ q r s = cw → σ p r s = cw
 \end{lstlisting}
 
 
-The proofs of these properties are based on an equivalence between the orientation of a triple of points and the \emph{slopes} of the lines that connect them. Namely, if $p, q, r$  are sorted from left to right, then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pq}) < \textsf{slope}(\vec{pr})$  and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\vec{pr}) < \textsf{slope}(\vec{qr})$. By proving first these \emph{slope-orientation} equivalences we can then easily prove e.g.,~\lstinline|σ_prop₁|, as illustrated in~\Cref{fig:orientation-implication}.
+The proofs of these properties are based on an equivalence between the orientation of a triple of points and the \emph{slopes} of the lines that connect them. Namely, if $p, q, r$  are sorted from left to right, then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pq}) < \textsf{slope}(\overrightarrow{pr})$  and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pr}) < \textsf{slope}(\overrightarrow{qr})$. By proving first these \emph{slope-orientation} equivalences we can then easily prove e.g.,~\lstinline|σ_prop₁|, as illustrated in~\Cref{fig:orientation-implication}.
 
 \begin{figure}
   \centering
