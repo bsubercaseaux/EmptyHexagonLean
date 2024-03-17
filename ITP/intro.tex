@@ -1,38 +1,43 @@
-Mathematicians are skeptical of proofs relying on extensive computation.
-However, there are many mathematically-interesting theorems that have been resolved by computation.
-Some examples include the proofs of
+Even though mathematicians are often skeptical of proofs relying on extensive computation (e.g., the four color theorem~\cite{Walters2004ItAT}),
+many mathematically-interesting theorems have been resolved that way. In the last decade, SAT-solving has shown to be a very powerful tool for mathematics, successfully resolving
 Keller's conjecture~\cite{brakensiek2023resolution},
 the packing chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023},
 the Pythagorean triples problem~\cite{Heule_2016},
 Lam's problem~\cite{21bright_sat_based_resolution_lams_problem},
 and one case of the Erd\H{o}s discrepancy conjecture~\cite{konev2014sat}.
-
-All of these proofs follow the same structure:
+All of these proofs rely on the same two-step structure:
 \begin{itemize}
-  \item[(i)] Reduce the mathematical theorem to an instance~$P$ of the boolean satisfiability problem (SAT).
-  \item[(ii)] Determine that $P$ has no satisfying truth assignment.\footnote{
-    A variant of this procedure uses \emph{satisfying assignments} for $P$ to construct explicit witnesses for the original theorem, but we focus on the unsatisfiable case.}
+\item \textbf{(Reduction)} One shows that the mathematical theorem of interest is true if a concrete CNF formula $F$ is unsatisfiable.
+\item \textbf{(Solving)} Show that $F$ is indeed unsatisfiable.
 \end{itemize}
 
-Formal methods researchers have created methods and tools for ensuring the correctness of step (ii).
-Modern SAT solvers produce proofs of unsatisfiability in a formal proof system,
+% \footnote{A variant of this procedure uses \emph{satisfying assignments} for $P$ to construct explicit witnesses for the original theorem, but we focus on the unsatisfiable case.}
+% \end{itemize}
+
+Formal methods researchers have devoted significant attention to making the \emph{solving} step reliable, reproducible and trustworthy. That is, to ensure that when a SAT-solver declares a formula $F$ to be unsatisfiable, the formula is indeed unsatisfiable.
+Modern SAT solvers produce proofs of unsatisfiability in formal systems
 such as DRAT~\cite{drat-trim14},
-that can be checked with verified proof checkers,
-such as \texttt{cake\_lpr}~\cite{tanVerifiedPropagationRedundancy2023}.
-Yet in the literature, less scrutiny has been applied to the correctness of step (i),
-leaving room for doubt that any results relying on such reduction arguments are correct.
+that can in turn be checked with verified proof checkers,
+such as \texttt{cake\_lpr}~\cite{tanVerifiedPropagationRedundancy2023}. 
+On the other hand, the \emph{reduction} step can hardly be addressed through general tools, since reductions are often highly problem-specific and require deep mathematical insights.
+It is therefore the reduction step that poses the greatest challenge to the trustworthiness of SAT-based proofs in mathematics. 
+% The correctness of the \emph{reduction} step, however, has received 
+% leaving room for doubt that any results relying on such reduction arguments are correct.
 
-A recent result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
-They resolve a variant of the Happy Ending Problem,
-in particular that every set of 30 points in general position contains an empty convex hexagon.
-Their proof relies on a complicated reduction to SAT
-involving numerous nontrivial geometric optimizations and symmetry-breaking arguments.
+A recent breakthrough from Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry is a perfect example of the complexity of reducing mathematical theorems to propositional formulas that can be solved efficiently. Indeed, they constructed (and solved) a formula $F$ whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon.
+However, as it is common in such results, their reduction argument is only sketched, relying heavily on intuition, and leaving several gaps to be filled.
+ 
 
-In this paper, we prove their result in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}
-by connecting existing geometric definitions
-in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2020}.
-to the unsatisfiability of a particular SAT instance.
-This sets a new standard for verifying results which rely on extensive computation.
+% result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
+% They resolve a variant of the Happy Ending Problem,
+% in particular that every set of 30 points in general position contains an empty convex hexagon.
+% Their proof relies on a complicated reduction to SAT
+% involving numerous nontrivial geometric optimizations and symmetry-breaking arguments.
+
+In this paper we complete and formalize the reduction of Heule and Scheucher in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}.
+We do so by connecting existing geometric definitions
+in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2020}
+to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation.
 
 Our formalization is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.
 
