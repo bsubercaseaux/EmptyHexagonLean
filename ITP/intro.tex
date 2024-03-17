@@ -69,6 +69,7 @@ In a similar spirit,
 Erd\H{o}s defined $h(k)$
 to be the minimal number of points in general position
 that is guaranteed to contain a \emph{$k$-hole},
+or \emph{empty $k$-gon},
 meaning a convex $k$-gon with no other point inside.
 It is easy to check that $h(3) = 3$ and $h(4) = 5$.
 In 1978, Harborth established that $h(5) = 10$~\cite{Harborth1978}.
@@ -106,7 +107,7 @@ who improved on the speed needed to obtain $g(6) = 17$,
 and trustworthiness of this result,
 by replacing bespoke code with a SAT encoding
 and verifying this encoding in \textsf{Isabelle/HOL}.
-We compare this with our work in more detail in~\Cref{sec:related-work}.
+We give a detailed comparison between this work and ours in~\Cref{sec:related-work}.
 The solution to the Pythagorean triples problem
 was verified in the \textsf{Coq} proof assistant
 by Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}.

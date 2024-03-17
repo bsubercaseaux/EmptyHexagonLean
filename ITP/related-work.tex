@@ -1,0 +1,101 @@
+Our formalization is closely related to a prior development
+in which Marić put proofs of $g(6) \leq 17$ on a more solid foundation \cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}.
+The inequality,
+originally obtained by Szekeres and Peters \cite{06szekeres_computer_solution_17_point_erdos_szekeres_problem}
+using a bespoke, unverified search algorithm,
+was confirmed in the work of Marić
+by means of a formally verified SAT encoding.
+Introducing an optimized encoding based on nested convex hull structures
+and leveraging accumulated progress in SAT solving technology [citation?],
+this approach also improved on the time to solution
+
+Our work focuses on the closely related problem
+of determining $k$-hole numbers $h(k)$.
+Rather than devising a new SAT encoding,
+we use one from Heule and Scheucher \cite{emptyHexagonNumber}
+in a lightly modified form.
+
+Despite the different focus,
+a proof of $g(6) \leq 17$ can be obtained easily
+as a corollary of our development:
+asserting the hole variables $\hvar_{a,b,c}$ as unit clauses,
+leaving the remainder of the encoding in~\Cref{fig:full-encoding} unchanged,
+trivializes constraints that have to do with emptiness
+so that only convexity constraints remain.
+The resulting CNF formula
+asserts the existence of a set of $n$ points
+with no convex $6$-gon.
+We find this formula to be unsatisfiable for $n = 17$,
+giving the classic
+\begin{lstlisting}
+theorem gon_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
+    (h : pts.length ≥ 17) : HasConvexKGon 6 pts.toFinset
+\end{lstlisting}
+However, it would not be as easy
+to attack $g(k)$ for $k \neq 6$ using this particular encoding.
+
+As both formalizations are executable,
+we can perform a direct comparison against Marić's encoding.
+On a personal laptop,
+we find that it takes negligible time (below 1s)
+for our verified Lean encoder to generate a CNF,
+which then takes around 28s to solve.
+In contrast,
+the Isabelle/HOL-based encoder takes around 10 minutes [TODO precis] to generate a CNF,
+which then takes around 787s to solve.
+
+To avoid encoding overhead,
+Marić resorts to trusting a C++ encoder
+whose code has been manually compared against the Isabelle/HOL specification:
+something we do not have to do.
+The difference in solving time
+can likely be accounted for by differences in the respective encodings,
+in particular their symmetry breaking strategies.
+The encoding of Heule and Scheucher uses $\mathcal O(n^4)$ clauses
+to look for a $6$-hole or $6$-gon in $n$ points,
+whereas the one of Marić uses $\mathcal O(n^6)$ clauses.
+They are based on different ideas:
+the former as detailed in~\Cref{sec:symmetry-breaking},
+whereas the latter on nested convex hulls.
+The different approaches have been discussed by Scheucher \cite{scheucherTwoDisjoint5holes2020}.
+The progress in solving times
+represents an encouraging state of affairs;
+we are optimistic that if continued,
+it could lead to an eventual resolution of $g(7)$.
+
+Further differences regard what exactly was formally proven.
+Like most work in this area,
+we use the combinatorial abstraction of triple orientations.
+We and Marić alike show that point sets in $\mathbb R^2$
+satisfy orientation properties (\Cref{sec:properties-of-sigma}).
+However, our work goes further in building the connection
+between geometry and combinatorics:
+our definitions of convexity and emptiness (\Cref{sec:geometry}),
+and consequently the theorem statements,
+are the geometric ones based on convex hulls
+as defined in Lean's \texttt{mathlib} \cite{20lean_mathematical_library}.
+In contrast, Marić axiomatizes these as being about specific values of $\sigma$.
+Thus one has to trust that each combinatorial abstraction
+corresponds exactly to the geometric concept.
+
+A final point of difference concerns the verification of SAT proofs.
+Marić fully reconstructs some of their results,
+though not the main one for $g(6)$,
+in an NbE-based proof checker for Isabelle/HOL.
+We make no such attempt for the time being,
+instead passing our SAT proofs through the the formally verified proof checker \texttt{cake\_lpr} \cite{tanVerifiedPropagationRedundancy2023}
+and asserting unsatisfiability of the CNF as an axiom in Lean.
+Thus we are trusting that the CNF formula produced by the verified Lean encoder
+is the same one whose unsatisfiability was checked by \texttt{cake\_lpr}.
+Everything else has been verified.
+
+We know of no other formal proofs of Erd\H{o}s-Szekeres-type problems.
+
+% WN: Maybe put this in the symmetry breaking section?
+Compared to the work of Heule and Scheucher which we have verified \cite{emptyHexagonNumber},
+besides the significant improvement in trust,
+we have streamlined the symmetry breaking argument somewhat.
+It no longer requires applying continuity of the determinant map,
+or shearing points to have positive $y$ coordinates.
+
+% WN: Anything else that should be mentioned here?
