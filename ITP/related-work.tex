@@ -45,7 +45,10 @@ we find that it takes negligible time (below 1s)
 for our verified Lean encoder to generate a CNF,
 which then takes around 28s to solve.
 In contrast,
-the Isabelle/HOL-based encoder takes around 10 minutes [TODO precis] to generate a CNF,
+Marić's encoder running in Isabelle/HOL 2016\footnote{
+The latest version that accepts the codebase
+without broader changes.}
+takes 437s to generate a CNF,
 which then takes around 787s to solve.
 
 To avoid encoding overhead,
