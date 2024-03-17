@@ -28,7 +28,7 @@ As illustrated in~\Cref{fig:sigma-equiv}, there are pointsets that are only $\si
 
 \input{fig-symmetry-breaking.tex}
 \begin{proof}[Proof Sketch]
-The proof consists in 6 steps, illustrated in~\Cref{fig:symmetry-break$ing}. In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one, and the last one will be in canonical position.
+The proof consists in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}. In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one, and the last one will be in canonical position.
 The main justification for each step is that, given that the function $\sigma$ is defined as a sign of the determinant, applying transformations that preserve the sign of the determinant will preserve the values of $\sigma$. In particular, given the identity $\det(AB) = \det(A)\det(B)$, if we apply a transformation to the points that corresponds to multiplying by a matrix $B$ such that $\det(B) > 0$, then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved.
 In step 1, we transform the list of points so that no two points share the same $x$-coordinate. This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix, whose determinant is $1$. 
 In step 2, we translate all points by a constant vector $t$, by multiplying by a translation matrix, so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate. We relocate the point $(0,0)$ to the front of the list, denoting it by $p_1$, and we denote by $L_2$ rest of the list this transformation.
@@ -45,7 +45,7 @@ In step 5, we check whether the \emph{Left-Right order} condition above is satis
 In step 6, we bring point $(0, \infty)$ back into the range by finding a large enough value $M$ such that $(0, M)$ has the same orientation with respect to the other points as $(0, \infty)$ did, meaning that 
 \[
 \sigma((0, M), q, r) = \sigma_{(0, \infty)}(q, r), \quad \text{for all } q, r \in L_3.
-.\] Finally, we note that the list of points obtained in step 6 satisfies the \text{CCW-order} property by the following reasoning. Let $1 < i < j \leq n$ be indices, and note that 
+\] Finally, we note that the list of points obtained in step 6 satisfies the \text{CCW-order} property by the following reasoning. Let $1 < i < j \leq n$ be indices, and note that 
 \begin{align*}
   \sigma(p_1, p_i, p_j) = 1 &\iff \sigma((0, M), p_i, p_j) = 1\\
                             &\iff \sigma_{(0, \infty)}(p_i, p_j) = 1\tag{By step 6}\\
