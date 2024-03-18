@@ -32,7 +32,13 @@ The proof consists in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}. In e
 The main justification for each step is that, given that the function $\sigma$ is defined as a sign of the determinant, applying transformations that preserve the sign of the determinant will preserve the values of $\sigma$. In particular, given the identity $\det(AB) = \det(A)\det(B)$, if we apply a transformation to the points that corresponds to multiplying by a matrix $B$ such that $\det(B) > 0$, then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved.
 In step 1, we transform the list of points so that no two points share the same $x$-coordinate. This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix, whose determinant is $1$. 
 In step 2, we translate all points by a constant vector $t$, by multiplying by a translation matrix, so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate. We relocate the point $(0,0)$ to the front of the list, denoting it by $p_1$, and we denote by $L_2$ rest of the list this transformation.
-Then, in step 3, we  apply the projective transformation $f: (x, y) \mapsto (y/x, 1/x)$ to every point in $L_2$, showing that this preserves orientations within $L_2$. To preserve orientations with respect to the leftmost point $(0, 0)$ as well, we set $f( (0, 0)) = (0, \infty)$, a special point that is treated separately as follows. Given the function $\sigma$ takes points in $\mathbb{R}^2$ as arguments, we define the natural extension:
+Then, in step 3, we  apply the projective transformation $f: (x, y) \mapsto (y/x, 1/x)$ to every point in $L_2$, showing that this preserves orientations within $L_2$.
+To see that this mapping preserves orientation consider that 
+\begin{align*}
+ \sign \det \begin{pmatrix} p_x & q_x & r_x \\ p_y & q_y & r_y \\ 1 & 1 & 1 \end{pmatrix} &=  \sign \det \left( \begin{pmatrix} 0 & 0 & 1 \\ 1 & 0 & 0\\ 0 & 1 & 0 \end{pmatrix}  \begin{pmatrix} \nicefrac{p_y}{p_x} & \nicefrac{q_y}{q_x} & \nicefrac{r_y}{r_x} \\ \nicefrac{1}{p_x} & \nicefrac{1}{q_x} & \nicefrac{1}{r_x} \\ 1 & 1 & 1 \end{pmatrix}  \begin{pmatrix} p_x & 0 & 0 \\ 0 & q_x & 0\\ 0 & 0 & r_x \end{pmatrix} \right)\\
+                        &= \sign \left(1 \cdot \det  \begin{pmatrix} \nicefrac{p_y}{p_x} & \nicefrac{q_y}{q_x} & \nicefrac{r_y}{r_x} \\ \nicefrac{1}{p_x} & \nicefrac{1}{q_x} & \nicefrac{1}{r_x} \\ 1 & 1 & 1 \end{pmatrix} \cdot  p_x q_x r_x  \right)\\ &= \sign \det \begin{pmatrix} p_y/p_x & q_y/q_x & r_y/r_x \\ 1/p_x & 1/q_x & 1/r_x \\ 1 & 1 & 1 \end{pmatrix}.
+\end{align*}
+To preserve orientations with respect to the leftmost point $(0, 0)$ as well, we set $f( (0, 0)) = (0, \infty)$, a special point that is treated separately as follows. Given the function $\sigma$ takes points in $\mathbb{R}^2$ as arguments, we define the natural extension:
 \[
   \sigma_{(0, \infty)}(q, r) = \begin{cases}
     1 & \text{if } q_x < r_x, \\
@@ -41,13 +47,13 @@ Then, in step 3, we  apply the projective transformation $f: (x, y) \mapsto (y/x
 \] 
 And then show that $\sigma((0, 0), q, r) = \sigma_{(0, \infty)}(f(q), f(r))$ for all points $q, r \in L_2$. 
 In step 4, we sort the list $L_2$ in increasing order of $x$-coordinate, thus obtaining a list $L_3$. This can be done preserving $\sigma$-equivalence because sorting corresponds to a bijection between $L_2$ and $L_3$.
-In step 5, we check whether the \emph{Left-Right order} condition above is satisfied in $L_3$, and if it is not, we reflect the pointing by applying $g: (x, y) \mapsto (-x, y)$, which as explained above, preserves $\sigma$-equivalence by leveraging the parity option in the definition.
-In step 6, we bring point $(0, \infty)$ back into the range by finding a large enough value $M$ such that $(0, M)$ has the same orientation with respect to the other points as $(0, \infty)$ did, meaning that 
+In step 5, we check whether the \emph{Left-Right order} condition above is satisfied in $L_3$, and if it is not, we reflect the pointset, which as explained above, preserves $\sigma$-equivalence by leveraging the parity option in the definition. Note that in such a case we need to relabel the points from left to right again. 
+In step 6, we bring point $(0, \infty)$ back into the range by first finding a constant $c$ such that all points in $L_3$ are to the right of the line $y=c$, and then finding a large enough value $M$ such that $(c, M)$ has the same orientation with respect to the other points as $(0, \infty)$ did, meaning that 
 \[
-\sigma((0, M), q, r) = \sigma_{(0, \infty)}(q, r), \quad \text{for all } q, r \in L_3.
+\sigma((c, M), q, r) = \sigma_{(0, \infty)}(q, r), \quad \text{for all } q, r \in L_3.
 \] Finally, we note that the list of points obtained in step 6 satisfies the \text{CCW-order} property by the following reasoning. Let $1 < i < j \leq n$ be indices, and note that 
 \begin{align*}
-  \sigma(p_1, p_i, p_j) = 1 &\iff \sigma((0, M), p_i, p_j) = 1\\
+  \sigma(p_1, p_i, p_j) = 1 &\iff \sigma((c, M), p_i, p_j) = 1\\
                             &\iff \sigma_{(0, \infty)}(p_i, p_j) = 1\tag{By step 6}\\
                             &\iff (p_i)_x < (p_j)_x \tag{By definition of $\sigma_{(0, \infty)}$}\\
                             &\iff \textsf{true} \tag{By step 4, since points are sorted and $i < j$}.
