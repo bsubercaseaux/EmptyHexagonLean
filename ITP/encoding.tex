@@ -76,27 +76,43 @@ corresponding to $S$. We then have:
 
 \subparagraph*{Satisfaction.}
 We now have to justify that the clauses of $\phi_n$
-are satisfied by the intended interpretation $\tau_S$.
+are satisfied by the intended interpretation $\tau_S$
+for a $6$-hole-free point set $S$.
 The variable-defining clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:capDef,eq:cupDef,eq:capFDef,eq:capDef2,eq:cupDef2}
 follow essentially by definition combined with boolean reasoning.
 The orientation properties~\labelcref{eq:signotopeClauses11,eq:signotopeClauses12}
-have been established in the family of theorems \lstinline|theorem σ_propᵢ|.
+have been established in the family of theorems \lstinline|σ_propᵢ|.
 The lexicographic ordering clauses~\labelcref{eq:revLexClauses}
 follow from the \textbf{Lex order} property of canonical positions.
-Thus we are left with clauses~\labelcref{eq:no6Hole1Below,eq:no6Hole4Above,eq:no6Hole2Below1,eq:no6Hole2Below2,eq:no6Hole3Below}.
-These forbid the presence of certain $6$-holes.\footnote{
+Thus we are left with clauses~\labelcref{eq:no6Hole1Below,eq:no6Hole4Above,eq:no6Hole2Below1,eq:no6Hole2Below2,eq:no6Hole3Below}
+which forbid the presence of certain $6$-holes.\footnote{
 They are intended to forbid \emph{all} $6$-holes,
 but we do not prove completeness.}
+Justifying these is by far the most complicated
+part of the proof.
+We illustrate it for clause~\labelcref{eq:no6Hole1Below}.
+It is easier to state the contrapositive:
+if $\tau_S(\ufvar_{a,d,e}) = \tau_S(\orvar_{a,b,e}) = 1$,
+then $S$ contains a $6$-hole.
+To show this, we need to introduce \lstinline{Arc}s, \lstinline|σCCWPoints|,
+and prove two key lemmas.
 
-[WIP]
-We illustrate the proof of clause~\labelcref{eq:no6Hole1Below}
-This proof relies on two key lemmas:
-first, that two arcs can be put together into \lstinline|σCCWPoints|
-second, that any \lstinline|σCCWPoints| containing a $3$-hole
-must form a $6$-hole.
+\begin{lstlisting}
+inductive Arc (w : CanonicalPoints) (o : Orientation) :
+    List (Fin w.length) → Prop where
+  | one : a < b → Arc w o [a, b]
+  | cons : a < b →
+    σ w[a] w[b] w[c] = o → Arc w o (b::c::l) → Arc w o (a::b::c::l)
 
-[Frankenstein'd here, TODO Fix]
-Another key idea required for the proof is that of ``\emph{triangulations}'': given any convex point set $S$ and a line $\overleftrightarrow{ab}$ between vertices of $S$, the convex hull of $S$ is contained in the convex hull of points on each side of $\overleftrightarrow{ab}$. That is:
+def σCCWPoints : List Point → Prop
+  | [] => True
+  | a :: l => l.Pairwise (σ a · · = .ccw) ∧ σCCWPoints l
+\end{lstlisting}
+
+\textbf{Triangulations.} Given any convex point set $S$
+and a line $\overleftrightarrow{ab}$ between vertices of $S$,
+the convex hull of $S$ is contained in the convex hull
+of points on each side of $\overleftrightarrow{ab}$. That is:
 \begin{lstlisting}
 theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
@@ -114,21 +130,30 @@ By using this lemma repeatedly, we can slice up a convex $k$-gon into smaller pi
     To show that $z\in \overline{ab}$, suppose not, so that $a$ lies between $z$ and $b$ (see \Cref{fig:triangulation2-b}). (The case where $z$ is on the $b$ side is similar.) We can decompose $z$ as a convex combination of some $w\in \overline{S\setminus\{a\}}$ and $a$, which means that $w,z,a,b$ are collinear and appear in this order on the line. Therefore $a$ is a convex combination of $w$ and $b$, which means that $a\in \overline{S\setminus\{a\}}$ which violates convexity of $S$.
 \end{proof}
 
+\textbf{Joining arcs.} two arcs can be put together into a \lstinline|σCCWPoints|
+% theorem Arc.join (H1 : Arc w .ccw (a::l₁++[b])) (H2 : Arc w .cw (a::l₂++[b])) :
+%    σCCWPoints ((a::l₁++b::l₂.reverse).map (w[·])) := by
+
+% theorem satisfies_no6Hole1Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset)
+%    {a d e f : Fin w.rlen} (ae : a < e) (ef : e < f) :
+%    (no6Hole1Below a d f e).eval (w.toPropAssn holes) := by
+%  simp [no6Hole1Below]; intro ⟨df, c, ⟨b, ab, bc, cd, abc, bcd⟩, cdf, acf⟩ aef
+%  have := Arc.join (l₁ := [_]) (l₂ := [_,_,_])
+%    (.cons' ae aef <| .one' ef)
+%    (.cons' ab abc <| .cons' bc bcd <| .cons' cd cdf <| .one' df)
+%  refine hw <| this.emptyHexagonIf w.gp (acf · |>.perm₂) (subset_map' w [a, e, f, d, c, b])
+
+\begin{proof}[Proof of clause~\labelcref{eq:no6Hole1Below}]
+any \lstinline|σCCWPoints| containing a $3$-hole must form a $6$-hole.
+% TODO inline proof of
+% theorem σCCWPoints.emptyHexagon
+%    (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S)
+%    (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
+%    σHasEmptyKGon 6 S.toFinset := by
+\end{proof}
+
 \subparagraph*{QED.}
 Having now shown that if $\phi_{30}$ were unsatisfiable,
 our main result would follow,
 we run a distributed computation to confirm the antecedent
 and conclude the proof.
-
-% file-local attic:
-
-%This is captured by the following two fundamental asymmetries:
-%\begin{lstlisting}
-%  lemma σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
-%  lemma σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
-%\end{lstlisting}
-
-% theorem σCCWPoints.emptyHexagon
-%    (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S)
-%    (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
-%    σHasEmptyKGon 6 S.toFinset := by
