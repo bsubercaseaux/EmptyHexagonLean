@@ -1,5 +1,6 @@
 # EmptyHexagonLean
-A Lean verification of the empty hexagon number, obtained by a [recent breakthrough of Heule and Scheucher](https://arxiv.org/abs/2403.00737).
+A Lean verification of the _Empty Hexagon Number_, obtained by a [recent breakthrough of Heule and Scheucher](https://arxiv.org/abs/2403.00737).
+The main theorem is that every finite set of 30 or more points must contain a convex and empty 6-gon. The proof is based on generating a CNF formula whose unsatisfiability is formally proved to imply the theorem. This repository contains the formalization code, and it allows the generation of the associated CNF.
 
 
 
