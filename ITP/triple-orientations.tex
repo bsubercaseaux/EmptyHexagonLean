@@ -79,10 +79,10 @@ def OrientationProperty (P : List Point → Prop) :=
   ∀ {{S T}}, S ≃σ T → (P S ↔ P T) -- `≃σ` is infix notation for `σEquiv`
 \end{lstlisting}
 
-To illustrate how these notions will be used, let us consider the property, corresponding to \lstinline|HasConvexEmptyKGon|.
-\[
-  \pi_k(S) \triangleq \text{\em ``pointset } S \text{ contains an empty convex } k\text{-gon''}.
-\]
+To illustrate how these notions will be used, let us consider the property
+\(
+  \pi_k(S) \triangleq \text{\em ``pointset } S \text{ contains an empty convex } k\text{-gon''}
+\),  which corresponds to \lstinline|HasConvexEmptyKGon|.
 
 Based on \lstinline|ConvexEmptyIn.iff_triangles|, we know that $\pi_k(S)$ can be written in terms of triangles that are empty w.r.t $S$. We can define triangle emptiness using $\sigma$, and prove its equivalence to the geoemetric definition.
 \begin{lstlisting}
