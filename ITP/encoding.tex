@@ -153,8 +153,22 @@ any \lstinline|σCCWPoints| containing a $3$-hole must form a $6$-hole.
 %    σHasEmptyKGon 6 S.toFinset := by
 \end{proof}
 
+\subparagraph*{Running and Proof Checking}
+We solved the SAT formula $\phi_{30}$ produced Lean using the same setup as 
+Heule and Scheucher~\cite{emptyHexagonNumber}, although we used different hardware, 
+i.e., the Bridges 2 cluster of the Pittsburgh Supercomputing Center. 
+Following Heule and Scheucher, we use a partition of the problem into 312\,418 subproblems. Each of these subproblems was
+solved using {\tt CaDiCaL} version 1.9.5. The solver produced a LRAT proof for each execution,
+which was concurrently validated using the {\tt cake\_lpr} verified checker to avoid writing/storing/reading large files. 
+The total runtime was 25876.5 CPU hours, so roughly 3 CPU years. The difference in runtime is purely due to the 
+difference in hardware. Additionally, we validated that the subproblems together cover the entire search space. 
+This was done by another formula that took 20 seconds to solve. 
+
+
 \subparagraph*{QED.}
 Having now shown that if $\phi_{30}$ were unsatisfiable,
 our main result would follow,
 we run a distributed computation to confirm the antecedent
 and conclude the proof.
+
+
