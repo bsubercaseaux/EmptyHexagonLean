@@ -92,9 +92,7 @@ def PtInTriangle (a : Point) (p q r : Point) : Prop :=
 
 /-- `Means that `a' is in the triangle `pqr' strictly, not on the boundary. -/
 def σPtInTriangle (a p q r : Point) : Prop :=
-  σ p q a = σ p q r ∧
-  σ p a r = σ p q r ∧
-  σ a q r = σ p q r
+  σ p q a = σ p q r ∧ σ p a r = σ p q r ∧  σ a q r = σ p q r
 
 theorem σPtInTriangle_iff {a p q r : Point} (gp : InGenPos₄ a p q r) :
   σPtInTriangle a p q r ↔ PtInTriangle a p q r
@@ -122,9 +120,8 @@ def σIsEmptyTriangleFor (a b c : Point) (S : Set Point) : Prop :=
   ∀ s ∈ S, ¬σPtInTriangle s a b c
 
 def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧
-    ∀ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
-      σIsEmptyTriangleFor a b c S
+  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ∀ (a ∈ s) (b ∈ s) (c ∈ s), 
+  a ≠ b → a ≠ c → b ≠ c → σIsEmptyTriangleFor a b c S
 
 theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : Point.ListInGenPos pts) :
       σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset
@@ -223,7 +220,7 @@ The proofs of these properties are based on an equivalence between the orientati
       \node[] at ( \i*\localspacing +3.4, 1.3) {$r$};
 
       \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (s\i) at ( \i*\localspacing +4.0, 3.25) {};
-      \node[] at ( \i*\localspacing +4.05, 3) {$s$};
+      \node[] at ( \i*\localspacing +3.75, 3) {$s$};
     }
 
     % \newcommand{\localdx}{0.25}
