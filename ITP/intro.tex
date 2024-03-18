@@ -1,6 +1,6 @@
 Even though mathematicians are skeptical of proofs that rely on extensive computation (e.g., the four color theorem~\cite{Walters2004ItAT}),
 many mathematically-interesting theorems have been resolved that way.
-In the last decade, SAT solving has been a powerful tool for mathematics, successfully resolving
+SAT solving in particular has been a powerful tool for mathematics, successfully resolving
 Keller's conjecture~\cite{brakensiek2023resolution},
 the packing chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023},
 the Pythagorean triples problem~\cite{Heule_2016},
@@ -27,8 +27,8 @@ In contrast, the \emph{reduction} step can use problem-specific mathematical ins
 
 A perfect example of the complexity of this reduction step can be found in a recent breakthrough of Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry. 
 They constructed (and solved) a formula $F$ whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon.
-However, as is common with such results, their reduction argument was only sketched, relying heavily on intuition,
-and it left several gaps to be filled in.
+However, as is common with such results, their reduction argument was only sketched, relied heavily on intuition,
+and left several gaps to be filled in.
  
 
 % result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
@@ -43,29 +43,28 @@ in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2
 to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation.
 
 \subparagraph*{Verification of SAT proofs.}
-Formal verification plays a crucial role in the SAT community,
-for example in verified solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
-and proof checking~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
-Despite this,
-not many mathematical proofs obtained through SAT-solving
-have been formally verified.
+As already mentioned, formal verification plays a crucial role in certifying the solving step of SAT-based results.
+For example, theorem provers and formal methods tools have been used to verify solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
+and proof checkers~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
+However, the reduction step has not received similar scrutiny.
 
-In SAT-based combinatorial geometry,
-formal verification was pioneered by Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}
-who improved on the speed needed to obtain $g(6) = 17$,
-and trustworthiness of this result,
-by replacing bespoke code with a SAT encoding
-and verifying this encoding in \textsf{Isabelle/HOL}.
-We give a detailed comparison between this work and ours in~\Cref{sec:related-work}.
+Some work has been done to verify the reductions to SAT underlying these kinds of mathematical results.
 The solution to the Pythagorean triples problem
 was verified in the \textsf{Coq} proof assistant
 by Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}.
+More generally,
 Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} provide a \textsf{CakeML} library
-for verified SAT encodings
-which they demonstrated on different puzzles
+of verified SAT encodings,
+which they used to write verified reductions from different puzzles
 (e.g., Sudoku, Kakuro, the \emph{N-queens} problem).
-As far as verifying SAT encodings in Lean,
-we base our work on that of Codel, Avigad, and Heule~\cite{Cayden}.
+The reduction verification techniques we use in this paper
+are based on that of Codel, Avigad, and Heule~\cite{Cayden} in the Lean theorem prover.
+
+Formal verification for SAT-based combinatorial geometry
+was pioneered by Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}.
+He used \textsf{Isabelle/HOL} to verify the reduction of $g(6) = 17$ to SAT,
+while also improving on the reduction to make the generated formula easier to solve.
+We give a detailed comparison between his work and ours in~\Cref{sec:related-work}.
 
 \subparagraph*{Lean.}
 Initially developed by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015},
