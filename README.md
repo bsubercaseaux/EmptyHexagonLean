@@ -1,6 +1,6 @@
 # EmptyHexagonLean
-A Lean verification of the empty hexagon theorem.
-![Orientation constraints from the boolean formulas used in this work.](image.png)
+A Lean verification of the empty hexagon number, obtained by a [recent breakthrough of Heule and Scheucher](https://arxiv.org/abs/2403.00737).
+
 
 
 ## Installing Lean
