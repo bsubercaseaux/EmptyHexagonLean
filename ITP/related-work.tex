@@ -6,16 +6,15 @@ using a bespoke, unverified search algorithm,
 was confirmed in the work of Marić
 by means of a formally verified SAT encoding.
 Introducing an optimized encoding based on nested convex hull structures
-and leveraging accumulated progress in SAT solving technology [citation?],
+and leveraging accumulated progress in SAT solving technology, % BS: I think it's fine without citation
 this approach also improved on the time to solution
 
 Our work focuses on the closely related problem
 of determining $k$-hole numbers $h(k)$.
 Rather than devising a new SAT encoding,
-we use one from Heule and Scheucher \cite{emptyHexagonNumber}
+we use one from Heule and Scheucher~\cite{emptyHexagonNumber}
 in a lightly modified form.
-
-Despite the different focus,
+Interestingly,
 a proof of $g(6) \leq 17$ can be obtained easily
 as a corollary of our development:
 asserting the hole variables $\hvar_{a,b,c}$ as unit clauses,
@@ -35,8 +34,8 @@ giving the classic
 theorem gon_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
     (h : pts.length ≥ 17) : HasConvexKGon 6 pts.toFinset
 \end{lstlisting}
-However, it would not be as easy
-to attack $g(k)$ for $k \neq 6$ using this particular encoding.
+% However, it would not be as easy
+% to attack $g(k)$ for $k \neq 6$ using this particular encoding. BS: just to save space; it's not a bad sentence but also not key
 
 As both formalizations are executable,
 we can perform a direct comparison against Marić's encoding.
@@ -45,9 +44,10 @@ we find that it takes negligible time (below 1s)
 for our verified Lean encoder to generate a CNF,
 which then takes around 28s to solve.
 In contrast,
-Marić's encoder running in Isabelle/HOL 2016\footnote{
-The latest version that accepts the codebase
-without broader changes.}
+Marić's encoder, running in Isabelle/HOL 2016,
+% \footnote{
+% The latest version that accepts the codebase
+% without broader changes.} BS: just to save space
 takes 437s to generate a CNF,
 which then takes around 787s to solve.
 
@@ -74,13 +74,13 @@ Further differences regard what exactly was formally proven.
 Like most work in this area,
 we use the combinatorial abstraction of triple orientations.
 We and Marić alike show that point sets in $\mathbb R^2$
-satisfy orientation properties (\Cref{sec:properties-of-sigma}).
+satisfy orientation properties (\Cref{sec:triple-orientations}).
 However, our work goes further in building the connection
 between geometry and combinatorics:
 our definitions of convexity and emptiness (\Cref{sec:geometry}),
 and consequently the theorem statements,
 are the geometric ones based on convex hulls
-as defined in Lean's \texttt{mathlib} \cite{The_mathlib_Community_2020}.
+as defined in Lean's \texttt{mathlib}~\cite{The_mathlib_Community_2020}.
 In contrast, Marić axiomatizes these as being about specific values of $\sigma$.
 Thus one has to trust that each combinatorial abstraction
 corresponds exactly to the geometric concept.
@@ -96,13 +96,9 @@ Thus we are trusting that the CNF formula produced by the verified Lean encoder
 is the same one whose unsatisfiability was checked by \texttt{cake\_lpr}.
 Everything else has been verified.
 
-We know of no other formal proofs of Erd\H{o}s-Szekeres-type problems.
+% We know of no other formal proofs of Erd\H{o}s-Szekeres-type problems.
 
 % WN: Maybe put this in the symmetry breaking section?
-Compared to the work of Heule and Scheucher which we have verified \cite{emptyHexagonNumber},
-besides the significant improvement in trust,
-we have streamlined the symmetry breaking argument somewhat.
-It no longer requires applying continuity of the determinant map,
-or shearing points to have positive $y$ coordinates.
+
 
 % WN: Anything else that should be mentioned here?

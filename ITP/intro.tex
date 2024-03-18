@@ -24,7 +24,6 @@ These tools ensure that when a SAT solver declares a formula~$F$ to be unsatisfi
 In contrast, the \emph{reduction} step can use problem-specific mathematical insights that, when left unverified, threaten the trustworthiness of SAT-based proofs in mathematics. 
 % The correctness of the \emph{reduction} step, however, has received 
 % leaving room for doubt that any results relying on such reduction arguments are correct.
-
 A perfect example of the complexity of this reduction step can be found in a recent breakthrough of Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry. 
 They constructed (and solved) a formula $F$ whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon.
 However, as is common with such results, their reduction argument was only sketched, relied heavily on intuition,
@@ -47,7 +46,6 @@ As already mentioned, formal verification plays a crucial role in certifying the
 For example, theorem provers and formal methods tools have been used to verify solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
 and proof checkers~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
 However, the reduction step has not received similar scrutiny.
-
 Some work has been done to verify the reductions to SAT underlying these kinds of mathematical results.
 The solution to the Pythagorean triples problem
 was verified in the \textsf{Coq} proof assistant
@@ -72,8 +70,7 @@ the Lean theorem prover has become a popular choice for formalizing modern mathe
 Recent successes include the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}
 and the proof of the polynomial Freiman-Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023},
 both of which brought significant attention to Lean.
-
-One selling point for Lean is the \textsf{mathlib} project~\cite{The_mathlib_Community_2020},
+A major selling point for Lean is the \textsf{mathlib} project~\cite{The_mathlib_Community_2020},
 a monolithic formalization of foundational mathematics.
 By relying on \textsf{mathlib} for definitions, lemmas, and proof tactics,
 mathematicians can focus on the interesting components of a formalization
