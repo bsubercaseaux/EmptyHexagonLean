@@ -2,7 +2,7 @@ An essential step for obtaining computational proofs of geometric results is \em
 This poses a particular challenge for problems in which the desired geometric object $\mathcal{O}$ is characterized by very specific coordinates of points, requiring to deal with floating point arithmetic or numerical instability.
 Fortunately, this is not the case for Erd\H{o}s-Szekeres-type problems such as determining the value of $h(k)$, which are naturally well-suited for computation.
 This is so because the properties of interest (e.g., convexity, emptiness) can be described in terms of high-level relationships between points and lines (e.g., point $p$ is above the line $\vec{qr}$, lines $\vec{qr}$ and $\vec{st}$ intersect, etc.), which are invariant under rotations, translations, and even small perturbations of the coordinates. This suggests the problems can be discretized in terms of boolean variables representing these high-level relationships, forgetting the specific coordinates of the points.
-The combinatorial abstraction that has been most widely used in Erd\H{o}s-Szekeres-type problems is that of \emph{triple orientations}~\cite{ emptyHexagonNumber, scheucherTwoDisjoint5holes2020}.\footnote{Also known as \emph{signotopes}~\cite{felsnerSweepsArrangementsSignotopes2001,subercaseaux2023minimizing},  Knuth's \emph{counterclockwise} relation~\cite{knuthAxiomsHulls1992}, or \emph{signatures}~\cite{szekeres_peters_2006}.}
+The combinatorial abstraction that has been most widely used in Erd\H{o}s-Szekeres-type problems is that of \emph{triple orientations}~\cite{ emptyHexagonNumber, scheucherTwoDisjoint5holes2020}. This concept is also known as \emph{signotopes}~\cite{felsnerSweepsArrangementsSignotopes2001,subercaseaux2023minimizing},  Knuth's \emph{counterclockwise} relation~\cite{knuthAxiomsHulls1992}, or \emph{signatures}~\cite{szekeres_peters_2006}.
 Given points $p, q, r$, their \emph{triple-orientation} is defined as
 \newcommand{\sign}{\operatorname{sign}}
 \[
@@ -84,7 +84,7 @@ To illustrate how these notions will be used, let us consider the property
   \pi_k(S) \triangleq \text{\em ``pointset } S \text{ contains an empty convex } k\text{-gon''}
 \),  which corresponds to \lstinline|HasConvexEmptyKGon|.
 
-Based on \lstinline|ConvexEmptyIn.iff_triangles|, we know that $\pi_k(S)$ can be written in terms of triangles that are empty w.r.t $S$. We can define triangle emptiness using $\sigma$, and prove its equivalence to the geoemetric definition.
+Based on \lstinline|ConvexEmptyIn.iff_triangles|, we know that $\pi_k(S)$ can be written in terms of triangles that are empty w.r.t $S$. We can define triangle emptiness using $\sigma$, and prove its equivalence to the geometric definition.
 \begin{lstlisting}
 /-- `Means that `a' is in the triangle `pqr', but possibly on the boundary. -/
 def PtInTriangle (a : Point) (p q r : Point) : Prop :=
