@@ -23,7 +23,8 @@ As illustrated in~\Cref{fig:sigma-equiv}, there are pointsets that are only $\si
 % The concrete theorem we prove is the following:
 
 \begin{lstlisting}
-  theorem symmetry_breaking (l : GenPosPtList): ∃ w: CanonicalPtList, (l ≃σ w.pts)
+theorem symmetry_breaking : ListInGenPos l →
+  ∃ w : CanonicalPoints, Nonempty (l.toFinset ≃σ w.points.toFinset)
 \end{lstlisting}
 
 \input{fig-symmetry-breaking.tex}
