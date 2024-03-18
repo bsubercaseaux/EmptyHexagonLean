@@ -85,8 +85,7 @@ In this spirit, we connect our results to~\textsf{mathlib} as much as possible.
 
 \subparagraph*{The Empty Hexagon Number.}
 In the 1930s,
-following a suggestion of Esther Klein,
-Erd\H{o}s and Szekeres showed that for any $k \geq 3$,
+Erd\H{o}s and Szekeres, inspired by Esther Klein, showed that for any $k \geq 3$,
 one can find a sufficiently large number $n$
 such that every $n$ points in \emph{general position}
 (i.e., with no three points collinear)
@@ -110,23 +109,17 @@ or \emph{empty $k$-gon},
 meaning a convex $k$-gon with no other point inside.
 It is easy to check that $h(3) = 3$ and $h(4) = 5$.
 In 1978, Harborth established that $h(5) = 10$~\cite{Harborth1978}.
-Surprisingly, for $k \geq 7$ a point set with no $k$-hole
-can always be constructed
-as demonstrated by Horton in 1983~\cite{hortonSetsNoEmpty1983}.
-The only case left open was thus $h(6)$.
+Surprisingly, in 1983, Horton discovered constructions of arbitrarily large point sets that 
+avoid $k$-holes for $k \geq 7$~\cite{hortonSetsNoEmpty1983}.
+Only $h (6)$ remained.
 The \emph{Empty Hexagon Theorem},
 establishing $h(6)$ to be finite,
 was proven independently by Gerken and Nicolás in 2006~\cite{gerkenEmptyConvexHexagons2008,nicolasEmptyHexagonTheorem2007}.
-As of last year,
-the known range of values for $h(6)$ was quite large,
-at $30 \leq h(6) \leq 1717$
-as refined by Valtr in 2008~\cite{valtr},
-until a breakthrough by Heule and Scheucher~\cite{emptyHexagonNumber}.
-These authors used a SAT solver
-to prove that $h(6) \leq 30$,
+In 2008, Valtr closed the range of possible values to $30 \leq h(6) \leq 1717$,
+where the problem remained until the breakthrough by Heule and Scheucher~\cite{emptyHexagonNumber},
+who used a SAT solver to prove that $h(6) \leq 30$,
 a result we refer to as the \emph{Empty Hexagon Number}.
 Now that all the values of $h$ are known,
 and especially given the extensive computation involved in its proofs,
 we propose that the final chapter in the story
 should be a formal verification of the Empty Hexagon Number.
-We now outline our approach.
