@@ -127,8 +127,13 @@ theorem σIsEmptyTriangleFor_exists (gp : ListInGenPos S)
   ∃ b' ∈ S, σ a b' c = σ a b c ∧ (b' = b ∨ σPtInTriangle b' a b c) ∧
     σIsEmptyTriangleFor a b' c S.toFinset
 \end{lstlisting}
-\begin{proof}[Proof sketch]
-  todo
+\begin{proof}
+  Given points $p,q$, say that $p \leq q$ iff $p$ is in the triangle $aqc$.
+  This is a preorder.
+  Now, the set $S' = \{x \in S \mid \sigma(a,x,c) = \sigma(a,b,c) \wedge x \leq b\}$
+  is finite and so has a weakly minimal element $b'$,
+  in the sense that no $x \in S'$ has $x < b'$.
+  Emptiness of $ab'c$ follows by minimality.
 \end{proof}
 
 Moving on, (b) follows from a \emph{triangulation lemma}:
@@ -155,9 +160,9 @@ theorem split_convexHull (cvx : ConvexPoints S) :
 
 By contraposition,
 the triangulation lemma directly implies that
-if \lstinline|{x ∈ S ∣ σ a b x ≠ ccw}| and \lstinline|{x ∈ S ∣ σ a b x ≠ cw}|
-are both empty shapes in \lstinline|P|,
-then \lstinline|S| is an empty shape in \lstinline|P|.
+if $\{x \in S \mid \sigma(a,b,x) \neq +1\}$ and $\{x \in S \mid \sigma(a,b,x) \neq -1\}$
+are both empty shapes in $P$,
+then $S$ is an empty shape in $P$.
 
 \subparagraph*{Running the CNF.}
 Having now shown that if $\phi_{30}$ were unsatisfiable,
