@@ -144,23 +144,115 @@ Let us discuss why the previous theorem is relevant, as it plays an important ro
   \item As introduced at the beginning of this section, SAT encodings for Erd\H{o}s-Szekeres-type problems are based on capturing properties like convexity or emptiness in terms of triple orientations, thus reducing a continuous search space to a discrete one. Because we have proved that $\pi_k(S)$ is an orientation property, then the values of $\sigma$ for all triples of points in $S$ is enough information to determine whether $\pi_k(S)$ or not.  Therefore, we have proved that given $n$ points it is enough to analyze the values of $\sigma$ over the points, a discrete space with at most $2^{n^3}$ possibilities, instead of $\left(\mathbb{R}^2\right)^n$. This is the key idea that will allow us to transition from the finitely-verifiable statement \emph{``no set of triple orientations over $n$ points satisfies property $\pi_k$''} to \emph{``no set of $n$ points satisfies property $\pi_k$''}.
 \end{enumerate}
 
+\subsection{Properties of orientations}\label{sec:sigma-props}
 
-\subsection{Base variables}
-% \subsection{Some key properties of the $\sigma$ function}
-Ranging from the initial work of Peters and Szekeres~\cite{szekeres_peters_2006} to the recent work of Heule and Scheucher~\cite{emptyHexagonNumber}, the base variables are defined as follows. Assuming a list of points $L = (p_1, \ldots, p_n)$,
-we construct boolean variables $\orvar_{a, b, c}$ that represent $\sigma(p, q, r) = 1$, provided $L[a] = p, L[b] = q, L[c] =r$.\footnote{Given that pointsets are assumed to be in general position we have $\neg \orvar_{i,j,k} \iff \sigma(p, q, r) = -1$.} If one were to create a variable $\orvar_{a,b,c}$ for every triple of points $p \neq q \neq r$, that would amount to $n(n-1)(n-2)$ variables for $n$ points. However, the orientations of triples $(p, q, r)$ and $(q, r, p)$ or $(r, q, p)$ contain redundant information: if $p,q,r$ are oriented counterclockwise, then $q,r,p$ and $r,p,q$ are also oriented counterclockwise, whereas $p,r,q$ is oriented clockwise. This is captured by the following two fundamental asymmetries:
+We now prove that, assuming points will be sorted left to right (which is justified in~\Cref{sec:symmetry-breaking}), then the clauses in~\Cref{eq:signotopeClauses11,eq:signotopeClauses12} are justified.
+Consider four points $p, q, r, s$ that are sorted from left to right. If $p, q, r$ are oriented counterclockwise, and $q, r, s$ are oriented counterclockwise as well, then it follows that $p, r, s$ must be oriented counterclockwise too (see~\Cref{fig:orientation-implication}). Different \emph{$\sigma$-implication-properties} of this form are used to reduce the search space in SAT encodings~\cite{emptyHexagonNumber,scheucherTwoDisjoint5holes2020,subercaseaux2023minimizing, szekeres_peters_2006}, as they can be easily added in clausal form:
+\begin{align}
+  &\left(\neg \orvar_{a, b, c} \lor \neg \orvar_{a, c, d} \lor \orvar_{a, b, d}\right) \land \left(\orvar_{a, b, c} \lor \orvar_{a, c, d} \lor  \neg \orvar_{a, b, d}\right)
+\end{align}
+
+We prove these properties of the $\sigma$ function, justifying the addition of~\Cref{eq:signotopeClauses11,eq:signotopeClauses12}, as well as other similar properties that are useful for other proofs, even if not explicitly added to the encoding.
 \begin{lstlisting}
-  lemma σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
-  lemma σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
+theorem σ_prop₁ (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
+    σ p q r = ccw → σ q r s = ccw → σ p r s = ccw
+
+ [...]
+
+theorem σ_prop₃ (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
+    σ p q r = cw → σ q r s = cw → σ p r s = cw
 \end{lstlisting}
-As a result, it suffices to have variables $\orvar(a, b, c)$ with $1 \leq a < b < c \leq n$, thus reducing the number of variables by a factor of $3! = 6$.
-Next, variables $\cvar_{i;a,b,c}$ correspond to whether point $i$ is inside the triangle $abc$, with $a < b < c$.
-If we assume that points will be sorted from left to right (which will be justified in~\Cref{sec:symmetry-breaking}), then we only need to consider $a < i < c$,
-and by combining the definition of \lstinline|σPtInTriangle| with the \lstinline|σ_perm| lemmas, we obtain precisely the definition of $\cvar_{i;a,b,c}$ of~\Cref{eq:insideClauses1,eq:insideClauses2}.
-Finally, the variables $\hvar_{a, b, c}$ correspond to whether the triangle $abc$ is empty, and are defined in terms of $\cvar_{i;a,b,c}$ as in~\Cref{eq:holeDefClauses1}.
+
+
+The proofs of these properties are based on an equivalence between the orientation of a triple of points and the \emph{slopes} of the lines that connect them. Namely, if $p, q, r$  are sorted from left to right, then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pq}) < \textsf{slope}(\overrightarrow{pr})$  and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pr}) < \textsf{slope}(\overrightarrow{qr})$. By proving first these \emph{slope-orientation} equivalences we can then easily prove e.g.,~\lstinline|σ_prop₁|, as illustrated in~\Cref{fig:orientation-implication}.
+
+\begin{figure}
+  \centering
+  \begin{tikzpicture}
+    \newcommand{\localspacing}{4.5}
+
+    \foreach \i in {0, 1, 2} {
+
+      \coordinate (p\i) at ( \i*\localspacing +0.5,0);
+      \coordinate (q\i) at ( \i*\localspacing +2.5, 0.75);
+      \coordinate (r\i) at ( \i*\localspacing +3.25, 1.5);
+      \coordinate (s\i) at ( \i*\localspacing +4.0, 3.25);
+    }
+    \coordinate (0p) at (13,0);
+    \coordinate (0q) at (13, 0.75);
+    \coordinate (0r) at (13, 1.5);
+    \coordinate (0s) at (13, 3.25);
+
+    \pic [draw, <->,
+    angle radius=9mm, angle eccentricity=0.8, fill=blue!20!white,
+    "$\text{\tiny{\(\theta_1\)}}$"] {angle = 0p--p0--q0};
+
+    \pic [draw, <->,
+    angle radius=7mm, angle eccentricity=0.6, fill=orange!20!white,
+    "$\text{\tiny{\(\theta_2\)}}$"] {angle = 0q--q0--r0};
+
+
+    \pic [draw, <->,
+    angle radius=7mm, angle eccentricity=0.6, fill=orange!20!white,
+    "$\text{\tiny{\(\theta_2\)}}$"] {angle = 0q--q1--r1};
+
+    \pic [draw, <->,
+    angle radius=6mm, angle eccentricity=0.6, fill=yellow!20!white,
+    "$\text{\tiny{\(\theta_3\)}}$"] {angle = 0r--r1--s1};
+
+
+    \pic [draw, <->,
+    angle radius=9mm, angle eccentricity=0.8, fill=purple!20!white,
+    "$\text{\tiny{\(\theta_4\)}}$"] {angle = 0p--p2--r2};
+
+
+    \pic [draw, <->,
+    angle radius=6mm, angle eccentricity=0.6, fill=yellow!20!white,
+    "$\text{\tiny{\(\theta_3\)}}$"] {angle = 0r--r2--s2};
 
 
 
+    \foreach \i in {0, 1, 2} {
+
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (p\i) at ( \i*\localspacing +0.5,0) {};
+      \node[] at ( \i*\localspacing + 0.3, -0.25) {$p$};
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (q\i) at ( \i*\localspacing +2.5, 0.75) {};
+      \node[] at ( \i*\localspacing +2.6, 0.5) {$q$};
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (r\i) at ( \i*\localspacing +3.25, 1.5) {};
+      \node[] at ( \i*\localspacing +3.4, 1.3) {$r$};
+
+      \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (s\i) at ( \i*\localspacing +4.0, 3.25) {};
+      \node[] at ( \i*\localspacing +4.05, 3) {$s$};
+    }
+
+    % \newcommand{\localdx}{0.25}
+    % \newcommand{\localdy}{-0.5}
+    \draw[thick, green!60!black] (p0) -- (q0);
+    \draw[thick, green!60!black, ->] (q0) -- (r0);
+
+    \draw[ thick, green!60!black] (q1) -- (r1);
+    \draw[ thick, green!60!black, ->] (r1) -- (s1);
+
+    \draw[ thick, green!60!black] (p2) -- (r2);
+    \draw[ thick, green!60!black, ->] (r2) -- (s2);
+    % \draw[  dashed, green!60!black] (0 + \localdx, 0 + \localdy) -- (2.5 + \localdx, 0.75 + \localdy);
+    % \draw[ dashed, green!60!black, ->] (2.5 + \localdx, 0.75 + \localdy) -- (3.25 + \localdx, 1.5 + \localdy);
+
+
+    % \draw[  dashed, green!60!black] (2.5  - \localdx, 0.75 - \localdy) -- (3.25 - \localdx, 1.5 - \localdy);
+    % \draw[ dashed, green!60!black, ->] (3.25 - \localdx, 1.5 - \localdy) -- (4.25  - \localdx, 3.25 - \localdy);
+
+    % \draw[ thick, dashed, green!60!black] (p) -- (r);
+    % \draw[ thick, dashed, green!60!black, ->] (r) -- (s);
+
+
+    \draw[dashed] (p0) -- (0p);
+    \draw[dashed] (q0) -- (0q);
+    \draw[dashed] (r0) -- (0r);
+    \draw[dashed] (s0) -- (0s);
 
 
 
+  \end{tikzpicture}
+  \caption{Illustration for $\sigma(p,q,r) = 1 \; \land \; \sigma(q,r,s) = 1 \implies \sigma(p, r, s) = 1$. As we have assumptions $\theta_3 > \theta_2 > \theta_4$  by the forward direction of the \emph{slope-orientation equivalence}, we deduce $\theta_3 > \theta_4$, and then conclude $\sigma(p, r, s) = 1$ by the backward direction of the \emph{slope-orientation equivalence}.  }\label{fig:orientation-implication}
+\end{figure}

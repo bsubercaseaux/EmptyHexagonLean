@@ -1,0 +1,53 @@
+We will incrementally build sufficient machinery to prove:
+
+\begin{theorem*}
+Any finite set of $30$ or more points in the plane in general position contains a $6$-hole.
+\end{theorem*}
+
+We begin in~\Cref{sec:geometry} by precisely stating the above theorem,
+and the geometric terms involved, in Lean.
+
+\Cref{sec:triple-orientations} follows with a discussion of \emph{triple orientations},
+a fundamental tool in computational geometry
+used to discretely represent problems
+involving an a priori continuous space (in this case $\mathbb{R}^2$).
+One finds that each set of points $S$ gives rise to an assignment $\sigma_S: S^3 \to \{-1,0,+1\}$
+of triple orientations
+with the property that $S$ contains a $6$-hole
+if and only if a certain predicate \lstinline|σHasEmptyKGon k| holds of $\sigma_S$.
+The search space is thus reduced to a finite one.
+
+While finite, a naïve encoding of $\sigma_S$ would be far too large to solve.
+In~\Cref{sec:symmetry-breaking}, we show that one can assume WLOG
+that $S$ is in \emph{canonical position}.
+Canonicity eliminates a number of symmetries --
+ordering, rotation, and mirroring --
+from the problem,
+significantly reducing the search space.
+
+Finally in~\Cref{sec:encoding},
+we put the above ingredients together
+into the construction of a CNF formula $\phi_n$
+following the encoding of Heule and Scheucher.
+We show that any finite set of $n$ points in canonical position
+containing no $6$-hole
+would give rise to a propositional assignment $\tau_S$ satisfying $\phi_n$.
+However, $\phi_{30}$ (depicted in~\Cref{fig:full-encoding}) is unsatisfiable;
+therefore no such set of size $30$ exists
+and the theorem follows by contradiction.
+The construction of $\phi_n$ and $\tau_S$
+involves sophisticated optimizations
+which we justify using geometric arguments.
+
+% file-local attic:
+
+%We compare our work with its closest precedent due to Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}
+%in~\Cref{sec:related-work}.
+%We conclude in~\Cref{sec:conclusions} by discussing next steps
+%towards the formal verification of other Erd\H{o}s-Szekeres-type problems.
+
+% Then,~\Cref{sec:empty-triangle} presents how the previous elements are already enough
+% to formalize a SAT-based proof for the \emph{Empty Triangle Theorem},
+% a much simpler problem involving only triangles.
+
+% Namely, that one can assume without loss of generality the following two properties at the same time: (i) points are labeled from left to right without two of them having the same $x$-coordinate, and (ii) the triples $(p_1, p_i, p_j)$ are always oriented counterclockwise for $i < j$.

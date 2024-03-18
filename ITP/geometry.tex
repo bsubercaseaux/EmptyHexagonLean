@@ -1,4 +1,4 @@
-We start by identifying points with elements of $\mathbb{R}^2$. Concretely,~\lstinline|abbrev Point := EuclideanSpace ℝ (Fin 2)|.
+We identify points with elements of $\mathbb{R}^2$. Concretely,~\lstinline|abbrev Point := EuclideanSpace ℝ (Fin 2)|.
 The next step is to define what it means for a $k$-gon to be \emph{empty} (with respect to a set of points) and \emph{convex}, which we do in terms of \textsf{mathlib} primitives.
 
 \begin{lstlisting}
@@ -70,11 +70,3 @@ By using this lemma repeatedly, we can slice up a convex $k$-gon into smaller pi
 
     To show that $z\in \overline{ab}$, suppose not, so that $a$ lies between $z$ and $b$ (see \Cref{fig:triangulation2-b}). (The case where $z$ is on the $b$ side is similar.) We can decompose $z$ as a convex combination of some $w\in \overline{S\setminus\{a\}}$ and $a$, which means that $w,z,a,b$ are collinear and appear in this order on the line. Therefore $a$ is a convex combination of $w$ and $b$, which means that $a\in \overline{S\setminus\{a\}}$ which violates convexity of $S$.
 \end{proof}
-
-
-% \begin{proof}[Human proof sketch]
-
-% \end{proof}
-
-
-

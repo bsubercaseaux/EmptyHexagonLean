@@ -1,1 +1,14 @@
 \input{encoding-fig.tex}
+
+\subsection{Base variables}
+Ranging from the initial work of Peters and Szekeres~\cite{szekeres_peters_2006} to the recent work of Heule and Scheucher~\cite{emptyHexagonNumber}, the base variables are defined as follows. Assuming a list of points $L = (p_1, \ldots, p_n)$,
+we construct boolean variables $\orvar_{a, b, c}$ that represent $\sigma(p, q, r) = 1$, provided $L[a] = p, L[b] = q, L[c] =r$.\footnote{Given that pointsets are assumed to be in general position we have $\neg \orvar_{i,j,k} \iff \sigma(p, q, r) = -1$.} If one were to create a variable $\orvar_{a,b,c}$ for every triple of points $p \neq q \neq r$, that would amount to $n(n-1)(n-2)$ variables for $n$ points. However, the orientations of triples $(p, q, r)$ and $(q, r, p)$ or $(r, q, p)$ contain redundant information: if $p,q,r$ are oriented counterclockwise, then $q,r,p$ and $r,p,q$ are also oriented counterclockwise, whereas $p,r,q$ is oriented clockwise. This is captured by the following two fundamental asymmetries:
+\begin{lstlisting}
+  lemma σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
+  lemma σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
+\end{lstlisting}
+As a result, it suffices to have variables $\orvar(a, b, c)$ with $1 \leq a < b < c \leq n$, thus reducing the number of variables by a factor of $3! = 6$.
+Next, variables $\cvar_{i;a,b,c}$ correspond to whether point $i$ is inside the triangle $abc$, with $a < b < c$.
+If we assume that points will be sorted from left to right (which will be justified in~\Cref{sec:symmetry-breaking}), then we only need to consider $a < i < c$,
+and by combining the definition of \lstinline|σPtInTriangle| with the \lstinline|σ_perm| lemmas, we obtain precisely the definition of $\cvar_{i;a,b,c}$ of~\Cref{eq:insideClauses1,eq:insideClauses2}.
+Finally, the variables $\hvar_{a, b, c}$ correspond to whether the triangle $abc$ is empty, and are defined in terms of $\cvar_{i;a,b,c}$ as in~\Cref{eq:holeDefClauses1}.

@@ -42,6 +42,47 @@ We do so by connecting existing geometric definitions
 in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2020}
 to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation.
 
+\subparagraph*{Verification of SAT proofs.}
+Formal verification plays a crucial role in the SAT community,
+for example in verified solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
+and proof checking~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
+Despite this,
+not many mathematical proofs obtained through SAT-solving
+have been formally verified.
+
+In SAT-based combinatorial geometry,
+formal verification was pioneered by Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}
+who improved on the speed needed to obtain $g(6) = 17$,
+and trustworthiness of this result,
+by replacing bespoke code with a SAT encoding
+and verifying this encoding in \textsf{Isabelle/HOL}.
+We give a detailed comparison between this work and ours in~\Cref{sec:related-work}.
+The solution to the Pythagorean triples problem
+was verified in the \textsf{Coq} proof assistant
+by Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}.
+Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} provide a \textsf{CakeML} library
+for verified SAT encodings
+which they demonstrated on different puzzles
+(e.g., Sudoku, Kakuro, the \emph{N-queens} problem).
+As far as verifying SAT encodings in Lean,
+we base our work on that of Codel, Avigad, and Heule~\cite{Cayden}.
+
+\subparagraph*{Lean.}
+Initially developed by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015},
+the Lean theorem prover has become a popular choice for formalizing modern mathematical research.
+Recent successes include the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}
+and the proof of the polynomial Freiman-Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023},
+both of which brought significant attention to Lean.
+
+One selling point for Lean is the \textsf{mathlib} project~\cite{The_mathlib_Community_2020},
+a monolithic formalization of foundational mathematics.
+By relying on \textsf{mathlib} for definitions, lemmas, and proof tactics,
+mathematicians can focus on the interesting components of a formalization
+while avoiding reduplication of proof efforts across formalizations.
+In turn, by making a formalization compatible with \textsf{mathlib},
+future proof efforts can rely on work done today.
+In this spirit, we connect our results to~\textsf{mathlib} as much as possible.
+
 \subparagraph*{The Empty Hexagon Number.}
 In the 1930s,
 following a suggestion of Esther Klein,
@@ -88,45 +129,4 @@ Now that all the values of $h$ are known,
 and especially given the extensive computation involved in its proofs,
 we propose that the final chapter in the story
 should be a formal verification of the Empty Hexagon Number.
-
-\subparagraph*{Verification of SAT proofs.}
-Formal verification plays a crucial role in the SAT community,
-for example in verified solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
-and proof checking~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
-Despite this,
-not many mathematical proofs obtained through SAT-solving
-have been formally verified.
-
-In SAT-based combinatorial geometry,
-formal verification was pioneered by Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}
-who improved on the speed needed to obtain $g(6) = 17$,
-and trustworthiness of this result,
-by replacing bespoke code with a SAT encoding
-and verifying this encoding in \textsf{Isabelle/HOL}.
-We give a detailed comparison between this work and ours in~\Cref{sec:related-work}.
-The solution to the Pythagorean triples problem
-was verified in the \textsf{Coq} proof assistant
-by Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}.
-Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} provide a \textsf{CakeML} library
-for verified SAT encodings
-which they demonstrated on different puzzles
-(e.g., Sudoku, Kakuro, the \emph{N-queens} problem).
-As far as verifying SAT encodings in Lean,
-we base our work on that of Codel, Avigad, and Heule~\cite{Cayden}.
-
-\subparagraph*{Lean.}
-Initially developed by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015},
-the Lean theorem prover has become a popular choice for formalizing modern mathematical research.
-Recent successes include the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}
-and the proof of the polynomial Freiman-Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023},
-both of which brought significant attention to Lean.
-
-One selling point for Lean is the \textsf{mathlib} project~\cite{The_mathlib_Community_2020},
-a monolithic formalization of foundational mathematics.
-By relying on \textsf{mathlib} for definitions, lemmas, and proof tactics,
-mathematicians can focus on the interesting components of a formalization
-while avoiding reduplication of proof efforts across formalizations.
-In turn, by making a formalization compatible with \textsf{mathlib},
-future proof efforts can rely on work done today.
-In this spirit, we connect our results to~\textsf{mathlib} as much as possible.
-
+We now outline our approach.
