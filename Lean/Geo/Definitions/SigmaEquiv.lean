@@ -38,41 +38,31 @@ theorem mem (σ : S ≃σ T) (h : x ∈ S) : σ.f x ∈ T :=
 def refl (S : Set Point) : S ≃σ S :=
   ⟨id, Set.bijOn_id S, false, fun _ _ _ _ _ _ => rfl⟩
 
-def symm : S ≃σ T → T ≃σ S :=
-  fun ⟨f, bij, parity, hσ⟩ =>
+def symm : S ≃σ T → T ≃σ S
+  | ⟨f, bij, parity, hσ⟩ => by
     have inv := Set.BijOn.invOn_invFunOn bij |>.symm
     have bij := bij.symm inv
-    ⟨f.invFunOn S,
-    bij,
-    parity,
-    by
-      intro p hp q hq r hr
-      rw [hσ _ (bij.left hp) _ (bij.left hq) _ (bij.left hr),
-        inv.left hp, inv.left hq, inv.left hr]
-      simp⟩
+    refine ⟨f.invFunOn S, bij, parity, fun p hp q hq r hr => ?_⟩
+    rw [hσ _ (bij.left hp) _ (bij.left hq) _ (bij.left hr),
+      inv.left hp, inv.left hq, inv.left hr]
+    simp
 
 lemma symm_invOn (e : S ≃σ T) : Set.InvOn e.symm e S T :=
   e.bij.invOn_invFunOn
 
 @[trans]
-def trans : S ≃σ T → T ≃σ U → S ≃σ U :=
-  fun ⟨f, fbij, fp, fσ⟩ ⟨g, gbij, gp, gσ⟩ =>
-    ⟨g ∘ f,
-    gbij.comp fbij,
-    xor fp gp,
-    by
-      intro p hp q hq r hr
-      rw [fσ _ hp _ hq _ hr, gσ _ (fbij.left hp) _ (fbij.left hq) _ (fbij.left hr)]
-      simp⟩
+def trans : S ≃σ T → T ≃σ U → S ≃σ U
+  | ⟨f, fbij, fp, fσ⟩, ⟨g, gbij, gp, gσ⟩ => by
+    refine ⟨g ∘ f, gbij.comp fbij, xor fp gp, fun p hp q hq r hr => ?_⟩
+    rw [fσ _ hp _ hq _ hr, gσ _ (fbij.left hp) _ (fbij.left hq) _ (fbij.left hr)]
+    simp
 
 @[simp]
-theorem symm_apply_apply (e : S ≃σ T) : p ∈ S → e.symm (e p) = p := by
-  intro hp
+theorem symm_apply_apply (e : S ≃σ T) (hp : p ∈ S) : e.symm (e p) = p := by
   rw [(symm_invOn e).left hp]
 
 @[simp]
-theorem apply_symm_apply (e : S ≃σ T) : p ∈ T → e (e.symm p) = p := by
-  intro hp
+theorem apply_symm_apply (e : S ≃σ T) (hp : p ∈ T) : e (e.symm p) = p := by
   rw [(symm_invOn e).right hp]
 
 end σEquiv

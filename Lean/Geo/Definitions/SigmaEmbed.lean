@@ -33,8 +33,9 @@ theorem length_eq (σ : S ≼σ T) : S.length = T.length := by simp [← σ.perm
 def refl (S : List Point) : S ≼σ S := ⟨id, by simp, false, by simp⟩
 
 def trans (f : S ≼σ T) (g : T ≼σ U) : S ≼σ U := by
-  refine ⟨g.f ∘ f.f, by simpa using (f.perm.map _).trans g.perm, xor f.parity g.parity, fun p q r hp hq hr => ?_⟩
-  simp [f.σ_eq _ _ _ hp hq hr, g.σ_eq _ _ _ (f.mem hp) (f.mem hq) (f.mem hr), Bool.xor_comm]
+  refine ⟨g.f ∘ f.f, ?_, xor f.parity g.parity, fun p q r hp hq hr => ?_⟩
+  · simpa using (f.perm.map _).trans g.perm
+  · simp [f.σ_eq _ _ _ hp hq hr, g.σ_eq _ _ _ (f.mem hp) (f.mem hq) (f.mem hr), Bool.xor_comm]
 
 theorem nodup_of (e : S ≼σ T) : T.Nodup → S.Nodup :=
   fun h => List.Nodup.of_map _ (e.perm.nodup_iff.mpr h)
