@@ -1,18 +1,14 @@
 We will incrementally build sufficient machinery to prove:
 
 \begin{theorem*}
-Any finite set of $30$ or more points in the plane in general position contains a $6$-hole.
+Any finite set of $30$ points in the plane in general position contains a $6$-hole.
 \end{theorem*}
 
-We begin in~\Cref{sec:geometry} by precisely stating the above theorem,
-    and the geometric terms involved, in Lean.
-
-
 \begin{proof}[Outline of the proof]
-In a nutshell, the proof consists of building a CNF formula $\phi_n$ such that 
+We begin in~\Cref{sec:geometry} by precisely stating the above theorem, and the geometric terms involved, in Lean. In a nutshell, the proof consists of building a CNF formula $\phi_n$ such that 
 from any set $S$ of $n$ points in general position without a $6$-hole we can construct a satisfying assignment $\tau_S$ for $\phi_n$.
 Then, checking that $\phi_{30}$ is unsatisfiable implies that no such set $S$ exists, thus implying the theorem. 
-
+% 
 In order to construct $\phi_n$, one must first discretize the continuous space $\mathbb{R}^2$. \emph{Triple orientations}, presented in~\Cref{sec:triple-orientations}, are a way to achieve this. Concretely, any three points $p,q,r$, in general position, correspond to either a clockwise turn, denoted by $\sigma(p, q, r) = -1$, or a counterclockwise turn, denoted by $\sigma(p, q, r) = +1$, depending on whether $r$ is above the line $\vec{pq}$ or not. 
 This way, every set $S$ of points in general position induces an assignment $\sigma_S: S^3 \to \{-1,+1\}$
 of triple orientations, and as we show in~\Cref{sec:triple-orientations}, whether $S$ contains a $k$-hole or not (i.e., \lstinline|HasConvexEmptyKgon k S|) depends entirely on $\sigma_S$. 
@@ -21,12 +17,11 @@ Because \lstinline|HasConvexEmptyKgon k S| depends only on $\sigma_S$, it can be
 % \[ 
 %     \exists S : \text{set of points in general position without a } k\text{-hole} \implies   
 % \]
-
 % Therefore, $\phi_n$ can be constructed by writting the statement 
 % \[
 % \exists \sigma_S : S^3 \to \{-1,+1\}, \text{ such that } \neg \text{\lstinline|HasConvexEmpty6gon S|}[\sigma_S]    
 % \]
-
+% 
 Unfortunately, it would be practically unfeasible to determine if such a formula is satisfiable or not with a naïve encoding.
 In order to allow for a better encoding,~\Cref{sec:symmetry-breaking} shows that one can assume, without loss of generality, that the set of points $S$ is in \emph{canonical position}.
 Canonicity eliminates a number of symmetries from the problem --
