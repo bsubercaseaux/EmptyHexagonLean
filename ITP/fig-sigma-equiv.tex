@@ -3,30 +3,30 @@
     \begin{subfigure}{0.24\linewidth}
         \centering
         \begin{tikzpicture}
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$a$}] (a) at (0*0.75,0*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$b$}] (b) at (1.75*0.75,1*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$c$}] (c) at (3*0.75,0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=-0.6cm]$d$}] (d) at (2.6*0.75,-0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$a$}] (a) at (0*0.75,0*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$b$}] (b) at (1.75*0.75,1*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$c$}] (c) at (3*0.75,0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=-0.6cm]$d$}] (d) at (2.6*0.75,-0.4*0.75) {};
             \coordinate (a) at (0*0.75,0*0.75);
             \coordinate (b) at (1.75*0.75,1*0.75);
             \coordinate (c) at (3*0.75,0.4*0.75);
             \coordinate (d) at (2.6*0.75,-0.4*0.75);
-            \fill[orange, opacity=0.3] (a) -- (b) -- (c) -- (d) -- (a) -- cycle;
+            \fill[blue, opacity=0.3] (a) -- (b) -- (c) -- (d) -- (a) -- cycle;
         \end{tikzpicture}
         \caption{}\label{fig:equiv-a}
     \end{subfigure}
     \begin{subfigure}{0.24\linewidth}
         \centering
         \begin{tikzpicture}[scale=0.75]
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$a'$}] (a) at (0*0.75,0*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$b'$}] (b) at (-1.75*0.75,1*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$c'$}] (c) at (3*0.75,1.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=0.1cm]$d'$}] (d) at (0.2*0.75,2*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$a'$}] (a) at (0*0.75,0*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$b'$}] (b) at (-1.75*0.75,1*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$c'$}] (c) at (3*0.75,1.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=0.1cm]$d'$}] (d) at (0.2*0.75,2*0.75) {};
             \coordinate (a) at (0*0.75,0*0.75);
             \coordinate (b) at (-1.75*0.75,1*0.75);
             \coordinate (c) at (3*0.75,1.4*0.75);
             \coordinate (d) at (0.2*0.75,2*0.75);*0.75
-            \fill[orange, opacity=0.3] (b) -- (d) -- (c) -- (a) -- (b) -- cycle;
+            \fill[blue, opacity=0.3] (b) -- (d) -- (c) -- (a) -- (b) -- cycle;
         \end{tikzpicture}
         \caption{}\label{fig:equiv-b}
     \end{subfigure}
@@ -34,12 +34,12 @@
     \begin{subfigure}{0.24\linewidth}
         \centering
         \begin{tikzpicture}[scale=.75]
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$a$}] (a) at (1*2.5*0.75,6*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$b$}] (b) at (2*2.5*0.75,6.5*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$c$}] (c) at (2.1*2.5*0.75,1.5*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$d$}] (d) at (2.25*2.5*0.75,5*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.3cm, yshift=-0.4cm]$e$}] (e) at (2.8*2.5*0.75,10*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=0.2cm, yshift=-0.6cm]$f$}] (f) at (3.1*2.5*0.75,4.8*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$a$}] (a) at (1*2.5*0.75,6*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.1cm]$b$}] (b) at (2*2.5*0.75,6.5*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$c$}] (c) at (2.1*2.5*0.75,1.5*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=-0.6cm]$d$}] (d) at (2.25*2.5*0.75,5*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.3cm, yshift=-0.4cm]$e$}] (e) at (2.8*2.5*0.75,10*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.2cm, yshift=-0.6cm]$f$}] (f) at (3.1*2.5*0.75,4.8*0.4*0.75) {};
             \coordinate (a) at (1*2.5*0.75,6*0.4*0.75);
             \coordinate (b) at (2*2.5*0.75,6.5*0.4*0.75);
             \coordinate (c) at (2.1*2.5*0.75,1.5*0.4*0.75);
@@ -53,12 +53,12 @@
     \begin{subfigure}{0.24\linewidth}
         \centering
         \begin{tikzpicture}[scale=.75]
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.1cm, yshift=-0.6cm]$a'$}] (a) at (-1*2.5*0.75,6*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.1cm, yshift=0.1cm]$b'$}] (b) at (-2*2.5*0.75,6.5*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.2cm, yshift=-0.6cm]$c'$}] (c) at (-2.1*2.5*0.75,1.5*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.2cm, yshift=-0.6cm]$d'$}] (d) at (-2.25*2.5*0.75,5*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=-0.4cm]$e'$}] (e) at (-2.8*2.5*0.75,10*0.4*0.75) {};
-            \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=-0.6cm]$f'$}] (f) at (-3.1*2.5*0.75,4.8*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.1cm, yshift=-0.6cm]$a'$}] (a) at (-1*2.5*0.75,6*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.1cm, yshift=0.1cm]$b'$}] (b) at (-2*2.5*0.75,6.5*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.2cm, yshift=-0.6cm]$c'$}] (c) at (-2.1*2.5*0.75,1.5*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.2cm, yshift=-0.6cm]$d'$}] (d) at (-2.25*2.5*0.75,5*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=-0.4cm]$e'$}] (e) at (-2.8*2.5*0.75,10*0.4*0.75) {};
+            \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.3cm, yshift=-0.6cm]$f'$}] (f) at (-3.1*2.5*0.75,4.8*0.4*0.75) {};
             \coordinate (a) at (-1*2.5*0.75,6*0.4*0.75);
             \coordinate (b) at (-2*2.5*0.75,6.5*0.4*0.75);
             \coordinate (c) at (-2.1*2.5*0.75,1.5*0.4*0.75);
