@@ -17,24 +17,24 @@ Given points $p, q, r$, their \emph{triple-orientation} is defined as
   \centering
 \begin{tikzpicture}
   %\draw[ultra thick, dashed, blue] (5,1) -- (0,0);
-  \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (p) at (0,0) {};
+  \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (p) at (0,0) {};
   \node[] at (-0.2, 0.25) {$p$};
-  \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (q) at (5,1) {};
+  \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (q) at (5,1) {};
   \node[] at (5.2, 0.75) {$q$};
-  \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (r) at (2,3) {};
+  \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (r) at (2,3) {};
   \node[] at (2, 3.25) {$r$};
 
-  \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (s) at (1.5, 1) {};
+  \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (s) at (1.5, 1) {};
   \node[] at (1.35, 1.2) {$s$};
 
-  \node[draw, circle, black, fill=black, inner sep=0pt, minimum size=5pt] (t) at (4.5, 3) {};
+  \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt] (t) at (4.5, 3) {};
   \node[] at (4.3, 3.25) {$t$};
 
   \draw[ thick,  green!60!black] (p) -- (r);
   \draw[ thick,  green!60!black, -latex] (r) -- (q);
 
-  \draw[ thick,  blue] (r) -- (s);
-  \draw[ thick,  blue, -latex] (s) -- (q);
+  \draw[ thick,  black] (r) -- (s);
+  \draw[ thick,  black, -latex] (s) -- (q);
 
   \draw[thick,  red] (p) -- (s);
   \draw[thick,  red, -latex] (s) -- (t);
