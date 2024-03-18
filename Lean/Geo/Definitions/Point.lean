@@ -30,10 +30,10 @@ variable {p q r s t : Point}
   intros; ext i
   match i with | ⟨0, _⟩ | ⟨1, _⟩ => assumption
 
-theorem eq_iff : p = q ↔ (p.x = q.x ∧ p.y = q.y) := by
+theorem ext_iff : p = q ↔ p.x = q.x ∧ p.y = q.y := by
   aesop (add safe ext)
 
-instance : IsTotal Point (fun P Q => P.x <= Q.x) :=
+instance : IsTotal Point fun P Q => P.x <= Q.x :=
   ⟨fun _ _ => LE.isTotal.total _ _⟩
 
 instance : IsTrans Point fun P Q => P.x <= Q.x :=
