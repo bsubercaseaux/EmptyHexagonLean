@@ -1,14 +1,115 @@
+Having established the reduction to orientations,
+and the symmetry-breaking assumption of canonicity,
+we now turn to the construction of a CNF formula $\phi_n$
+whose unsatisfiability would imply
+that every set of $n$ points
+contains a $6$-hole.\footnote{
+  Satisfiability of $\phi_n$ would \emph{not} necessarily imply
+  the existence of a point set without a $6$-hole.
+  First, the mapping from sets of points to assignments of triple orientations is not surjective.
+  Second, even if it were, $\phi_n$ is tailored to looking for an unsatisfiability proof,
+  using implication rather than bi-implication in some of the variable-defining clauses.
+}
+The formula is detailed in~\Cref{fig:full-encoding}.
+
 \input{encoding-fig.tex}
 
-\subsection{Base variables}
-Ranging from the initial work of Peters and Szekeres~\cite{szekeres_peters_2006} to the recent work of Heule and Scheucher~\cite{emptyHexagonNumber}, the base variables are defined as follows. Assuming a list of points $L = (p_1, \ldots, p_n)$,
-we construct boolean variables $\orvar_{a, b, c}$ that represent $\sigma(p, q, r) = 1$, provided $L[a] = p, L[b] = q, L[c] =r$.\footnote{Given that pointsets are assumed to be in general position we have $\neg \orvar_{i,j,k} \iff \sigma(p, q, r) = -1$.} If one were to create a variable $\orvar_{a,b,c}$ for every triple of points $p \neq q \neq r$, that would amount to $n(n-1)(n-2)$ variables for $n$ points. However, the orientations of triples $(p, q, r)$ and $(q, r, p)$ or $(r, q, p)$ contain redundant information: if $p,q,r$ are oriented counterclockwise, then $q,r,p$ and $r,p,q$ are also oriented counterclockwise, whereas $p,r,q$ is oriented clockwise. This is captured by the following two fundamental asymmetries:
-\begin{lstlisting}
-  lemma σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
-  lemma σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
-\end{lstlisting}
-As a result, it suffices to have variables $\orvar(a, b, c)$ with $1 \leq a < b < c \leq n$, thus reducing the number of variables by a factor of $3! = 6$.
-Next, variables $\cvar_{i;a,b,c}$ correspond to whether point $i$ is inside the triangle $abc$, with $a < b < c$.
-If we assume that points will be sorted from left to right (which will be justified in~\Cref{sec:symmetry-breaking}), then we only need to consider $a < i < c$,
-and by combining the definition of \lstinline|σPtInTriangle| with the \lstinline|σ_perm| lemmas, we obtain precisely the definition of $\cvar_{i;a,b,c}$ of~\Cref{eq:insideClauses1,eq:insideClauses2}.
-Finally, the variables $\hvar_{a, b, c}$ correspond to whether the triangle $abc$ is empty, and are defined in terms of $\cvar_{i;a,b,c}$ as in~\Cref{eq:holeDefClauses1}.
+\subparagraph*{Variables.}
+Let $S = (p_1, \ldots, p_n)$ be the list of points in canonical position.
+We explain the variables of $\phi_n$
+by specifying their values in the propositional assignment $\tau_S$
+that is our intended model of $\phi_n$
+corresponding to $S$. We then have:
+\begin{itemize}
+  \item
+    For every $2 \leq a < b < c \leq n$, $\orvar_{a,b,c}$ is true
+    iff $\sigma(p_a,p_b,p_c) = +1$.\footnote{
+    Since the point set is in general position,
+    we have $\neg \orvar_{a,b,c} \iff \sigma(p_a, p_b, p_c) = -1$.}
+
+    The first optimization observes that orientations are antisymmetric:
+    if $(p,q,r)$ is counterclockwise then $(q,p,r)$ is clockwise, etc.
+    Thus one only needs $\orvar_{a,b,c}$ for ordered triples $(a,b,c)$,
+    reducing the number of orientation variables by a factor of $3! = 6$
+    relative to using all triples. The second optimization uses the \textbf{CCW-order} property of canonical positions:
+    since all $\orvar_{1,a,b}$ are true, we may as well omit them from the encoding.
+
+  \item
+    Next, for every $a < b < c$ with $a < i < b$ or $b < i < c$,
+    the variable $\cvar_{i;a,b,c}$ is true
+    iff \lstinline|σPtInTriangle S[i] S[a] S[b] S[c]| holds.
+    By \lstinline|σPtInTriangle_iff|, this is true exactly
+    iff $p_i$ is inside the triangle $p_ap_bp_c$.
+
+    The reason for assuming $(a,b,c)$ to be ordered is again symmetry:
+    $p_ap_bp_c$ is the same triangle as $p_ap_cp_b$, etc.
+    Furthermore thanks to the \textbf{$x$-order} property of canonical positions,
+    if $p_i$ is in the triangle
+    then $x(p_a) < x(p_i) < x(p_c)$.
+    This implies that $a < i < c$,
+    leaving one case distinction permuting $(i,b)$.
+
+  \item
+    For every $a < b < c$,
+    $\hvar_{a,b,c}$ is true
+    iff \lstinline|σIsEmptyTriangleFor S[a] S[b] S[c] S| holds.
+    By a geometro-combinatorial connection analogous to ones above,
+    this is true iff $p_ap_bp_c$ is a $3$-hole.
+
+  \item
+    Finally, one defines \emph{$4$-cap}, \emph{$5$-cap}, and \emph{$4$-cup} variables.
+    For $a+1 < c < d$, $\uvar_{a,c,d}$ is true
+    iff there is $b$ with $a < b < c$ with $\sigma(p_a,p_b,p_c) = \sigma(p_b,p_c,p_d) = -1$.
+    $\vvar_{a,c,d}$ is analogous, except in that the two orientations are required to be counterclockwise.
+    These are the $4$-caps and $4$-cups, respectively.
+    The $5$-cap variables $\ufvar_{a,d,e}$
+    are defined for $a+2 < d < e$.
+    We set $\ufvar_{a,d,e}$ to true
+    iff there exists $c$ with $a+1<c<d$
+    such that $\uvar_{a,c,d}$, $\orvar_{c,d,e}$, and $\hvar_{a,c,e}$ are all true.
+
+    Intuitively, $4$-caps and $4$-cups are clockwise and counterclockwise arcs of length $4$,
+    respectively,
+    whereas $5$-caps are clockwise arcs of length $5$ containing a $3$-hole.
+    All three are depicted in [FIG].
+\end{itemize}
+
+\subparagraph*{Satisfaction.}
+We now have to justify that the clauses of $\phi_n$
+are satisfied by the intended interpretation $\tau_S$.
+The variable-defining clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:capDef,eq:cupDef,eq:capFDef,eq:capDef2,eq:cupDef2}
+follow essentially by definition combined with boolean reasoning.
+The orientation properties~\labelcref{eq:signotopeClauses11,eq:signotopeClauses12}
+have been established in the family of theorems \lstinline|theorem σ_propᵢ|.
+The lexicographic ordering clauses~\labelcref{eq:revLexClauses}
+follow from the \textbf{Lex order} property of canonical positions.
+Thus we are left with clauses~\labelcref{eq:no6Hole1Below,eq:no6Hole4Above,eq:no6Hole2Below1,eq:no6Hole2Below2,eq:no6Hole3Below}.
+These forbid the presence of certain $6$-holes.\footnote{
+They are intended to forbid \emph{all} $6$-holes,
+but we do not prove completeness.}
+
+[WIP]
+We illustrate the proof of clause~\labelcref{eq:no6Hole1Below}
+This proof relies on two key lemmas:
+first, that two arcs can be put together into \lstinline|σCCWPoints|
+second, that any \lstinline|σCCWPoints| containing a $3$-hole
+must form a $6$-hole.
+
+\subparagraph*{QED.}
+Having now shown that if $\phi_{30}$ were unsatisfiable,
+our main result would follow,
+we run a distributed computation to confirm the antecedent
+and conclude the proof.
+
+% file-local attic:
+
+%This is captured by the following two fundamental asymmetries:
+%\begin{lstlisting}
+%  lemma σ_perm₁ (p q r : Point) : σ p q r = -σ q p r
+%  lemma σ_perm₂ (p q r : Point) : σ p q r = -σ p r q
+%\end{lstlisting}
+
+% theorem σCCWPoints.emptyHexagon
+%    (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S)
+%    (hole : σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
+%    σHasEmptyKGon 6 S.toFinset := by
