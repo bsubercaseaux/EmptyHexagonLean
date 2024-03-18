@@ -47,13 +47,13 @@ theorem satisfies_no6Hole2Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6
   split_ifs at hh with ce <;> simp [Var.hole] at hh <;> [exact hh h h; exact (hh h h).perm₂]
 
 theorem satisfies_no6Hole1Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset)
-    {a d e f : Fin w.rlen} (ae : a < e) (ef : e < f) :
-    (no6Hole1Below a d f e).eval (w.toPropAssn holes) := by
-  simp [no6Hole1Below]; intro ⟨df, c, ⟨b, ab, bc, cd, abc, bcd⟩, cdf, acf⟩ aef
+    {a d e p : Fin w.rlen} (ap : a < p) (pf : p < e) :
+    (no6Hole1Below a d e p).eval (w.toPropAssn holes) := by
+  simp [no6Hole1Below]; intro ⟨de, c, ⟨b, ab, bc, cd, abc, bcd⟩, cde, ace⟩ ape
   have := Arc.join (l₁ := [_]) (l₂ := [_,_,_])
-    (.cons' ae aef <| .one' ef)
-    (.cons' ab abc <| .cons' bc bcd <| .cons' cd cdf <| .one' df)
-  refine hw <| this.emptyHexagonIf w.gp (acf · |>.perm₂) (subset_map' w [a, e, f, d, c, b])
+    (.cons' ap ape <| .one' pf)
+    (.cons' ab abc <| .cons' bc bcd <| .cons' cd cde <| .one' de)
+  refine hw <| this.emptyHexagonIf w.gp (ace · |>.perm₂) (subset_map' w [a, p, e, d, c, b])
 
 theorem satisfies_hexagonEncoding (w : CanonicalPoints) (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset) :
     (hexagonEncoding w.rlen holes).eval (w.toPropAssn holes) := by with_reducible
