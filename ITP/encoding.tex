@@ -40,7 +40,6 @@ corresponding to $S$. We then have:
     iff \lstinline|σPtInTriangle S[i] S[a] S[b] S[c]| holds.
     By \lstinline|σPtInTriangle_iff|, this is true exactly
     iff $p_i$ is inside the triangle $p_ap_bp_c$.
-
     The reason for assuming $(a,b,c)$ to be ordered is again symmetry:
     $p_ap_bp_c$ is the same triangle as $p_ap_cp_b$, etc.
     Furthermore thanks to the \textbf{$x$-order} property of canonical positions,
@@ -52,7 +51,8 @@ corresponding to $S$. We then have:
   \item
     For every $a < b < c$,
     $\hvar_{a,b,c}$ is true
-    iff \lstinline|σIsEmptyTriangleFor S[a] S[b] S[c] S| holds.
+    iff \lstinline|σIsEmptyTriangleFor S[a] S[b] S[c] S| holds. 
+    %  Analogously to the previous items,
     By a geometro-combinatorial connection analogous to ones above,
     this is true iff $p_ap_bp_c$ is a $3$-hole.
 
@@ -67,12 +67,13 @@ corresponding to $S$. We then have:
     We set $\ufvar_{a,d,e}$ to true
     iff there exists $c$ with $a+1<c<d$
     such that $\uvar_{a,c,d}$, $\orvar_{c,d,e}$, and $\hvar_{a,c,e}$ are all true.
-
     Intuitively, $4$-caps and $4$-cups are clockwise and counterclockwise arcs of length $4$,
     respectively,
     whereas $5$-caps are clockwise arcs of length $5$ containing a $3$-hole.
     All three are depicted in [FIG].
 \end{itemize}
+
+\input{fig-cup-cap.tex}
 
 \subparagraph*{Satisfaction.}
 We now have to justify that the clauses of $\phi_n$

@@ -7,10 +7,11 @@ A list $L = (p_1,\ldots, p_{n})$ of points is said to be in canonical position i
     \item \textbf{($x$-order)} The points are sorted with respect to their $x$-coordinates, i.e., $x(p_i) < x(p_j)$ for all $1 \leq i < j \leq n$.
     \item \textbf{(General Position)} No three points are collinear, i.e., for all $1 \leq i < j < k \leq n$, we have $\sigma(p_i, p_j, p_k) \neq 0$.
     \item \textbf{(CCW-order)} All orientations $\sigma(p_1, p_i, p_j)$, with $1 < i < j \leq n$, are counterclockwise.
-    \item \textbf{(Lex order)} The list of orientations \[\textsf{Left} := \left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)\] is not lexicographically smaller than the list \[ \textsf{Right} := \left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right).\]
+    \item \textbf{(Lex order)} The list of orientations \( \left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)\) is not lexicographically smaller than the list \(\left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right).\)
     % Given the general position condition, all orientations are in $\{-1, 1\}$, and thus the lexicographic condition is equivalent to stating that there is an index $i$ such that $\forall j < i$, $\textsf{Left}[j] = \textsf{Right}[j]$, and $\textsf{Left}[i] = -1$ but $\textsf{Right}[i] = 1$.
 \end{itemize}
 \end{definition}
+
 This symmetry breaking assumption not only reduces the search space of the SAT solver, but it is required for the correctness of the encoding, as~\Cref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12} rely on points being sorted from left to right.
 Before discussing the proof of correctness for this symmetry breaking, let us first focus on the last condition, expressed explicitly on~\Cref{eq:revLexClauses} in the encoding. The main idea behind this condition is that \emph{reflecting} a pointset, i.e., applying the map $(x, y) \mapsto (-x, y)$, preserves the presence of $k$-holes, or convex $k$-gons. This is the reason for incorporating the \emph{parity} element in the definition of $\sigma$-equivalence.
 \input{fig-sigma-equiv.tex}
@@ -22,8 +23,7 @@ As illustrated in~\Cref{fig:sigma-equiv}, there are pointsets that are only $\si
 % The concrete theorem we prove is the following:
 
 \begin{lstlisting}
-  theorem symmetry_breaking (l : GenPosPointList):
-  ∃ w : CanonicalPointList, (l ≃σ w.points)
+  theorem symmetry_breaking (l : GenPosPtList): ∃ w: CanonicalPtList, (l ≃σ w.pts)
 \end{lstlisting}
 
 \input{fig-symmetry-breaking.tex}
