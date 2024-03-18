@@ -14,13 +14,15 @@ attribute [-simp] getElem_fin
 theorem satisfies_no6Hole3Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset)
     {a c d e : Fin w.rlen} (de : d < e) :
     (no6Hole3Below holes a c d e).eval (w.toPropAssn holes) := by
-  simp [no6Hole3Below]; intro ace ⟨b, ab, bc, cd, abc, bcd⟩ cde
-  refine hw <| σCCWPoints.emptyHexagonIf' ?_ w.gp ace
+  simp [no6Hole3Below, -not_forall]
+  intro ⟨b, ab, bc, cd, abc, bcd⟩ cde ace
+  refine hw <| σCCWPoints.emptyHexagonIf' ?ccwp w.gp ace
     (subset_map w [0, a.succ, b.succ, c.succ, d.succ, e.succ])
-  exact Arc.join (l₁ := [_,_,_,_]) (l₂ := [])
-    (.cons (Fin.succ_pos _) (w.σ_0 ab) <|
-      .cons' ab abc <| .cons' bc bcd <| .cons' cd cde <| .one' de)
-    (.one <| Fin.succ_pos _)
+  case ccwp =>
+    exact Arc.join (l₁ := [_,_,_,_]) (l₂ := [])
+      (.cons (Fin.succ_pos _) (w.σ_0 ab) <|
+        .cons' ab abc <| .cons' bc bcd <| .cons' cd cde <| .one' de)
+      (.one <| Fin.succ_pos _)
 
 theorem satisfies_no6Hole4Above {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset)
     {a d e f : Fin w.rlen} (ef : e < f) :

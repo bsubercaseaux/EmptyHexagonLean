@@ -84,10 +84,16 @@ theorem satisfies_insideClauses (w : CanonicalPoints) : (insideClauses w.rlen).e
   simp [insideClauses]
   intro a b hab c hbc x
   constructor
-  · intro hax hxb
-    exact (insideDefs_aux₁ (w.sorted₄' hax hxb hbc) (w.gp₄' hax hxb hbc)).1
-  · intro hbx hxc
-    exact (insideDefs_aux₂ (w.sorted₄' hab hbx hxc) (w.gp₄' hab hbx hxc)).1
+  · intro hax hxb tri
+    have ⟨l,r⟩ := (insideDefs_aux₁ (w.sorted₄' hax hxb hbc) (w.gp₄' hax hxb hbc)).1 tri
+    constructor
+    · exact l
+    · rw [←r]
+  · intro hbx hxc tri
+    have ⟨l,r⟩ := (insideDefs_aux₂ (w.sorted₄' hab hbx hxc) (w.gp₄' hab hbx hxc)).1 tri
+    constructor
+    · exact l
+    · rw [←r]
 
 theorem holeDefs_aux (w : CanonicalPoints) {b c : Fin (rlen w)} {a i : Fin (length w)}
     (ab : a < b.succ) (bc : b < c)
