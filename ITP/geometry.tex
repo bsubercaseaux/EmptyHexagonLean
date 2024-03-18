@@ -20,11 +20,11 @@ def HasConvexEmptyKGon (k : Nat) (S : Set Point) : Prop :=
     ∃ s : Finset Point, s.card = k ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 \end{lstlisting}
 
-Assume for now\footnote{The definition is presented in~\Cref{sec:triple-orientations}.} a predicate \lstinline|Point.ListInGenPos| that states that a list of points is in \emph{general position}, i.e., no three points lie on a common line.
+Assume for now\footnote{The definition is presented in~\Cref{sec:triple-orientations}.} a predicate \lstinline|ListInGenPos| that states that a list of points is in \emph{general position}, i.e., no three points lie on a common line.
 With this we can already state the main theorem of our paper.
 
 \begin{lstlisting}
-theorem hole_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
+theorem hole_6_theorem (pts : List Point) (gp : ListInGenPos pts)
     (h : pts.length ≥ 30) : HasConvexEmptyKGon 6 pts.toFinset
 \end{lstlisting}
 
