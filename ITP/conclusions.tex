@@ -1,11 +1,35 @@
-\begin{itemize}
-    \item We found some bugs 
-    \item Similar theorems can be proven using our framework
-    \item The main challenge to the ITP community is to better integrate SAT-solving so that end-to-end proofs are possible, instead of relying on an UNSAT axiom that is verified externally.
-\end{itemize}
+This formalization required approximately 300 hours of work over 3 months
+by researchers with significant experience formalizing mathematics in Lean.
+The final version of our proofs consists of approximately 4.7k lines of Lean code
+(including comments/whitespace);
+about $26\%$ consists of lemmas that should be moved to upstream libraries,
+about $40\%$ develops the mathematical theory of orientations in plane geometry,
+and the remaining $34\%$ (1550 LOC) validates the symmetry breaking and SAT encoding.
+Many more lines of code were deleted or rewritten,
+so these numbers should be taken with a grain of salt.
 
-Compared to the work of Heule and Scheucher which we have verified \cite{emptyHexagonNumber},
-besides the significant improvement in trust,
-we have streamlined the symmetry breaking argument somewhat.
-It no longer requires applying continuity of the determinant map,
-or shearing points to have positive $y$ coordinates.
+We substantially simplified the symmetry-breaking argument presented by Heule and Scheucher.
+Beyond that, though, the correctness argument remains generally the same.
+So what did formal verification contribute in this case?
+
+We have substantially improved the level of trust in the new result by Heule and Scheucher.
+Prior to formalization,
+their result relied on the correctness of various components that are hard to validate manually,
+while now we can assert with high confidence that their result is correct.
+Beyond the main theorem presented here,
+we demonstrated our approach for formalizing reductions to UNSAT,
+and developed a broadly useful formal theory of orientations and plane geometry.
+
+\subparagraph*{Future work.}
+The geometric and combinatorial machinery developed for this formalization
+will be useful in future formalizations of Erdos-Szekeres style problems.
+We believe automated reasoning will continue to be used in this area,
+and hope future results can be verified with much less effort.
+Beyond automated reasoning,
+we hope to see formalizations of traditional pen and paper proofs in this area,
+perhaps starting with a (formal) proof of the lower bound for the $h(6) = 30$ result.
+
+We also believe work should be done towards improving the connection between verified SAT tools and ITPs.
+Although we are confident that our results are correct,
+the trust story at the connection point clearly has room for improvement,
+starting with some simple automation for running verified SAT toolchains from Lean.
