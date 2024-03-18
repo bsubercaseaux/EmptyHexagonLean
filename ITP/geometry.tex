@@ -3,8 +3,7 @@ The next step is to define what it means for a $k$-gon to be \emph{empty} (with 
 
 \begin{lstlisting}
 /-- `EmptyShapeIn S P' means that `S' carves out an empty shape in `P':
-the convex hull of `S' contains no point of `P'
-other than those already in `S'. -/
+the convex hull of `S' contains no point of `P' other than those already in `S'. -/
 def EmptyShapeIn (S P : Set Point) : Prop :=
     ∀ p ∈ P \ S, p ∉ convexHull ℝ S
 
