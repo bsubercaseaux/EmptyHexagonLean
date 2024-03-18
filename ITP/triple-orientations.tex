@@ -120,6 +120,9 @@ theorem σPtInTriangle_iff {a p q r : Point} (gp : InGenPos₄ a p q r) :
 Heule and Scheucher used the orientation-based definition~\cite{emptyHexagonNumber}, and as it is common in the area, its equivalence to the \emph{ground-truth} mathematical definition was left implicit. This equivalence, proven in~\lstinline|theorem σPtInTriangle_iff| is not trivial to prove, in particular the forward direction requires reasoning about convex combinations and determinants.
 Using the previous theorem, we can generalize to $k$-gons as follows.
 \begin{lstlisting}
+def σIsEmptyTriangleFor (a b c : Point) (S : Set Point) : Prop :=
+  ∀ s ∈ S, ¬σPtInTriangle s a b c
+
 def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧
     ∀ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
