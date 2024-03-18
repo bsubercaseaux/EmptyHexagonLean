@@ -43,9 +43,9 @@ def no6Hole2Below (holes : Bool) (a c d c' : Fin n) : PropForm (Var n) :=
 --        ·
 --   ·         d
 -- a ----------- e
---         b
-def no6Hole1Below (a d e b : Fin n) : PropForm (Var n) :=
-  .not <| .all #[Var.capF a d e, Var.sigma a b e]
+--         p
+def no6Hole1Below (a d e p : Fin n) : PropForm (Var n) :=
+  .not <| .all #[Var.capF a d e, Var.sigma a p e]
 
 def no6HoleClauses2 (n : Nat) (holes : Bool) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>

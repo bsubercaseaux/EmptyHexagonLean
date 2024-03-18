@@ -9,6 +9,7 @@
     \draw[thick] (a) -- (b) -- (c) -- (d);
     \end{tikzpicture}
     \caption{}
+    \label{fig:cap}
 \end{subfigure}
 \begin{subfigure}{0.2\textwidth}
     \begin{tikzpicture}
@@ -19,6 +20,7 @@
     \draw[thick] (a) -- (b) -- (c) -- (d);
     \end{tikzpicture}
     \caption{}
+    \label{fig:cup}
 \end{subfigure}
 \begin{subfigure}{0.2\textwidth}
     \begin{tikzpicture}
@@ -28,13 +30,14 @@
     \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.0cm]$d$}] (d) at (1.9*0.8,0.9*0.7) {};
     \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.0cm]$e$}] (e) at (2.5*0.8,-0.2*0.7) {};
 
-    \draw[thick] (a) -- (b) -- (c) -- (d) -- (e) -- (a);
+    \draw[thick] (a) -- (b) -- (c) -- (d) -- (e);
     \coordinate (a) at (0,0);
     \coordinate (c) at (1.2*0.8, 1.3*0.7);
     \coordinate (e) at (2.5*0.8,-0.2*0.7);
     \fill[blue, opacity=0.2] (a) -- (c) -- (e) -- cycle;
     \end{tikzpicture}
     \caption{}
+    \label{fig:capF}
 \end{subfigure}
 \begin{subfigure}{0.2\textwidth}
     \begin{tikzpicture}
@@ -43,8 +46,8 @@
     \node[draw, circle, blue, inner sep=0pt, minimum size=5pt, label={[xshift=-0.1cm, yshift=0.0cm]$\exists c$}] (c) at (0.8, 0.9) {};
     \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.0cm]$d$}] (d) at (1.3,0.7) {};
     \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.1cm, yshift=0.0cm]$e$}] (e) at (1.7,0.2) {};
-    \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.2cm, yshift=-0.5cm]$f$}] (f) at (0.9,-0.3) {};
-    \draw[thick] (a) -- (b) -- (c) -- (d) -- (e) -- (f) -- (a);
+    \node[draw, circle, black, fill=blue, inner sep=0pt, minimum size=5pt, label={[xshift=0.2cm, yshift=-0.5cm]$p$}] (p) at (0.9,-0.3) {};
+    \draw[thick] (a) -- (b) -- (c) -- (d) -- (e) -- (p) -- (a);
 
     \coordinate (a) at (0,0);
     \coordinate (c) at (0.8, 0.9);
@@ -52,6 +55,7 @@
     \fill[blue, opacity=0.2] (a) -- (c) -- (e) -- cycle;
     \end{tikzpicture}
     \caption{}
+    \label{fig:capFHexagon}
 \end{subfigure}
-\caption{Illustration of the $4$-cups, $4$-caps, and $5$-caps variables.}\label{fig:cup-cap-vars}
+\caption{Illustration of $4$-cap \textbf{(a)}, $4$-cup \textbf{(b)}, and $5$-cap \textbf{(c)} variables.}\label{fig:cup-cap-vars}
 \end{figure}
