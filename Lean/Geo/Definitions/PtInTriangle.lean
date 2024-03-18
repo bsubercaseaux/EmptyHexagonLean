@@ -1,6 +1,6 @@
 import Geo.Definitions.Point
 import Geo.Definitions.CanonicalPoints
-import Geo.Orientations
+import Geo.Definitions.Orientations
 import Geo.Canonicalization.TMatrix
 import Geo.Canonicalization.Affine
 

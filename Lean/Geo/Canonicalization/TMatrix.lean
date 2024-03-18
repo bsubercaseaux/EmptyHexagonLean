@@ -1,7 +1,7 @@
 import Mathlib.Tactic
 import Mathlib.Data.Matrix.Basic
 import Mathlib.Algebra.Algebra.Basic
-import Geo.Orientations
+import Geo.Definitions.Orientations
 import Geo.ToMathlib
 
 namespace Geo

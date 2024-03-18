@@ -1,4 +1,4 @@
-import Geo.Orientations
+import Geo.Definitions.Orientations
 
 namespace Geo
 noncomputable section

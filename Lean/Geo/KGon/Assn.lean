@@ -2,7 +2,7 @@ import Geo.Definitions.CanonicalPoints
 import Geo.Definitions.PtInTriangle
 import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
-import Geo.Orientations
+import Geo.Definitions.Orientations
 import Geo.KGon.Encoding
 
 namespace Geo.CanonicalPoints

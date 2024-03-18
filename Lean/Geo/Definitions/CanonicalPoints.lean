@@ -1,6 +1,6 @@
 import Geo.Definitions.Point
 import Geo.Definitions.ListLex
-import Geo.Orientations
+import Geo.Definitions.Orientations
 
 namespace Geo
 open Point

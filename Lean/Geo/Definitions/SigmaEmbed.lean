@@ -1,5 +1,5 @@
 import Std.Data.List.Lemmas
-import Geo.Orientations
+import Geo.Definitions.Orientations
 import Geo.Definitions.SigmaEquiv
 
 namespace Geo
