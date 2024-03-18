@@ -31,13 +31,13 @@ Given points $p, q, r$, their \emph{triple-orientation} is defined as
   \node[] at (4.3, 3.25) {$t$};
 
   \draw[ thick,  green!60!black] (p) -- (r);
-  \draw[ thick,  green!60!black, ->] (r) -- (q);
+  \draw[ thick,  green!60!black, -latex] (r) -- (q);
 
   \draw[ thick,  blue] (r) -- (s);
-  \draw[ thick,  blue, ->] (s) -- (q);
+  \draw[ thick,  blue, -latex] (s) -- (q);
 
   \draw[thick,  red] (p) -- (s);
-  \draw[thick,  red, ->] (s) -- (t);
+  \draw[thick,  red, -latex] (s) -- (t);
   % \draw[fill=green, opacity=0.5] (a.center) -- (b.center) -- (c.center) -- cycle;
 \end{tikzpicture}
 \caption{Illustration of triple orientations, where $\sigma(p, r, q) = -1, \sigma(r, s, q) = 1, $ and $\sigma(p, s, t) = 0$.}\label{fig:triple-orientation}
@@ -184,30 +184,30 @@ The proofs of these properties are based on an equivalence between the orientati
     \coordinate (0r) at (13, 1.5);
     \coordinate (0s) at (13, 3.25);
 
-    \pic [draw, <->,
+    \pic [draw, latex-latex,
     angle radius=9mm, angle eccentricity=0.8, fill=blue!20!white,
     "$\text{\tiny{\(\theta_1\)}}$"] {angle = 0p--p0--q0};
 
-    \pic [draw, <->,
+    \pic [draw, latex-latex,
     angle radius=7mm, angle eccentricity=0.6, fill=orange!20!white,
     "$\text{\tiny{\(\theta_2\)}}$"] {angle = 0q--q0--r0};
 
 
-    \pic [draw, <->,
+    \pic [draw, latex-latex,
     angle radius=7mm, angle eccentricity=0.6, fill=orange!20!white,
     "$\text{\tiny{\(\theta_2\)}}$"] {angle = 0q--q1--r1};
 
-    \pic [draw, <->,
+    \pic [draw, latex-latex,
     angle radius=6mm, angle eccentricity=0.6, fill=yellow!20!white,
     "$\text{\tiny{\(\theta_3\)}}$"] {angle = 0r--r1--s1};
 
 
-    \pic [draw, <->,
+    \pic [draw, latex-latex,
     angle radius=9mm, angle eccentricity=0.8, fill=purple!20!white,
     "$\text{\tiny{\(\theta_4\)}}$"] {angle = 0p--p2--r2};
 
 
-    \pic [draw, <->,
+    \pic [draw, latex-latex,
     angle radius=6mm, angle eccentricity=0.6, fill=yellow!20!white,
     "$\text{\tiny{\(\theta_3\)}}$"] {angle = 0r--r2--s2};
 
@@ -229,13 +229,13 @@ The proofs of these properties are based on an equivalence between the orientati
     % \newcommand{\localdx}{0.25}
     % \newcommand{\localdy}{-0.5}
     \draw[thick, green!60!black] (p0) -- (q0);
-    \draw[thick, green!60!black, ->] (q0) -- (r0);
+    \draw[thick, green!60!black, -latex] (q0) -- (r0);
 
     \draw[ thick, green!60!black] (q1) -- (r1);
-    \draw[ thick, green!60!black, ->] (r1) -- (s1);
+    \draw[ thick, green!60!black, -latex] (r1) -- (s1);
 
     \draw[ thick, green!60!black] (p2) -- (r2);
-    \draw[ thick, green!60!black, ->] (r2) -- (s2);
+    \draw[ thick, green!60!black, -latex] (r2) -- (s2);
     % \draw[  dashed, green!60!black] (0 + \localdx, 0 + \localdy) -- (2.5 + \localdx, 0.75 + \localdy);
     % \draw[ dashed, green!60!black, ->] (2.5 + \localdx, 0.75 + \localdy) -- (3.25 + \localdx, 1.5 + \localdy);
 
