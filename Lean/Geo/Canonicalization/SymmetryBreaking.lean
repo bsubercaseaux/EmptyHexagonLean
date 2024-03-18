@@ -15,10 +15,10 @@ open Classical
 open scoped List
 
 def σEmbed.reverse (S : List Point) : S ≼σ S.reverse :=
-  ⟨id, by simp [List.reverse_perm S |>.symm], false, by simp⟩
+  ⟨id, by simp [List.reverse_perm S |>.symm], false, by simp, by simp⟩
 
 def σEmbed.flipX (S : List Point) : S ≼σ S.map flipX :=
-  ⟨Geo.flipX, by simp, true, by
+  ⟨Geo.flipX, by simp, true, by simp [Geo.flipX, Point.ext_iff], by
     simp [Geo.σ, Geo.flipX, Point.det_eq, Orientation.true_xor, ← Orientation.ofReal_neg]
     intros; congr 1; ring⟩
 
@@ -34,7 +34,9 @@ lemma orientWithInfty_flipX (P Q : Point) :
 theorem σEmbed_rotate (l : List Point) (h : l.Nodup) :
     ∃ l', ∃ _ : l ≼σ l', l'.Pairwise (·.x ≠ ·.x) := by
   have ⟨θ, hDistinct⟩ := distinct_rotate_list _ h
-  refine have σ := ⟨rotationMap θ, .rfl, false, fun p q r _ _ _ => ?hσ⟩; ⟨_, σ, hDistinct⟩
+  refine have σ := ⟨rotationMap θ, .rfl, false, fun p q _ _ eq => ?inj, fun p q r _ _ _ => ?hσ⟩; ⟨_, σ, hDistinct⟩
+  case inj =>
+    done
   case hσ =>
     simpa [ptTransform_rotateByAffine] using
       (TMatrix.rotateByAffine θ).ptTransform_preserves_sigma p q r

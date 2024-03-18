@@ -9,6 +9,7 @@ structure σEmbed (S T : List Point) where
   f : Point → Point
   perm : S.map f ~ T
   parity : Bool := false
+  inj : ∀ p q, p ∈ S → q ∈ S → f p = f q → p = q
   σ_eq : ∀ p q r, p ∈ S → q ∈ S → r ∈ S → σ (f p) (f q) (f r) = parity ^^^ σ p q r
 
 infix:50 " ≼σ " => σEmbed
@@ -24,17 +25,21 @@ def permRight (σ : S ≼σ T) (h : T ~ T') : S ≼σ T' :=
   { σ with perm := σ.perm.trans h }
 
 def permLeft (σ : S ≼σ T) (h : S ~ S') : S' ≼σ T :=
-  { σ with perm := (h.symm.map _).trans σ.perm, σ_eq := by simpa [h.symm.mem_iff] using σ.σ_eq }
+  { σ with
+    perm := (h.symm.map _).trans σ.perm
+    inj := by simpa [h.symm.mem_iff] using σ.inj
+    σ_eq := by simpa [h.symm.mem_iff] using σ.σ_eq }
 
 def range (σ : S ≼σ T) : List Point := S.map σ.f
 
 theorem length_eq (σ : S ≼σ T) : S.length = T.length := by simp [← σ.perm.length_eq]
 
-def refl (S : List Point) : S ≼σ S := ⟨id, by simp, false, by simp⟩
+def refl (S : List Point) : S ≼σ S := ⟨id, by simp, false, by simp, by simp⟩
 
 def trans (f : S ≼σ T) (g : T ≼σ U) : S ≼σ U := by
-  refine ⟨g.f ∘ f.f, ?_, xor f.parity g.parity, fun p q r hp hq hr => ?_⟩
+  refine ⟨g.f ∘ f.f, ?_, xor f.parity g.parity, fun p q hp hq eq => ?_, fun p q r hp hq hr => ?_⟩
   · simpa using (f.perm.map _).trans g.perm
+  · exact f.inj _ _ hp hq <| g.inj _ _ (f.mem hp) (f.mem hq) eq
   · simp [f.σ_eq _ _ _ hp hq hr, g.σ_eq _ _ _ (f.mem hp) (f.mem hq) (f.mem hr), Bool.xor_comm]
 
 theorem nodup_of (e : S ≼σ T) : T.Nodup → S.Nodup :=
