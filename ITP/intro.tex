@@ -1,5 +1,6 @@
-Even though mathematicians are often skeptical of proofs relying on extensive computation (e.g., the four color theorem~\cite{Walters2004ItAT}),
-many mathematically-interesting theorems have been resolved that way. In the last decade, SAT-solving has shown to be a very powerful tool for mathematics, successfully resolving
+Even though mathematicians are skeptical of proofs that rely on extensive computation (e.g., the four color theorem~\cite{Walters2004ItAT}),
+many mathematically-interesting theorems have been resolved that way.
+In the last decade, SAT solving has been a powerful tool for mathematics, successfully resolving
 Keller's conjecture~\cite{brakensiek2023resolution},
 the packing chromatic number of the infinite grid~\cite{Subercaseaux_Heule_2023},
 the Pythagorean triples problem~\cite{Heule_2016},
@@ -7,25 +8,27 @@ Lam's problem~\cite{21bright_sat_based_resolution_lams_problem},
 and one case of the Erd\H{o}s discrepancy conjecture~\cite{konev2014sat}.
 All of these proofs rely on the same two-step structure:
 \begin{itemize}
-\item \textbf{(Reduction)} Show that the mathematical theorem of interest is true if a concrete CNF formula $F$ is unsatisfiable.
+\item \textbf{(Reduction)} Show that the mathematical theorem of interest is true if a concrete propositional formula~$F$ is unsatisfiable.
 \item \textbf{(Solving)} Show that $F$ is indeed unsatisfiable.
 \end{itemize}
 
 % \footnote{A variant of this procedure uses \emph{satisfying assignments} for $P$ to construct explicit witnesses for the original theorem, but we focus on the unsatisfiable case.}
 % \end{itemize}
 
-Formal methods researchers have devoted significant attention to making the \emph{solving} step reliable, reproducible and trustworthy. That is, to ensure that when a SAT-solver declares a formula $F$ to be unsatisfiable, the formula is indeed unsatisfiable.
+Formal methods researchers have devoted significant attention to making the \emph{solving} step reliable, reproducible and trustworthy.
 Modern SAT solvers produce proofs of unsatisfiability in formal systems
-such as DRAT~\cite{drat-trim14},
-that can in turn be checked with verified proof checkers,
+such as DRAT~\cite{drat-trim14}
+that can in turn be checked with verified proof checkers
 such as \texttt{cake\_lpr}~\cite{tanVerifiedPropagationRedundancy2023}. 
-On the other hand, the \emph{reduction} step can hardly be addressed through general tools, since reductions are often highly problem-specific and require deep mathematical insights.
-It is therefore the reduction step that poses the greatest challenge to the trustworthiness of SAT-based proofs in mathematics. 
+These tools ensure that when a SAT solver declares a formula~$F$ to be unsatisfiable, the formula is indeed unsatisfiable.
+In contrast, the \emph{reduction} step can use problem-specific mathematical insights that, when left unverified, threaten the trustworthiness of SAT-based proofs in mathematics. 
 % The correctness of the \emph{reduction} step, however, has received 
 % leaving room for doubt that any results relying on such reduction arguments are correct.
 
-A recent breakthrough from Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry is a perfect example of the complexity of reducing mathematical theorems to propositional formulas that can be solved efficiently. Indeed, they constructed (and solved) a formula $F$ whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon.
-However, as it is common in such results, their reduction argument was only sketched, relying heavily on intuition, and leaving several gaps to be filled.
+A perfect example of the complexity of this reduction step can be found in a recent breakthrough of Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry. 
+They constructed (and solved) a formula $F$ whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon.
+However, as is common with such results, their reduction argument was only sketched, relying heavily on intuition,
+and it left several gaps to be filled in.
  
 
 % result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
@@ -38,8 +41,6 @@ In this paper we complete and formalize the reduction of Heule and Scheucher in 
 We do so by connecting existing geometric definitions
 in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2020}
 to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation.
-
-
 
 \subparagraph*{The Empty Hexagon Number.}
 In the 1930s,
@@ -114,11 +115,18 @@ As far as verifying SAT encodings in Lean,
 we base our work on that of Codel, Avigad, and Heule~\cite{Cayden}.
 
 \subparagraph*{Lean.}
-Initially developed by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015}, the Lean theorem prover has arguably become the most popular theorem prover for formalizing modern breakthroughs in mathematical research.
-On the one hand, the recent success of projects such as the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}, or the proof of~the polynomial Freiman–Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023} has brought significant attention to~Lean. % as an interactive theorem prover.
-On the the other hand, the \textsf{mathlib} project~\cite{The_mathlib_Community_2020} has already cemented the foundations of many areas of mathematics, thus allowing modern results to be formalized much more easily by relying on hundreds of thousands of existing lines of code. In this spirit, we connect our formalization to~\textsf{mathlib} as much as possible.
+Initially developed by Leonardo de Moura in 2013~\cite{demouraLeanTheoremProver2015},
+the Lean theorem prover has become a popular choice for formalizing modern mathematical research.
+Recent successes include the~\emph{Liquid Tensor Experiment}~\cite{Castelvecchi2021}
+and the proof of the polynomial Freiman-Ruzsa conjecture~\cite{gowers2023conjecture, slomanATeamMathProves2023},
+both of which brought significant attention to Lean.
 
-% \subparagraph*{Mathlib.}
-% % TODO
-
+One selling point for Lean is the \textsf{mathlib} project~\cite{The_mathlib_Community_2020},
+a monolithic formalization of foundational mathematics.
+By relying on \textsf{mathlib} for definitions, lemmas, and proof tactics,
+mathematicians can focus on the interesting components of a formalization
+while avoiding reduplication of proof efforts across formalizations.
+In turn, by making a formalization compatible with \textsf{mathlib},
+future proof efforts can rely on work done today.
+In this spirit, we connect our results to~\textsf{mathlib} as much as possible.
 

@@ -152,7 +152,7 @@ stringstyle=\color{stringcolor}
 
 \begin{abstract}
   A recent breakthrough in computer-assisted mathematics showed that every set of $30$ points in the plane in general position (i.e., no three points on a common line) contains an empty convex hexagon. %, closing a line of research dating back to the 1930s.
-  Through a combination of geometric insights and automated reasoning techniques, Heule and Scheucher constructed CNF formulas $\phi_n$, with $O(n^4)$ clauses, such that if $\phi_n$ is unsatisfiable then every set of $n$ points in general position must contain an empty convex hexagon.
+  With a combination of geometric insights and automated reasoning techniques, Heule and Scheucher constructed CNF formulas $\phi_n$, with $O(n^4)$ clauses, such that if $\phi_n$ is unsatisfiable then every set of $n$ points in general position must contain an empty convex hexagon.
   An unsatisfiability proof for $n = 30$ was then found with a SAT solver using 17\,300 CPU hours of parallel computation. %, thus implying that the empty hexagon number $h(6)$ is equal to 30.
   In this paper, we formalize and verify this result in the Lean theorem prover. Our formalization covers ideas in discrete computational geometry and SAT encoding techniques by introducing a framework that connects geometric objects to propositional assignments.
   %  that have been successfully applied to similar Erd\H{o}s-Szekeres-type problems.
