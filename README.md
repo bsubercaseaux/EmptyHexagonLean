@@ -43,3 +43,11 @@ For `k = 3, 4, 5` on `n = 3, 5, 10` respectively,
 the CNFs produced can be shown UNSAT instantly.
 
 For `k = 6`, `n = 30`, the CNF takes on the order of 17,000 CPU hours to show UNSAT.
+
+## Authors
+- Bernardo Subercaseaux
+- Wojciech Nawrocki
+- James Gallicchio
+- Cayden Codel
+- Mario Carneiro
+- Marijn J. H. Heule
