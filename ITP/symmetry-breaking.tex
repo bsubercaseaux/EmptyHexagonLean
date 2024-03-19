@@ -21,15 +21,15 @@ As illustrated in~\Cref{fig:sigma-equiv}, there are pointsets that are only $\si
 %     While the first 3 conditions are now arguably standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
 %     Interestingly, in the process of verifying the correctness of this symmetry-breaking assumption, we found a small error in the proof presented in~\cite{scheucherTwoDisjoint5holes2020} for the first $3$ conditions.
 % The concrete theorem we prove is the following:
-
+\input{fig-symmetry-breaking.tex}
 \begin{lstlisting}
 theorem symmetry_breaking : ListInGenPos l →
   ∃ w : CanonicalPoints, Nonempty (l.toFinset ≃σ w.points.toFinset)
 \end{lstlisting}
 
-\input{fig-symmetry-breaking.tex}
+
 \begin{proof}[Proof Sketch]
-The proof consists in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}. In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one, and the last one will be in canonical position.
+The proof consists in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}. In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one, and the last one will be in canonical position.\footnote{Even though we defined $\sigma$-equivalence for sets of points, our formalization goes back and forth between sets and lists. Given symmetry breaking distinguishes between the order of the points e.g., $x$-order, this theorem and proof proceeds over lists. }
 The main justification for each step is that, given that the function $\sigma$ is defined as a sign of the determinant, applying transformations that preserve the sign of the determinant will preserve the values of $\sigma$. In particular, given the identity $\det(AB) = \det(A)\det(B)$, if we apply a transformation to the points that corresponds to multiplying by a matrix $B$ such that $\det(B) > 0$, then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved.
 In step 1, we transform the list of points so that no two points share the same $x$-coordinate. This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix, whose determinant is $1$. 
 In step 2, we translate all points by a constant vector $t$, by multiplying by a translation matrix, so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate. We relocate the point $(0,0)$ to the front of the list, denoting it by $p_1$, and we denote by $L_2$ rest of the list this transformation.
