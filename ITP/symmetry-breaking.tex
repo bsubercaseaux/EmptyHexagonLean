@@ -35,10 +35,13 @@ In step 1, we transform the list of points so that no two points share the same 
 In step 2, we translate all points by a constant vector $t$, by multiplying by a translation matrix, so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate. We relocate the point $(0,0)$ to the front of the list, denoting it by $p_1$, and we denote by $L_2$ rest of the list this transformation.
 Then, in step 3, we  apply the projective transformation $f: (x, y) \mapsto (y/x, 1/x)$ to every point in $L_2$, showing that this preserves orientations within $L_2$.
 To see that this mapping preserves orientation consider that 
-\begin{align*}
- \sign \det \begin{pmatrix} p_x & q_x & r_x \\ p_y & q_y & r_y \\ 1 & 1 & 1 \end{pmatrix} &=  \sign \det \left( \begin{pmatrix} 0 & 0 & 1 \\ 1 & 0 & 0\\ 0 & 1 & 0 \end{pmatrix}  \begin{pmatrix} \nicefrac{p_y}{p_x} & \nicefrac{q_y}{q_x} & \nicefrac{r_y}{r_x} \\ \nicefrac{1}{p_x} & \nicefrac{1}{q_x} & \nicefrac{1}{r_x} \\ 1 & 1 & 1 \end{pmatrix}  \begin{pmatrix} p_x & 0 & 0 \\ 0 & q_x & 0\\ 0 & 0 & r_x \end{pmatrix} \right)\\
-                        &= \sign \left(1 \cdot \det  \begin{pmatrix} \nicefrac{p_y}{p_x} & \nicefrac{q_y}{q_x} & \nicefrac{r_y}{r_x} \\ \nicefrac{1}{p_x} & \nicefrac{1}{q_x} & \nicefrac{1}{r_x} \\ 1 & 1 & 1 \end{pmatrix} \cdot  p_x q_x r_x  \right)\\ &= \sign \det \begin{pmatrix} p_y/p_x & q_y/q_x & r_y/r_x \\ 1/p_x & 1/q_x & 1/r_x \\ 1 & 1 & 1 \end{pmatrix}.\tag{As $p_x q_x r_x > 0$ by step 2}
-\end{align*}
+\[
+\begin{multlined}
+ \sign \det \begin{pmatrix} p_x & q_x & r_x \\ p_y & q_y & r_y \\ 1 & 1 & 1 \end{pmatrix} =  \sign \det \left( \begin{pmatrix} 0 & 0 & 1 \\ 1 & 0 & 0\\ 0 & 1 & 0 \end{pmatrix}  \begin{pmatrix} \nicefrac{p_y}{p_x} & \nicefrac{q_y}{q_x} & \nicefrac{r_y}{r_x} \\ \nicefrac{1}{p_x} & \nicefrac{1}{q_x} & \nicefrac{1}{r_x} \\ 1 & 1 & 1 \end{pmatrix}  \begin{pmatrix} p_x & 0 & 0 \\ 0 & q_x & 0\\ 0 & 0 & r_x \end{pmatrix} \right)\\
+                        = \sign \left(1 \cdot \det  \begin{pmatrix} \nicefrac{p_y}{p_x} & \nicefrac{q_y}{q_x} & \nicefrac{r_y}{r_x} \\ \nicefrac{1}{p_x} & \nicefrac{1}{q_x} & \nicefrac{1}{r_x} \\ 1 & 1 & 1 \end{pmatrix} \cdot  p_x q_x r_x  \right) = \sign \det \begin{pmatrix} p_y/p_x & q_y/q_x & r_y/r_x \\ 1/p_x & 1/q_x & 1/r_x \\ 1 & 1 & 1 \end{pmatrix}.
+                        %  \tag{As $p_x q_x r_x > 0$ by step 2}
+\end{multlined}
+\]
 To preserve orientations with respect to the leftmost point $(0, 0)$, we set $f( (0, 0)) = (0, \infty)$, a special point that is treated separately as follows. Given the function $\sigma$ takes points in $\mathbb{R}^2$ as arguments, we define the natural extension
 \(
   \sigma_{(0, \infty)}(q, r) = \begin{cases}

@@ -5,10 +5,10 @@ whose unsatisfiability would imply
 that every set of $n$ points
 contains a $6$-hole.\footnote{
   Satisfiability of $\phi_n$ would \emph{not} necessarily imply
-  the existence of a point set without a $6$-hole.
-  First, the mapping from sets of points to assignments of triple orientations is not surjective.
-  Second, even if it were, $\phi_n$ is tailored to looking for an unsatisfiability proof,
-  using implication rather than bi-implication in some of the variable-defining clauses.
+  the existence of a point set without a $6$-hole, due to the \emph{realizability problem} (see e.g.,~\cite{subercaseaux2023minimizing}).
+  % First, the mapping from sets of points to assignments of triple orientations is not surjective.
+  % Second, even if it were, $\phi_n$ is tailored to looking for an unsatisfiability proof,
+  % using implication rather than bi-implication in some of the variable-defining clauses.
 }
 The formula is detailed in~\Cref{fig:full-encoding}.
 
@@ -121,9 +121,8 @@ Formally, (a) can be stated as
 
 \begin{lstlisting}
 theorem σIsEmptyTriangleFor_exists (gp : ListInGenPos S)
-  (abc : [a, b, c] ⊆ S) :
-  ∃ b' ∈ S, σ a b' c = σ a b c ∧ (b' = b ∨ σPtInTriangle b' a b c) ∧
-    σIsEmptyTriangleFor a b' c S.toFinset
+  (abc : [a, b, c] ⊆ S) : ∃ b' ∈ S, σ a b' c = σ a b c 
+    ∧ (b' = b ∨ σPtInTriangle b' a b c) ∧ σIsEmptyTriangleFor a b' c S.toFinset
 \end{lstlisting}
 \begin{proof}
   Given points $p,q$, say that $p \leq q$ iff $p$ is in the triangle $aqc$.
@@ -143,9 +142,8 @@ That is:
 \begin{lstlisting}
 theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
-    convexHull ℝ S ⊆
-    convexHull ℝ {x ∈ S | σ a b x ≠ ccw} ∪
-    convexHull ℝ {x ∈ S | σ a b x ≠ cw}
+    convexHull ℝ S ⊆ convexHull ℝ {x ∈ S | σ a b x ≠ ccw} 
+                      ∪ convexHull ℝ {x ∈ S | σ a b x ≠ cw}
 \end{lstlisting}
 \input{fig_triangulation2.tex}
 \begin{proof}
