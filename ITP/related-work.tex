@@ -44,10 +44,9 @@ we find that it takes negligible time (below 1s)
 for our verified Lean encoder to generate a CNF,
 which then takes around 28s to solve.
 In contrast,
-Marić's encoder, running in Isabelle/HOL 2016,
-% \footnote{
-% The latest version that accepts the codebase
-% without broader changes.} BS: just to save space
+Marić's encoder, running in Isabelle/HOL 2016
+(the latest version that accepts the codebase
+without broader changes), % WN: restored this parenthetical because it is useful for anyone who'd try to reproduce the run
 takes 437s to generate a CNF,
 which then takes around 787s to solve.
 To avoid encoding overhead,
@@ -89,7 +88,7 @@ Marić fully reconstructs some of their results,
 though not the main one for $g(6)$,
 in an NbE-based proof checker for Isabelle/HOL.
 We make no such attempt for the time being,
-instead passing our SAT proofs through the the formally verified proof checker \texttt{cake\_lpr} \cite{tanVerifiedPropagationRedundancy2023}
+instead passing our SAT proofs through the formally verified proof checker \texttt{cake\_lpr} \cite{tanVerifiedPropagationRedundancy2023}
 and asserting unsatisfiability of the CNF as an axiom in Lean.
 Thus we are trusting that the CNF formula produced by the verified Lean encoder
 is the same one whose unsatisfiability was checked by \texttt{cake\_lpr}.
