@@ -1,5 +1,5 @@
-\emph{Symmetry breaking} plays a key role in modern SAT-solving by substantially reducing the search space of assignments to a formula~\cite{biereHandbookSatisfiabilityVolume2009}.
-For example, if one proves that all satisfying assignments to a formula $F$ have either (i) $x_1 = 0, x_2 = 1$, or  (ii) $x_1 = 1, x_2 = 0$, and there is a bijection between satisfying assignments of form (i) and satisfying assignments of form (ii), then one can assume, \emph{without loss of generality}, that $x_1 = 0, x_2 = 1$, and thus add unit clauses $\ov{x_1}$ and $x_2$ to the formula $F$ while preserving its satisfiability.
+\emph{Symmetry breaking} plays a key role in modern SAT-solving by substantially reducing the search space of assignments to a formula~\cite{biereHandbookSatisfiabilityVolume2009,Crawford}.
+For example, if one proves that all satisfying assignments to a formula $\phi$ have either (i) $x_1 = 0, x_2 = 1$, or  (ii) $x_1 = 1, x_2 = 0$, and there is a bijection between satisfying assignments of form (i) and satisfying assignments of form (ii), then one can assume, \emph{without loss of generality}, that $x_1 = 0, x_2 = 1$, and thus add unit clauses $\ov{x_1}$ and $x_2$ to the formula $\phi$ while preserving its satisfiability.
 
 In the context of the Empty Hexagon Number, the symmetry breaking done by Heule and Scheucher consists in assuming
 that in order to search for a list of $30$ points in general position without a $6$-hole,

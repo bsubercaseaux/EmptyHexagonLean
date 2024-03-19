@@ -159,7 +159,7 @@ Having now shown that our main result follows if $\phi_{30}$ is unsatisfiable,
 we run a distributed computation to check its unsatisfiability.
 We solve the SAT formula~$\phi_{30}$ produced by Lean using the same setup as
 Heule and Scheucher~\cite{emptyHexagonNumber}, although using different hardware:
-the Bridges 2 cluster of the Pittsburgh Supercomputing Center.
+the Bridges 2 cluster of the Pittsburgh Supercomputing Center~\cite{cluster}.
 Following Heule and Scheucher,
 we partition the problem into 312\,418 subproblems.
 Each of these subproblems was
@@ -171,7 +171,7 @@ The total runtime was 25\,876.5 CPU hours, or roughly 3 CPU years.
 The difference in runtime relative to Heule and Scheucher's original run
 is purely due to the difference in hardware.
 Additionally,
-we validated that the subproblems cover the entire search space.
+we validated that the subproblems cover the entire search space as Heule and Scheucher did~\cite[Section 7.3]{emptyHexagonNumber}.
 This was done by verifying the unsatisfiability
 of another formula that took 20 seconds to solve.
 
