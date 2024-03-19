@@ -51,7 +51,7 @@ corresponding to $S$. We then have:
   \item
     For every $a < b < c$,
     $\hvar_{a,b,c}$ is true
-    iff \lstinline|σIsEmptyTriangleFor S[a] S[b] S[c] S| holds. 
+    iff \lstinline|σIsEmptyTriangleFor S[a] S[b] S[c] S| holds.
     %  Analogously to the previous items,
     By a geometro-combinatorial connection analogous to ones above,
     this is true iff $p_ap_bp_c$ is a $3$-hole.
@@ -90,38 +90,28 @@ follow from the \textbf{Lex order} property of canonical positions.
 Thus we are left with clauses~\labelcref{eq:no6Hole1Below,eq:no6Hole4Above,eq:no6Hole2Below1,eq:no6Hole2Below2,eq:no6Hole3Below}
 which forbid the presence of certain $6$-holes.\footnote{
 They are intended to forbid \emph{all} $6$-holes,
-but we do not prove completeness.}
+but we do not (need to) prove completeness because these clauses are already unsatisfiable.}
 We illustrate it for clause~\labelcref{eq:no6Hole1Below}.
 The contrapositive is easier to state:
-if $\tau_S(\ufvar_{a,d,e}) = \tau_S(\orvar_{a,p,e}) = 1$,
+if $\tau_S$ satisfies $\ufvar_{a,d,e}\wedge\orvar_{a,p,e}$,
 then $S$ contains a $6$-hole.
 The intuitive argument is depicted in~\Cref{fig:clause-13-forbid}.
-We know that $aec$ forms a $3$-hole,
-and wish to conclude the existence of a $6$-hole.
-If $ape$, $edc$, and $cba$ are all $3$-holes,
-then we are done
-by gluing the four triangles into an empty hexagon.
-Suppose otherwise that $ape$ were not a $3$-hole,
-i.e., there is a nonempty set $O$
-of points strictly contained in $ape$.
-Then we can take the element $\cdot \in O$ closest to $ea$,
-and construct a new triangle $\cdot ea$, in green.
-By minimality of distance between $\cdot$ and $ea$,
-this is a $3$-hole.
-Repeating the argument for $edc$ and $cba$ concludes the proof.
+The clause directly implies the existence of a convex hexagon $apedcb$
+such that $ace$ is a $3$-hole, but it turns out that this is enough to ensure
+a $6$-hole by ``flattening'' the triangles $ape$, $edc$, and $cba$ if necessary
+to obtain empty triangles, which can be assembled into a $6$-hole $ap'ed'cb'$.
 
-Justifying this reasoning formally
-turned to be complex,
+Justifying this reasoning formally turned out to be complex,
 requring a fair bit of reasoning about point \lstinline|Arc|s
 and \lstinline|σCCWPoints|: lists of points winding around a convex polygon.
 Luckily, the main argument can be summarized in terms of two facts:
-(a) the minimality argument works; and
+(a) any triangle $abc$ contains an empty triangle $ab'c$; and
 (b) empty shapes sharing a common line segment can be glued together.
 Formally, (a) can be stated as
 
 \begin{lstlisting}
 theorem σIsEmptyTriangleFor_exists (gp : ListInGenPos S)
-  (abc : [a, b, c] ⊆ S) : ∃ b' ∈ S, σ a b' c = σ a b c 
+  (abc : [a, b, c] ⊆ S) : ∃ b' ∈ S, σ a b' c = σ a b c
     ∧ (b' = b ∨ σPtInTriangle b' a b c) ∧ σIsEmptyTriangleFor a b' c S.toFinset
 \end{lstlisting}
 \begin{proof}
@@ -142,15 +132,15 @@ That is:
 \begin{lstlisting}
 theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
-    convexHull ℝ S ⊆ convexHull ℝ {x ∈ S | σ a b x ≠ ccw} 
+    convexHull ℝ S ⊆ convexHull ℝ {x ∈ S | σ a b x ≠ ccw}
                       ∪ convexHull ℝ {x ∈ S | σ a b x ≠ cw}
 \end{lstlisting}
 \input{fig_triangulation2.tex}
 \begin{proof}
     Let $S^+=\{x\in S\mid \sigma(a,b,x)\ge 0\}$ and $S^-=\{x\in S\mid \sigma(a,b,x)\le 0\}$ be the two sets in the theorem, and let $p\in \overline{S}$, where $\overline{S}$ denotes the convex hull of $S$. Assume WLOG that $\sigma(a,b,p)\ge 0$. (We would like to show that $p\in \overline{S^+}$.) Now $p$ is a convex combination of elements of $S^+$ and elements of $S^-$, so there exist points $u\in \overline{S^-}$ and $v\in \overline{S^+}$ such that $p$ lies on the $\overline{uv}$ line.
-% 
+%
     Because $\{x\mid \det(a,b,x)\le 0\}\supseteq S^-$ is convex, it follows that $\det(a,b,u)\le 0$, and likewise $\det(a,b,v)\ge 0$, so they lie on opposite sides of the $\overleftrightarrow{ab}$ line and hence $\overline{uv}$ intersects $\overleftrightarrow{ab}$ at a point $z$. The key point is that $z$ must in fact be on the line segment $\overline{ab}$; assuming that this was the case, we could obtain $z$ as a convex combination of $a$ and $b$, and $p$ as a convex combination of $v$ and $z$, and since $v$ is in $\overline{S^+}$ and $a,b\in S^+\subseteq\overline{S^+}$ we can conclude $p\in \overline{S^+}$.
-% 
+%
     To show that $z\in \overline{ab}$, suppose not, so that $a$ lies between $z$ and $b$ (see \Cref{fig:triangulation2-b}). (The case where $z$ is on the $b$ side is similar.) We can decompose $z$ as a convex combination of some $w\in \overline{S\setminus\{a\}}$ and $a$, which means that $w,z,a,b$ are collinear and appear in this order on the line. Therefore $a$ is a convex combination of $w$ and $b$, which means that $a\in \overline{S\setminus\{a\}}$ which violates convexity of $S$.
 \end{proof}
 
@@ -165,23 +155,23 @@ Having now shown that if $\phi_{30}$ were unsatisfiable,
 our main result would follow,
 we run a distributed computation to confirm the antecedent
 and conclude the proof.
-We solve the SAT formula $\phi_{30}$ produced by Lean using the same setup as 
+We solve the SAT formula $\phi_{30}$ produced by Lean using the same setup as
 Heule and Scheucher~\cite{emptyHexagonNumber}, although using different hardware:
-the Bridges 2 cluster of the Pittsburgh Supercomputing Center. 
+the Bridges 2 cluster of the Pittsburgh Supercomputing Center.
 Following Heule and Scheucher,
 we use a partition of the problem into 312\,418 subproblems.
 Each of these subproblems was
 solved using {\tt CaDiCaL} version 1.9.5.
 The solver produced an LRAT proof for each execution,
 which was validated using the {\tt cake\_lpr} verified checker on-the-fly
-in order to avoid writing/storing/reading large files. 
+in order to avoid writing/storing/reading large files.
 The total runtime was 25876.5 CPU hours, or roughly 3 CPU years.
 The difference in runtime relative to Heule and Scheucher's original run
 is purely due to the difference in hardware.
 Additionally,
-we validated that the subproblems cover the entire search space. 
+we validated that the subproblems cover the entire search space.
 This was done by verifying the unsatisfiability
-of another formula that took 20 seconds to solve. 
+of another formula that took 20 seconds to solve.
 
 % file-local attic:
 
