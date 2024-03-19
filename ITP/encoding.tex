@@ -90,18 +90,21 @@ follow from the \textbf{Lex order} property of canonical positions.
 Thus we are left with clauses~\labelcref{eq:no6Hole1Below,eq:no6Hole4Above,eq:no6Hole2Below1,eq:no6Hole2Below2,eq:no6Hole3Below}
 which forbid the presence of certain $6$-holes.\footnote{
 They are intended to forbid \emph{all} $6$-holes,
-but we do not (need to) prove completeness because these clauses are already unsatisfiable.}
-We illustrate it for clause~\labelcref{eq:no6Hole1Below}.
+but proving completeness is not necessary for an unsatisfiability-based result.}
+We illustrate why clause~\labelcref{eq:no6Hole1Below} is true.
 The contrapositive is easier to state:
 if $\tau_S$ satisfies $\ufvar_{a,d,e}\wedge\orvar_{a,p,e}$,
 then $S$ contains a $6$-hole.
 The intuitive argument is depicted in~\Cref{fig:clause-13-forbid}.
 The clause directly implies the existence of a convex hexagon $apedcb$
-such that $ace$ is a $3$-hole, but it turns out that this is enough to ensure
-a $6$-hole by ``flattening'' the triangles $ape$, $edc$, and $cba$ if necessary
-to obtain empty triangles, which can be assembled into a $6$-hole $ap'ed'cb'$.
+such that $ace$ is a $3$-hole.
+It turns out that this is enough to ensure
+the existence of a $6$-hole by ``flattening'' the triangles $ape$, $edc$, and $cba$,
+if necessary,
+to obtain empty triangles $ap'e$, $ed'c$, and $cb'a$,
+which can be assembled into a $6$-hole $ap'ed'cb'$.
 
-Justifying this reasoning formally turned out to be complex,
+Justifying this formally turned out to be complex,
 requring a fair bit of reasoning about point \lstinline|Arc|s
 and \lstinline|σCCWPoints|: lists of points winding around a convex polygon.
 Luckily, the main argument can be summarized in terms of two facts:
@@ -125,15 +128,15 @@ theorem σIsEmptyTriangleFor_exists (gp : ListInGenPos S)
 
 Moving on, (b) follows from a \emph{triangulation lemma}:
 given any convex point set $S$
-and a line $\overleftrightarrow{ab}$ between vertices of $S$,
-the convex hull of $S$ is contained in the convex hull
-of points on each side of $\overleftrightarrow{ab}$.
+and a line $\overleftrightarrow{ab}$ between two vertices of $S$,
+the convex hull of $S$ is contained in the convex hulls
+of points on either side of $\overleftrightarrow{ab}$.
 That is:
 \begin{lstlisting}
 theorem split_convexHull (cvx : ConvexPoints S) :
   ∀ {a b}, a ∈ S → b ∈ S →
     convexHull ℝ S ⊆ convexHull ℝ {x ∈ S | σ a b x ≠ ccw}
-                      ∪ convexHull ℝ {x ∈ S | σ a b x ≠ cw}
+                    ∪ convexHull ℝ {x ∈ S | σ a b x ≠ cw}
 \end{lstlisting}
 \input{fig_triangulation2.tex}
 \begin{proof}
