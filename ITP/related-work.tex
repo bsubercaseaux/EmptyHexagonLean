@@ -33,11 +33,11 @@ theorem gon_6_theorem (pts : List Point) (gp : ListInGenPos pts)
     (h : pts.length ≥ 17) : HasConvexKGon 6 pts.toFinset
 \end{lstlisting}
 
-Using this result,
-we can perform a direct comparison against Marić's encoding.
+As both formalizations can be executed to produce a CNF,
+we performed a direct comparison against Marić's encoding.
 On a personal laptop,
-we find that it takes negligible time (below 1s)
-for our verified Lean encoder to output the CNF.
+we found that it takes negligible time (below 1s)
+for our verified Lean encoder to output the full CNF.
 In contrast,
 Marić's encoder, extracted from Isabelle/HOL code,
 took 437s to output a CNF
@@ -45,8 +45,8 @@ took 437s to output a CNF
 the latest version that accepts the codebase without broader changes).
 To circumvent the encoder slowness,
 Marić wrote a C++ encoder
-whose code was manually compared against the Isabelle/HOL specification,
-a step which we do not have to take.
+whose code was manually compared against the Isabelle/HOL specification.
+We do not need to resort to an unverified implementation.
 
 As for the encodings,
 ours took 28s to solve,
@@ -88,4 +88,5 @@ We make no such attempt for the time being,
 instead passing our SAT proofs through the
 formally verified proof checker \texttt{cake\_lpr} \cite{tanVerifiedPropagationRedundancy2023}
 and asserting unsatisfiability of the CNF as an axiom in Lean.
-This limitation is discussed in the concluding remarks.
+Thus we are trusting that the CNF formula produced by the verified Lean encoder
+is the same one whose unsatisfiability was checked by \textsf{cake\_lpr}.
