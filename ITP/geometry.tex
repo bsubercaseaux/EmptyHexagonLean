@@ -15,7 +15,7 @@ def ConvexPoints (S : Set Point) : Prop :=
 def ConvexEmptyIn (S P : Set Point) : Prop :=
     ConvexPoints S ∧ EmptyShapeIn S P
 
-def HasConvexEmptyKGon (k : Nat) (S : Set Point) : Prop :=
+def HasEmptyKGon (k : Nat) (S : Set Point) : Prop :=
     ∃ s : Finset Point, s.card = k ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 \end{lstlisting}
 
@@ -24,7 +24,7 @@ With this we can already state the main theorem of our paper.
 
 \begin{lstlisting}
 theorem hole_6_theorem (pts : List Point) (gp : ListInGenPos pts)
-    (h : pts.length ≥ 30) : HasConvexEmptyKGon 6 pts.toFinset
+    (h : pts.length ≥ 30) : HasEmptyKGon 6 pts.toFinset
 \end{lstlisting}
 
 At the root  of the encoding of Heule and Scheucher is the idea that the~\lstinline|ConvexEmptyIn| predicate can be determined by analyzing only triangles. In particular, that a set $s$ of $k$ points in a pointset $S$ form an empty convex $k$-gon if and only if all the ${k \choose 3}$ triangles induced by vertices in $s$ are empty with respect to $S$. This is discussed informally in~\cite[Section 3, Eq.~4]{emptyHexagonNumber}.

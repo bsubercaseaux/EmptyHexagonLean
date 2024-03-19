@@ -82,7 +82,7 @@ def OrientationProperty (P : List Point → Prop) :=
 To illustrate how these notions will be used, let us consider the property
 \(
   \pi_k(S) \triangleq \text{\em ``pointset } S \text{ contains an empty convex } k\text{-gon''}
-\),  which corresponds to \lstinline|HasConvexEmptyKGon|.
+\),  which corresponds to \lstinline|HasEmptyKGon|.
 
 Based on \lstinline|ConvexEmptyIn.iff_triangles|, we know that $\pi_k(S)$ can be written in terms of triangles that are empty w.r.t $S$. We can define triangle emptiness using $\sigma$, and prove its equivalence to the geometric definition.
 \begin{lstlisting}
@@ -123,7 +123,7 @@ def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ∀ (a ∈ s) (b ∈ s) (c ∈ s), 
   a ≠ b → a ≠ c → b ≠ c → σIsEmptyTriangleFor a b c S
 
-theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : Point.ListInGenPos pts) :
+theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : ListInGenPos pts) :
       σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset
 \end{lstlisting}
 

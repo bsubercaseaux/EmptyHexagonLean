@@ -31,7 +31,7 @@ with no convex $6$-gon.
 We find this formula to be unsatisfiable for $n = 17$,
 giving the classic
 \begin{lstlisting}
-theorem gon_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
+theorem gon_6_theorem (pts : List Point) (gp : ListInGenPos pts)
     (h : pts.length ≥ 17) : HasConvexKGon 6 pts.toFinset
 \end{lstlisting}
 % However, it would not be as easy
