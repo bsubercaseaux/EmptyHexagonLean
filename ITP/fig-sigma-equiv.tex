@@ -69,6 +69,9 @@
         \end{tikzpicture}
         \caption{}\label{fig:equiv-d}
     \end{subfigure}
-  \caption{The pointsets depicted in \Cref{fig:equiv-a,fig:equiv-b} do not require the parity option to be shown $\sigma$-equivalent, since the bijection $f$ defined by $(a,b,c,d) \mapsto (b', d', c', a')$ already satisfies $\sigma(p_i, p_j, p_k) = \sigma(f(p_i), f(p_j), f(p_j))$ for every $\{p_i, p_j, p_k\} \subseteq \{a,b,c,d\}.$ On the other hand, no such bijection exists for~\Cref{fig:equiv-c,fig:equiv-d},  which require the parity option for $\sigma$-equivalence. }\label{fig:sigma-equiv}
+  \caption{The pointsets depicted in \Cref{fig:equiv-a,fig:equiv-b} are $\sigma$-equivalent with \lstinline|parity := false|
+  since the bijection $f$ defined by $(a,b,c,d) \mapsto (b', d', c', a')$ satisfies $\sigma(p_i, p_j, p_k) = \sigma(f(p_i), f(p_j), f(p_j))$ for every $\{p_i, p_j, p_k\} \subseteq \{a,b,c,d\}$.
+On the other hand, no orientation-preserving bijection exists for~\Cref{fig:equiv-c,fig:equiv-d},
+which are only $\sigma$-equivalent with \lstinline|parity := true|.}\label{fig:sigma-equiv}
   %We obtained~\Cref{fig:equiv-c,fig:equiv-d} computationally.
   \end{figure}

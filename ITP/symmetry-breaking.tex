@@ -1,6 +1,10 @@
-\emph{Symmetry breaking} plays a key role in modern SAT-solving by substantially reducing the search space of satisfying assignments to a formula~\cite{biereHandbookSatisfiabilityVolume2009}. For example, if one proves that all satisfying assignments to a formula $F$ have either (i) $x_1 = 0, x_2 = 1$, or  (ii) $x_1 = 1, x_2 = 0$, and there is a bijection between satisfying assignments of form (i) and satisfying assignments of form (ii), then one can assume, \emph{without loss of generality}, that $x_1 = 0, x_2 = 1$, and thus add unit clauses $\ov{x_1}$ and $x_2$ to the formula $F$ while preserving its satisfiability.
+\emph{Symmetry breaking} plays a key role in modern SAT-solving by substantially reducing the search space of assignments to a formula~\cite{biereHandbookSatisfiabilityVolume2009}.
+For example, if one proves that all satisfying assignments to a formula $F$ have either (i) $x_1 = 0, x_2 = 1$, or  (ii) $x_1 = 1, x_2 = 0$, and there is a bijection between satisfying assignments of form (i) and satisfying assignments of form (ii), then one can assume, \emph{without loss of generality}, that $x_1 = 0, x_2 = 1$, and thus add unit clauses $\ov{x_1}$ and $x_2$ to the formula $F$ while preserving its satisfiability.
 
-In the context of the Empty Hexagon Number, the symmetry breaking done by Heule and Scheucher consists in assuming, \emph{without loss of generality}, that in order to search for a list of $30$ points in general position without a $6$-hole, one can search only amongst lists of $30$ points in \emph{canonical} position, which are defined as follows.
+In the context of the Empty Hexagon Number, the symmetry breaking done by Heule and Scheucher consists in assuming
+that in order to search for a list of $30$ points in general position without a $6$-hole,
+it suffices to can search only amongst lists of $30$ points in \emph{canonical} position.
+These are defined as follows.
 \begin{definition}[Canonical Position]
 A list $L = (p_1,\ldots, p_{n})$ of points is said to be in canonical position if it satisfies all the following properties:
 \begin{itemize}
@@ -12,11 +16,17 @@ A list $L = (p_1,\ldots, p_{n})$ of points is said to be in canonical position i
 \end{itemize}
 \end{definition}
 
-This symmetry breaking assumption not only reduces the search space of the SAT solver, but it is required for the correctness of the encoding, as~\Cref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12} rely on points being sorted from left to right.
-Before discussing the proof of correctness for this symmetry breaking, let us first focus on the last condition, expressed explicitly on~\Cref{eq:revLexClauses} in the encoding. The main idea behind this condition is that \emph{reflecting} a pointset, i.e., applying the map $(x, y) \mapsto (-x, y)$, preserves the presence of $k$-holes, or convex $k$-gons. This is the reason for incorporating the \emph{parity} element in the definition of $\sigma$-equivalence.
+This symmetry breaking assumption not only reduces the search space of the SAT solver, but it is required for the correctness of the encoding,
+as clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12} rely on points being sorted from left to right.
+Before discussing the proof of correctness of symmetry breaking,
+let us first focus on the last condition, expressed explicitly in clause~\labelcref{eq:revLexClauses} of the encoding.
+The main idea behind this condition is that \emph{reflecting} a pointset, i.e., applying the map $(x, y) \mapsto (-x, y)$,
+preserves the presence of $k$-holes, or convex $k$-gons.
+This is the reason for incorporating the \emph{parity} flag in the definition of $\sigma$-equivalence.
 \input{fig-sigma-equiv.tex}
-As illustrated in~\Cref{fig:sigma-equiv}, there are pointsets that are only $\sigma$-equivalent to their reflections because of the parity option. That being said, we are now ready to state the main symmetry breaking theorem and sketch its proof.
-
+As illustrated in~\Cref{fig:sigma-equiv}, there are pointsets that are only $\sigma$-equivalent to their reflections
+with \lstinline|parity := true|.
+We are now ready to state the main symmetry breaking theorem and sketch its proof.
 
 %     While the first 3 conditions are now arguably standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
 %     Interestingly, in the process of verifying the correctness of this symmetry-breaking assumption, we found a small error in the proof presented in~\cite{scheucherTwoDisjoint5holes2020} for the first $3$ conditions.
@@ -29,10 +39,12 @@ theorem symmetry_breaking : ListInGenPos l →
 
 
 \begin{proof}[Proof Sketch]
-The proof consists in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}. In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one, and the last one will be in canonical position.\footnote{Even though we defined $\sigma$-equivalence for sets of points, our formalization goes back and forth between sets and lists. Given symmetry breaking distinguishes between the order of the points e.g., $x$-order, this theorem and proof proceeds over lists. }
-The main justification for each step is that, given that the function $\sigma$ is defined as a sign of the determinant, applying transformations that preserve the sign of the determinant will preserve the values of $\sigma$. In particular, given the identity $\det(AB) = \det(A)\det(B)$, if we apply a transformation to the points that corresponds to multiplying by a matrix $B$ such that $\det(B) > 0$, then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved.
-In step 1, we transform the list of points so that no two points share the same $x$-coordinate. This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix, whose determinant is $1$. 
-In step 2, we translate all points by a constant vector $t$, by multiplying by a translation matrix, so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate. We relocate the point $(0,0)$ to the front of the list, denoting it by $p_1$, and we denote by $L_2$ rest of the list this transformation.
+The proof proceeds in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}. In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one, and the last one will be in canonical position.\footnote{Even though we defined $\sigma$-equivalence for sets of points, our formalization goes back and forth between sets and lists. Given that symmetry breaking distinguishes between the order of the points e.g., $x$-order, this theorem and proof proceeds over lists. }
+The main justification for each step is that, given that the function $\sigma$ is defined as a sign of the determinant, applying transformations that preserve (or, when \lstinline|parity := true|, uniformly reverse) the sign of the determinant will preserve (or uniformly reverse) the values of $\sigma$. In particular, given the identity $\det(AB) = \det(A)\det(B)$, if we apply a transformation to the points that corresponds to multiplying by a matrix $B$ such that $\det(B) > 0$, then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved.
+In step 1, we transform the list of points so that no two points share the same $x$-coordinate. This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix.
+Rotations always have determinant $1$. 
+In step 2, we translate all points by a constant vector $t$, by multiplying by a translation matrix, so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate.
+Let $L_2$ be the list of points after this transformation, excluding $(0,0)$ which we will denote by $p_1$.
 Then, in step 3, we  apply the projective transformation $f: (x, y) \mapsto (y/x, 1/x)$ to every point in $L_2$, showing that this preserves orientations within $L_2$.
 To see that this mapping preserves orientation consider that 
 \[
@@ -42,19 +54,23 @@ To see that this mapping preserves orientation consider that
                         %  \tag{As $p_x q_x r_x > 0$ by step 2}
 \end{multlined}
 \]
-To preserve orientations with respect to the leftmost point $(0, 0)$, we set $f( (0, 0)) = (0, \infty)$, a special point that is treated separately as follows. Given the function $\sigma$ takes points in $\mathbb{R}^2$ as arguments, we define the natural extension
+To preserve orientations with respect to the leftmost point $(0, 0)$, we set $f( (0, 0)) = (0, \infty)$, a special point that is treated separately as follows.
+As the function $\sigma$ takes points in $\mathbb{R}^2$ as arguments,
+we need to define an extension
 \(
   \sigma_{(0, \infty)}(q, r) = \begin{cases}
     1 & \text{if } q_x < r_x \\
     -1 & \text{otherwise}.  
   \end{cases},
 \)
-and then show that $\sigma((0, 0), q, r) = \sigma_{(0, \infty)}(f(q), f(r))$ for all points $q, r \in L_2$. 
-In step 4, we sort the list $L_2$ in increasing order of $x$-coordinate, thus obtaining a list $L_3$. This can be done preserving $\sigma$-equivalence because sorting corresponds to a bijection between $L_2$ and $L_3$.
+We then show that $\sigma((0, 0), q, r) = \sigma_{(0, \infty)}(f(q), f(r))$ for all points $q, r \in L_2$. 
+In step 4, we sort the list $L_2$ by $x$-coordinate in increasing order, thus obtaining a list $L_3$.
+This can be done while preserving $\sigma$-equivalence because sorting corresponds to a bijection between $L_2$ and $L_3$.
 In step 5, we check whether the \textsf{Lex order} condition above is satisfied in $L_3$, and if it is not, we reflect the pointset, which as explained above, preserves $\sigma$-equivalence by leveraging the parity option in the definition. Note that in such a case we need to relabel the points from left to right again.
 In step 6, we bring point $(0, \infty)$ back into the range by first finding a constant $c$ such that all points in $L_3$ are to the right of the line $y=c$, and then finding a large enough value $M$ such that $(c, M)$ has the same orientation with respect to the other points as $(0, \infty)$ did, meaning that 
 \(\sigma((c, M), q, r) = \sigma_{(0, \infty)}(q, r)\) for every $q, r \in L_3$.
-Finally, we note that the list of points obtained in step 6 satisfies the \text{CCW-order} property by the following reasoning. Let $1 < i < j \leq n$ be indices, and note that 
+Finally, we note that the list of points obtained in step 6 satisfies the \text{CCW-order} property by the following reasoning:
+if $1 < i < j \leq n$ are indices, then 
 \begin{align*}
   \sigma(p_1, p_i, p_j) = 1 &\iff \sigma((c, M), p_i, p_j) = 1\\
                             &\iff \sigma_{(0, \infty)}(p_i, p_j) = 1\tag{By step 6}\\
