@@ -152,21 +152,19 @@ are both empty shapes in $P$,
 then $S$ is an empty shape in $P$.
 
 \subparagraph*{Running the CNF.}
-Having now shown that if $\phi_{30}$ were unsatisfiable,
-our main result would follow,
-we run a distributed computation to confirm the antecedent
-and conclude the proof.
-We solve the SAT formula $\phi_{30}$ produced by Lean using the same setup as
+Having now shown that our main result follows if $\phi_{30}$ is unsatisfiable,
+we run a distributed computation to check its unsatisfiability.
+We solve the SAT formula~$\phi_{30}$ produced by Lean using the same setup as
 Heule and Scheucher~\cite{emptyHexagonNumber}, although using different hardware:
 the Bridges 2 cluster of the Pittsburgh Supercomputing Center.
 Following Heule and Scheucher,
-we use a partition of the problem into 312\,418 subproblems.
+we partition the problem into 312\,418 subproblems.
 Each of these subproblems was
 solved using {\tt CaDiCaL} version 1.9.5.
 The solver produced an LRAT proof for each execution,
 which was validated using the {\tt cake\_lpr} verified checker on-the-fly
 in order to avoid writing/storing/reading large files.
-The total runtime was 25876.5 CPU hours, or roughly 3 CPU years.
+The total runtime was 25\,876.5 CPU hours, or roughly 3 CPU years.
 The difference in runtime relative to Heule and Scheucher's original run
 is purely due to the difference in hardware.
 Additionally,
