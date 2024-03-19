@@ -8,7 +8,7 @@ def EmptyShapeIn (S P : Set Point) : Prop :=
     ∀ p ∈ P \ S, p ∉ convexHull ℝ S
 
 /-- `ConvexPoints S' means that `S' consists of extremal points of its convex hull,
-i.e. the point set encloses a convex polygon. -/
+i.e., the point set encloses a convex polygon. -/
 def ConvexPoints (S : Set Point) : Prop :=
     ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
@@ -19,7 +19,7 @@ def HasEmptyKGon (k : Nat) (S : Set Point) : Prop :=
     ∃ s : Finset Point, s.card = k ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 \end{lstlisting}
 
-Assume for now (the definition is presented in~\Cref{sec:triple-orientations}) a predicate \lstinline|ListInGenPos| that states that a list of points is in \emph{general position}, i.e., no three points lie on a common line.
+Let \lstinline|ListInGenPos| be a predicate that states that a list of points is in \emph{general position}, i.e., no three points lie on a common line (made precise in~\Cref{sec:triple-orientations}).
 With this we can already state the main theorem of our paper.
 
 \begin{lstlisting}
@@ -39,7 +39,7 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
 \begin{proof}[Proof sketch]
     We first prove a simple monotonicity lemma: if $\textsf{ConvexPoints}(s)$, then $\textsf{ConvexPoints}(s')$ for every $s' \subseteq s$, and similarly $\textsf{EmptyShapeIn}(s, S) \Rightarrow \textsf{EmptyShapeIn}(s', S)$ for every set of points $S$.
     By instantiating this monotonicity lemma over all subsets $t \subseteq s$ with $|t| = 3$ we get the forward direction of the theorem.
-    For the backward direction it is easier to reason contrapositively: if $s$ does not hold the~$\textsf{ConvexPoints}$ predicate, or is not empty w.r.t.~$S$, then we want to show that there is a triangle $t \subseteq s$ that is also not empty w.r.t.~$S$. To see this, let $H$ be the convex hull of $s$, and then by Carath\'eodory's theorem (cf. \lstinline|theorem convexHull_eq_union| from \textsf{mathlib}), every point in $H$ is a convex combination of at most $3$ points in $s$, and consequently, of exactly $3$ points in $s$.
+    For the backward direction it is easier to reason contrapositively: if the~$\textsf{ConvexPoints}$ predicate does not hold of $s$, or if $s$ is not empty w.r.t.~$S$, then we want to show that there is a triangle $t \subseteq s$ that is also not empty w.r.t.~$S$. To see this, let $H$ be the convex hull of $s$, and then by Carath\'eodory's theorem (cf. \lstinline|theorem convexHull_eq_union| from \textsf{mathlib}), every point in $H$ is a convex combination of at most $3$ points in $s$, and consequently, of exactly $3$ points in $s$.
     If $s$ is non-empty w.r.t.~$S$, then there is a point $p \in S \setminus s$ that belongs to $H$, and by Carath\'eodory, $p$ is a convex combination of $3$ points in $s \setminus \{a\}$, and thus lies inside a triangle $t \subseteq s$ (\Cref{fig:triangulation-a}). If $s$ does not hold $\textsf{ConvexPoints}$, then there is a point $a \in s$ such that $a \in \textsf{convexHull}(s \setminus \{a\})$, and by Carath\'eodory again, $a$ is a convex combination of $3$ points in $s$, and thus lies inside a triangle $t \subseteq s \setminus \{a\}$ (\Cref{fig:triangulation-b}).
 %     The
 %     The forward direction is easy to see, as triangles are always convex, and if $s$ is empty w.r.t.~$S$, then so are the triangles induced by vertices of $s$.
