@@ -144,6 +144,7 @@ theorem split_convexHull (cvx : ConvexPoints S) :
     To show that $z\in \overline{ab}$, suppose not, so that $a$ lies between $z$ and $b$ (see \Cref{fig:triangulation2-b}). (The case where $z$ is on the $b$ side is similar.) We can decompose $z$ as a convex combination of some $w\in \overline{S\setminus\{a\}}$ and $a$, which means that $w,z,a,b$ are collinear and appear in this order on the line. Therefore $a$ is a convex combination of $w$ and $b$, which means that $a\in \overline{S\setminus\{a\}}$ which violates convexity of $S$.
 \end{proof}
 
+\noindent
 By contraposition,
 the triangulation lemma directly implies that
 if $\{x \in S \mid \sigma(a,b,x) \neq +1\}$ and $\{x \in S \mid \sigma(a,b,x) \neq -1\}$
