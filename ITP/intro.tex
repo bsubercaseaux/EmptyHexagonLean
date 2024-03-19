@@ -37,16 +37,16 @@ and left several gaps to be filled in.
 % involving numerous nontrivial geometric optimizations and symmetry-breaking arguments.
 
 In this paper we complete and formalize the reduction of Heule and Scheucher in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}. We do so by connecting existing geometric definitions
-in the \texttt{mathlib} mathematical proof library~\cite{The_mathlib_Community_2020}
+in the mathematical proof library \texttt{mathlib}~\cite{The_mathlib_Community_2020}
 to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation.
 Our formalization is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean}.
 
 
 \subparagraph*{Verification of SAT proofs.}
-As already mentioned, formal verification plays a crucial role in certifying the solving step of SAT-based results.
+Formal verification plays a crucial role in certifying the \emph{solving} step of SAT-based results.
 For example, theorem provers and formal methods tools have been used to verify solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
 and proof checkers~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
-However, the reduction step has not received similar scrutiny.
+However, the \emph{reduction} step has not received similar scrutiny.
 Some work has been done to verify the reductions to SAT underlying these kinds of mathematical results.
 The solution to the Pythagorean triples problem
 was verified in the \textsf{Coq} proof assistant
@@ -61,8 +61,8 @@ are based on that of Codel, Avigad, and Heule~\cite{Cayden} in the Lean theorem 
 
 Formal verification for SAT-based combinatorial geometry
 was pioneered by Marić~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}.
-He used \textsf{Isabelle/HOL} to verify the reduction of $g(6) = 17$ to SAT,
-while also improving on the reduction to make the generated formula easier to solve.
+He developed a reduction of a case of the Happy Ending Problem to SAT
+and formally verified it in \textsf{Isabelle/HOL}.
 We give a detailed comparison between his work and ours in~\Cref{sec:related-work}.
 
 \subparagraph*{Lean.}
@@ -75,7 +75,7 @@ A major selling point for Lean is the \textsf{mathlib} project~\cite{The_mathlib
 a monolithic formalization of foundational mathematics.
 By relying on \textsf{mathlib} for definitions, lemmas, and proof tactics,
 mathematicians can focus on the interesting components of a formalization
-while avoiding reduplication of proof efforts across formalizations.
+while avoiding duplication of proof efforts across formalizations.
 In turn, by making a formalization compatible with \textsf{mathlib},
 future proof efforts can rely on work done today.
 In this spirit, we connect our results to~\textsf{mathlib} as much as possible.
