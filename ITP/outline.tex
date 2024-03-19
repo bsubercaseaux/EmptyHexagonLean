@@ -34,8 +34,8 @@ a smaller CNF formula $\phi_n$.
 Concretely, we show that any finite set of $n$ points in canonical position
 containing no $6$-hole
 would give rise to a propositional assignment $\tau_S$ satisfying $\phi_n$.
-However, $\phi_{30}$ (depicted in~\Cref{fig:full-encoding}) is unsatisfiable;
-therefore no such set of size $30$ exists
+However, $\phi_{30}$ (depicted in~\Cref{fig:full-encoding}) is unsatisfiable. As detailed in~\Cref{sec:encoding}, we ran the formula produced from our verified encoding, found it to be unsatisfiable, and used a verified proof checker to ceritfy the  correctness of the unsatisfiability proof.
+As a conclusion of the unsatisfiability of $\phi_{30}$, no set of size $30$ in canonical position containing no $6$-hole exists,
 and the theorem follows by contradiction.
 The construction of $\phi_n$ and $\tau_S$
 involves sophisticated optimizations
