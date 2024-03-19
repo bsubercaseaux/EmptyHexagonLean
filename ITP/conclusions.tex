@@ -1,8 +1,18 @@
-We have proved the correctness of the main result of Heule and Scheucher~\cite{emptyHexagonNumber}, implying $h(6) \leq 30$. Given the lower bound $h(6) > 29$ can be checked directly (see \cite{emptyHexagonNumber}), we conclude the result $h(6) = 30$ is indeed correct.
-As a result, we believe this work puts a \emph{happy ending} to the line of research started by Stein, Erd\H{o}s and Szekeres in the 1930s. Prior to formalization, the result of Heule and Scheucher relied on the correctness of various components of a highly sophisticated encoding that are hard to validate manually, and that required a signfiicant development of combinatorial geoemtry that was not present in~\textsf{mathlib}.
+We have proved the correctness of the main result of Heule and Scheucher~\cite{emptyHexagonNumber},
+implying $h(6) \leq 30$.
+Given the lower bound $h(6) > 29$ can be checked directly (see \cite{emptyHexagonNumber}),
+we conclude the result $h(6) = 30$ is indeed correct.
+We believe this work puts a \emph{happy ending} to
+one line of research started by Klein, Erd\H{o}s and Szekeres in the 1930s.
+Prior to formalization, the result of Heule and Scheucher
+relied on the correctness of various components of a highly sophisticated encoding
+that are hard to validate manually.
+We developed a significant theory of combinatorial geometry
+that was not present in~\textsf{mathlib}.
 Beyond the main theorem presented here,
-we showed how our framework can be used for other related theorems such as $g(6) = 17$, and we hope it can be used for proving many further results in the area.
-
+we showed how our framework can be used for other related theorems
+such as $g(6) = 17$,
+and we hope it can be used for proving many further results in the area.
 
 Our formalization required approximately 300 hours of work over 3 months
 by researchers with significant experience formalizing mathematics in Lean.
@@ -15,23 +25,22 @@ and the remaining $34\%$ (1550 LOC) validates the symmetry breaking and SAT enco
 % so these numbers should be taken with a grain of salt.
 %  (BS: commented to save space)
 
-We substantially simplified the symmetry-breaking argument presented by Heule and Scheucher, and derived in turn from Scheucher~\cite{scheucherTwoDisjoint5holes2020}.
-Moreover, we found a small error in their proof, as their transformation uses the mapping $(x, y) \mapsto (x/y, -1/y)$, and incorrectly assumes that $x/y$ is increasing for points in CCW-order, whereas only the slopes, $y/x$, is increasing.
-Similarly, we found a typo in the statement of the \textsf{Lex order} condition that did not match the (correct) code of Heule and Scheucher. This has been corrected in our formalization.
-% Beyond that, though, the correctness argument remains generally the same.
-% So what did formal verification contribute in this case?
+We substantially simplified the symmetry-breaking argument presented by Heule and Scheucher,
+and derived in turn from Scheucher~\cite{scheucherTwoDisjoint5holes2020}.
+Moreover, we found a small error in their proof,
+as their transformation uses the mapping $(x, y) \mapsto (x/y, -1/y)$,
+and incorrectly assumes that $x/y$ is increasing for points in CCW-order,
+whereas only the slopes, $y/x$, is increasing.
+Similarly, we found a typo in the statement of the \textsf{Lex order} condition
+that did not match the (correct) code of Heule and Scheucher.
+This has been corrected in our formalization.
 
-% We have substantially improved the level of trust in the new result by Heule and Scheucher.
-
-In terms of future work, we hope to formally verified the result $h(7) = \infty$ due to Horton~\cite{hortonSetsNoEmpty1983}.
-% the geometric and combinatorial machinery developed for this formalization
-% will be useful in future formalizations of Erd\H{o}s-Szekeres style problems.
-% We believe automated reasoning will continue to be used in this area,
-% and hope future results can be verified with much less effort.
-% Beyond automated reasoning,
-% we hope to see formalizations of traditional pen and paper proofs in this area,
-% perhaps starting with a (formal) proof of the lower bound for the $h(6) = 30$ result.
-We also believe a key challenge for the community is to improve the connection between verified SAT tools and ITPs, which presents a significant engineering challenge given the proofs in the area are hundreds of terabytes long.
+In terms of future work,
+we hope to formally verify the result $h(7) = \infty$ due to Horton~\cite{hortonSetsNoEmpty1983},
+and other results in Erd\H{o}s-Szekeres style problems.
+We also believe a key challenge for the community
+is to improve the connection between verified SAT tools and ITPs,
+which presents a significant engineering challenge
+for proofs which are hundreds of terabytes long (as in this result).
 Although we are confident that our results are correct,
-the trust story at the connection point  clearly has room for improvement,
-starting with some simple automation for running verified SAT toolchains from Lean.
+the trust story at this connection point has room for improvement.
