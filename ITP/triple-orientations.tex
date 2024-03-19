@@ -1,7 +1,7 @@
 An essential step for obtaining computational proofs of geometric results is \emph{discretization}: problems concerning the existence of an object $\mathcal{O}$ in a continuous space such as $\mathbb{R}^2$ must be reformulated in terms of the existence of a discrete and finitely representable object $\mathcal{O}'$ that a computer can find (or discard its existence).
 This poses a particular challenge for problems in which the desired geometric object $\mathcal{O}$ is characterized by very specific coordinates of points, requiring to deal with floating point arithmetic or numerical instability.
 Fortunately, this is not the case for Erd\H{o}s-Szekeres-type problems such as determining the value of $h(k)$, which are naturally well-suited for computation.
-This is so because the properties of interest (e.g., convexity, emptiness) can be described in terms of high-level relationships between points and lines (e.g., point $p$ is above the line $\overrightarrow{qr}$, lines $\overrightarrow{qr}$ and $\overrightarrow{st}$ intersect, etc.), which are invariant under rotations, translations, and even small perturbations of the coordinates. This suggests the problems can be discretized in terms of boolean variables representing these high-level relationships, forgetting the specific coordinates of the points.
+This is so because the properties of interest (e.g., convexity, emptiness) can be described in terms of axiomatizable relationships between points and lines (e.g., point $p$ is above the line $\overrightarrow{qr}$, lines $\overrightarrow{qr}$ and $\overrightarrow{st}$ intersect, etc.), which are invariant under rotations, translations, and even small perturbations of the coordinates. This suggests the problems can be discretized in terms of boolean variables representing these relationships, forgetting the specific coordinates of the points.
 The combinatorial abstraction that has been most widely used in Erd\H{o}s-Szekeres-type problems is that of \emph{triple orientations}~\cite{ emptyHexagonNumber, scheucherTwoDisjoint5holes2020}. This concept is also known as \emph{signotopes}~\cite{felsnerSweepsArrangementsSignotopes2001,subercaseaux2023minimizing},  Knuth's \emph{counterclockwise} relation~\cite{knuthAxiomsHulls1992}, or \emph{signatures}~\cite{szekeres_peters_2006}.
 Given points $p, q, r$, their \emph{triple-orientation} is defined as
 \newcommand{\sign}{\operatorname{sign}}
@@ -64,7 +64,7 @@ noncomputable def σ (p q r : Point) : Orientation :=
 %   else if r < 0 then cw
 %   else collinear
 
-Through the $\sigma$ function we can immediately define the notion of \emph{general position} for collections (e.g., finite sets, lists, etc.) of points, simply establishing that $\sigma(p, q, r) \neq 0$ for every three distinct points $p, q, r$ in the collection.
+Using the function $\sigma$ we can define the notion of \emph{general position} for collections (e.g., finite sets, lists, etc.) of points, simply postulating that $\sigma(p, q, r) \neq 0$ for every three distinct points $p, q, r$ in the collection.
 Furthermore, we can start formalizing sets of points that are \emph{equivalent} with respect to their triple orientations, and consequently, properties of pointsets that are fully captured by their triple orientations~(\emph{orientation properties}).
 % An illustration is presented in~\Cref{fig:sigma-equiv}.
 % \input{fig-sigma-equiv.tex}
@@ -75,18 +75,21 @@ structure σEquiv (S T : Set Point) where
   parity : Bool -- See Section 4 for details on this field
   σ_eq : ∀ (p ∈ S) (q ∈ S) (r ∈ S), σ p q r = parity ^^^ σ (f p) (f q) (f r)
 
-def OrientationProperty (P : List Point → Prop) :=
-  ∀ {{S T}}, S ≃σ T → (P S ↔ P T) -- `≃σ` is infix notation for `σEquiv`
+def OrientationProperty (P : Set Point → Prop) :=
+  ∀ {{S T}}, S ≃σ T → P S → P T -- `≃σ` is infix notation for `σEquiv`
 \end{lstlisting}
 
 To illustrate how these notions will be used, let us consider the property
 \(
   \pi_k(S) \triangleq \text{\em ``pointset } S \text{ contains an empty convex } k\text{-gon''}
-\),  which corresponds to \lstinline|HasEmptyKGon|.
+\), formalized as \lstinline|HasEmptyKGon|.
 
-Based on \lstinline|ConvexEmptyIn.iff_triangles|, we know that $\pi_k(S)$ can be written in terms of triangles that are empty w.r.t $S$. We can define triangle emptiness using $\sigma$, and prove its equivalence to the geometric definition.
+Based on \lstinline|ConvexEmptyIn.iff_triangles|, we know that $\pi_k(S)$ can be written
+in terms of whether certain triangles are empty w.r.t $S$.
+We can define triangle membership using $\sigma$,
+and prove its equivalence to the geometric definition.
 \begin{lstlisting}
-/-- `Means that `a' is in the triangle `pqr', but possibly on the boundary. -/
+/-- `Means that `a' is in the triangle `pqr', possibly on the boundary. -/
 def PtInTriangle (a : Point) (p q r : Point) : Prop :=
   a ∈ convexHull ℝ {p, q, r}
 
@@ -113,7 +116,9 @@ theorem σPtInTriangle_iff {a p q r : Point} (gp : InGenPos₄ a p q r) :
 
 
 % Let us now discuss the previous steps. First,~\lstinline|(PtInTriangle a p q r)| presents a \emph{ground-truth}  definition for membership in a triangle, in terms of~\textsf{mathlib}'s \lstinline|ConvexHull| definition,  whereas~\lstinline|(σPtInTriangle a p q r)| is based on orientations.
-Heule and Scheucher used the orientation-based definition~\cite{emptyHexagonNumber}, and as it is common in the area, its equivalence to the \emph{ground-truth} mathematical definition was left implicit. This equivalence, proven in~\lstinline|theorem σPtInTriangle_iff| is not trivial to prove, in particular the forward direction requires reasoning about convex combinations and determinants.
+Heule and Scheucher used the orientation-based definition~\cite{emptyHexagonNumber}, and as it is common in the area, its equivalence to the \emph{ground-truth} mathematical definition was left implicit.
+This equivalence, formalized in~\lstinline|theorem σPtInTriangle_iff| is not trivial to prove:
+the forward direction in particular requires reasoning about convex combinations and determinants.
 Using the previous theorem, we can generalize to $k$-gons as follows.
 \begin{lstlisting}
 def σIsEmptyTriangleFor (a b c : Point) (S : Set Point) : Prop :=
@@ -138,8 +143,11 @@ theorem OrientationProperty_HasEmptyKGon : OrientationProperty (HasEmptyKGon n)
 
 Let us discuss why the previous theorem is relevant, as it plays an important role in the formalization of Erd\H{o}s-Szekeres-type problems. This boils down to two reasons:
 \begin{enumerate}
-  \item If we prove that the function $\sigma$ is invariant under a certain transformation of its arguments (e.g., rotations, translations, etc.) then we can directly conclude that any orientation property is invariant under the same transformation. This is a powerful tool for applying manipulations to pointsets that preserve the properties of interest, which will be key for symmetry breaking (see~\Cref{sec:symmetry-breaking}). For a concrete example, when a proof for an Erd\H{o}s-Szekeres-type result starts saying \emph{``we assume without loss of generality that points $p_1, \ldots, p_n$ are sorted from left to right''}, we can immediately formalize that this assumption indeed maintains generality for orientation properties, as sorting a list naturally induces a bijection.
-  \item As introduced at the beginning of this section, SAT encodings for Erd\H{o}s-Szekeres-type problems are based on capturing properties like convexity or emptiness in terms of triple orientations, thus reducing a continuous search space to a discrete one. Because we have proved that $\pi_k(S)$ is an orientation property, then the values of $\sigma$ for all triples of points in $S$ is enough information to determine whether $\pi_k(S)$ or not.  Therefore, we have proved that given $n$ points it is enough to analyze the values of $\sigma$ over the points, a discrete space with at most $2^{n^3}$ possibilities, instead of $\left(\mathbb{R}^2\right)^n$. This is the key idea that will allow us to transition from the finitely-verifiable statement \emph{``no set of triple orientations over $n$ points satisfies property $\pi_k$''} to \emph{``no set of $n$ points satisfies property $\pi_k$''}.
+  \item If we prove that the function $\sigma$ is invariant under a certain transformation of its arguments (e.g., rotations, translations, etc.) then we can directly conclude that any orientation property is invariant under the same transformation. This is a powerful tool for applying manipulations to pointsets that preserve the properties of interest, which will be key for symmetry breaking (see~\Cref{sec:symmetry-breaking}).
+    For a concrete example, consider a proof of an Erd\H{o}s-Szekeres-type result that starts by saying \emph{``we assume without loss of generality that points $p_1, \ldots, p_n$ all have positive $y$-coordinates''}.
+    As translations are $\sigma$-equivalences, we can see that this assumption
+    indeed does not impact the truth of any orientation property.
+  \item As introduced at the beginning of this section, SAT encodings for Erd\H{o}s-Szekeres-type problems are based on capturing properties like convexity or emptiness in terms of triple orientations, thus reducing a continuous search space to a discrete one. Because we have proved that $\pi_k(S)$ is an orientation property, the values of $\sigma$ for all triples of points in $S$ contain enough information to determine whether $\pi_k(S)$ or not.  Therefore, we have proved that given $n$ points it is enough to analyze the values of $\sigma$ over these points, a discrete space with at most $2^{n^3}$ possibilities, instead of $\left(\mathbb{R}^2\right)^n$. This is the key idea that will allow us to transition from the finitely-verifiable statement \emph{``no set of triple orientations over $n$ points satisfies property $\pi_k$''} to \emph{``no set of $n$ points satisfies property $\pi_k$''}.
 \end{enumerate}
 
 \subsection{Properties of orientations}\label{sec:sigma-props}
