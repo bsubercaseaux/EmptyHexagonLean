@@ -1,6 +1,6 @@
 We have proved the correctness of the main result of Heule and Scheucher~\cite{emptyHexagonNumber},
 implying $h(6) \leq 30$.
-Given the lower bound $h(6) > 29$ can be checked directly (see \cite{emptyHexagonNumber}),
+Given that the lower bound $h(6) > 29$ can be checked directly (see \cite{emptyHexagonNumber}),
 we conclude the result $h(6) = 30$ is indeed correct.
 We believe this work puts a \emph{happy ending} to
 one line of research started by Klein, Erd\H{o}s and Szekeres in the 1930s.
@@ -30,7 +30,7 @@ and derived in turn from Scheucher~\cite{scheucherTwoDisjoint5holes2020}.
 Moreover, we found a small error in their proof,
 as their transformation uses the mapping $(x, y) \mapsto (x/y, -1/y)$,
 and incorrectly assumes that $x/y$ is increasing for points in CCW-order,
-whereas only the slopes, $y/x$, is increasing.
+whereas only the slopes $y/x$ are increasing.
 Similarly, we found a typo in the statement of the \textsf{Lex order} condition
 that did not match the (correct) code of Heule and Scheucher.
 This has been corrected in our formalization.
@@ -38,9 +38,9 @@ This has been corrected in our formalization.
 In terms of future work,
 we hope to formally verify the result $h(7) = \infty$ due to Horton~\cite{hortonSetsNoEmpty1983},
 and other results in Erd\H{o}s-Szekeres style problems.
-We also believe a key challenge for the community
-is to improve the connection between verified SAT tools and ITPs,
-which presents a significant engineering challenge
-for proofs which are hundreds of terabytes long (as in this result).
+A key challenge for the community
+is to improve the connection between verified SAT tools and ITPs.
+This presents a significant engineering task
+for proofs that are hundreds of terabytes long (as in this result).
 Although we are confident that our results are correct,
 the trust story at this connection point has room for improvement.
