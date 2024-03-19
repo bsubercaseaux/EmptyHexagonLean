@@ -1,24 +1,24 @@
 Our formalization is closely related to a prior development
-in which Marić put proofs of $g(6) \leq 17$ on a more solid foundation \cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}.
+in which Marić put proofs of $g(6) \leq 17$ on a more solid foundation~\cite{19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points}.
 The inequality,
 originally obtained by Szekeres and Peters \cite{06szekeres_computer_solution_17_point_erdos_szekeres_problem}
 using a specialized, unverified search algorithm,
-was confirmed by Marić using a formally verified SAT encoding.
+was confirmed by Marić using a formally-verified SAT encoding.
 Marić introduced an optimized encoding based on nested convex hull structures,
-which when combined with performance advances in modern SAT solvers,
-improved the search time significantly over the unverified computation.
+which, when combined with performance advances in modern SAT solvers,
+significantly improved the search time over the unverified computation.
 
-Our work focuses on the closely related problem
+Our work focuses on the closely-related problem
 of determining $k$-hole numbers $h(k)$.
-Rather than devising a new SAT encoding,
-we use essentially the same encoding presented in Heule and Scheucher~\cite{emptyHexagonNumber}.
+Rather than devise a new SAT encoding,
+we use essentially the same encoding presented by Heule and Scheucher~\cite{emptyHexagonNumber}.
 Interestingly,
 a (verified) proof of $g(6) \leq 17$ can be obtained
 as a corollary of our development.
-We can assert the hole variables $\hvar_{a,b,c}$ as true rather than false,
+We can assert the hole variables $\hvar_{a,b,c}$ as true
 while leaving the remainder of the encoding in~\Cref{fig:full-encoding} unchanged,
 which trivializes constraints about emptiness
-so that only convexity constraints remain.\footnote{
+so that only the convexity constraints remain.\footnote{
 This modification was performed by an author
 who did not understand this part of the proof,
 nevertheless having full confidence in its correctness
@@ -33,7 +33,7 @@ theorem gon_6_theorem (pts : List Point) (gp : ListInGenPos pts)
     (h : pts.length ≥ 17) : HasConvexKGon 6 pts.toFinset
 \end{lstlisting}
 
-As both formalizations can be executed to produce a CNF,
+Since both formalizations can be executed,
 we performed a direct comparison against Marić's encoding.
 On a personal laptop,
 we found that it takes negligible time (below 1s)
@@ -65,7 +65,7 @@ represents an encouraging state of affairs;
 we are optimistic that if continued,
 it could lead to an eventual resolution of $g(7)$.
 
-Further differences regard what exactly was formally proven.
+Further differences include what exactly was formally proven.
 As with most work in this area,
 we use the combinatorial abstraction of triple orientations.
 We and Marić alike show that point sets in $\mathbb R^2$
@@ -81,12 +81,12 @@ A skeptical reviewer must manually verify that these combinatorial definitions
 correspond to the desired geometric concept.
 
 A final point of difference concerns the verification of SAT proofs.
-Marić fully reconstructs some of their results,
+Marić fully reconstructs some of the SAT proofs on which his results depend,
 though not the main one for $g(6)$,
 in an NbE-based proof checker for Isabelle/HOL.
 We make no such attempt for the time being,
 instead passing our SAT proofs through the
-formally verified proof checker \texttt{cake\_lpr} \cite{tanVerifiedPropagationRedundancy2023}
+formally verified proof checker \texttt{cake\_lpr}~\cite{tanVerifiedPropagationRedundancy2023}
 and asserting unsatisfiability of the CNF as an axiom in Lean.
-Thus we are trusting that the CNF formula produced by the verified Lean encoder
+Thus we trust that the CNF formula produced by the verified Lean encoder
 is the same one whose unsatisfiability was checked by \textsf{cake\_lpr}.

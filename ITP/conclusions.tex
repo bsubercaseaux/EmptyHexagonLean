@@ -18,8 +18,8 @@ Our formalization required approximately 300 hours of work over 3 months
 by researchers with significant experience formalizing mathematics in Lean.
 The final version of our proofs consists of approximately 4.7k lines of Lean code;
 % (including comments/whitespace);
-about $26\%$ consists of lemmas that should be moved to upstream libraries,
-about $40\%$ develops the mathematical theory of orientations in plane geometry,
+about $26\%$ are lemmas that should be moved to upstream libraries,
+about $40\%$ develops the theory of orientations in plane geometry,
 and the remaining $34\%$ (1550 LOC) validates the symmetry breaking and SAT encoding.
 % Many more lines of code were deleted or rewritten,
 % so these numbers should be taken with a grain of salt.
@@ -33,7 +33,7 @@ and incorrectly assumes that $x/y$ is increasing for points in CCW-order,
 whereas only the slopes $y/x$ are increasing.
 Similarly, we found a typo in the statement of the \textsf{Lex order} condition
 that did not match the (correct) code of Heule and Scheucher.
-This has been corrected in our formalization.
+Our formalization corrects this.
 
 In terms of future work,
 we hope to formally verify the result $h(7) = \infty$ due to Horton~\cite{hortonSetsNoEmpty1983},
