@@ -49,6 +49,6 @@ For `k = 6`, `n = 30`, the CNF takes on the order of 17,000 CPU hours to show UN
 - [Bernardo Subercaseaux](https://bsubercaseaux.github.io/) (Carnegie Mellon University)
 - [Wojciech Nawrocki](https://voidma.in/) (Carnegie Mellon University)
 - [James Gallicchio](https://gallicch.io/index.html) (Carnegie Mellon University)
-- [Cayden Codel](http://crcodel.com/) (Carnegie Mellon University)
+- [Cayden Codel](https://crcodel.com/) (Carnegie Mellon University)
 - [Mario Carneiro](https://digama0.github.io/) (Carnegie Mellon University)
 - [Marijn J. H. Heule](https://www.cs.cmu.edu/~mheule/) (Carnegie Mellon University)
