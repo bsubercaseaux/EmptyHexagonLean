@@ -25,3 +25,4 @@
 *.pdf
 *.xdv
 *.vtc
+*.synctex*
