@@ -105,14 +105,13 @@ def baseEncoding (n : Nat) (holes : Bool) : PropForm (Var n) :=
 def holeIf (holes : Bool) (a b c : Fin n) : PropForm (Var n) :=
   .impP holes fun _ => Var.hole a b c
 
-def arc' (o : Orientation) (sz : Nat) (a b c : Fin n) : PropForm (Var n) :=
-  if sz = 0 then
-    match o with
+def arc (o : Orientation) (sz : Nat) (a b c : Fin n) : PropForm (Var n) :=
+  match sz with
+  | 0 => match o with
     | .cw => .not (Var.sigma a b c)
     | .ccw => Var.sigma a b c
     | .collinear => .false
-  else
-    Var.arc o sz a b c
+  | sz+1 => Var.arc1 o sz a b c
 
 -- cap a c d:    b  c        cup a c d:  a ------ d
 --            a ------ d                    b  c
@@ -131,7 +130,7 @@ def arcDefClauses1 (n : Nat) (o : Orientation) (sz : Nat) : PropForm (Var n) :=
   .impP (b < c) fun _ =>
   .forAll (Fin n) fun d =>
   .impP (c < d) fun _ =>
-  .imp (.and (arc' o sz a b c) (arc' o 0 b c d)) (Var.arc o (sz+1) a c d)
+  .imp (.and (arc o sz a b c) (arc o 0 b c d)) (Var.arc1 o sz a c d)
 
 def arcDefClauses2 (n : Nat) (o : Orientation) (sz : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
@@ -139,7 +138,7 @@ def arcDefClauses2 (n : Nat) (o : Orientation) (sz : Nat) : PropForm (Var n) :=
   .impP (a.1+sz < c.1) fun _ =>
   .forAll (Fin n) fun d =>
   .impP (c < d) fun _ =>
-  .imp (Var.arc o (sz+1) a c d) (arc' o sz a c d)
+  .imp (Var.arc1 o sz a c d) (arc o sz a c d)
 
 --                .   b
 -- capF a c d:            c      (where a-b-d is a hole)

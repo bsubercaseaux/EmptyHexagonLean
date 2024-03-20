@@ -29,11 +29,11 @@ def isCapF (w : CanonicalPoints) (a c d : Fin w.rlen) (holes := true) :=
     σ w+[b] w+[c] w+[d] = .cw ∧ (holes → σIsEmptyTriangleFor w+[a] w+[b] w+[d] w.toFinset)
 
 @[simp] def toPropAssn (w : CanonicalPoints) (holes := true) : Var w.rlen → Prop
-  | .sigma a b c    => σ w+[a] w+[b] w+[c] = .ccw
-  | .inside x a b c => σPtInTriangle w+[x] w+[a] w+[b] w+[c]
-  | .hole₀ a b c    => holes → σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset
-  | .arc o sz a c d => isArc w o sz a c d
-  | .capF a d e     => isCapF w a d e holes
+  | .sigma a b c     => σ w+[a] w+[b] w+[c] = .ccw
+  | .inside x a b c  => σPtInTriangle w+[x] w+[a] w+[b] w+[c]
+  | .hole₀ a b c     => holes → σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset
+  | .arc1 o sz a c d => isArc w o (sz+1) a c d
+  | .capF a d e      => isCapF w a d e holes
 
 @[simp] theorem eval_holeIf (w : CanonicalPoints) {a b c : Fin w.rlen} :
     (holeIf holes a b c).eval (w.toPropAssn holes) ↔
@@ -173,10 +173,10 @@ theorem satisfies_baseEncoding (w : CanonicalPoints) :
   simp [baseEncoding, satisfies_signotopeClauses1, satisfies_insideClauses,
     satisfies_holeDefClauses1, satisfies_revLexClauses]
 
-@[simp] theorem eval_arc' (w : CanonicalPoints) {a b c : Fin w.rlen} (ab : a < b) (bc : b < c) :
-    (arc' o sz a b c).eval (w.toPropAssn holes) ↔ isArc w o sz a b c := by
-  simp [arc']; split
-  · subst sz; simp [isArc]; split <;> simp
+@[simp] theorem eval_arc (w : CanonicalPoints) {a b c : Fin w.rlen} (ab : a < b) (bc : b < c) :
+    (arc o sz a b c).eval (w.toPropAssn holes) ↔ isArc w o sz a b c := by
+  simp [arc]; split
+  · simp [isArc]; split <;> simp
     · exact (w.gp₃' ab bc).σ_iff
     · exact (w.gp₃' ab bc).σ_ne
   · simp
