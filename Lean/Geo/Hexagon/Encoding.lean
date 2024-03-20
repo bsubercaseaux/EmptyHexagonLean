@@ -61,7 +61,11 @@ def no6HoleClauses2 (n : Nat) (holes : Bool) : PropForm (Var n) :=
   ]
 
 def hexagonEncoding (n : Nat) (holes : Bool) : PropForm (Var n) :=
-  .all #[baseKGonEncoding n holes, no6HoleClauses1 n holes, no6HoleClauses2 n holes]
+  .all #[baseEncoding n holes,
+    arcDefClauses1 n .ccw 0, arcDefClauses2 n .ccw 0,
+    arcDefClauses1 n .cw 0, arcDefClauses2 n .cw 0,
+    capFDefClauses n holes,
+    no6HoleClauses1 n holes, no6HoleClauses2 n holes]
 
 def hexagonCNF (rlen : Nat) (holes : Bool) : ICnf :=
   (Geo.hexagonEncoding rlen holes |>.toICnf compare).2

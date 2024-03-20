@@ -15,7 +15,7 @@ theorem satisfies_no6Hole3Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6
     {a c d e : Fin w.rlen} (de : d < e) :
     (no6Hole3Below holes a c d e).eval (w.toPropAssn holes) := by
   simp [no6Hole3Below, -not_forall]
-  intro ⟨b, ab, bc, cd, abc, bcd⟩ cde ace
+  intro ⟨cd, b, ab, bc, abc, bcd⟩ cde ace
   refine hw <| σCCWPoints.emptyHexagonIf' ?ccwp w.gp ace
     (subset_map w [0, a.succ, b.succ, c.succ, d.succ, e.succ])
   case ccwp =>
@@ -27,7 +27,7 @@ theorem satisfies_no6Hole3Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6
 theorem satisfies_no6Hole4Above {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset)
     {a d e f : Fin w.rlen} (ef : e < f) :
     (no6Hole4Above a d e f).eval (w.toPropAssn holes) := by
-  simp [no6Hole4Above]; intro ⟨de, c, ⟨b, ab, bc, cd, abc, bcd⟩, cde, ace⟩
+  simp [no6Hole4Above]; intro ⟨de, c, ⟨cd, b, ab, bc, abc, bcd⟩, cde, ace⟩
   refine (w.gp₃' de ef).σ_iff'.1 fun def_ => ?_
   refine hw <| (σCCWPoints.cycle (l₂ := [_, _, _, _, _]) ?_).emptyHexagonIf'
     w.gp (ace · |>.perm₂.perm₁.perm₂) (subset_map' w [f, e, d, c, b, a])
@@ -38,7 +38,7 @@ theorem satisfies_no6Hole4Above {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6
 theorem satisfies_no6Hole2Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset)
     {a c e f : Fin w.rlen} :
     (no6Hole2Below holes a c f e).eval (w.toPropAssn holes) := by
-  simp [no6Hole2Below]; intro ⟨b, ab, bc, cf, abc, bcd⟩ ⟨d, ad, de, ef, ade, def_⟩
+  simp [no6Hole2Below]; intro ⟨cf, b, ab, bc, abc, bcd⟩ ⟨ef, d, ad, de, ade, def_⟩
   refine not_imp.1 fun hh => ?_
   have := Arc.join (l₁ := [_,_]) (l₂ := [_,_])
     (.cons' ab abc <| .cons' bc bcd <| .one' cf)
@@ -49,7 +49,7 @@ theorem satisfies_no6Hole2Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6
 theorem satisfies_no6Hole1Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset)
     {a d e p : Fin w.rlen} (ap : a < p) (pf : p < e) :
     (no6Hole1Below a d e p).eval (w.toPropAssn holes) := by
-  simp [no6Hole1Below]; intro ⟨de, c, ⟨b, ab, bc, cd, abc, bcd⟩, cde, ace⟩ ape
+  simp [no6Hole1Below]; intro ⟨de, c, ⟨cd, b, ab, bc, abc, bcd⟩, cde, ace⟩ ape
   have := Arc.join (l₁ := [_]) (l₂ := [_,_,_])
     (.cons' ap ape <| .one' pf)
     (.cons' ab abc <| .cons' bc bcd <| .cons' cd cde <| .one' de)
@@ -57,7 +57,8 @@ theorem satisfies_no6Hole1Below {w : CanonicalPoints} (hw : ¬σHasEmptyKGonIf 6
 
 theorem satisfies_hexagonEncoding (w : CanonicalPoints) (hw : ¬σHasEmptyKGonIf 6 holes w.toFinset) :
     (hexagonEncoding w.rlen holes).eval (w.toPropAssn holes) := by with_reducible
-  simp [hexagonEncoding, satisfies_baseKGonEncoding, no6HoleClauses1, no6HoleClauses2]
+  simp [hexagonEncoding, satisfies_baseEncoding, satisfies_arcDefClauses1,
+    satisfies_arcDefClauses2, satisfies_capFDefClauses, no6HoleClauses1, no6HoleClauses2]
   refine ⟨
     fun a b _ c _ d cd => ⟨?_, fun _ => ?_⟩,
     fun a b _ c _ p ap pc _ => ⟨fun _ => ?_, fun _ => ?_⟩⟩

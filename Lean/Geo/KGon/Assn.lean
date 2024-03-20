@@ -9,20 +9,30 @@ namespace Geo.CanonicalPoints
 open List Classical LeanSAT.Model PropFun Point
 attribute [-simp] getElem_fin
 
-def isCap (w : CanonicalPoints) (a c d : Fin w.rlen) (o : Orientation) :=
-  ∃ b, a < b ∧ b < c ∧ c < d ∧
-    σ w+[a] w+[b] w+[c] = o ∧ σ w+[b] w+[c] w+[d] = o
+def isArc (w : CanonicalPoints) (o : Orientation) (sz : Nat) (a c d : Fin w.rlen) :=
+  match sz with
+  | 0 => σ w+[a] w+[c] w+[d] = o
+  | l+1 => c < d ∧ ∃ b, a < b ∧ b < c ∧
+    isArc w o l a b c ∧ σ w+[b] w+[c] w+[d] = o
+
+theorem isArc_succ {w : CanonicalPoints} {o : Orientation} {sz : Nat} {a c d : Fin w.rlen} :
+    isArc w o (sz+1) a c d → isArc w o sz a c d
+  | ⟨cd, b, ab, bc, h1, h2⟩ => match sz with
+    | 0 => match o with
+      | .ccw => σ_prop₁ (w.sorted₄' ab bc cd) (w.gp₄' ab bc cd) h1 h2
+      | .cw => σ_prop₃ (w.sorted₄' ab bc cd) (w.gp₄' ab bc cd) h1 h2
+      | .collinear => nomatch (w.gp₃' bc cd).σ_ne h2
+    | _+1 => ⟨cd, b, ab, bc, isArc_succ h1, h2⟩
 
 def isCapF (w : CanonicalPoints) (a c d : Fin w.rlen) (holes := true) :=
-  c < d ∧ ∃ b : Fin w.rlen, isCap w a b c .cw ∧
+  c < d ∧ ∃ b : Fin w.rlen, isArc w .cw 1 a b c ∧
     σ w+[b] w+[c] w+[d] = .cw ∧ (holes → σIsEmptyTriangleFor w+[a] w+[b] w+[d] w.toFinset)
 
 @[simp] def toPropAssn (w : CanonicalPoints) (holes := true) : Var w.rlen → Prop
   | .sigma a b c    => σ w+[a] w+[b] w+[c] = .ccw
   | .inside x a b c => σPtInTriangle w+[x] w+[a] w+[b] w+[c]
   | .hole₀ a b c    => holes → σIsEmptyTriangleFor w[a] w+[b] w+[c] w.toFinset
-  | .cap a c d      => isCap w a c d .cw
-  | .cup a c d      => isCap w a c d .ccw
+  | .arc o sz a c d => isArc w o sz a c d
   | .capF a d e     => isCapF w a d e holes
 
 @[simp] theorem eval_holeIf (w : CanonicalPoints) {a b c : Fin w.rlen} :
@@ -163,42 +173,30 @@ theorem satisfies_baseEncoding (w : CanonicalPoints) :
   simp [baseEncoding, satisfies_signotopeClauses1, satisfies_insideClauses,
     satisfies_holeDefClauses1, satisfies_revLexClauses]
 
-theorem satisfies_capDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
-    (ab : a < b) (bc : b < c) (cd : c < d) : (capDef a b c d).eval (w.toPropAssn holes) := by
-  simp [capDef, isCap]; intro h1 h2
-  exact ⟨_, ab, bc, cd, (w.gp₃' ab bc).σ_iff.1 h1, (w.gp₃' bc cd).σ_iff.1 h2⟩
+@[simp] theorem eval_arc' (w : CanonicalPoints) {a b c : Fin w.rlen} (ab : a < b) (bc : b < c) :
+    (arc' o sz a b c).eval (w.toPropAssn holes) ↔ isArc w o sz a b c := by
+  simp [arc']; split
+  · subst sz; simp [isArc]; split <;> simp
+    · exact (w.gp₃' ab bc).σ_iff
+    · exact (w.gp₃' ab bc).σ_ne
+  · simp
 
-theorem satisfies_capDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
-    (capDef2 a c d).eval (w.toPropAssn holes) := by
-  simp [capDef2, isCap]; intro b ab bc cd h1 h2
-  have gp := w.gp₄' ab bc cd
-  exact gp.gp₃.σ_iff.2 <| σ_prop₃ (w.sorted₄' ab bc cd) gp h1 h2
+theorem satisfies_arcDefClauses1 (w : CanonicalPoints) :
+    (arcDefClauses1 w.rlen o sz).eval (w.toPropAssn holes) := by
+  simp [arcDefClauses1, isArc]; intro a b ab c bc d cd h1 h2
+  have ab : a < b := Nat.lt_of_le_of_lt (Nat.le_add_right ..) ab
+  simp [ab, bc, cd] at h1 h2
+  exact ⟨cd, _, ab, bc, h1, h2⟩
 
-theorem satisfies_cupDef (w : CanonicalPoints) {a b c d : Fin w.rlen}
-    (ab : a < b) (bc : b < c) (cd : c < d) : (cupDef a b c d).eval (w.toPropAssn holes) := by
-  simp [cupDef, isCap]; intro h1 h2
-  exact ⟨_, ab, bc, cd, h1, h2⟩
+theorem satisfies_arcDefClauses2 (w : CanonicalPoints) :
+    (arcDefClauses2 w.rlen o sz).eval (w.toPropAssn holes) := by
+  simp [arcDefClauses2]; intro a b ab c bc H
+  have ab : a < b := Nat.lt_of_le_of_lt (Nat.le_add_right ..) ab
+  simp [ab, bc]; exact isArc_succ H
 
-theorem satisfies_cupDef2 (w : CanonicalPoints) {a c d : Fin w.rlen} :
-    (cupDef2 a c d).eval (w.toPropAssn holes) := by
-  simp [cupDef2, isCap]; intro b ab bc cd h1 h2
-  exact σ_prop₁ (w.sorted₄' ab bc cd) (w.gp₄' ab bc cd) h1 h2
-
-theorem satisfies_capFDef (w : CanonicalPoints) {a b c d : Fin w.rlen} (bc : b < c) (cd : c < d) :
-    (capFDef holes a b c d).eval (w.toPropAssn holes) := by
-  simp [capFDef, isCapF]; intro h1 h2 hh
+theorem satisfies_capFDefClauses (w : CanonicalPoints) :
+    (capFDefClauses w.rlen holes).eval (w.toPropAssn holes) := by
+  simp [capFDefClauses, isCapF]; intro a b _ c bc d cd h1 h2 hh
   exact ⟨cd, _, h1, (w.gp₃' bc cd).σ_iff.1 h2, hh⟩
-
-theorem satisfies_baseKGonEncoding (w : CanonicalPoints) :
-    (baseKGonEncoding w.rlen holes).eval (w.toPropAssn holes) := by with_reducible
-  simp [baseKGonEncoding, capDefClauses1, capDefClauses2, satisfies_baseEncoding]
-  refine ⟨
-    fun a b ab c bc d cd => ⟨?_, ?_, fun _ => ?_⟩,
-    fun a b _ c _ => ⟨?_, ?_⟩⟩
-  · exact satisfies_capDef w ab bc cd
-  · exact satisfies_cupDef w ab bc cd
-  · exact satisfies_capFDef w bc cd
-  · exact satisfies_capDef2 w
-  · exact satisfies_cupDef2 w
 
 end CanonicalPoints

@@ -15,7 +15,7 @@ inductive Orientation : Type where
   | cw -- clockwise :=  -
   | ccw -- counter clockwise := +
   | collinear -- := 0
-  deriving DecidableEq
+  deriving DecidableEq, Repr
 
 def Orientation.neg : Orientation → Orientation
   | cw => ccw

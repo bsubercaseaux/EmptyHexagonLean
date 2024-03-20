@@ -56,6 +56,7 @@ def main (args : List String) : IO Unit := do
     | .cap a b c => def_ (a+2) (b+2) (c+2) 0
     | .cup a b c => def_ (a+2) (b+2) (c+2) 1
     | .capF a b c => def_ (a+2) (b+2) (c+2) 2
+    | .arc .. => 0
     let m (v : Nat) : Nat :=
       match vars[v]? with
       | none => v - vars.size + nVars

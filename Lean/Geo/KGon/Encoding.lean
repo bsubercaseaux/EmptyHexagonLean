@@ -105,48 +105,51 @@ def baseEncoding (n : Nat) (holes : Bool) : PropForm (Var n) :=
 def holeIf (holes : Bool) (a b c : Fin n) : PropForm (Var n) :=
   .guard holes fun _ => Var.hole a b c
 
--- cap a c d:    b  c
---            a ------ d
-def capDef (a b c d : Fin n) : PropForm (Var n) :=
-  .imp (.and (.not (Var.sigma a b c)) (.not (Var.sigma b c d))) (Var.cap a c d)
+def arc' (o : Orientation) (sz : Nat) (a b c : Fin n) : PropForm (Var n) :=
+  if sz = 0 then
+    match o with
+    | .cw => .not (Var.sigma a b c)
+    | .ccw => Var.sigma a b c
+    | .collinear => .false
+  else
+    Var.arc o sz a b c
 
-def capDef2 (a c d : Fin n) : PropForm (Var n) :=
-  .imp (Var.cap a c d) (.not (Var.sigma a c d))
-
---            a ------ d
--- cup a c d:    b  c
-def cupDef (a b c d : Fin n) : PropForm (Var n) :=
-  .imp (.and (Var.sigma a b c) (Var.sigma b c d)) (Var.cup a c d)
-
-def cupDef2 (a c d : Fin n) : PropForm (Var n) :=
-  .imp (Var.cup a c d) (Var.sigma a c d)
-
---                .   b
--- capF a c d:            c      (where a-b-d is a hole)
---             a ---------- d
-def capFDef (holes : Bool) (a b c d : Fin n) : PropForm (Var n) :=
-  .imp (.all #[Var.cap a b c, .not (Var.sigma b c d), holeIf holes a b d]) (Var.capF a c d)
-
-def capDefClauses1 (n : Nat) (holes : Bool) : PropForm (Var n) :=
+-- cap a c d:    b  c        cup a c d:  a ------ d
+--            a ------ d                    b  c
+--
+-- arc .cw sz a c d:      .·· b  c        sz+3 points total
+--                      a --------- d
+--
+--                      a --------- d
+-- arc .ccw sz a c d:     ·.. b  c
+--
+def arcDefClauses1 (n : Nat) (o : Orientation) (sz : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
   .forAll (Fin n) fun b =>
-  .guard (a < b) fun _ =>
+  .guard (a.1+sz < b.1) fun _ =>
   .forAll (Fin n) fun c =>
   .guard (b < c) fun _ =>
   .forAll (Fin n) fun d =>
   .guard (c < d) fun _ =>
-  .flatCNF <| .all #[
-    capDef a b c d, cupDef a b c d,
-    .guard (a.1+1 < b.1) fun _ => capFDef holes a b c d
-  ]
+  .imp (.and (arc' o sz a b c) (arc' o 0 b c d)) (Var.arc o (sz+1) a c d)
 
-def capDefClauses2 (n : Nat) : PropForm (Var n) :=
+def arcDefClauses2 (n : Nat) (o : Orientation) (sz : Nat) : PropForm (Var n) :=
   .forAll (Fin n) fun a =>
   .forAll (Fin n) fun c =>
-  .guard (a.1+1 < c.1) fun _ =>
+  .guard (a.1+sz < c.1) fun _ =>
   .forAll (Fin n) fun d =>
   .guard (c < d) fun _ =>
-  .all #[capDef2 a c d, cupDef2 a c d]
+  .imp (Var.arc o (sz+1) a c d) (arc' o sz a c d)
 
-def baseKGonEncoding (n : Nat) (holes : Bool) : PropForm (Var n) :=
-  .all #[baseEncoding n holes, capDefClauses1 n holes, capDefClauses2 n]
+--                .   b
+-- capF a c d:            c      (where a-b-d is a hole)
+--             a ---------- d
+def capFDefClauses (n : Nat) (holes : Bool) : PropForm (Var n) :=
+  .forAll (Fin n) fun a =>
+  .forAll (Fin n) fun b =>
+  .guard (a.1+1 < b.1) fun _ =>
+  .forAll (Fin n) fun c =>
+  .guard (b < c) fun _ =>
+  .forAll (Fin n) fun d =>
+  .guard (c < d) fun _ =>
+  .imp (.all #[Var.cap a b c, .not (Var.sigma b c d), holeIf holes a b d]) (Var.capF a c d)
