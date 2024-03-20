@@ -11,7 +11,7 @@ open LeanSAT Var
 def noKHoleClausesCore (n k : Nat) (i : Nat)
     (G1 : Fin n → Fin n → PropForm (Var n)) (G2 : Fin n → PropForm (Var n)) : PropForm (Var n) :=
   if 0 < k then
-    .guard (i < n) fun hi =>
+    .impP (i < n) fun hi =>
     .and (.imp (G2 ⟨i, hi⟩) <|
       noKHoleClausesCore n (k-1) (i+1)
         (fun b c => .and (Var.hole ⟨i, hi⟩ b c) (G1 b c))
@@ -23,7 +23,7 @@ termination_by n - i
 decreasing_by all_goals decreasing_with omega
 
 def noKHoleClauses (k n : Nat) : PropForm (Var n) :=
-  .guard (0 < k) fun _ =>
+  .impP (0 < k) fun _ =>
     .and (noKHoleClausesCore n (k-1) 0 (fun b c => Var.hole₀ 0 b c) (fun _ => .true)) <|
     noKHoleClausesCore n k 0 (fun _ _ => .true) (fun _ => .true)
 

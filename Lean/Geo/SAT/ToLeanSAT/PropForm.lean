@@ -173,12 +173,19 @@ def «exists» (as : σ) [ToArray as α] (f : α → PropForm v) : PropForm v :=
     eval τ (.exists as f) ↔ ∃ a, p a ∧ eval τ (f a) := by
   simp [PropForm.exists, LawfulToArray.toArray_eq, LawfulToArray.mem_base]
 
-def guard (p : Prop) [Decidable p] (f : p → PropForm v) : PropForm v :=
+def impP (p : Prop) [Decidable p] (f : p → PropForm v) : PropForm v :=
   if hp : p then f hp else .true
 
-@[simp] theorem eval_guard (τ : v → Prop) (p : Prop) {_ : Decidable p} (f : p → PropForm v) :
-    eval τ (.guard p f) ↔ ∀ h : p, eval τ (f h) := by
-  simp [guard]; split <;> simp [*]
+@[simp] theorem eval_impP (τ : v → Prop) (p : Prop) {_ : Decidable p} (f : p → PropForm v) :
+    eval τ (.impP p f) ↔ ∀ h : p, eval τ (f h) := by
+  simp [impP]; split <;> simp [*]
+
+def andP (p : Prop) [Decidable p] (f : p → PropForm v) : PropForm v :=
+  if hp : p then f hp else .false
+
+@[simp] theorem eval_andP (τ : v → Prop) (p : Prop) {_ : Decidable p} (f : p → PropForm v) :
+    eval τ (.andP p f) ↔ ∃ h : p, eval τ (f h) := by
+  simp [andP]; split <;> simp [*]
 
 /-- Expands out a formula directly as a CNF, without auxiliaries (unlike `PropForm.toICnf`).
 Stops at `atomic` or literal subterms. -/
