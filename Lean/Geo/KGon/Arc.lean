@@ -16,6 +16,21 @@ theorem Arc.cons' {w o} {a b c : Fin w.rlen} {l} (h1 : a < b) (h2 : σ w+[a] w+[
     Arc w o (b.succ::c.succ::l) → Arc w o (a.succ::b.succ::c.succ::l) :=
   .cons h1.succ₂ h2
 
+theorem Arc.concat {w o} {a : Fin w.length} {b c : Fin w.rlen}
+    {l} (h1 : Arc w o (l ++ [a, b.succ])) (bc : b < c) (h2 : σ w[a] w+[b] w+[c] = o) :
+    Arc w o (l ++ [a] ++ [b.succ, c.succ]) := by
+  generalize eq : l ++ [a, b.succ] = l' at h1
+  induction h1 generalizing l with
+  | one ab =>
+    cases l <;> [cases eq; simpa using congrArg List.length eq]
+    exact .cons ab h2 (.one bc.succ₂)
+  | cons ab abc h IH =>
+    cases l <;> [cases eq; injection eq with eq1 eq]
+    subst eq1; specialize IH eq
+    rename_i x l
+    match l with
+    | [] | [_] | _::_::_ => cases eq; exact .cons ab abc IH
+
 theorem Arc.sorted (H : Arc w o l) : l.Sorted (·<·) := by
   apply chain'_iff_pairwise.1
   induction H with
@@ -24,6 +39,13 @@ theorem Arc.sorted (H : Arc w o l) : l.Sorted (·<·) := by
 
 theorem Arc.head_lt (H : Arc w o (a::b::l)) : a < b := by
   have := H.sorted; simp at this; simp [this]
+
+theorem Arc.cons_0 {a : Fin w.rlen}
+    (H : Arc w .ccw (a.succ :: l)) : Arc w .ccw (0 :: a.succ :: l) := by
+  cases l with | nil => cases H | cons b l => ?_
+  obtain rfl | ⟨b, rfl⟩ := b.eq_zero_or_eq_succ
+  · cases H.head_lt
+  · exact .cons (Nat.succ_pos _) (w.σ_0 (Fin.succ_lt_succ_iff.1 H.head_lt)) H
 
 theorem Arc.pairwise {a b c : Fin w.length} (ab : a < b) (abc : σ w[a] w[b] w[c] = o)
     (H : Arc w o (b::c::l)) : (b::c::l).Pairwise (σ w[a] w[·] w[·] = o) := by

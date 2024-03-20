@@ -140,6 +140,11 @@ def arcDefClauses2 (n : Nat) (o : Orientation) (sz : Nat) : PropForm (Var n) :=
   .impP (c < d) fun _ =>
   .imp (Var.arc1 o sz a c d) (arc o sz a c d)
 
+-- ensures `Var.arc1 o i` is defined for 0 <= i < sz  (<= sz+1 intermediate points)
+def arcDefClausesUpTo (n : Nat) (o : Orientation) (sz : Nat) : PropForm (Var n) :=
+  .forAll (Fin sz) fun ⟨i, _⟩ =>
+  .and (arcDefClauses1 n o i) (arcDefClauses2 n o i)
+
 --                .   b
 -- capF a c d:            c      (where a-b-d is a hole)
 --             a ---------- d

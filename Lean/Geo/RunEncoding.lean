@@ -1,5 +1,6 @@
 import Geo.Naive.Encoding
 import Geo.Hexagon.Encoding
+import Geo.Gon.Encoding
 import LeanSAT.Solver.Dimacs
 
 open LeanSAT
@@ -25,8 +26,7 @@ def main (args : List String) : IO Unit := do
   else if holes then
     pure <| (Geo.naiveEncoding k rlen).toICnf compare
   else
-    IO.println "TODO: k-gon encoding only supported for k=6"
-    IO.Process.exit 1
+    pure <| (Geo.gonEncoding k rlen).toICnf compare
   if let out::_ := rest then
     let h ← IO.FS.Handle.mk out IO.FS.Mode.write
     for v in vars do

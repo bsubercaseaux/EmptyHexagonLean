@@ -194,6 +194,10 @@ theorem satisfies_arcDefClauses2 (w : CanonicalPoints) :
   have ab : a < b := Nat.lt_of_le_of_lt (Nat.le_add_right ..) ab
   simp [ab, bc]; exact isArc_succ H
 
+theorem satisfies_arcDefClausesUpTo (w : CanonicalPoints) :
+    (arcDefClausesUpTo w.rlen o sz).eval (w.toPropAssn holes) := by
+  simp [arcDefClausesUpTo, satisfies_arcDefClauses1, satisfies_arcDefClauses2]
+
 theorem satisfies_capFDefClauses (w : CanonicalPoints) :
     (capFDefClauses w.rlen holes).eval (w.toPropAssn holes) := by
   simp [capFDefClauses, isCapF]; intro a b _ c bc d cd h1 h2 hh
