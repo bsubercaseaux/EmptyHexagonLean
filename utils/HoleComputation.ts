@@ -1,3 +1,4 @@
+export { };
 const points = [
   [1, 1260],
   [16, 743],
@@ -31,13 +32,13 @@ const points = [
 ];
 const r = 6;
 
-const allPoints = points.map(p => ({ x: p[0], y: p[1] }));
+type point = { x: number, y: number };
+const allPoints: point[] = points.map(p => ({ x: p[0], y: p[1] }));
 for (let idP = 0; idP < allPoints.length; idP++) {
   const referencePoint = allPoints[idP];
 
-  function ccw(a, b, c) {
-    return (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y) > 0;
-  }
+  const ccw = (a: point, b: point, c: point) =>
+    (b.x - a.x) * (c.y - a.y) - (c.x - a.x) * (b.y - a.y) > 0;
 
   // computeStarPolygon
   // first remove points to the left of referencePoint.
@@ -51,10 +52,10 @@ for (let idP = 0; idP < allPoints.length; idP++) {
   const pointSequence = [referencePoint, ...sortedPoints];
 
   // computeVisibilityGraph
-  let edges = [];
-  let queues = pointSequence.map(() => []);
+  let edges: number[][] = [];
+  let queues: number[][] = pointSequence.map(() => []);
   for (let i = 0; i < pointSequence.length - 1; i++) {
-    function proceed(i, j) {
+    const proceed = function (i: number, j: number) {
       let Q_i = queues[i];
       let Q_j = queues[j];
       // is Q_i[0] -> i -> j ccw?
@@ -79,14 +80,14 @@ for (let idP = 0; idP < allPoints.length; idP++) {
   edges = edges.filter(edge => edge[0] !== 0 && edge[1] !== 0);
 
   // maxChain
-  let Lmap = {};
+  let Lmap: { [index: string]: number } = {};
   for (let i = pointSequence.length - 1; i >= 0; --i) {
     let pIncoming = edges.filter(edge => edge[1] === i);
     let pOutgoing = edges.filter(edge => edge[0] === i);
     let l = pOutgoing.length - 1;
     let m = 0;
     for (let j = pIncoming.length - 1; j >= 0; --j) {
-      Lmap[pIncoming[j]] = m + 1;
+      Lmap[String(pIncoming[j])] = m + 1;
       while (l >= 0) {
         let ccw_jl = ccw(
           pointSequence[pIncoming[j][0]],
@@ -95,28 +96,29 @@ for (let idP = 0; idP < allPoints.length; idP++) {
         if (!ccw_jl) {
           break;
         }
-        if (Lmap[pOutgoing[l]] > m) {
-          m = Lmap[pOutgoing[l]];
-          Lmap[pIncoming[j]] = m + 1;
+        if (Lmap[String(pOutgoing[l])] > m) {
+          m = Lmap[String(pOutgoing[l])];
+          Lmap[String(pIncoming[j])] = m + 1;
         }
         l -= 1;
       }
     }
   }
+  console.log(Lmap)
 
   // chainTreatment
-  let ChMap = {};
+  let ChMap: { [index: string]: number[][][] } = {};
   for (let i = 0; i < pointSequence.length - 1; ++i) {
     let S_i = edges.filter(edge => edge[1] === i);
     let S_o = edges.filter(edge => edge[0] === i);
-    let S_o_sorted = S_o.sort((edge1, edge2) => Lmap[edge2] - Lmap[edge1]);
+    let S_o_sorted = S_o.sort((edge1, edge2) => Lmap[String(edge2)] - Lmap[String(edge1)]);
     for (let j = 0; j < S_o.length; ++j) {
       //console.log("S_o[j]", S_o[j], "Lmap[S_o[j]]", Lmap[S_o[j]], "r-2", r-2);
-      if (Lmap[S_o[j]] >= r - 2) {
+      if (Lmap[String(S_o[j])] >= r - 2) {
         // console.log("value is >= r-2", (r-2));
-        ChMap[S_o[j]] = [[S_o[j]]];
+        ChMap[String(S_o[j])] = [[S_o[j]]];
       } else {
-        ChMap[S_o[j]] = [];
+        ChMap[String(S_o[j])] = [];
       }
     }
 
@@ -135,16 +137,16 @@ for (let idP = 0; idP < allPoints.length; idP++) {
         om -= 1;
         m += 1;
       }
-      ChMap[S_i[j]].forEach(chain => {
+      ChMap[String(S_i[j])].forEach(chain => {
         let t = 0;
         let l = chain.length;
-        while (t <= om && Lmap[S_o_sorted[t]] >= r - 2 - l) {
+        while (t <= om && Lmap[String(S_o_sorted[t])] >= r - 2 - l) {
           chain.push(S_o_sorted[t]);
           if (l === r - 3) {
             console.log("Found empty convex polygon of desired length!!");
             console.log("l", l, " chain length: ", chain.length, " chain: ", chain);
           } else {
-            ChMap[S_o_sorted[t]].push(chain);
+            ChMap[String(S_o_sorted[t])].push(chain);
           }
           t += 1;
         }
