@@ -21,28 +21,28 @@ theorem gon_theorem (rlen_le : 2 ≤ rlen) (unsat : (Geo.gonCNF k rlen).isUnsat)
     rw [rlen9] at this
     rwa [gonCNF]
 
-/-- This asserts that the CNF produced by `lake exe encode gon 3 3 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode gon 3 3` is UNSAT -/
 axiom unsat_3gon_cnf : (Geo.gonCNF (k := 3) (rlen := 3-1)).isUnsat
 
 theorem gon_3_theorem : ∀ (pts : List Point),
     Point.ListInGenPos pts → pts.length ≥ 3 → HasConvexKGon 3 pts.toFinset :=
   gon_theorem (by decide) unsat_3gon_cnf
 
-/-- This asserts that the CNF produced by `lake exe encode gon 4 5 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode gon 4 5` is UNSAT -/
 axiom unsat_4gon_cnf : (Geo.gonCNF (k := 4) (rlen := 5-1)).isUnsat
 
 theorem gon_4_theorem : ∀ (pts : List Point),
     Point.ListInGenPos pts → pts.length ≥ 5 → HasConvexKGon 4 pts.toFinset :=
   gon_theorem (by decide) unsat_4gon_cnf
 
-/-- This asserts that the CNF produced by `lake exe encode gon 5 9 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode gon 5 9` is UNSAT -/
 axiom unsat_5gon_cnf : (Geo.gonCNF (k := 5) (rlen := 9-1)).isUnsat
 
 theorem gon_5_theorem : ∀ (pts : List Point),
     Point.ListInGenPos pts → pts.length ≥ 9 → HasConvexKGon 5 pts.toFinset :=
   gon_theorem (by decide) unsat_5gon_cnf
 
-/-- This asserts that the CNF produced by `lake exe encode gon 6 17 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode gon 6 17` is UNSAT -/
 axiom unsat_6gon_cnf : (Geo.gonCNF (k := 6) (rlen := 17-1)).isUnsat
 
 theorem gon_6_theorem : ∀ (pts : List Point),

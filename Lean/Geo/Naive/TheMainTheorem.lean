@@ -21,21 +21,21 @@ theorem empty_kgon_naive (rlen_le : 2 ≤ rlen) (unsat : (Geo.naiveCNF k rlen).i
     rw [rlen9] at this
     rwa [naiveCNF]
 
-/-- This asserts that the CNF produced by `lake exe encode hole 3 3 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode hole 3 3` is UNSAT -/
 axiom unsat_3hole_cnf : (Geo.naiveCNF (k := 3) (rlen := 3-1)).isUnsat
 
 theorem hole_3_theorem : ∀ (pts : List Point),
     Point.ListInGenPos pts → pts.length ≥ 3 → HasEmptyKGon 3 pts.toFinset :=
   empty_kgon_naive (by decide) unsat_3hole_cnf
 
-/-- This asserts that the CNF produced by `lake exe encode hole 4 5 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode hole 4 5` is UNSAT -/
 axiom unsat_4hole_cnf : (Geo.naiveCNF (k := 4) (rlen := 5-1)).isUnsat
 
 theorem hole_4_theorem : ∀ (pts : List Point),
     Point.ListInGenPos pts → pts.length ≥ 5 → HasEmptyKGon 4 pts.toFinset :=
   empty_kgon_naive (by decide) unsat_4hole_cnf
 
-/-- This asserts that the CNF produced by `lake exe encode hole 5 10 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode hole 5 10` is UNSAT -/
 axiom unsat_5hole_cnf : (Geo.naiveCNF (k := 5) (rlen := 10-1)).isUnsat
 
 theorem hole_5_theorem : ∀ (pts : List Point),

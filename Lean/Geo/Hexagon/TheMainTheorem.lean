@@ -5,7 +5,7 @@ import Geo.Hexagon.Encoding
 namespace Geo
 open Classical LeanSAT Model
 
--- /-- This asserts that the CNF produced by `lake exe encode gon 6 17 vars.out` is UNSAT -/
+-- /-- This asserts that the CNF produced by `lake exe encode gon 6 17` is UNSAT -/
 -- axiom unsat_6gon_cnf : (Geo.hexagonCNF (rlen := 17-1) (holes := false)).isUnsat
 
 -- theorem gon_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
@@ -23,7 +23,7 @@ open Classical LeanSAT Model
 --     rw [rlen_eq] at this
 --     rwa [hexagonCNF]
 
-/-- This asserts that the CNF produced by `lake exe encode hole 6 30 vars.out` is UNSAT -/
+/-- This asserts that the CNF produced by `lake exe encode hole 6 30` is UNSAT -/
 axiom unsat_6hole_cnf : (Geo.hexagonCNF (rlen := 30-1) (holes := true)).isUnsat
 
 theorem hole_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
