@@ -103,30 +103,31 @@ where
   termination_by n - i
 
 def maxChain (pts : Fin n → Point) (r : Nat) (graph : VisibilityGraph n)
-    (lmap : Std.RBMap (Fin n ×ₗ Fin n) (List (Fin n)) compare) : ∀ i, i ≤ n → Option Unit
+    (lmap : Std.RBMap (Fin n ×ₗ Fin n) Nat compare) : ∀ i, i ≤ n → Option Unit
   | 0, _ => pure ()
   | p+1, hp => do
     let (in_, out) := graph.edges.get ⟨p, graph.sz.symm ▸ hp⟩
     let rec loop lmap
     | [], _, m => do
-      dbg_trace m
-      guard (m.length < r)
+      guard <| m < r
       pure lmap
     | i::in_, out, m => do
-      let finish := loop (lmap.insert (i, ⟨p, hp⟩) (i::m)) in_
+      let finish out m :=
+        loop (lmap.insert (i, ⟨p, hp⟩) (m+1)) in_ out m
       let rec inner
       | [], m => finish [] m
-      | o::out, m =>
+      | o::out, m => do
         if ccw (pts i) (pts ⟨p, hp⟩) (pts o) then
-          inner out <| max m <| lmap.findD (⟨p, hp⟩, o) []
+          let m' := lmap.find! (⟨p, hp⟩, o)
+          inner out <| if m' > m then m' else m
         else finish (o::out) m
       inner out m
-    let lmap ← loop lmap in_ out []
+    let lmap ← loop lmap in_ out 0
     maxChain pts r graph lmap p (Nat.le_of_lt hp)
 
 def holeCheck (r : Nat) (points : List Point) (lo := 0) : Option Unit := do
-  let p :: points := points | some ()
-  guard (lo < p.1)
+  let p :: points := points | return
+  guard <| lo < p.1
   let slope : Point → Rat := fun q => mkRat (q.2 - p.2) (q.1 - p.1)
   let sorted := points.mergeSort (slope · ≤ slope ·)
   guard <| sorted.Chain' (slope · ≠ slope ·)
@@ -144,7 +145,5 @@ def points := [
   (1259, 320),
 ]
 
-#guard Option.isSome <| holeCheck (6-2) points
-
--- FIXME, this should fail since there are definitely empty 5-holes
-#guard Option.isSome <| holeCheck (5-2) points
+#guard Option.isSome <| holeCheck (6-3) points
+#guard Option.isNone <| holeCheck (5-3) points

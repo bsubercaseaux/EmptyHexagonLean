@@ -79,14 +79,14 @@ for (let idP = 0; idP < allPoints.length; idP++) {
   }
 
   // maxChain
-  let Lmap: { [index: string]: number } = {};
+  let Lmap: { [index: string]: number[] } = {};
   for (let i = pointSequence.length - 1; i >= 0; --i) {
     let pIncoming = edges.filter(edge => edge[1] === i);
     let pOutgoing = edges.filter(edge => edge[0] === i);
     let l = pOutgoing.length - 1;
-    let m = 0;
+    let m: number[] = [i];
     for (let j = pIncoming.length - 1; j >= 0; --j) {
-      Lmap[String(pIncoming[j])] = m + 1;
+      Lmap[String(pIncoming[j])] = [pIncoming[j][0], ...m];
       while (l >= 0) {
         let ccw_jl = ccw(
           pointSequence[pIncoming[j][0]],
@@ -95,11 +95,12 @@ for (let idP = 0; idP < allPoints.length; idP++) {
         if (!ccw_jl) {
           break;
         }
-        if (Lmap[String(pOutgoing[l])] > m) {
+        if (Lmap[String(pOutgoing[l])].length > m.length) {
           m = Lmap[String(pOutgoing[l])];
-          Lmap[String(pIncoming[j])] = m + 1;
-          if (m >= r - 3) {
-            console.log("Found empty convex polygon of desired length!!");
+          const n = [pIncoming[j][0], ...m];
+          Lmap[String(pIncoming[j])] = n;
+          if (m.length >= r - 2) {
+            console.log(`Found empty convex polygon: ${idP}:${n}`);
           }
         }
         l -= 1;
