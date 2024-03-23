@@ -37,6 +37,18 @@ open List in
 theorem List.Subperm.cons₂ : l <+~ l' → a :: l <+~ a :: l'
   | ⟨l₂, hp, hs⟩ => ⟨a::l₂, .cons _ hp, .cons₂ _ hs⟩
 
+theorem List.Chain.and : @Chain α R l a → Chain S l a → Chain (fun a b => R a b ∧ S a b) l a
+  | .nil, .nil => .nil
+  | .cons ha₁ h₁, .cons ha₂ h₂ => .cons ⟨ha₁, ha₂⟩ (h₁.and h₂)
+
+theorem List.Chain'.and : ∀ {l}, @Chain' α R l → Chain' S l → Chain' (fun a b => R a b ∧ S a b) l
+  | [], _, _ => trivial
+  | _::_, h₁, h₂ => Chain.and h₁ h₂
+
+theorem List.Chain'.imp₂ {R S T : α → α → Prop} (H : ∀ a b, R a b → S a b → T a b)
+    (h1 : Chain' R l) (h2 : Chain' S l) : Chain' T l :=
+  (h1.and h2).imp fun _ _ ⟨h1, h2⟩ => H _ _ h1 h2
+
 theorem List.of_Pairwise_toFinset [DecidableEq α] (as : List α) (R : α → α → Prop) :
     (∀ i j : Fin as.length, i < j → as[i] = as[j] → R as[i] as[j]) →
     as.toFinset.toSet.Pairwise R → as.Pairwise R := by

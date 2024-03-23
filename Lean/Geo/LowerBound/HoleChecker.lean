@@ -1,15 +1,15 @@
 import Std.Tactic.GuardExpr
 import Std.Data.Rat
 import Mathlib.Data.List.Sort
-import Mathlib.Tactic
+import Mathlib.Data.Prod.Lex
 
 namespace Geo
 
 namespace HoleChecker
 
-abbrev Point := Nat × Nat
+def NPoint := Nat × Nat
 
-def ccw (a b c : Point) : Bool :=
+def ccw (a b c : NPoint) : Bool :=
   a.1 * b.2 + b.1 * c.2 + c.1 * a.2 > a.2 * b.1 + b.2 * c.1 + c.2 * a.1
 
 structure VisibilityGraph (n : Nat) where
@@ -61,7 +61,7 @@ structure Queues (n a : Nat) where
     · have := Nat.eq_of_lt_succ_of_not_lt h (by rwa [Q.sz])
       subst i; simpa using l.2
 
-@[specialize] def proceed (pts : Fin n → Point) (i j : Fin n) (hi : i < j)
+@[specialize] def proceed (pts : Fin n → NPoint) (i j : Fin n) (hi : i < j)
     (Q : Queues n j) (Q_j : BelowList n j) :
     Queues n j × BelowList n j :=
   let q := Q.q[i]'(Q.sz ▸ hi)
@@ -82,7 +82,7 @@ structure Queues (n a : Nat) where
       finish Q ⟨a::q, ha, hq⟩ Q_j
   loop Q Q_j q this
 
-@[specialize] def mkVisibilityGraph (pts : Fin n → Point) : VisibilityGraph n :=
+@[specialize] def mkVisibilityGraph (pts : Fin n → NPoint) : VisibilityGraph n :=
   if n0 : 0 < n then
     loop 0 {
       q := #[[]]
@@ -102,7 +102,7 @@ where
       Q.graph
   termination_by n - i
 
-def maxChain (pts : Fin n → Point) (r : Nat) (graph : VisibilityGraph n)
+def maxChain (pts : Fin n → NPoint) (r : Nat) (graph : VisibilityGraph n)
     (lmap : Std.RBMap (Fin n ×ₗ Fin n) Nat compare) : ∀ i, i ≤ n → Option Unit
   | 0, _ => pure ()
   | p+1, hp => do
@@ -125,19 +125,21 @@ def maxChain (pts : Fin n → Point) (r : Nat) (graph : VisibilityGraph n)
     let lmap ← loop lmap in_ out 0
     maxChain pts r graph lmap p (Nat.le_of_lt hp)
 
-def holeCheck (r : Nat) (points : List Point) (lo := 0) : Option Unit := do
-  let p :: points := points | return
-  guard <| lo < p.1
-  let slope : Point → Rat := fun q => mkRat (q.2 - p.2) (q.1 - p.1)
-  let sorted := points.mergeSort (slope · ≤ slope ·)
-  guard <| sorted.Chain' (slope · ≠ slope ·)
-  let sorted := Array.mk sorted
-  let n := sorted.size
-  let graph := mkVisibilityGraph (n := n) (fun i => sorted[i])
-  maxChain (n := n) (fun i => sorted[i]) r graph {} n (Nat.le_refl _)
-  holeCheck r points p.1
+def holeCheck (r : Nat) (points : List NPoint) (lo : Nat) : Option Unit :=
+  match points with
+  | [] => return
+  | p :: points => do
+    guard <| lo < p.1
+    let slope : NPoint → Rat := fun q => mkRat (q.2 - p.2) (q.1 - p.1)
+    let sorted := points.mergeSort (slope · ≤ slope ·)
+    guard <| sorted.Chain' (slope · ≠ slope ·)
+    let sorted := Array.mk sorted
+    let n := sorted.size
+    let graph := mkVisibilityGraph (n := n) (fun i => sorted[i])
+    maxChain (n := n) (fun i => sorted[i]) r graph {} n (Nat.le_refl _)
+    holeCheck r points p.1
 
-def points := [
+def points : List NPoint := [
   (1, 1260), (16, 743), (22, 531), (37, 0), (306, 592), (310, 531), (366, 552),
   (371, 487), (374, 525), (392, 575), (396, 613), (410, 539), (416, 550), (426, 526),
   (434, 552), (436, 535), (446, 565), (449, 518), (450, 498), (453, 542), (458, 526),
@@ -145,5 +147,5 @@ def points := [
   (1259, 320),
 ]
 
-#guard Option.isSome <| holeCheck (6-3) points
-#guard Option.isNone <| holeCheck (5-3) points
+#guard Option.isSome <| holeCheck (6-3) points 0
+#guard Option.isNone <| holeCheck (5-3) points 0
