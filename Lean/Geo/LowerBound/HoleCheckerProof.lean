@@ -36,10 +36,91 @@ theorem slope_lt {p a b : NPoint} (ha : p.1 < a.1) (hb : p.1 < b.1) :
 
 def toSet (pts : Fin n → NPoint) : Set Point := Set.range (pts ·)
 
-def Visible (p : NPoint) (pts : Fin n → NPoint) (i j : Fin n) :=
-  σIsEmptyTriangleFor p (pts i) (pts j) (toSet pts)
+variable {n : Nat} (p : NPoint) (pts : Fin n → NPoint)
+def Visible (i j : Fin n) := i < j ∧ σIsEmptyTriangleFor p (pts i) (pts j) (toSet pts)
 
-theorem of_holeCheck (H : holeCheck r pts lo = some ()) :
+def VisibilityGraph.MemIn (g : VisibilityGraph n) (j i : Fin n) :=
+  j ∈ (g.edges[i.1]'(g.sz.symm ▸ i.2)).1
+
+def VisibilityGraph.MemOut (g : VisibilityGraph n) (i j : Fin n) :=
+  j ∈ (g.edges[i.1]'(g.sz.symm ▸ i.2)).2
+
+def VisibilityGraph.Mem (g : VisibilityGraph n) (i j : Fin n) :=
+  g.MemIn i j ∧ g.MemOut i j
+
+inductive Queues.Ordered : (lo : Nat) → (j : Fin n) →
+    (Q : (x : Fin n) → x < j → List (Fin n)) → List (Fin n) → Prop where
+  | nil : lo ≤ j.1 → Queues.Ordered lo j Q []
+  | cons {i : Fin n} (h : i < j) :
+    (∀ k ∈ Q i h, σ (pts k) (pts i) (pts j) ≠ .ccw) →
+    Queues.Ordered lo i (fun x hx => Q x (hx.trans h)) (Q i h) →
+    Queues.Ordered (i+1) j Q l →
+    Queues.Ordered lo j Q (i :: l)
+
+-- structure Queues.WF (Q : Queues n a) : Prop where
+--   graph : ∀ i j, j.1 < a → Visible p pts i j → Q.graph.Mem i j
+--   mem : ∀ (i j : Fin n) (h : i < a), j ∈ Q.q[i.1]'(Q.sz ▸ h) ↔
+--     Visible p pts j i ∧ ∀ k, i < k → k < a → ¬Visible p pts j k
+
+-- proceed i j := do
+--   while Q[i] != 0 && ccw(Q[i].0, i, j) do
+--     proceed Q[i].0 j
+--     Q[i].dequeue
+--   add i j
+--   Q[j].enqueue i
+
+--                  3
+--
+--
+--          2
+--   1
+--             4          5
+--
+--             6
+-- p               7
+--
+--
+--                   8
+--        9
+
+--     1  2  3  4  5  6   7   8   9
+-- 12     1
+-- 23     1  2
+--   14      2 1
+--  24         12
+-- 34          123
+-- 45          123 4
+--   16         23 4 1
+--   26          3 4 12
+--  46           3   124
+-- 56            3   1245
+-- 67            3   1245 6
+--   18          3    245 6  1
+--  68           3    245    16
+-- 78            3    245    167
+--  19           3    245     67 1
+--   29          3     45     67 12
+--   49          3      5     67 124
+--  69           3      5      7 1246
+--  79           3      5        12467
+-- 89            3      5        124678
+
+theorem of_proceed
+    {i j : Fin n} {Q : Queues n j} (hi : i < j) {Q_j : BelowList n j}
+    (Hj : ∀ r, Queues.Ordered pts lo j (fun k h => Q.q[k]'(Q.sz ▸ h)) r →
+      Queues.Ordered pts 0 j (fun k h => Q.q[k]'(Q.sz ▸ h)) (Q_j.1.reverseAux r))
+    {Q' Q_j' r} (eq : proceed pts i j hi Q Q_j = (Q', Q_j'))
+    (hr : Queues.Ordered pts (i+1) j (fun k h => Q.q[k]'(Q.sz ▸ h)) r) :
+    Queues.Ordered pts 0 j (fun k h => Q.q[k]'(Q.sz ▸ h)) (Q_j'.1.reverseAux r) := by
+  sorry
+
+def VisibilityGraph.WF (g : VisibilityGraph n) : Prop :=
+  ∀ i j, Visible p pts i j → g.Mem i j
+
+theorem of_mkVisibilityGraph : (mkVisibilityGraph pts).WF p pts := by
+  sorry
+
+theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
     (pts.map (·.1)).Chain (· < ·) lo ∧
     Point.ListInGenPos (↑'pts) ∧
     ¬σHasEmptyKGon (r+3) {x | ∃ a ∈ pts, ↑a = x} := by
@@ -91,7 +172,6 @@ theorem of_holeCheck (H : holeCheck r pts lo = some ()) :
         · ext x; by_cases xp : x = p <;> simp [xp, hp]
           simpa [xp, lp.mem_iff] using congrArg (x ∈ ·) hs
       sorry
-
 
 theorem holeCheck_points : (holeCheck (6-3) points 0).isSome = true := by native_decide
 
