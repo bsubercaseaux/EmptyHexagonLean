@@ -19,16 +19,16 @@ Formal methods researchers have devoted significant attention to making the \emp
 Modern SAT solvers produce proofs of unsatisfiability in formal systems
 such as DRAT~\cite{drat-trim14}
 that can in turn be checked with verified proof checkers
-such as \texttt{cake\_lpr}~\cite{tanVerifiedPropagationRedundancy2023}. 
+such as \texttt{cake\_lpr}~\cite{tanVerifiedPropagationRedundancy2023}.
 These tools ensure that when a SAT solver declares a formula~$\phi$ to be unsatisfiable, the formula is indeed unsatisfiable.
-In contrast, the \emph{reduction} step can use problem-specific mathematical insights that, when left unverified, threaten the trustworthiness of SAT-based proofs in mathematics. 
-% The correctness of the \emph{reduction} step, however, has received 
+In contrast, the \emph{reduction} step can use problem-specific mathematical insights that, when left unverified, threaten the trustworthiness of SAT-based proofs in mathematics.
+% The correctness of the \emph{reduction} step, however, has received
 % leaving room for doubt that any results relying on such reduction arguments are correct.
-A perfect example of the complexity of this reduction step can be found in a recent breakthrough of Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry. 
-They constructed (and solved) a formula $\phi$ whose unsatisfiability implies that every set of 30 points, without three in a common line, must contain an empty convex hexagon.
+A perfect example of the complexity of this reduction step can be found in a recent breakthrough of Heule and Scheucher~\cite{emptyHexagonNumber} in discrete computational geometry.
+They constructed (and solved) a formula $\phi$ whose unsatisfiability implies that every set of 30 points in the plane, without three in a common line, must contain an empty convex hexagon.
 However, as is common with such results, their reduction argument was only sketched, relied heavily on intuition,
 and left several gaps to be filled in.
- 
+
 
 % result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
 % They resolve a variant of the Happy Ending Problem,
@@ -106,7 +106,7 @@ or \emph{empty $k$-gon},
 meaning a convex $k$-gon with no other point inside.
 It is easy to check that $h(3) = 3$ and $h(4) = 5$.
 In 1978, Harborth established that $h(5) = 10$~\cite{Harborth1978}.
-Surprisingly, in 1983, Horton discovered constructions of arbitrarily large point sets that 
+Surprisingly, in 1983, Horton discovered constructions of arbitrarily large point sets that
 avoid $k$-holes for $k \geq 7$~\cite{hortonSetsNoEmpty1983}.
 Only $h (6)$ remained.
 The \emph{Empty Hexagon Theorem},
