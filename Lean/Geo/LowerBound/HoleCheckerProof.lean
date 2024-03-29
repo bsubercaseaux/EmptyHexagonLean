@@ -117,8 +117,39 @@ theorem of_proceed
 def VisibilityGraph.WF (g : VisibilityGraph n) : Prop :=
   ∀ i j, Visible p pts i j → g.Mem i j
 
-theorem of_mkVisibilityGraph : (mkVisibilityGraph pts).WF p pts := by
+theorem mkVisibilityGraph_loop_wf
+    {Q : Queues n (i+1)} (hi : i < n)
+    (H : Queues.Ordered pts 0 ⟨i, hi⟩
+      (fun k h => Q.q[k]'(Q.sz ▸ Nat.lt_succ_of_lt h))
+      (Q.q[i]'(Q.sz ▸ Nat.lt_succ_self _))) :
+    (mkVisibilityGraph.loop pts i Q).WF p pts := by
   sorry
+
+variable
+  (ord : ∀ a b, a < b → σ p (pts a) (pts b) = .ccw)
+  (gp : ∀ {i j k}, i < j → j < k → Point.InGenPos₃ (pts i) (pts j) (pts k)) in
+theorem mkVisibilityGraph_wf : (mkVisibilityGraph pts).WF p pts := by
+  have := ord
+  have := @gp
+  sorry
+
+variable {r : ℕ} {graph : VisibilityGraph n} (g_wf : graph.WF p pts) in
+theorem of_maxChain
+    {lmap hq} (H : maxChain pts r graph lmap q hq = some ())
+    (hlmap : ∀ i j, graph.MemOut i j → q ≤ i →
+      ∃ k, lmap.find? (i, j) = some (k+1) ∧ k < r ∧
+        ∀ is, (i::j::is).Pairwise (Visible p pts) → is.length ≤ k) :
+    ∀ is : List (Fin n), is.Pairwise (Visible p pts) → is.length < r + 2 := by
+  match q with
+  | 0 =>
+    intro is his
+    refine not_le.1 fun h => ?_
+    let a::b::is := is
+    have ⟨k, eq, kr, hk⟩ :=
+      hlmap _ _ (g_wf _ _ <| (pairwise_cons.1 his).1 _ (.head _)).2 (Nat.zero_le _)
+    exact (Nat.add_lt_add_right ((hk is his).trans_lt kr) 2).not_le h
+  | q+1 =>
+    sorry
 
 theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
     (pts.map (·.1)).Chain (· < ·) lo ∧
@@ -135,17 +166,15 @@ theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
     simp (config := {zeta := false}); intro h1 h2 () h3 h4
     have ⟨h5, h6, h7⟩ := IH h4
     have perm : sorted ~ pts := perm_mergeSort ..
+    have h5' : ∀ a ∈ sorted, p.1 < a.1 := fun a ha =>
+      (pairwise_cons.1 (pairwise_map.1 h5.pairwise)).1 _ (perm.mem_iff.1 ha)
     have sccw : sorted.Pairwise (fun a b : NPoint => σ p a b = .ccw) := by
       have : IsTotal NPoint (slope · ≤ slope ·) := ⟨fun _ _ => le_total ..⟩
       have : IsTrans NPoint (slope · ≤ slope ·) := ⟨fun _ _ _ => le_trans⟩
       have : IsTrans NPoint (slope · < slope ·) := ⟨fun _ _ _ => lt_trans⟩
       have := chain'_iff_pairwise.1 <|
         (sorted_mergeSort ..).chain'.imp₂ (fun _ _ => lt_of_le_of_ne) h2
-      have h5 := (pairwise_cons.1 (pairwise_map.1 h5.pairwise)).1
-      refine this.imp_of_mem fun {a b} ha hb h => ?_
-      have ha := h5 _ <| perm.mem_iff.1 ha
-      have hb := h5 _ <| perm.mem_iff.1 hb
-      exact (slope_lt ha hb).1 h
+      refine this.imp_of_mem fun {a b} ha hb h => (slope_lt (h5' _ ha) (h5' _ hb)).1 h
     have gp : (↑'pts).Pairwise (Point.InGenPos₃ p) := by
       refine pairwise_map.2 <| (sccw.imp fun h => ?_).perm perm Point.InGenPos₃.perm₂
       rw [Point.InGenPos₃.iff_ne_collinear, h]; decide
@@ -171,7 +200,31 @@ theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
             ← hs, Finset.card_erase_of_mem hp, eq]; rfl
         · ext x; by_cases xp : x = p <;> simp [xp, hp]
           simpa [xp, lp.mem_iff] using congrArg (x ∈ ·) hs
-      sorry
+      let n' := sorted.length
+      let pts' : Fin n' → NPoint := sorted.get
+      have gp {i j k} (ij : i < j) (jk : j < k) : Point.InGenPos₃ (pts' i) (pts' j) (pts' k) := by
+        have := List.sublist_iff_exists_index.2
+          ⟨[i, j, k], chain_iff_pairwise.1 <| .cons ij <| .cons jk .nil, rfl⟩
+        exact Point.ListInGenPos.subperm.1 h6 <| (perm.map _).subperm_left.1 (this.map _).subperm
+      let graph' := mkVisibilityGraph pts'
+      replace h3 : maxChain pts' r graph' ∅ n' (Nat.le_refl n') = some () := h3
+      obtain ⟨is : List (Fin n'), iss : is.Sorted (·<·), rfl : map pts' is = _⟩ := hl1.exists_index
+      have : ∀ a b, a < b → σ p (pts' a) (pts' b) = .ccw := pairwise_iff_get.1 sccw
+      have h5 i : p.toPoint ≠ pts' i :=
+        mt toPoint_inj <| mt (congrArg (·.1)) (h5' _ (get_mem ..)).ne
+      have mem {x} : x ∈ toSet pts' ↔ ∃ a ∈ pts, a.toPoint = x := by
+        simp (config := {zeta := false}) only [← perm.mem_iff]
+        simp only [toSet, Set.mem_range, mem_iff_get, exists_exists_eq_and]
+      clear_value pts' n'
+      refine (of_maxChain p pts' ?_ h3 (fun i _ _ h => nomatch h.not_lt i.2) is ?_).ne ?_
+      · exact mkVisibilityGraph_wf p pts' this gp
+      · refine iss.imp_of_mem fun {a b} ha hb h => ⟨h, fun c hc => ?_⟩
+        refine hS p (by simp)
+          (pts' a) (by simpa using .inr ⟨_, ha, rfl⟩)
+          (pts' b) (by simpa using .inr ⟨_, hb, rfl⟩)
+          (h5 _) (h5 _) (fun h' => ?_) c (.inr <| mem.1 hc)
+        have := this _ _ h; rw [h', σ_self₁] at this; cases this
+      · simpa using hl2
 
 theorem holeCheck_points : (holeCheck (6-3) points 0).isSome = true := by native_decide
 
