@@ -60,43 +60,20 @@ theorem List.of_Pairwise_toFinset [DecidableEq α] (as : List α) (R : α → α
   . apply hRefl _ _ hLt (of_decide_eq_true hEq)
 
 open List in
-theorem List.Sublist.exists_index : ∀ {l₁ l₂ : List α} (H : l₁ <+ l₂),
-    ∃ is : List (Fin l₂.length), is.Sorted (· < ·) ∧ is.map l₂.get = l₁
-  | _, _, .slnil => ⟨[], .nil, rfl⟩
-  | _, _, .cons a h =>
-    let ⟨is, h1, h2⟩ := h.exists_index
-    ⟨is.map Fin.succ, pairwise_map.2 <| h1.imp Nat.succ_lt_succ, by simp [Function.comp, h2]⟩
-  | _, _, .cons₂ a h =>
-    let ⟨is, h1, h2⟩ := h.exists_index
-    ⟨(0:Fin (_+1)) :: is.map Fin.succ,
-      .cons (by simp) <| pairwise_map.2 <| h1.imp Nat.succ_lt_succ, by simp [Function.comp, h2]⟩
-
-open List in
-theorem List.sublist_iff_exists_index {l₁ l₂ : List α} : l₁ <+ l₂ ↔
-    ∃ is : List (Fin l₂.length), is.Sorted (· < ·) ∧ is.map l₂.get = l₁ := by
-  refine ⟨Sublist.exists_index, ?_⟩; rintro ⟨is, h1, rfl⟩
-  induction l₂ with
-  | nil => let [] := is; apply nil_sublist
-  | cons a l₂ ih =>
-    match is with
-    | [] => apply nil_sublist
-    | i::is =>
-      let ⟨h1', h2⟩ := pairwise_cons.1 h1
-      obtain ⟨is, rfl⟩ : ∃ is' : List (Fin l₂.length), is = is'.map Fin.succ := by
-        clear h1 h2
-        induction is with
-        | nil => exact ⟨[], rfl⟩
-        | cons i is ih =>
-          rw [forall_mem_cons] at h1'
-          obtain ⟨is', rfl⟩ := ih h1'.2
-          obtain rfl | ⟨i, rfl⟩ := i.eq_zero_or_eq_succ
-          · cases h1'.1
-          · exact ⟨_::is', rfl⟩
-      simp [pairwise_map] at h2
-      obtain rfl | ⟨i, rfl⟩ := i.eq_zero_or_eq_succ
-      · apply Sublist.cons₂; simpa [Function.comp] using ih _ h2
-      · rw [← map_cons, map_map]
-        exact .cons _ <| ih (i::is) (.cons (by simpa using h1') h2)
+theorem List.sublist_map {l₁ : List β} {l₂ : List α} {f : α → β} :
+    l₁ <+ map f l₂ ↔ ∃ l', l₁ = map f l' ∧ l' <+ l₂ := by
+  refine ⟨fun h => ?_, fun ⟨l', h1, h2⟩ => h1 ▸ h2.map _⟩
+  generalize e : map f l₂ = l₂' at h
+  induction h generalizing l₂ with
+  | slnil => exact ⟨[], rfl, nil_sublist _⟩
+  | cons _ _ ih =>
+    let a :: l₂ := l₂; cases e
+    obtain ⟨l', rfl, h2⟩ := ih rfl
+    exact ⟨_, rfl, .cons _ h2⟩
+  | cons₂ _ _ ih =>
+    let a :: l₂ := l₂; cases e
+    obtain ⟨l', rfl, h2⟩ := ih rfl
+    exact ⟨_::_, rfl, .cons₂ _ h2⟩
 
 @[simp]
 theorem List.toFinset_map [DecidableEq α] [DecidableEq β] (l : List α) (f : α → β) :

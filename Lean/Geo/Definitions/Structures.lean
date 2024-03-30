@@ -17,6 +17,10 @@ theorem EmptyShapeIn.rfl {S : Set Point} : EmptyShapeIn S S := by
   intro _ h
   simp at h
 
+theorem emptyShapeIn_congr_right {S : Set Point} (h : ∀ p ∉ S, p ∈ P₁ ↔ p ∈ P₂) :
+    EmptyShapeIn S P₁ ↔ EmptyShapeIn S P₂ :=
+  forall_congr' fun _ => imp_congr_left <| and_congr_left (h _)
+
 /-- `ConvexPoints S` means that `S` consists of extremal points of its convex hull,
 i.e. the point set encloses a convex polygon. -/
 def ConvexPoints (S : Set Point) : Prop :=

@@ -107,18 +107,19 @@ def maxChain (pts : Fin n → NPoint) (r : Nat) (graph : VisibilityGraph n)
   | 0, _ => pure ()
   | p+1, hp => do
     let (in_, out) := graph.edges.get ⟨p, graph.sz.symm ▸ hp⟩
+    let p : Fin n := ⟨p, hp⟩
     let rec loop lmap
     | [], _, m => do
       guard <| m < r
       pure lmap
     | i::in_, out, m => do
       let finish out m :=
-        loop (lmap.insert (i, ⟨p, hp⟩) (m+1)) in_ out m
+        loop (lmap.insert (i, p) (m+1)) in_ out m
       let rec inner
       | [], m => finish [] m
       | o::out, m => do
-        if ccw (pts i) (pts ⟨p, hp⟩) (pts o) then
-          inner out <| max m (lmap.find! (⟨p, hp⟩, o))
+        if ccw (pts i) (pts p) (pts o) then
+          inner out <| max m (lmap.find! (p, o))
         else finish (o::out) m
       inner out m
     let lmap ← loop lmap in_ out 0

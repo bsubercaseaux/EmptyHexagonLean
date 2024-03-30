@@ -36,6 +36,12 @@ theorem σIsEmptyTriangleFor_iff_diff (gp : Point.InGenPos₃ a b c) :
   · exact not_mem_σPtInTriangle gp hn
   · exact not_mem_σPtInTriangle gp.perm₂ hn.perm₂
 
+theorem σIsEmptyTriangleFor_congr_right (gp : Point.InGenPos₃ a b c)
+    (H : ∀ p, p ≠ a → p ≠ b → p ≠ c → (p ∈ S ↔ p ∈ S')) :
+    σIsEmptyTriangleFor a b c S ↔ σIsEmptyTriangleFor a b c S' := by
+  refine (σIsEmptyTriangleFor_iff_diff gp).trans <| .trans ?_ (σIsEmptyTriangleFor_iff_diff gp).symm
+  congr! 1; ext p; apply and_congr_left; simpa [not_or] using H p
+
 theorem σIsEmptyTriangleFor_iff'' (gp : Point.SetInGenPos S)
     (ha : a ∈ S) (hb : b ∈ S) (hc : c ∈ S) (ab : a ≠ b) (ac : a ≠ c) (bc : b ≠ c) :
     σIsEmptyTriangleFor a b c S ↔ EmptyShapeIn {a, b, c} S := by
