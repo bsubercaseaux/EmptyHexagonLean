@@ -132,6 +132,12 @@ namespace Array
 theorem mem_iff_getElem {a} {as : Array α} : a ∈ as ↔ ∃ n: Fin as.size, as[n] = a := by
   simp [mem_def, -getElem_fin, getElem_fin_eq_data_get, List.mem_iff_get]
 
+theorem get_modify (a : Array α) (i : Nat) (j : Nat) (hj : j < a.size) (f : α → α) :
+    (a.modify i f)[j]'(by simp [*]) = if i = j then f a[j] else a[j] := by
+  simp [modify, Id.run, modifyM]; split
+  · rw [get_set]; split <;> [(subst j; rfl); rfl]
+  · rw [if_neg (mt _ ‹_›)]; exact (· ▸ hj)
+
 @[inline]
 private unsafe def foldlM'Unsafe [Monad m]
     (as : Array α) (f : β → (a : α) → a ∈ as → m β) (init : β) : m β :=

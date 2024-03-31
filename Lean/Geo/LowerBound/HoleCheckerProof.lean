@@ -54,6 +54,10 @@ noncomputable def ptsProject (i : Fin n) : Point :=
 namespace WFPoints
 variable {p pts}
 
+theorem ccw_iff : σ p (pts i) (pts j) = .ccw ↔ i < j := by
+  obtain h | rfl | h := lt_trichotomy i j <;> simp [*, wf.ccw, σ_self₁, lt_asymm]
+  rw [σ_perm₂]; simp [wf.ccw h]
+
 theorem translate_pos (i) :
     0 < (ptTransform (translationMatrix (-p.1) (-p.2)) (pts i)).x := by
   simp [translation_translates]; exact wf.lt
@@ -106,8 +110,6 @@ theorem setGP' : Point.SetInGenPos (insert ↑p (toSet pts)) := by
       have := (List.pairwise_lt_finRange _).sublist h; simp only [pairwise_cons] at this
       exact wf.gp₀ (this.1 _ (.head _))
 
-theorem setGP : Point.SetInGenPos (toSet pts) := wf.setGP'.mono (by simp)
-
 nonrec theorem σ_prop₁ (ab : a < b) (bc : b < c) (cd : c < d)
     (h1 : σ (pts a) (pts b) (pts c) = .ccw) (h2 : σ (pts b) (pts c) (pts d) = .ccw) :
     σ (pts a) (pts c) (pts d) = .ccw := by
@@ -120,6 +122,14 @@ nonrec theorem σ_prop₁' (ab : a < b) (bc : b < c) (cd : c < d)
     σ (pts a) (pts b) (pts d) = .ccw := by
   rw [← wf.ptsProject_σ] at h1 h2 ⊢
   exact σ_prop₁' ⟨⟨wf.ptsProject_ccw ab, wf.ptsProject_ccw bc⟩, wf.ptsProject_ccw cd⟩
+    (wf.ptsProject_gp₄ ab bc cd) h1 h2
+
+nonrec theorem σ_prop₃' (ab : a < b) (bc : b < c) (cd : c < d)
+    (h1 : σ (pts a) (pts b) (pts c) ≠ .ccw) (h2 : σ (pts b) (pts c) (pts d) ≠ .ccw) :
+    σ (pts a) (pts b) (pts d) ≠ .ccw := by
+  simp only [(wf.gp ab bc).σ_iff, (wf.gp bc cd).σ_iff, (wf.gp ab (bc.trans cd)).σ_iff] at h1 h2 ⊢
+  rw [← wf.ptsProject_σ] at h1 h2 ⊢
+  exact σ_prop₃' ⟨⟨wf.ptsProject_ccw ab, wf.ptsProject_ccw bc⟩, wf.ptsProject_ccw cd⟩
     (wf.ptsProject_gp₄ ab bc cd) h1 h2
 
 theorem of_visible (ab : a < b) (bc : b < c) (H : Visible p pts a c) :
@@ -144,6 +154,12 @@ theorem visible_iff_emptyShapeIn (ab : a < b) :
     Visible p pts a b ↔ EmptyShapeIn {↑p, ↑(pts a), ↑(pts b)} (toSet pts) := by
   refine (wf.visible_iff_emptyShapeIn' ab).trans <|
     emptyShapeIn_congr_right (by simp (config := {contextual:=true}) [not_or])
+
+theorem visible_succ (a : Fin n) (h) : let b := ⟨a+1, h⟩; Visible p pts a b := by
+  intro b; have ab : a < b := Nat.lt_succ_self _
+  refine ⟨ab, ?_⟩; rintro _ ⟨c, rfl⟩ ⟨h1, h2, -⟩
+  rw [wf.ccw ab, wf.ccw_iff] at h1 h2
+  exact h1.not_le <| Nat.le_of_lt_succ h2
 
 theorem visible_trans
     (h1 : Visible p pts a b) (h2 : Visible p pts b c) (ccw : σ (pts a) (pts b) (pts c) = .ccw) :
@@ -177,99 +193,221 @@ theorem visible_cons
 
 end WFPoints
 
-def VisibilityGraph.MemIn (g : VisibilityGraph n) (j i : Fin n) :=
-  j ∈ (g.edges[i.1]'(g.sz.symm ▸ i.2)).1
-
-def VisibilityGraph.MemOut (g : VisibilityGraph n) (i j : Fin n) :=
-  j ∈ (g.edges[i.1]'(g.sz.symm ▸ i.2)).2
-
-def VisibilityGraph.Mem (g : VisibilityGraph n) (i j : Fin n) :=
-  g.MemIn i j ∧ g.MemOut i j
-
 inductive Queues.Ordered : (lo : Nat) → (j : Fin n) →
     (Q : (x : Fin n) → x < j → List (Fin n)) → List (Fin n) → Prop where
-  | nil : lo ≤ j.1 → Queues.Ordered lo j Q []
-  | cons {i : Fin n} (h : i < j) :
-    (∀ k ∈ Q i h, σ (pts k) (pts i) (pts j) ≠ .ccw) →
-    Queues.Ordered lo i (fun x hx => Q x (hx.trans h)) (Q i h) →
+  | nil : lo = j.1 → Queues.Ordered lo j Q []
+  | cons {i : Fin n} (h : Visible p pts i j) :
+    (∀ k ∈ Q i h.1, σ (pts k) (pts i) (pts j) ≠ .ccw) →
+    Queues.Ordered lo i (fun x hx => Q x (hx.trans h.1)) (Q i h.1) →
     Queues.Ordered (i+1) j Q l →
     Queues.Ordered lo j Q (i :: l)
 
--- structure Queues.WF (Q : Queues n a) : Prop where
---   graph : ∀ i j, j.1 < a → Visible p pts i j → Q.graph.Mem i j
---   mem : ∀ (i j : Fin n) (h : i < a), j ∈ Q.q[i.1]'(Q.sz ▸ h) ↔
---     Visible p pts j i ∧ ∀ k, i < k → k < a → ¬Visible p pts j k
+variable {p pts} in
+theorem Queues.Ordered.le : Queues.Ordered p pts lo j Q l → lo ≤ j
+  | .nil eq => eq.le
+  | .cons _ _ hq hl => hq.le.trans (Nat.le_of_lt hl.le)
 
--- proceed i j := do
---   while Q[i] != 0 && ccw(Q[i].0, i, j) do
---     proceed Q[i].0 j
---     Q[i].dequeue
---   add i j
---   Q[j].enqueue i
+variable {p pts} in
+theorem Queues.Ordered.mem_bdd : Queues.Ordered p pts lo j Q l → a ∈ l → lo ≤ a ∧ a < j
+  | .cons _ _ hq hl, .head _ => ⟨hq.le, hl.le⟩
+  | .cons _ _ hq hl, .tail _ h => (hl.mem_bdd h).imp_left (Nat.le_succ_of_le hq.le).trans
 
---                  3
---
---
---          2
---   1
---             4          5
---
---             6
--- p               7
---
---
---                   8
---        9
+variable {p pts} in
+theorem Queues.Ordered.congr {Q Q'} (H : ∀ x h, lo ≤ x.1 → Q x h = Q' x h)
+    (ord : Queues.Ordered p pts lo j Q l) : Queues.Ordered p pts lo j Q' l := by
+  induction ord with
+  | nil eq => exact .nil eq
+  | cons ij h1 h2 h3 IH2 IH3 =>
+    have := H _ h3.le h2.le
+    exact .cons ij (this ▸ h1)
+      (this ▸ IH2 fun x hx1 => H x (hx1.trans_le (Nat.le_of_lt h3.le)))
+      (IH3 fun x hx1 hx2 => H x hx1 (h2.le.trans (Nat.le_of_lt hx2)))
 
---     1  2  3  4  5  6   7   8   9
--- 12     1
--- 23     1  2
---   14      2 1
---  24         12
--- 34          123
--- 45          123 4
---   16         23 4 1
---   26          3 4 12
---  46           3   124
--- 56            3   1245
--- 67            3   1245 6
---   18          3    245 6  1
---  68           3    245    16
--- 78            3    245    167
---  19           3    245     67 1
---   29          3     45     67 12
---   49          3      5     67 124
---  69           3      5      7 1246
---  79           3      5        12467
--- 89            3      5        124678
+inductive Queues.OrderedTail : (lo : Nat) → (j : Fin n) →
+    (Q : (x : Fin n) → x < j → List (Fin n)) → List (Fin n) → Prop where
+  | nil : Queues.OrderedTail 0 j Q []
+  | cons {i : Fin n} (h : Visible p pts i j) :
+    (∀ k ∈ Q i h.1, σ (pts k) (pts i) (pts j) ≠ .ccw) →
+    Queues.Ordered p pts lo i (fun x hx => Q x (hx.trans h.1)) (Q i h.1) →
+    Queues.OrderedTail lo j Q l →
+    Queues.OrderedTail (i+1) j Q (i :: l)
 
-theorem of_proceed
-    {i j : Fin n} {Q : Queues n j} (hi : i < j) {Q_j : BelowList n j}
-    (Hj : ∀ r, Queues.Ordered pts lo j (fun k h => Q.q[k]'(Q.sz ▸ h)) r →
-      Queues.Ordered pts 0 j (fun k h => Q.q[k]'(Q.sz ▸ h)) (Q_j.1.reverseAux r))
-    {Q' Q_j' r} (eq : proceed pts i j hi Q Q_j = (Q', Q_j'))
-    (hr : Queues.Ordered pts (i+1) j (fun k h => Q.q[k]'(Q.sz ▸ h)) r) :
-    Queues.Ordered pts 0 j (fun k h => Q.q[k]'(Q.sz ▸ h)) (Q_j'.1.reverseAux r) := by
-  sorry
+theorem Queues.OrderedTail.apply
+    (h1 : OrderedTail p pts lo j Q l)
+    (h2 : Ordered p pts lo j Q r) : Ordered p pts 0 j Q (List.reverseAux l r) := by
+  induction h1 generalizing r with
+  | nil => exact h2
+  | cons v o1 o2 _ ih => exact ih <| .cons v o1 o2 h2
 
-def VisibilityGraph.WF' (g : VisibilityGraph n) (P : Fin n → Fin n → Prop) : Prop :=
+variable {p pts} in
+theorem Queues.OrderedTail.congr {Q Q'} (H : ∀ x h, x.1 < lo → Q x h = Q' x h)
+    (ord : Queues.OrderedTail p pts lo j Q l) : Queues.OrderedTail p pts lo j Q' l := by
+  induction ord with
+  | nil => exact .nil
+  | cons v h1 h2 _ ih =>
+    have := H _ v.1 (Nat.lt_succ_self _)
+    exact .cons v (this ▸ h1)
+      (this ▸ h2.congr fun x hx1 _ => H _ _ (Nat.lt_succ_of_lt hx1))
+      (ih fun x hx1 hx2 => H _ _ (hx2.trans (Nat.lt_succ.2 h2.le)))
+
+variable {p pts} in
+theorem Queues.Ordered.not_visible
+    {i : Fin n} {Q} (ij : i < j)
+    (hσ : ∀ k ∈ l, σ (pts k) (pts i) (pts j) ≠ .ccw)
+    (H : Queues.Ordered p pts lo i Q l)
+    (loa : lo ≤ a.1) (vis : Visible p pts a j) : i ≤ a := by
+  induction H with
+  | nil eq => subst eq; exact loa
+  | @cons c Q lo l b v h1 h2 h3 ih1 ih2 =>
+    let ⟨hσ1, hσ2⟩ := forall_mem_cons.1 hσ
+    refine ih2 ij hσ2 (Nat.lt_of_le_of_ne (ih1 (v.1.trans ij) ?_ loa) fun ab => ?_)
+    · exact fun d hd => wf.σ_prop₃' (h2.mem_bdd hd).2 v.1 ij (h1 _ hd) hσ1
+    · cases Fin.eq_of_veq ab; exact hσ1 <| wf.of_visible v.1 ij vis
+
+def VisibilityGraph.WF (g : VisibilityGraph n) (P : Fin n → Fin n → Prop) : Prop :=
   ∀ i : Fin n, ∀ in_ out, g.edges[i.1]'(g.sz.symm ▸ i.2) = (in_, out) →
     (∀ j, j ∈ in_ ↔ P j i) ∧ (∀ j, j ∈ out ↔ P i j) ∧
     in_.Pairwise (· > ·) ∧ out.Pairwise (· > ·)
 
-def VisibilityGraph.WF (g : VisibilityGraph n) : Prop := g.WF' (Visible p pts)
+def VisibleLT (i j i' j') := Visible p pts i' j' ∧ (j'.1 < j ∨ j'.1 = j ∧ i'.1 < i)
+
+theorem VisibilityGraph.WF.cast (H : WF g P) (hP : ∀ i j, P i j ↔ P' i j) : WF g P' := by
+  convert ← H; ext i j; apply hP
+
+theorem VisibilityGraph.WF.add (vis : Visible p pts i j)
+    (H : WF g (VisibleLT p pts i j)) : WF (g.add i j) (VisibleLT p pts (i + 1) j) := by
+  intro k in_ out eq
+  simp [VisibilityGraph.add] at eq
+  have := H k (g.edges[k.1]'(g.sz.symm ▸ k.2)).1 (g.edges[k.1]'(g.sz.symm ▸ k.2)).2 rfl
+  iterate 2 rw [Array.get_modify (hj := by simp [g.sz, *])] at eq
+  split at eq <;> split at eq <;> rename_i jk ik
+  · cases Nat.ne_of_gt vis.1 (jk.trans ik.symm)
+  · cases Fin.eq_of_veq jk
+    cases eq; simp [this]; refine ⟨fun i' => ?_, fun j' => ?_, fun i' v => ?_⟩
+    · by_cases hi : i' = i <;> simp [hi]
+      · refine ⟨vis, .inr ⟨rfl, Nat.lt_succ_self _⟩⟩
+      · refine and_congr_right fun _ => or_congr_right <| and_congr_right fun _ => ?_
+        exact (Nat.lt_succ_iff_lt_or_eq.trans <| or_iff_left (Fin.vne_of_ne hi)).symm
+    · refine and_congr_right fun _ => or_congr_right <| and_congr_right fun _ => ?_
+      exact (Nat.lt_succ_iff_lt_or_eq.trans <| or_iff_left (Ne.symm ik)).symm
+    · exact (v.2.resolve_left (lt_irrefl _)).2
+  · cases Fin.eq_of_veq ik
+    cases eq; simp [this]; refine ⟨fun i' => ?_, fun j' => ?_, fun i' v => ?_⟩
+    · exact and_congr_right fun _ => or_congr_right <| and_congr_right (Ne.symm jk · |>.elim)
+    · by_cases hj : j' = j <;> simp [hj]
+      · refine ⟨vis, .inr ⟨rfl, Nat.lt_succ_self _⟩⟩
+      · exact and_congr_right fun _ => or_congr_right <|
+          and_congr_right (hj.elim <| Fin.eq_of_veq ·)
+    · have := v.2
+      exact v.2.resolve_right (lt_irrefl _ ·.2)
+  · simp [eq] at this; simp [this]; refine ⟨fun i' => ?_, fun j' => ?_⟩
+    · exact and_congr_right fun _ => or_congr_right <| and_congr_right (jk ·.symm |>.elim)
+    · refine and_congr_right fun _ => or_congr_right <| and_congr_right fun _ => ?_
+      exact (Nat.lt_succ_iff_lt_or_eq.trans <| or_iff_left (Ne.symm ik)).symm
+
+def ProceedIH {i j : Fin n} (hi : i < j)
+    (F : Queues n j → BelowList n j → Queues n j × BelowList n j) :=
+  ∀ {{lo}} {Q : Queues n j} {Q_j : BelowList n j},
+    Queues.OrderedTail p pts lo j (fun k h => Q.q[k.1]'(Q.sz ▸ h)) Q_j.1 →
+    Queues.Ordered p pts lo i (fun k h => Q.q[k.1]'(Q.sz ▸ h.trans hi)) (Q.q[i.1]'(Q.sz ▸ hi)) →
+    Q.graph.WF (VisibleLT p pts lo j) →
+    ∀ {Q' Q_j'}, F Q Q_j = (Q', Q_j') →
+    Q'.graph.WF (VisibleLT p pts (i+1) j) ∧
+    (∀ (k : Fin n) (h : k < j), ¬(lo ≤ k ∧ k ≤ i) → Q'.q[k.1]'(Q'.sz ▸ h) = Q.q[k.1]'(Q.sz ▸ h)) ∧
+    Queues.OrderedTail p pts (i+1) j (fun k h => Q'.q[k.1]'(Q'.sz ▸ h)) Q_j'.1
+
+theorem of_proceed_loop
+    {i j : Fin n} (ij : Visible p pts i j) {Q : Queues n j} {Q_j : BelowList n j} {Q_i} (ha)
+    {IH} (hIH : ∀ a (ha : a < i), Visible p pts a j → ProceedIH p pts (ha.trans ij.1) (IH a ha))
+    (Hj : Queues.OrderedTail p pts lo j (fun k h => Q.q[k.1]'(Q.sz ▸ h)) Q_j.1)
+    (ord : Queues.Ordered p pts lo i (fun k h => Q.q[k.1]'(Q.sz ▸ h.trans ij.1)) Q_i)
+    (g_wf : Q.graph.WF (VisibleLT p pts lo j))
+    {Q' Q_j'} (eq : proceed.loop pts i j ij.1 IH Q Q_j Q_i ha = (Q', Q_j')) :
+    ∃ a Q₁ Q_i₁ Q_j₁, proceed.finish i j ij.1 Q₁ Q_i₁ Q_j₁ = (Q', Q_j') ∧
+      Q₁.graph.WF (VisibleLT p pts i j) ∧
+      (∀ k ∈ Q_i₁.1, σ (pts k) (pts i) (pts j) ≠ .ccw) ∧
+      lo ≤ a ∧ Queues.Ordered p pts a i (fun k h => Q.q[k.1]'(Q.sz ▸ h.trans ij.1)) Q_i₁.1 ∧
+      (∀ (k : Fin n) (h : k < j), ¬(lo ≤ k ∧ k < a) → Q₁.q[k.1]'(Q₁.sz ▸ h) = Q.q[k.1]'(Q.sz ▸ h)) ∧
+      Queues.OrderedTail p pts a j (fun k h => Q₁.q[k.1]'(Q₁.sz ▸ h)) Q_j₁.1 := by
+  cases ord with
+  | nil _ => subst lo; refine ⟨_, _, _, _, eq, g_wf, fun., le_rfl, .nil rfl, fun _ _ _ => rfl, Hj⟩
+  | @cons _ _ _ l a ai hσ hQi hl =>
+    let ⟨_, hl'⟩ := ha
+    simp (config := {iota := false}) [proceed.loop] at eq
+    split at eq <;> rename_i ccw <;> rw [ccw_iff] at ccw
+    · split at eq; rename_i Q₁ Q_j₁ eqIH
+      obtain ⟨g₁_wf, hQQ, hQj₁⟩ := hIH _ _ (wf.visible_trans ai ij ccw) Hj hQi g_wf eqIH
+      have ⟨b, Q₂, Q_i₂, Q_j₂, h1, h2, hQi₂, ab, h3, h4, h5⟩ := of_proceed_loop ij hl' hIH hQj₁
+        (hl.congr fun x xi ax => (hQQ _ (xi.trans ij.1) fun ⟨_, h⟩ => h.not_lt ax).symm) g₁_wf eq
+      refine ⟨_, _, _, _, h1, h2, hQi₂, hQi.le.trans (Nat.le_of_lt ab), h3.congr ?_, ?_, h5⟩
+      · exact fun x xi bx => hQQ _ (xi.trans ij.1) fun ⟨_, h⟩ => (bx.trans h).not_lt ab
+      · refine fun k hk hn => (h4 k hk (mt ?_ hn)).trans (hQQ _ hk (mt ?_ hn))
+        · exact .imp_left fun h => hQi.le.trans (Nat.le_of_lt h)
+        · exact .imp_right fun (h : k.1 ≤ _) => h.trans_lt ab
+    · have hσ' : ∀ k ∈ a :: l, σ (pts k) (pts i) (pts j) ≠ .ccw := by
+        refine forall_mem_cons.2 ⟨ccw, fun k hk => ?_⟩
+        have ⟨ak, ki⟩ := hl.mem_bdd hk
+        exact mt (wf.σ_prop₁ ak ki ij.1 (wf.of_visible ak ki ai)) ccw
+      have hQ' := hQi.cons ai hσ hl
+      refine ⟨_, _, _, _, eq, ?_, hσ', le_rfl, hQ', fun _ _ _ => rfl, Hj⟩
+      convert g_wf using 1; ext i' j'
+      refine and_congr_right fun ij' => or_congr_right <| and_congr_right fun jj =>
+        ⟨fun ii => not_le.1 fun loi => ?_, (·.trans_le <| hQi.le.trans (Nat.le_of_lt hl.le))⟩
+      cases Fin.eq_of_veq jj
+      exact (hQ'.not_visible wf ij.1 hσ' loi ij').not_lt ii
+
+theorem of_proceed {i j : Fin n} (ij : Visible p pts i j) : ProceedIH p pts ij.1 (proceed pts i j ij.1) := by
+  intro lo Q Q_j Hj ord g_wf Q' Q_j' eq
+  simp [proceed] at eq
+  have ⟨a, Q₁, Q_i₁, Q_j₁, eq, g₁_wf, hQi₁', _, hQi₁, hQQ, hQj₁⟩ :=
+    of_proceed_loop p pts wf ij _ (fun a _ v => of_proceed v) Hj ord g_wf eq
+  injection eq with eqQ eqQj; subst eqQj
+  constructor
+  · subst Q'; exact g₁_wf.add ij
+  · have {k : Fin n} (hk : k < j) : Q'.q[k.1]'(Q'.sz ▸ hk) =
+      if i.1 = k.1 then Q_i₁.1 else Q₁.q[k.1]'(Q₁.sz ▸ hk) := by subst Q'; exact Array.get_set ..
+    constructor
+    · intro k hk hn
+      rw [this hk, if_neg (mt (fun ik => ?_) hn), hQQ _ hk (mt (.imp_right (·.le.trans hQi₁.le)) hn)]
+      cases Fin.eq_of_veq ik; exact ⟨ord.le, le_rfl⟩
+    · refine .cons ij ?_ (this ij.1 ▸ if_pos rfl ▸ hQi₁.congr ?_) (hQj₁.congr ?_)
+      · rwa [this ij.1, if_pos rfl]
+      · intro x xj xa; rw [this xj, if_neg (xa.trans_le hQi₁.le).ne']
+      · intro x xi xa; have xj := xi.trans ij.1
+        rw [this xj, if_neg (Nat.ne_of_gt xi), hQQ _ xj fun ⟨_, h⟩ => h.not_le xa]
 
 theorem mkVisibilityGraph_loop_wf
     {Q : Queues n (i+1)} (hi : i < n)
-    (H : Queues.Ordered pts 0 ⟨i, hi⟩
-      (fun k h => Q.q[k]'(Q.sz ▸ Nat.lt_succ_of_lt h))
-      (Q.q[i]'(Q.sz ▸ Nat.lt_succ_self _))) :
-    (mkVisibilityGraph.loop pts i Q).WF p pts := by
-  sorry
+    (H : Queues.Ordered p pts 0 ⟨i, hi⟩
+      (fun k h => Q.q[k.1]'(Q.sz ▸ Nat.lt_succ_of_lt h))
+      (Q.q[i]'(Q.sz ▸ Nat.lt_succ_self _)))
+    (g_wf : Q.graph.WF (VisibleLT p pts 0 (i+1))) :
+    (mkVisibilityGraph.loop pts i Q).WF (Visible p pts) := by
+  unfold mkVisibilityGraph.loop; dsimp (config := {iota := false}) only; split
+  · split; rename_i h _ Q' Q_j' eq
+    have ⟨g'_wf, _, h2⟩ := of_proceed _ _ wf (wf.visible_succ ..) (by exact .nil) H g_wf eq
+    refine mkVisibilityGraph_loop_wf h ?_ ?_
+    · have (Qj hj) (k:Nat) (hk) : (Q'.push h ⟨Qj, hj⟩).q[k]'hk =
+        if h : k < Q'.q.size then Q'.q[k] else Qj := Array.get_push ..
+      simp only [← Q'.sz] at this
+      rw [this, dif_neg (lt_irrefl _)]
+      convert h2.apply (.nil rfl) using 1; funext k hk
+      rw [this, dif_pos (by exact hk)]
+    · refine g'_wf.cast fun i' j' => ?_
+      simp only [VisibleLT, not_lt_zero', and_false, or_false, and_congr_right_iff]
+      refine fun h => .trans ?_ Nat.lt_succ_iff_lt_or_eq.symm
+      exact or_congr_right <| and_iff_left_of_imp (· ▸ h.1)
+  · exact g_wf.cast fun i' j' => and_iff_left <| .inl <| j'.2.trans_le (not_lt.1 ‹_›)
+termination_by n - i
 
-theorem mkVisibilityGraph_wf : (mkVisibilityGraph pts).WF p pts := by
-  have := wf
-  sorry
+theorem mkVisibilityGraph_wf : (mkVisibilityGraph pts).WF (Visible p pts) := by
+  unfold mkVisibilityGraph; split
+  · refine mkVisibilityGraph_loop_wf p pts wf ‹_› (.nil rfl) (fun i in_ out eq => ?_)
+    cases eq.symm.trans (List.get_replicate ..)
+    simp [VisibleLT]
+    suffices ∀ i j, Visible p pts i j → j.1 ≠ 0 from ⟨(this · _), this _⟩
+    intro i j ⟨h, _⟩; exact ((Nat.zero_le _).trans_lt h).ne'
+  · intro i; cases ‹¬_› i.pos
 
 def LMapWF (lmap : Std.RBMap (Fin n ×ₗ Fin n) ℕ compare) (r i j) :=
   ∃ k, lmap.find? (i, j) = some (k+1) ∧ k < r ∧
@@ -363,7 +501,7 @@ theorem of_maxChain_loop
           | [] => exact Nat.zero_le _
           | o :: is => exact h2 mr o is pw
 
-variable {graph : VisibilityGraph n} (g_wf : graph.WF p pts) in
+variable {graph : VisibilityGraph n} (g_wf : graph.WF (Visible p pts)) in
 theorem of_maxChain
     {lmap hq} (H : maxChain pts r graph lmap q hq = some ())
     (hlmap : ∀ i j, Visible p pts i j → q ≤ j → LMapWF p pts lmap r i j) :
@@ -476,3 +614,12 @@ theorem hole_6_lower_bound : ∃ (pts : List Point),
   let ⟨(), eq⟩ := Option.isSome_iff_exists.1 holeCheck_points
   let ⟨_, H1, H2⟩ := of_holeCheck eq
   ⟨↑'points, H1, rfl, mt (σHasEmptyKGon_iff_HasEmptyKGon H1).2 (by convert H2 using 2; ext; simp)⟩
+
+/--
+info: 'Geo.HoleChecker.hole_6_lower_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ Lean.ofReduceBool,
+ mathlibSorry]
+-/
+#guard_msgs in #print axioms hole_6_lower_bound
