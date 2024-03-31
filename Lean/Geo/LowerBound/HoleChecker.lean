@@ -107,22 +107,25 @@ def maxChain (pts : Fin n → NPoint) (r : Nat) (graph : VisibilityGraph n)
   | 0, _ => pure ()
   | p+1, hp => do
     let (in_, out) := graph.edges.get ⟨p, graph.sz.symm ▸ hp⟩
-    let p : Fin n := ⟨p, hp⟩
-    let rec loop lmap
-    | [], _, m => do
-      guard <| m < r
+    let lmap ← if let [] := in_ then
       pure lmap
-    | i::in_, out, m => do
-      let finish out m :=
-        loop (lmap.insert (i, p) (m+1)) in_ out m
-      let rec inner
-      | [], m => finish [] m
-      | o::out, m => do
-        if ccw (pts i) (pts p) (pts o) then
-          inner out <| max m (lmap.find! (p, o))
-        else finish (o::out) m
-      inner out m
-    let lmap ← loop lmap in_ out 0
+    else
+      let p : Fin n := ⟨p, hp⟩
+      let rec loop lmap
+      | [], _, m => do
+        guard <| m < r
+        pure lmap
+      | i::in_, out, m => do
+        let finish out m :=
+          loop (lmap.insert (i, p) (m+1)) in_ out m
+        let rec inner
+        | [], m => finish [] m
+        | o::out, m => do
+          if ccw (pts i) (pts p) (pts o) then
+            inner out <| max m (lmap.find! (p, o))
+          else finish (o::out) m
+        inner out m
+      loop lmap in_ out 0
     maxChain pts r graph lmap p (Nat.le_of_lt hp)
 
 def holeCheck (r : Nat) (points : List NPoint) (lo : Nat) : Option Unit :=
@@ -138,14 +141,3 @@ def holeCheck (r : Nat) (points : List NPoint) (lo : Nat) : Option Unit :=
     let graph := mkVisibilityGraph (n := n) (fun i => sorted[i])
     maxChain (n := n) (fun i => sorted[i]) r graph {} n (Nat.le_refl _)
     holeCheck r points p.1
-
-def points : List NPoint := [
-  (1, 1260), (16, 743), (22, 531), (37, 0), (306, 592), (310, 531), (366, 552),
-  (371, 487), (374, 525), (392, 575), (396, 613), (410, 539), (416, 550), (426, 526),
-  (434, 552), (436, 535), (446, 565), (449, 518), (450, 498), (453, 542), (458, 526),
-  (489, 537), (492, 502), (496, 579), (516, 467), (552, 502), (754, 697), (777, 194),
-  (1259, 320),
-]
-
-#guard Option.isSome <| holeCheck (6-3) points 0
-#guard Option.isNone <| holeCheck (5-3) points 0

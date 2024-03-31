@@ -517,14 +517,17 @@ theorem of_maxChain
   | q+1 =>
     rw [maxChain] at H; split at H; rename_i in_ out eq; simp at H
     have ⟨hin2, hout2, hin1, hout1⟩ := g_wf ⟨q, hq⟩ _ _ eq
-    let ⟨lmap', H1, H2⟩ := H
-    rw [Array.get_eq_getElem] at eq
-    refine of_maxChain H2 (of_maxChain_loop p pts wf H1 hin1
-        (fun j => (hin2 j).1) hout1 (fun j => (hout2 j).1) ?_ ?_).2
-    · refine fun _ i o is h => .inl ?_
-      simp only [pairwise_cons] at h
-      exact ⟨(hin2 _).2 (h.1 _ (.head _)), (hout2 _).2 (h.2.1 _ (.head _))⟩
-    · exact fun _ i j v qj => hlmap i j v (qj.resolve_right fun ⟨rfl, h2⟩ => h2 ((hin2 _).2 v))
+    split at H
+    · refine of_maxChain H fun i j v qj => hlmap i j v <| lt_of_le_of_ne qj fun qj => ?_
+      subst q; simpa using (hin2 _).2 v
+    · simp at H; let ⟨lmap', H1, H2⟩ := H
+      rw [Array.get_eq_getElem] at eq
+      refine of_maxChain H2 (of_maxChain_loop p pts wf H1 hin1
+          (fun j => (hin2 j).1) hout1 (fun j => (hout2 j).1) ?_ ?_).2
+      · refine fun _ i o is h => .inl ?_
+        simp only [pairwise_cons] at h
+        exact ⟨(hin2 _).2 (h.1 _ (.head _)), (hout2 _).2 (h.2.1 _ (.head _))⟩
+      · exact fun _ i j v qj => hlmap i j v (qj.resolve_right fun ⟨rfl, h2⟩ => h2 ((hin2 _).2 v))
 
 end
 
@@ -607,19 +610,45 @@ theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
       · exact mkVisibilityGraph_wf p pts' wf
       · simpa using hl2
 
-theorem holeCheck_points : (holeCheck (6-3) points 0).isSome = true := by native_decide
+theorem hole_lower_bound {r : Nat}  (points : List NPoint)
+    (checkIt : (holeCheck r points 0).isSome = true := by native_decide) :
+    ∃ (pts : List Point), Point.ListInGenPos pts ∧
+      pts.length = points.length ∧ ¬HasEmptyKGon (r+3) pts.toFinset :=
+  let ⟨(), eq⟩ := Option.isSome_iff_exists.1 checkIt
+  let ⟨_, H1, H2⟩ := of_holeCheck eq
+  ⟨↑'points, H1, by simp,
+    mt (σHasEmptyKGon_iff_HasEmptyKGon H1).2 (by convert H2 using 2; ext; simp)⟩
 
 theorem hole_6_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 29 ∧ ¬HasEmptyKGon 6 pts.toFinset :=
-  let ⟨(), eq⟩ := Option.isSome_iff_exists.1 holeCheck_points
-  let ⟨_, H1, H2⟩ := of_holeCheck eq
-  ⟨↑'points, H1, rfl, mt (σHasEmptyKGon_iff_HasEmptyKGon H1).2 (by convert H2 using 2; ext; simp)⟩
+  hole_lower_bound [
+    (1, 1260), (16, 743), (22, 531), (37, 0), (306, 592), (310, 531), (366, 552),
+    (371, 487), (374, 525), (392, 575), (396, 613), (410, 539), (416, 550), (426, 526),
+    (434, 552), (436, 535), (446, 565), (449, 518), (450, 498), (453, 542), (458, 526),
+    (489, 537), (492, 502), (496, 579), (516, 467), (552, 502), (754, 697), (777, 194),
+    (1259, 320),
+  ]
+
+theorem hole_5_lower_bound : ∃ (pts : List Point),
+    Point.ListInGenPos pts ∧ pts.length = 9 ∧ ¬HasEmptyKGon 5 pts.toFinset :=
+  hole_lower_bound [
+    (232, 685), (629, 532), (781, 340), (846, 383), (861, 481), (877, 102), (895, 262),
+    (943, 341), (1125, 532),
+  ]
+
+theorem hole_4_lower_bound : ∃ (pts : List Point),
+    Point.ListInGenPos pts ∧ pts.length = 4 ∧ ¬HasEmptyKGon 4 pts.toFinset :=
+  hole_lower_bound [(1, 0), (3, 4), (4, 2), (5, 1)]
+
+theorem hole_3_lower_bound : ∃ (pts : List Point),
+    Point.ListInGenPos pts ∧ pts.length = 2 ∧ ¬HasEmptyKGon 3 pts.toFinset :=
+  hole_lower_bound [(1, 0), (2, 1)]
 
 /--
 info: 'Geo.HoleChecker.hole_6_lower_bound' depends on axioms: [propext,
  Classical.choice,
  Quot.sound,
- Lean.ofReduceBool,
- mathlibSorry]
+ mathlibSorry,
+ Lean.ofReduceBool]
 -/
 #guard_msgs in #print axioms hole_6_lower_bound
