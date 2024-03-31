@@ -204,6 +204,17 @@ theorem of_find?_insert [Hashable α] [BEq α] {m : HashMap α β} {a b} :
 
 end Std.HashMap
 
+namespace Std.RBMap
+
+theorem find?_insert {cmp} [@TransCmp α cmp] (t : RBMap α β cmp) (k k' v) :
+    (t.insert k v).find? k' = if cmp k' k = .eq then some v else t.find? k' := mathlibSorry _
+
+end Std.RBMap
+
+instance : @Std.TransCmp (Fin n ×ₗ Fin n) compare := mathlibSorry _
+
+theorem lex_compare_eq_iff (a b : Fin n ×ₗ Fin n) : compare a b = .eq ↔ a = b := mathlibSorry _
+
 theorem mem_affineSpan_pair [Ring k] [AddCommGroup V] [Module k V] [AddTorsor V P]
     {p₁ p₂ p : P} : p ∈ line[k, p₁, p₂] ↔ ∃ r : k, r • (p₂ -ᵥ p₁) +ᵥ p₁ = p := by
   conv_lhs => rw [← vsub_vadd p p₁]

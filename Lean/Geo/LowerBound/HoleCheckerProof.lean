@@ -281,26 +281,26 @@ theorem of_maxChain_inner
     {lmap} (H : maxChain.loop.inner pts q lmap i finish out m = some lmap')
     (hout1 : out.Pairwise (· > ·))
     (hout2 : ∀ o ∈ out, Visible p pts q o)
-    (hout : ∀ o is, (i::q::o::is).Pairwise (Visible p pts) → o ∈ out ∨ is.length < m)
-    (hlmap : ∀ i j, Visible p pts i j → q.1 < j → LMapWF p pts lmap r i j) :
+    (hout : P → ∀ o is, (i::q::o::is).Pairwise (Visible p pts) → o ∈ out ∨ is.length < m)
+    (hlmap : P → ∀ i j, Visible p pts i j → q < j → LMapWF p pts lmap r i j) :
     ∃ out' m', finish out' m' = some lmap' ∧ m ≤ m' ∧ out' <+ out ∧
       (∀ o ∈ out, σ (pts i) (pts q) (pts o) ≠ .ccw → o ∈ out') ∧
-      ∀ o is, (i::q::o::is).Pairwise (Visible p pts) → is.length < m' := by
+      (P → ∀ o is, (i::q::o::is).Pairwise (Visible p pts) → is.length < m') := by
   match out with
   | [] =>
     simp [maxChain.loop.inner] at H
-    exact ⟨_, _, H, le_rfl, .slnil, fun., fun o is h => (hout o is h).resolve_left (fun.)⟩
+    exact ⟨_, _, H, le_rfl, .slnil, fun., fun hp o is h => (hout hp o is h).resolve_left (fun.)⟩
   | o::out =>
     have hout1' := pairwise_cons.1 hout1
     have hout2' := forall_mem_cons.1 hout2
     simp [maxChain.loop.inner] at H; split at H
     · obtain ⟨out', m', h1, h2, h3, h4, h5⟩ := by
-        refine of_maxChain_inner H hout1'.2 hout2'.2 (fun o is h => ?_) hlmap
-        obtain (⟨⟩ | _) | _ := hout _ _ h
+        refine of_maxChain_inner H hout1'.2 hout2'.2 (fun hp o is h => ?_) hlmap
+        obtain (⟨⟩ | _) | _ := hout hp _ _ h
         · refine .inr <| lt_max_of_lt_right ?_
           have := (pairwise_cons.1 h).2
           have qo := (pairwise_cons.1 this).1 _ (.head _)
-          have ⟨k, h1, _, h3⟩ := hlmap _ _ qo qo.1
+          have ⟨k, h1, _, h3⟩ := hlmap hp _ _ qo qo.1
           simp [Std.RBMap.find!, h1]
           exact Nat.lt_succ_of_le (h3 _ this)
         · exact .inl ‹_›
@@ -308,8 +308,8 @@ theorem of_maxChain_inner
       exact ⟨out', m', h1, (le_max_left ..).trans h2, .cons _ h3,
         forall_mem_cons.2 ⟨fun h => (h (by rwa [← ccw_iff])).elim, h4⟩, h5⟩
     · next hccw =>
-      refine ⟨_, _, H, le_rfl, .refl _, fun _ h _ => h, fun o' is h => ?_⟩
-      refine (hout o' is h).resolve_left fun hn => ?_
+      refine ⟨_, _, H, le_rfl, .refl _, fun _ h _ => h, fun hp o' is h => ?_⟩
+      refine (hout hp o' is h).resolve_left fun hn => ?_
       have vis := h.sublist (sublist_append_left [i,q,o'] is); simp at vis
       let ⟨⟨iq, io'⟩, qo'⟩ := vis
       have ccw' := wf.of_visible iq.1 qo'.1 io'
@@ -324,31 +324,44 @@ theorem of_maxChain_loop
     (hin2 : ∀ i ∈ in_, Visible p pts i q)
     (hout1 : out.Pairwise (· > ·))
     (hout2 : ∀ o ∈ out, Visible p pts q o)
-    (vis : ∀ i o is, (i::q::o::is).Pairwise (Visible p pts) → i ∈ in_ ∧ o ∈ out ∨ is.length < m)
-    (hlmap : ∀ i j, Visible p pts i j → q.1 < j → LMapWF p pts lmap r i j) :
-    m < r ∧ ∀ i j, Visible p pts i j →
-      q.1 < j ∨ q.1 = j ∧ i ∈ in_ → LMapWF p pts lmap' r i j := by
+    (vis : m < r → ∀ i o is, (i::q::o::is).Pairwise (Visible p pts) →
+      i ∈ in_ ∧ o ∈ out ∨ is.length < m)
+    (hlmap : m < r → ∀ i j, Visible p pts i j → q < j ∨ q = j ∧ i ∉ in_ → LMapWF p pts lmap r i j) :
+    m < r ∧ ∀ i j, Visible p pts i j → q ≤ j → LMapWF p pts lmap' r i j := by
   match in_ with
   | [] =>
     simp [maxChain.loop] at H; obtain ⟨H, rfl⟩ := H
-    exact ⟨H, fun | _, _, v, .inl qi => hlmap _ _ v qi⟩
+    exact ⟨H, fun i j v qj => hlmap H i j v <| qj.lt_or_eq.imp_right (⟨·, fun.⟩)⟩
   | i::in_ =>
     have hin1' := pairwise_cons.1 hin1
     have hin2' := forall_mem_cons.1 hin2
     simp [maxChain.loop] at H
-    have ⟨out', m', H, mm, ss, h1, h2⟩ :=
-      of_maxChain_inner p pts wf H hout1 hout2 (fun o is h => (vis _ _ _ h).imp_left (·.2)) hlmap
-    obtain ⟨h3, h4⟩ := by
-      refine of_maxChain_loop H hin1'.2 hin2'.2 (hout1.sublist ss)
-        (fun _ h => hout2 _ (ss.subset h)) ?_ ?_
-      · intro i' o is h
-        obtain ⟨_ | ⟨_, hi⟩, ho⟩ | h := vis _ _ _ h
-        · exact .inr (h2 _ _ h)
-        · refine or_iff_not_imp_right.2 fun hl => ⟨hi, h1 _ ho fun hn => ?_⟩
-          exact hl <| h2 _ _ <| wf.visible_cons hin2'.1 hn (pairwise_cons.1 h).2
-        · exact .inr (h.trans_le mm)
-      · sorry
-    sorry
+    have ⟨out', m', H, mm, ss, h1, h2⟩ := of_maxChain_inner p pts wf H hout1 hout2
+      (fun mr o is h => (vis mr _ _ _ h).imp_left (·.2))
+      (fun mr i j v h => hlmap mr i j v (.inl h))
+    refine of_maxChain_loop H hin1'.2 hin2'.2 (hout1.sublist ss)
+      (fun _ h => hout2 _ (ss.subset h)) ?_ ?_ |>.imp_left (mm.trans_lt)
+    · intro m'r i' o is h
+      have mr := mm.trans_lt m'r
+      obtain ⟨_ | ⟨_, hi⟩, ho⟩ | h := vis mr _ _ _ h
+      · exact .inr (h2 mr _ _ h)
+      · refine or_iff_not_imp_right.2 fun hl => ⟨hi, h1 _ ho fun hn => ?_⟩
+        exact hl <| h2 mr _ _ <| wf.visible_cons hin2'.1 hn (pairwise_cons.1 h).2
+      · exact .inr (h.trans_le mm)
+    · intro m'r i' j' v qj
+      have mr := mm.trans_lt m'r
+      refine if qj' : _ then let ⟨k, h1, h2⟩ := hlmap mr i' j' v qj'; ⟨k, ?_, h2⟩ else ?_
+      · rw [Std.RBMap.find?_insert, if_neg, h1]
+        rw [lex_compare_eq_iff]; rintro ⟨⟩
+        exact (qj'.resolve_left (lt_irrefl _)).2 (.head _)
+      · obtain ⟨rfl, hi⟩ := qj.resolve_left (mt .inl qj')
+        if eq : i' = i then ?_ else simp [eq, hi] at qj'
+        subst i'
+        refine ⟨_, ?_, m'r, fun is pw => ?_⟩
+        · rw [Std.RBMap.find?_insert, if_pos]; rw [lex_compare_eq_iff]
+        · match is with
+          | [] => exact Nat.zero_le _
+          | o :: is => exact h2 mr o is pw
 
 variable {graph : VisibilityGraph n} (g_wf : graph.WF p pts) in
 theorem of_maxChain
@@ -368,15 +381,13 @@ theorem of_maxChain
     have ⟨hin2, hout2, hin1, hout1⟩ := g_wf ⟨q, hq⟩ _ _ eq
     let ⟨lmap', H1, H2⟩ := H
     rw [Array.get_eq_getElem] at eq
-    refine of_maxChain H2 fun i j v qj =>
-      (of_maxChain_loop p pts wf H1 hin1
-        (fun j => (hin2 j).1) hout1 (fun j => (hout2 j).1) ?_ hlmap).2 _ _ v ?_
-    · refine fun i o is h => .inl ?_
+    refine of_maxChain H2 (of_maxChain_loop p pts wf H1 hin1
+        (fun j => (hin2 j).1) hout1 (fun j => (hout2 j).1) ?_ ?_).2
+    · refine fun _ i o is h => .inl ?_
       simp only [pairwise_cons] at h
       exact ⟨(hin2 _).2 (h.1 _ (.head _)), (hout2 _).2 (h.2.1 _ (.head _))⟩
-    · refine qj.lt_or_eq.imp_right fun qj => ⟨qj, ?_⟩
-      cases Fin.eq_of_veq qj
-      exact (hin2 _).2 v
+    · exact fun _ i j v qj => hlmap i j v (qj.resolve_right fun ⟨rfl, h2⟩ => h2 ((hin2 _).2 v))
+
 end
 
 theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
