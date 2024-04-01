@@ -37,14 +37,32 @@ theorem slope_lt {p a b : NPoint} (ha : p.1 < a.1) (hb : p.1 < b.1) :
 
 def toSet (pts : Fin n → NPoint) : Set Point := Set.range (pts ·)
 
-variable {n : Nat} (p : NPoint) (pts : Fin n → NPoint)
+section
+variable [MaybeHoles] {n : Nat} (p : NPoint) (pts : Fin n → NPoint) (hole : MaybeHoles.holes)
 
 structure WFPoints : Prop where
   lt : p.1 < (pts i).1
   ccw : i < j → σ p (pts i) (pts j) = .ccw
   gp : i < j → j < k → Point.InGenPos₃ (pts i) (pts j) (pts k)
 
-def Visible (i j : Fin n) := i < j ∧ σIsEmptyTriangleFor p (pts i) (pts j) (toSet pts)
+def Visible (i j : Fin n) :=
+  i < j ∧ (MaybeHoles.holes → σIsEmptyTriangleFor p (pts i) (pts j) (toSet pts))
+
+inductive CCWChain : Fin n → Fin n → List (Fin n) → Prop
+  | nil : Visible p pts i j → CCWChain i j []
+  | cons : Visible p pts i j → σ (pts i) (pts j) (pts k) = .ccw →
+    CCWChain j k is → CCWChain i j (k::is)
+
+variable {p pts} in
+theorem CCWChain.head : CCWChain p pts i j is → Visible p pts i j
+  | .nil h | .cons h .. => h
+
+variable {p pts} in
+theorem CCWChain.lt₂ : CCWChain p pts i j is → k ∈ is → j < k
+  | .cons _ _ h3, hk =>
+    match hk with
+    | .head _ => h3.head.1
+    | .tail _ hk => h3.head.1.trans (h3.lt₂ hk)
 
 variable (wf : WFPoints p pts)
 
@@ -135,41 +153,48 @@ nonrec theorem σ_prop₃' (ab : a < b) (bc : b < c) (cd : c < d)
 theorem of_visible (ab : a < b) (bc : b < c) (H : Visible p pts a c) :
     σ (pts a) (pts b) (pts c) = .ccw := by
   refine (wf.gp ab bc).σ_iff'.1 fun hn => ?_
-  refine H.2 _ ⟨b, rfl⟩ ⟨?_, ?_, ?_⟩
+  refine H.2 hole _ ⟨b, rfl⟩ ⟨?_, ?_, ?_⟩
   · exact (wf.ccw ab).trans (wf.ccw H.1).symm
   · exact (wf.ccw bc).trans (wf.ccw H.1).symm
   · rw [σ_perm₁, hn, wf.ccw H.1]; rfl
 
+theorem visible_iff_σIsEmptyTriangleFor (ab : a < b) :
+    Visible p pts a b ↔ σIsEmptyTriangleFor p (pts a) (pts b) (toSet pts) :=
+  (and_iff_right ab).trans (imp_iff_right hole)
+
 theorem visible_iff_σIsEmptyTriangleFor' (ab : a < b) :
     Visible p pts a b ↔ σIsEmptyTriangleFor p (pts a) (pts b) (insert ↑p (toSet pts)) :=
-  (and_iff_right ab).trans <| σIsEmptyTriangleFor_congr_right (wf.gp₀ ab) fun q h _ _ => by simp [h]
+  (visible_iff_σIsEmptyTriangleFor hole ab).trans <|
+    σIsEmptyTriangleFor_congr_right (wf.gp₀ ab) fun q h _ _ => by simp [h]
 
 theorem visible_iff_emptyShapeIn' (ab : a < b) :
     Visible p pts a b ↔ EmptyShapeIn {↑p, ↑(pts a), ↑(pts b)} (insert ↑p (toSet pts)) :=
   have := wf.gp₀ ab
-  (wf.visible_iff_σIsEmptyTriangleFor' ab).trans <| σIsEmptyTriangleFor_iff'' wf.setGP'
+  (wf.visible_iff_σIsEmptyTriangleFor' hole ab).trans <| σIsEmptyTriangleFor_iff'' wf.setGP'
     (by simp) (by simp [toSet]) (by simp [toSet]) this.ne₁ this.ne₂ this.ne₃
 
 theorem visible_iff_emptyShapeIn (ab : a < b) :
     Visible p pts a b ↔ EmptyShapeIn {↑p, ↑(pts a), ↑(pts b)} (toSet pts) := by
-  refine (wf.visible_iff_emptyShapeIn' ab).trans <|
+  refine (wf.visible_iff_emptyShapeIn' hole ab).trans <|
     emptyShapeIn_congr_right (by simp (config := {contextual:=true}) [not_or])
 
 theorem visible_succ (a : Fin n) (h) : let b := ⟨a+1, h⟩; Visible p pts a b := by
   intro b; have ab : a < b := Nat.lt_succ_self _
-  refine ⟨ab, ?_⟩; rintro _ ⟨c, rfl⟩ ⟨h1, h2, -⟩
+  refine ⟨ab, fun _ => ?_⟩; rintro _ ⟨c, rfl⟩ ⟨h1, h2, -⟩
   rw [wf.ccw ab, wf.ccw_iff] at h1 h2
   exact h1.not_le <| Nat.le_of_lt_succ h2
 
 theorem visible_trans
     (h1 : Visible p pts a b) (h2 : Visible p pts b c) (ccw : σ (pts a) (pts b) (pts c) = .ccw) :
     Visible p pts a c := by
+  have ac := h1.1.trans h2.1
+  refine ⟨ac, fun hole => (visible_iff_σIsEmptyTriangleFor hole ac).1 ?_⟩
   have := σCCWPoints.split_emptyShapeIn p [pts a] (pts b) [pts c] (P := toSet pts)
-    (by simp [σCCWPoints, wf.ccw, h1.1, h2.1, h1.1.trans h2.1, ccw])
-    (by simpa using (wf.visible_iff_emptyShapeIn h1.1).1 h1)
-    (by have := (wf.visible_iff_emptyShapeIn h2.1).1 h2; simp at this ⊢
+    (by simp [σCCWPoints, wf.ccw, h1.1, h2.1, ac, ccw])
+    (by simpa using (wf.visible_iff_emptyShapeIn hole h1.1).1 h1)
+    (by have := (wf.visible_iff_emptyShapeIn hole h2.1).1 h2; simp at this ⊢
         rwa [Set.pair_comm, Set.insert_comm])
-  refine (wf.visible_iff_emptyShapeIn (h1.1.trans h2.1)).2 ?_
+  refine (wf.visible_iff_emptyShapeIn hole ac).2 ?_
   intro q ⟨hq1, hq2⟩ hq
   if eq : q = pts b then
     subst eq
@@ -179,17 +204,38 @@ theorem visible_trans
     exact this q ⟨hq1, by simp [not_or] at hq2 ⊢; simp [eq, hq2]⟩ <|
       convexHull_mono (by simp [Set.subset_def]) hq
 
-theorem visible_cons
-    (h1 : Visible p pts a b)
-    (h2 : σ (pts a) (pts b) (pts c) = .ccw)
-    (H : (b::c::is).Pairwise (Visible p pts)) :
-    (a::b::c::is).Pairwise (Visible p pts) := by
-  refine pairwise_cons.2 ⟨forall_mem_cons.2 ⟨h1, forall_mem_cons.2 ?_⟩, H⟩
-  simp at H
-  refine ⟨wf.visible_trans h1 H.1.1 h2, fun d hd => ?_⟩
-  refine wf.visible_trans h1 (H.1.2 _ hd) ?_
-  have bc := H.1.1.1; have cd := (H.2.1 _ hd).1
-  exact wf.σ_prop₁' h1.1 bc cd h2 <| wf.of_visible bc cd (H.1.2 _ hd)
+theorem CCWChain.ccw (H : CCWChain p pts a b is) (hk : c ∈ is) :
+    σ (pts a) (pts b) (pts c) = .ccw :=
+  let .cons _ h2 h3 := H
+  match hk with
+  | .head _ => h2
+  | .tail _ hk => wf.σ_prop₁' H.head.1 h3.head.1 (h3.lt₂ hk) h2 <| CCWChain.ccw h3 hk
+termination_by is
+
+theorem CCWChain.pairwise : CCWChain p pts i j is → (i::j::is).Pairwise (Visible p pts)
+  | .nil h => by simp [h]
+  | .cons h1 h2 h3 => by
+    have H := CCWChain.pairwise h3
+    refine pairwise_cons.2 ⟨forall_mem_cons.2 ⟨h1, fun k hk => ?_⟩, H⟩
+    refine wf.visible_trans h1 ((pairwise_cons.1 H).1 k hk) ?_
+    obtain _ | ⟨_, hk⟩ := hk
+    · exact h2
+    · exact CCWChain.ccw wf (.cons h1 h2 h3) (.tail _ hk)
+
+theorem ccwChain_iff_pairwise
+  (tri : ¬MaybeHoles.holes → ∀ {a b c}, a ∈ i::j::is → b ∈ i::j::is → c ∈ i::j::is →
+    a < b → b < c → σ (pts a) (pts b) (pts c) = .ccw) :
+  CCWChain p pts i j is ↔ (i::j::is).Pairwise (Visible p pts) := by
+  refine ⟨CCWChain.pairwise wf, fun h => ?_⟩
+  induction is generalizing i j with
+  | nil => constructor; simpa using h
+  | cons k is ih =>
+    have ⟨h1, h2⟩ := pairwise_cons.1 h; simp at h1
+    have jk := ((pairwise_cons.1 h2).1 _ (.head _)).1
+    refine .cons h1.1 ?_ <|
+      ih (fun hole a b c ha hb hc => tri hole (.tail _ ha) (.tail _ hb) (.tail _ hc)) h2
+    if hole : MaybeHoles.holes then exact wf.of_visible hole h1.1.1 jk h1.2.1
+    else exact tri hole (by simp) (by simp) (by simp) h1.1.1 jk
 
 end WFPoints
 
@@ -262,22 +308,25 @@ theorem Queues.Ordered.not_visible
     let ⟨hσ1, hσ2⟩ := forall_mem_cons.1 hσ
     refine ih2 ij hσ2 (Nat.lt_of_le_of_ne (ih1 (v.1.trans ij) ?_ loa) fun ab => ?_)
     · exact fun d hd => wf.σ_prop₃' (h2.mem_bdd hd).2 v.1 ij (h1 _ hd) hσ1
-    · cases Fin.eq_of_veq ab; exact hσ1 <| wf.of_visible v.1 ij vis
+    · cases Fin.eq_of_veq ab; exact hσ1 <| wf.of_visible hole v.1 ij vis
 
-def VisibilityGraph.WF (g : VisibilityGraph n) (P : Fin n → Fin n → Prop) : Prop :=
-  ∀ i : Fin n, ∀ in_ out, g.edges[i.1]'(g.sz.symm ▸ i.2) = (in_, out) →
+def MaybeHoles.graph.WF (g : MaybeHoles.graph n) (P : Fin n → Fin n → Prop) : Prop :=
+  ∀ i in_ out, MaybeHoles.edges g i = (in_, out) →
     (∀ j, j ∈ in_ ↔ P j i) ∧ (∀ j, j ∈ out ↔ P i j) ∧
     in_.Pairwise (· > ·) ∧ out.Pairwise (· > ·)
 
-def VisibleLT (i j i' j') := Visible p pts i' j' ∧ (j'.1 < j ∨ j'.1 = j ∧ i'.1 < i)
+def VisibilityGraph.WF (g : VisibilityGraph n) := @MaybeHoles.graph.WF .yes _ g
 
-theorem VisibilityGraph.WF.cast (H : WF g P) (hP : ∀ i j, P i j ↔ P' i j) : WF g P' := by
+theorem VisibilityGraph.WF.cast {g : VisibilityGraph n}
+    (H : g.WF P) (hP : ∀ i j, P i j ↔ P' i j) : g.WF P' := by
   convert ← H; ext i j; apply hP
+
+def VisibleLT (i j i' j') := Visible p pts i' j' ∧ (j'.1 < j ∨ j'.1 = j ∧ i'.1 < i)
 
 theorem VisibilityGraph.WF.add (vis : Visible p pts i j)
     (H : WF g (VisibleLT p pts i j)) : WF (g.add i j) (VisibleLT p pts (i + 1) j) := by
   intro k in_ out eq
-  simp [VisibilityGraph.add] at eq
+  simp [VisibilityGraph.add, MaybeHoles.edges] at eq
   have := H k (g.edges[k.1]'(g.sz.symm ▸ k.2)).1 (g.edges[k.1]'(g.sz.symm ▸ k.2)).2 rfl
   iterate 2 rw [Array.get_modify (hj := by simp [g.sz, *])] at eq
   split at eq <;> split at eq <;> rename_i jk ik
@@ -347,20 +396,21 @@ theorem of_proceed_loop
     · have hσ' : ∀ k ∈ a :: l, σ (pts k) (pts i) (pts j) ≠ .ccw := by
         refine forall_mem_cons.2 ⟨ccw, fun k hk => ?_⟩
         have ⟨ak, ki⟩ := hl.mem_bdd hk
-        exact mt (wf.σ_prop₁ ak ki ij.1 (wf.of_visible ak ki ai)) ccw
+        exact mt (wf.σ_prop₁ ak ki ij.1 (wf.of_visible hole ak ki ai)) ccw
       have hQ' := hQi.cons ai hσ hl
       refine ⟨_, _, _, _, eq, ?_, hσ', le_rfl, hQ', fun _ _ _ => rfl, Hj⟩
       convert g_wf using 1; ext i' j'
       refine and_congr_right fun ij' => or_congr_right <| and_congr_right fun jj =>
         ⟨fun ii => not_le.1 fun loi => ?_, (·.trans_le <| hQi.le.trans (Nat.le_of_lt hl.le))⟩
       cases Fin.eq_of_veq jj
-      exact (hQ'.not_visible wf ij.1 hσ' loi ij').not_lt ii
+      exact (hQ'.not_visible hole wf ij.1 hσ' loi ij').not_lt ii
 
-theorem of_proceed {i j : Fin n} (ij : Visible p pts i j) : ProceedIH p pts ij.1 (proceed pts i j ij.1) := by
+theorem of_proceed {i j : Fin n} (ij : Visible p pts i j) :
+    ProceedIH p pts ij.1 (proceed pts i j ij.1) := by
   intro lo Q Q_j Hj ord g_wf Q' Q_j' eq
   simp [proceed] at eq
   have ⟨a, Q₁, Q_i₁, Q_j₁, eq, g₁_wf, hQi₁', _, hQi₁, hQQ, hQj₁⟩ :=
-    of_proceed_loop p pts wf ij _ (fun a _ v => of_proceed v) Hj ord g_wf eq
+    of_proceed_loop p pts hole wf ij _ (fun a _ v => of_proceed v) Hj ord g_wf eq
   injection eq with eqQ eqQj; subst eqQj
   constructor
   · subst Q'; exact g₁_wf.add ij
@@ -368,7 +418,8 @@ theorem of_proceed {i j : Fin n} (ij : Visible p pts i j) : ProceedIH p pts ij.1
       if i.1 = k.1 then Q_i₁.1 else Q₁.q[k.1]'(Q₁.sz ▸ hk) := by subst Q'; exact Array.get_set ..
     constructor
     · intro k hk hn
-      rw [this hk, if_neg (mt (fun ik => ?_) hn), hQQ _ hk (mt (.imp_right (·.le.trans hQi₁.le)) hn)]
+      rw [this hk, if_neg (mt (fun ik => ?_) hn),
+        hQQ _ hk (mt (.imp_right (·.le.trans hQi₁.le)) hn)]
       cases Fin.eq_of_veq ik; exact ⟨ord.le, le_rfl⟩
     · refine .cons ij ?_ (this ij.1 ▸ if_pos rfl ▸ hQi₁.congr ?_) (hQj₁.congr ?_)
       · rwa [this ij.1, if_pos rfl]
@@ -385,7 +436,7 @@ theorem mkVisibilityGraph_loop_wf
     (mkVisibilityGraph.loop pts i Q).WF (Visible p pts) := by
   unfold mkVisibilityGraph.loop; dsimp (config := {iota := false}) only; split
   · split; rename_i h _ Q' Q_j' eq
-    have ⟨g'_wf, _, h2⟩ := of_proceed _ _ wf (wf.visible_succ ..) (by exact .nil) H g_wf eq
+    have ⟨g'_wf, _, h2⟩ := of_proceed _ _ hole wf (wf.visible_succ ..) (by exact .nil) H g_wf eq
     refine mkVisibilityGraph_loop_wf h ?_ ?_
     · have (Qj hj) (k:Nat) (hk) : (Q'.push h ⟨Qj, hj⟩).q[k]'hk =
         if h : k < Q'.q.size then Q'.q[k] else Qj := Array.get_push ..
@@ -402,7 +453,7 @@ termination_by n - i
 
 theorem mkVisibilityGraph_wf : (mkVisibilityGraph pts).WF (Visible p pts) := by
   unfold mkVisibilityGraph; split
-  · refine mkVisibilityGraph_loop_wf p pts wf ‹_› (.nil rfl) (fun i in_ out eq => ?_)
+  · refine mkVisibilityGraph_loop_wf p pts hole wf ‹_› (.nil rfl) (fun i in_ out eq => ?_)
     cases eq.symm.trans (List.get_replicate ..)
     simp [VisibleLT]
     suffices ∀ i j, Visible p pts i j → j.1 ≠ 0 from ⟨(this · _), this _⟩
@@ -410,51 +461,62 @@ theorem mkVisibilityGraph_wf : (mkVisibilityGraph pts).WF (Visible p pts) := by
   · intro i; cases ‹¬_› i.pos
 
 def LMapWF (lmap : Std.RBMap (Fin n ×ₗ Fin n) ℕ compare) (r i j) :=
-  ∃ k, lmap.find? (i, j) = some (k+1) ∧ k < r ∧
-    ∀ is, (i::j::is).Pairwise (Visible p pts) → is.length ≤ k
+  ∃ k, lmap.find? (i, j) = some (k+1) ∧ k < r ∧ ∀ is, CCWChain p pts i j is → is.length ≤ k
 
 section
 
 theorem of_maxChain_inner
-    {lmap} (H : maxChain.loop.inner pts q lmap i finish out m = some lmap')
-    (hout1 : out.Pairwise (· > ·))
-    (hout2 : ∀ o ∈ out, Visible p pts q o)
-    (hout : P → ∀ o is, (i::q::o::is).Pairwise (Visible p pts) → o ∈ out ∨ is.length < m)
+    {lmap} (H : maxChain.loop.inner pts q lmap i out₀ finish out m = some lmap')
+    (outss : out <+ out₀)
+    (hout1 : out₀.Pairwise (· > ·))
+    (hout2 : ∀ o ∈ out₀, Visible p pts q o)
+    (hout : P → ∀ o is, CCWChain p pts i q (o::is) → o ∈ out ∨ is.length < m)
     (hlmap : P → ∀ i j, Visible p pts i j → q < j → LMapWF p pts lmap r i j) :
-    ∃ out' m', finish out' m' = some lmap' ∧ m ≤ m' ∧ out' <+ out ∧
-      (∀ o ∈ out, σ (pts i) (pts q) (pts o) ≠ .ccw → o ∈ out') ∧
-      (P → ∀ o is, (i::q::o::is).Pairwise (Visible p pts) → is.length < m') := by
+    ∃ out' m', finish out' m' = some lmap' ∧ m ≤ m' ∧ out' <+ out₀ ∧
+      (if MaybeHoles.holes then
+        ∀ o ∈ out, σ (pts i) (pts q) (pts o) ≠ .ccw → o ∈ out' else out' = out₀) ∧
+      (P → ∀ o is, CCWChain p pts i q (o::is) → is.length < m') := by
+  clear hole
   match out with
   | [] =>
     simp [maxChain.loop.inner] at H
-    exact ⟨_, _, H, le_rfl, .slnil, fun., fun hp o is h => (hout hp o is h).resolve_left (fun.)⟩
+    refine ⟨_, _, H, le_rfl, ?_, ?_, fun hp o is h => (hout hp o is h).resolve_left (fun.)⟩
+    · split <;> [exact outss; rfl]
+    · by_cases hole : MaybeHoles.holes <;> simp [hole]
   | o::out =>
-    have hout1' := pairwise_cons.1 hout1
-    have hout2' := forall_mem_cons.1 hout2
-    simp [maxChain.loop.inner] at H; split at H
+    have hout1' := pairwise_cons.1 (hout1.sublist outss)
+    simp [maxChain.loop.inner] at H; split at H <;> rename_i hccw <;> rw [ccw_iff] at hccw
     · obtain ⟨out', m', h1, h2, h3, h4, h5⟩ := by
-        refine of_maxChain_inner H hout1'.2 hout2'.2 (fun hp o is h => ?_) hlmap
+        refine of_maxChain_inner H (sublist_of_cons_sublist outss) hout1 hout2
+          (fun hp o is h => ?_) hlmap
         obtain (⟨⟩ | _) | _ := hout hp _ _ h
         · refine .inr <| lt_max_of_lt_right ?_
-          have := (pairwise_cons.1 h).2
-          have qo := (pairwise_cons.1 this).1 _ (.head _)
+          have .cons _ _ h := h
+          have qo := h.head
           have ⟨k, h1, _, h3⟩ := hlmap hp _ _ qo qo.1
           simp [Std.RBMap.find!, h1]
-          exact Nat.lt_succ_of_le (h3 _ this)
+          exact Nat.lt_succ_of_le (h3 _ h)
         · exact .inl ‹_›
         · exact .inr <| lt_max_of_lt_left ‹_›
-      exact ⟨out', m', h1, (le_max_left ..).trans h2, .cons _ h3,
-        forall_mem_cons.2 ⟨fun h => (h (by rwa [← ccw_iff])).elim, h4⟩, h5⟩
-    · next hccw =>
-      refine ⟨_, _, H, le_rfl, .refl _, fun _ h _ => h, fun hp o' is h => ?_⟩
-      refine (hout hp o' is h).resolve_left fun hn => ?_
-      have vis := h.sublist (sublist_append_left [i,q,o'] is); simp at vis
-      let ⟨⟨iq, io'⟩, qo'⟩ := vis
-      have ccw' := wf.of_visible iq.1 qo'.1 io'
-      rw [ccw_iff] at hccw
-      obtain _ | ⟨_, hn⟩ := hn <;> [exact hccw ccw'; skip]
-      have o'o := hout1'.1 _ hn
-      exact hccw <| wf.σ_prop₁' iq.1 qo'.1 o'o ccw' <| wf.of_visible qo'.1 o'o hout2'.1
+      refine ⟨out', m', h1, (le_max_left ..).trans h2, h3, ?_, h5⟩; revert h4; split
+      · exact fun h4 => forall_mem_cons.2 ⟨fun h => (h hccw).elim, h4⟩
+      · exact id
+    · split at H <;> rename_i hole
+      · refine ⟨_, _, H, le_rfl, outss, by split <;> exact fun _ h _ => h, fun hp o' is h => ?_⟩
+        refine (hout hp o' is h).resolve_left fun hn => ?_
+        have .cons iq ccw' qo' := h
+        obtain _ | ⟨_, hn⟩ := hn <;> [exact hccw ccw'; skip]
+        have o'o := hout1'.1 _ hn
+        exact hccw <| wf.σ_prop₁' iq.1 qo'.head.1 o'o ccw' <|
+          wf.of_visible hole qo'.head.1 o'o (hout2 _ <| outss.subset (.head _))
+      · obtain ⟨out', m', h1, h2, h3, h4, h5⟩ := by
+          refine of_maxChain_inner H (sublist_of_cons_sublist outss) hout1 hout2
+            (fun hp o is h => ?_) hlmap
+          obtain (⟨⟩ | _) | _ := hout hp _ _ h
+          · have .cons .. := h; contradiction
+          · exact .inl ‹_›
+          · exact .inr ‹_›
+        exact ⟨out', m', h1, h2, h3, by simpa [hole] using h4, h5⟩
 
 theorem of_maxChain_loop
     {lmap} (H : maxChain.loop pts r q lmap in_ out m = some lmap')
@@ -462,7 +524,7 @@ theorem of_maxChain_loop
     (hin2 : ∀ i ∈ in_, Visible p pts i q)
     (hout1 : out.Pairwise (· > ·))
     (hout2 : ∀ o ∈ out, Visible p pts q o)
-    (vis : m < r → ∀ i o is, (i::q::o::is).Pairwise (Visible p pts) →
+    (vis : m < r → ∀ i o is, CCWChain p pts i q (o::is) →
       i ∈ in_ ∧ o ∈ out ∨ is.length < m)
     (hlmap : m < r → ∀ i j, Visible p pts i j → q < j ∨ q = j ∧ i ∉ in_ → LMapWF p pts lmap r i j) :
     m < r ∧ ∀ i j, Visible p pts i j → q ≤ j → LMapWF p pts lmap' r i j := by
@@ -474,7 +536,7 @@ theorem of_maxChain_loop
     have hin1' := pairwise_cons.1 hin1
     have hin2' := forall_mem_cons.1 hin2
     simp [maxChain.loop] at H
-    have ⟨out', m', H, mm, ss, h1, h2⟩ := of_maxChain_inner p pts wf H hout1 hout2
+    have ⟨out', m', H, mm, ss, h1, h2⟩ := of_maxChain_inner p pts wf H (.refl _) hout1 hout2
       (fun mr o is h => (vis mr _ _ _ h).imp_left (·.2))
       (fun mr i j v h => hlmap mr i j v (.inl h))
     refine of_maxChain_loop H hin1'.2 hin2'.2 (hout1.sublist ss)
@@ -483,8 +545,12 @@ theorem of_maxChain_loop
       have mr := mm.trans_lt m'r
       obtain ⟨_ | ⟨_, hi⟩, ho⟩ | h := vis mr _ _ _ h
       · exact .inr (h2 mr _ _ h)
-      · refine or_iff_not_imp_right.2 fun hl => ⟨hi, h1 _ ho fun hn => ?_⟩
-        exact hl <| h2 mr _ _ <| wf.visible_cons hin2'.1 hn (pairwise_cons.1 h).2
+      · refine or_iff_not_imp_right.2 fun hl => ⟨hi, ?_⟩
+        by_cases hole : MaybeHoles.holes <;> simp [hole] at h1
+        · refine h1 _ ho fun hn => ?_
+          let .cons _ _ h := h
+          exact hl <| h2 mr _ _ <| .cons hin2'.1 hn h
+        · exact h1 ▸ ho
       · exact .inr (h.trans_le mm)
     · intro m'r i' j' v qj
       have mr := mm.trans_lt m'r
@@ -501,19 +567,17 @@ theorem of_maxChain_loop
           | [] => exact Nat.zero_le _
           | o :: is => exact h2 mr o is pw
 
-variable {graph : VisibilityGraph n} (g_wf : graph.WF (Visible p pts)) in
+variable {graph : MaybeHoles.graph n} (g_wf : graph.WF (Visible p pts)) in
 theorem of_maxChain
     {lmap hq} (H : maxChain pts r graph lmap q hq = some ())
     (hlmap : ∀ i j, Visible p pts i j → q ≤ j → LMapWF p pts lmap r i j) :
-    ∀ is : List (Fin n), is.Pairwise (Visible p pts) → is.length < r + 2 := by
+    ∀ a b is, CCWChain p pts a b is → is.length < r := by
   match q with
   | 0 =>
-    intro is his
+    intro a b is his
     refine not_le.1 fun h => ?_
-    let a::b::is := is
-    have ⟨k, _, kr, hk⟩ :=
-      hlmap _ _ ((pairwise_cons.1 his).1 _ (.head _)) (Nat.zero_le _)
-    exact (Nat.add_lt_add_right ((hk is his).trans_lt kr) 2).not_le h
+    have ⟨k, _, kr, hk⟩ := hlmap _ _ his.head (Nat.zero_le _)
+    exact ((hk is his).trans_lt kr).not_le h
   | q+1 =>
     rw [maxChain] at H; split at H; rename_i in_ out eq; simp at H
     have ⟨hin2, hout2, hin1, hout1⟩ := g_wf ⟨q, hq⟩ _ _ eq
@@ -521,23 +585,29 @@ theorem of_maxChain
     · refine of_maxChain H fun i j v qj => hlmap i j v <| lt_of_le_of_ne qj fun qj => ?_
       subst q; simpa using (hin2 _).2 v
     · simp at H; let ⟨lmap', H1, H2⟩ := H
-      rw [Array.get_eq_getElem] at eq
       refine of_maxChain H2 (of_maxChain_loop p pts wf H1 hin1
           (fun j => (hin2 j).1) hout1 (fun j => (hout2 j).1) ?_ ?_).2
       · refine fun _ i o is h => .inl ?_
-        simp only [pairwise_cons] at h
-        exact ⟨(hin2 _).2 (h.1 _ (.head _)), (hout2 _).2 (h.2.1 _ (.head _))⟩
+        have .cons h1 _ h3 := h
+        exact ⟨(hin2 _).2 h1, (hout2 _).2 h3.head⟩
       · exact fun _ i j v qj => hlmap i j v (qj.resolve_right fun ⟨rfl, h2⟩ => h2 ((hin2 _).2 v))
 
 end
 
+structure MaybeHoles.WF : Prop where
+  mkGraph_wf {p n} {pts : Fin n → NPoint} (wf : WFPoints p pts) :
+    (MaybeHoles.mkGraph pts).WF (Visible p pts)
+
+variable (hwf : MaybeHoles.WF)
+
 theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
     (pts.map (·.1)).Chain (· < ·) lo ∧
     Point.ListInGenPos (↑'pts) ∧
-    ¬σHasEmptyKGon (r+3) {x | ∃ a ∈ pts, ↑a = x} := by
+    ¬σHasEmptyKGonIf (r+3) MaybeHoles.holes {x | ∃ a ∈ pts, ↑a = x} := by
+  clear hole
   induction pts generalizing lo with
   | nil =>
-    simp [Point.ListInGenPos]
+    simp [Point.ListInGenPos]; rw [σHasEmptyKGonIf_def]
     rintro ⟨x, h1, h2, -⟩
     cases (Finset.subset_empty (s := x)).1 (by simpa using h2 : ∀ s ∈ x, s ∈ ∅)
     cases h1
@@ -562,10 +632,12 @@ theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
     · cases h with
       | cons _ h => exact h6 h
       | cons₂ _ h => exact pairwise_iff_forall_sublist.1 gp h
-    · rintro ⟨S, eq, ss, hS⟩
+    · rw [σHasEmptyKGonIf_def]; rintro ⟨S, eq, ss, hS⟩
       if hp : ↑p ∈ S then ?_ else
-        refine h7 ⟨S, eq, fun x hx => (ss hx).resolve_left (hp <| · ▸ hx), ?_⟩
-        exact fun  _ ha _ hb _ hc ab ac bc q hq => hS _ ha _ hb _ hc ab ac bc _ (.inr hq)
+        refine h7 <| σHasEmptyKGonIf_def.2
+          ⟨S, eq, fun x hx => (ss hx).resolve_left (hp <| · ▸ hx), ?_⟩
+        refine fun _ ha _ hb _ hc ab ac bc q hq => hS _ ha _ hb _ hc ab ac bc _ ?_
+        revert hq; split <;> [exact .inr; exact id]
       obtain ⟨l, hl1, hl2, rfl⟩ :
           ∃ l, l <+ sorted ∧ l.length = r + 2 ∧ S = (↑'(p :: l)).toFinset := by
         let f : NPoint ↪ Point := ⟨NPoint.toPoint, fun _ _ => toPoint_inj⟩
@@ -586,7 +658,7 @@ theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
         have := List.map_get_sublist (is := [i, j, k]) <| show Pairwise (· < ·) _ from
           chain_iff_pairwise.1 <| .cons ij <| .cons jk .nil
         exact Point.ListInGenPos.subperm.1 h6 <| (perm.map _).subperm_left.1 (this.map _).subperm
-      let graph' := mkVisibilityGraph pts'
+      let graph' := MaybeHoles.mkGraph pts'
       replace h3 : maxChain pts' r graph' ∅ n' (Nat.le_refl n') = some () := h3
       obtain ⟨is : List (Fin n'), rfl : _ = map pts' is, iss : is.Sorted (·<·)⟩ :=
         List.sublist_eq_map_get hl1
@@ -600,24 +672,75 @@ theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
       clear_value pts' n'
       have wf : WFPoints p pts' := { lt := @lt, ccw := @sccw', gp := gp }
       have iss' : is.Pairwise (Visible p pts') := by
-        refine iss.imp_of_mem fun {a b} ha hb h => ⟨h, fun c hc => ?_⟩
-        refine hS p (by simp)
+        refine iss.imp_of_mem fun {a b} ha hb h => ?_
+        have hS := hS p (by simp)
           (pts' a) (by simpa using .inr ⟨_, ha, rfl⟩)
           (pts' b) (by simpa using .inr ⟨_, hb, rfl⟩)
-          (h5 _) (h5 _) (fun h' => ?_) c (.inr <| mem.1 hc)
-        have := sccw' _ _ h; rw [h', σ_self₁] at this; cases this
-      refine (of_maxChain p pts' wf ?_ h3 (fun _ j _ h => nomatch h.not_lt j.2) is iss').ne ?_
-      · exact mkVisibilityGraph_wf p pts' wf
+          (h5 _) (h5 _) (wf.gp₀ h).ne₃
+        refine ⟨h, fun hole c hc => hS c ?_⟩
+        simpa [hole] using .inr <| mem.1 hc
+        -- · refine ⟨h, hole.elim, fun c ac cb => ?_⟩
+        --   have := hS (pts' c) (.inr ⟨_, c, rfl⟩) -- c ?_ -- (by simpa [hole] using .inr <| mem.1 hc)
+        --   stop sorry
+      have tri (hole : ¬MaybeHoles.holes) {a b c} (ha : a ∈ is) (hb : b ∈ is) (hc : c ∈ is)
+          (ab : a < b) (bc : b < c) : σ (pts' a) (pts' b) (pts' c) = .ccw := by
+        have gp := wf.gp ab bc
+        refine gp.σ_iff'.1 fun hn => ?_
+        refine hS p (by simp)
+          (pts' a) (by simpa using .inr ⟨_, ha, rfl⟩)
+          (pts' c) (by simpa using .inr ⟨_, hc, rfl⟩)
+          (h5 _) (h5 _) gp.ne₂
+          (pts' b) (by simpa [hole] using .inr ⟨_, hb, rfl⟩) ⟨?_, ?_, ?_⟩
+        · exact (wf.ccw ab).trans (wf.ccw (ab.trans bc)).symm
+        · exact (wf.ccw bc).trans (wf.ccw (ab.trans bc)).symm
+        · rw [σ_perm₁, hn, wf.ccw (ab.trans bc)]; rfl
+      let a::b::is := is
+      have iss' : CCWChain p pts' a b is := (wf.ccwChain_iff_pairwise tri).2 iss'
+      refine (of_maxChain p pts' wf (hwf.mkGraph_wf wf) h3
+        (fun _ j _ h => nomatch h.not_lt j.2) _ _ _ iss').ne ?_
       · simpa using hl2
 
-theorem hole_lower_bound {r : Nat}  (points : List NPoint)
+end
+
+theorem MaybeHoles.yes_wf : MaybeHoles.yes.WF where
+  mkGraph_wf := mkVisibilityGraph_wf _ _ rfl
+
+attribute [local instance] MaybeHoles.no in
+theorem MaybeHoles.no_wf : MaybeHoles.no.WF where
+  mkGraph_wf {p n pts} _ k in_ out eq := by
+    simp [edges, mkGraph] at eq; simp [← eq]
+    refine ⟨fun j' => ?_, fun j' => ?_,  ?_, ?_⟩
+    · simp [mem_iff_get?, Visible]
+      refine ⟨fun ⟨a, ha⟩ => ?_, fun h => ⟨j', ?_⟩⟩
+      · cases le_or_lt k.1 a with
+        | inl h => simp [get?_eq_none.2 ((length_take_le ..).trans h)] at ha
+        | inr h => simp [get?_take h, get?_eq_some] at ha; obtain ⟨_, rfl⟩ := ha; assumption
+      · simp [get?_take h, get?_eq_some]
+    · simp [mem_iff_get?, get?_drop, get?_eq_some, Visible]
+      refine ⟨fun ⟨a, _, h⟩ => h ▸ Nat.le_add_right .., fun h : k.1 + 1 ≤ j' => ?_⟩
+      have := Nat.add_sub_cancel' h
+      exact ⟨j'-(k+1), this.symm ▸ j'.2, Fin.eq_of_veq this⟩
+    · exact pairwise_reverse.2 <| (List.pairwise_lt_finRange _).sublist (take_sublist ..)
+    · exact pairwise_reverse.2 <| (List.pairwise_lt_finRange _).sublist (drop_sublist ..)
+
+theorem hole_lower_bound {r : Nat} (points : List NPoint)
     (checkIt : (holeCheck r points 0).isSome = true := by native_decide) :
     ∃ (pts : List Point), Point.ListInGenPos pts ∧
       pts.length = points.length ∧ ¬HasEmptyKGon (r+3) pts.toFinset :=
   let ⟨(), eq⟩ := Option.isSome_iff_exists.1 checkIt
-  let ⟨_, H1, H2⟩ := of_holeCheck eq
+  let ⟨_, H1, H2⟩ := of_holeCheck MaybeHoles.yes_wf eq
   ⟨↑'points, H1, by simp,
     mt (σHasEmptyKGon_iff_HasEmptyKGon H1).2 (by convert H2 using 2; ext; simp)⟩
+
+attribute [local instance] MaybeHoles.no in
+theorem gon_lower_bound {r : Nat} (points : List NPoint)
+    (checkIt : (holeCheck r points 0).isSome = true := by native_decide) :
+    ∃ (pts : List Point), Point.ListInGenPos pts ∧
+      pts.length = points.length ∧ ¬HasConvexKGon (r+3) pts.toFinset :=
+  let ⟨(), eq⟩ := Option.isSome_iff_exists.1 checkIt
+  let ⟨_, H1, H2⟩ := of_holeCheck MaybeHoles.no_wf eq
+  ⟨↑'points, H1, by simp,
+    mt (σHasConvexKGon_iff_HasConvexKGon H1).2 (by convert H2 using 2; ext; simp)⟩
 
 theorem hole_6_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 29 ∧ ¬HasEmptyKGon 6 pts.toFinset :=
@@ -652,3 +775,36 @@ info: 'Geo.HoleChecker.hole_6_lower_bound' depends on axioms: [propext,
  Lean.ofReduceBool]
 -/
 #guard_msgs in #print axioms hole_6_lower_bound
+
+-- theorem gon_6_lower_bound : ∃ (pts : List Point),
+--     Point.ListInGenPos pts ∧ pts.length = 16 ∧ ¬HasConvexKGon 6 pts.toFinset :=
+--   gon_lower_bound [
+--     (1900, 19500), (9192, 24327), (11000, 47800), (11617, 28370),
+--     (11702, 35174), (22864, 21402), (24537, 23468), (25091, 27350),
+--     (25400, 2100), (25627, 9363), (27243, 14013), (40100, 47500),
+--     (40512, 37842), (40752, 33640), (41349, 31973), (49000, 19600)
+--   ]
+
+theorem gon_5_lower_bound : ∃ (pts : List Point),
+    Point.ListInGenPos pts ∧ pts.length = 8 ∧ ¬HasConvexKGon 5 pts.toFinset :=
+  gon_lower_bound [
+    (625, 532), (632, 199), (652, 486), (669, 247),
+    (958, 510), (978, 232), (989, 554), (1022, 177)
+  ]
+
+theorem gon_4_lower_bound : ∃ (pts : List Point),
+    Point.ListInGenPos pts ∧ pts.length = 4 ∧ ¬HasConvexKGon 4 pts.toFinset :=
+  gon_lower_bound [(1, 0), (3, 4), (4, 2), (5, 1)]
+
+theorem gon_3_lower_bound : ∃ (pts : List Point),
+    Point.ListInGenPos pts ∧ pts.length = 2 ∧ ¬HasConvexKGon 3 pts.toFinset :=
+  gon_lower_bound [(1, 0), (2, 1)]
+
+/--
+info: 'Geo.HoleChecker.gon_5_lower_bound' depends on axioms: [propext,
+ Classical.choice,
+ Quot.sound,
+ mathlibSorry,
+ Lean.ofReduceBool]
+-/
+#guard_msgs in #print axioms gon_5_lower_bound

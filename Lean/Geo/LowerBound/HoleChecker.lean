@@ -1,6 +1,7 @@
 import Std.Tactic.GuardExpr
 import Std.Data.Rat
 import Mathlib.Data.List.Sort
+import Mathlib.Data.List.Range
 import Mathlib.Data.Prod.Lex
 
 namespace Geo
@@ -102,11 +103,17 @@ where
       Q.graph
   termination_by n - i
 
-def maxChain (pts : Fin n → NPoint) (r : Nat) (graph : VisibilityGraph n)
+class MaybeHoles where
+  holes : Bool
+  graph : ℕ → Type
+  mkGraph : (pts : Fin n → NPoint) → graph n
+  edges : graph n → (p : Fin n) → List (Fin n) × List (Fin n)
+
+def maxChain [MaybeHoles] (pts : Fin n → NPoint) (r : Nat) (graph : MaybeHoles.graph n)
     (lmap : Std.RBMap (Fin n ×ₗ Fin n) Nat compare) : ∀ i, i ≤ n → Option Unit
   | 0, _ => pure ()
   | p+1, hp => do
-    let (in_, out) := graph.edges.get ⟨p, graph.sz.symm ▸ hp⟩
+    let (in_, out) := MaybeHoles.edges graph ⟨p, hp⟩
     let lmap ← if let [] := in_ then
       pure lmap
     else
@@ -119,16 +126,19 @@ def maxChain (pts : Fin n → NPoint) (r : Nat) (graph : VisibilityGraph n)
         let finish out m :=
           loop (lmap.insert (i, p) (m+1)) in_ out m
         let rec inner
-        | [], m => finish [] m
+        | [], m => finish (if MaybeHoles.holes then [] else out) m
         | o::out, m => do
           if ccw (pts i) (pts p) (pts o) then
             inner out <| max m (lmap.find! (p, o))
-          else finish (o::out) m
+          else if MaybeHoles.holes then
+            finish (o::out) m
+          else
+            inner out m
         inner out m
       loop lmap in_ out 0
     maxChain pts r graph lmap p (Nat.le_of_lt hp)
 
-def holeCheck (r : Nat) (points : List NPoint) (lo : Nat) : Option Unit :=
+def holeCheck [holes : MaybeHoles] (r : Nat) (points : List NPoint) (lo : Nat) : Option Unit :=
   match points with
   | [] => return
   | p :: points => do
@@ -138,6 +148,18 @@ def holeCheck (r : Nat) (points : List NPoint) (lo : Nat) : Option Unit :=
     guard <| sorted.Chain' (slope · ≠ slope ·)
     let sorted := Array.mk sorted
     let n := sorted.size
-    let graph := mkVisibilityGraph (n := n) (fun i => sorted[i])
+    let graph := MaybeHoles.mkGraph (n := n) (fun i => sorted[i])
     maxChain (n := n) (fun i => sorted[i]) r graph {} n (Nat.le_refl _)
     holeCheck r points p.1
+
+instance MaybeHoles.yes : MaybeHoles where
+  holes := true
+  graph := VisibilityGraph
+  mkGraph := mkVisibilityGraph
+  edges g p := g.edges[p.1]'(g.sz.symm ▸ p.2)
+
+def MaybeHoles.no : MaybeHoles where
+  holes := false
+  graph _ := Unit
+  mkGraph _ := ()
+  edges {n} _ p := let (a, b) := (List.finRange n).splitAt p; (a.reverse, b.tail.reverse)

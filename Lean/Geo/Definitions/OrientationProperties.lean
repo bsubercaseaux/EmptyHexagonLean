@@ -367,6 +367,12 @@ theorem σCCWPoints.emptyHexagon
 def σHasEmptyKGonIf (n : Nat) (holes : Bool) (S : Set Point) : Prop :=
   if holes then σHasEmptyKGon n S else σHasConvexKGon n S
 
+theorem σHasEmptyKGonIf_def : σHasEmptyKGonIf n holes S ↔
+  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧
+    ∀ᵉ (a ∈ s) (b ∈ s) (c ∈ s), a ≠ b → a ≠ c → b ≠ c →
+      σIsEmptyTriangleFor a b c (if holes then S else s) := by
+  unfold σHasEmptyKGonIf; split <;> rfl
+
 theorem σCCWPoints.emptyHexagonIf {holes : Bool}
     (H : σCCWPoints [a, b, c, d, e, f]) (gp : Point.ListInGenPos S)
     (hole : holes → σIsEmptyTriangleFor a c e S.toFinset) (sp : [a, b, c, d, e, f] ⊆ S) :
