@@ -5,6 +5,9 @@ import Geo.LowerBound.HoleCheckerProof
 
 /-! ## The definitions involved in the Empty Hexagon theorem -/
 
+/- We work over the Euclidean plane `ℝ²`. -/
+recall Geo.Point := Fin 2 → ℝ
+
 /- `EmptyShapeIn S P` means that `S` carves out an empty shape in `P`:
 the convex hull of `S` contains no point of `P`
 other than those already in `S`. -/
