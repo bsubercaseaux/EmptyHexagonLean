@@ -465,29 +465,25 @@ def LMapWF (lmap : Std.RBMap (Fin n ×ₗ Fin n) ℕ compare) (r i j) :=
 
 section
 
-theorem of_maxChain_inner
-    {lmap} (H : maxChain.loop.inner pts q lmap i out₀ finish out m = some lmap')
+theorem of_maxChainCoreOrdered_inner
+    {lmap} (H : maxChainCoreOrdered.loop.inner pts q lmap i finish out m = some lmap')
     (outss : out <+ out₀)
     (hout1 : out₀.Pairwise (· > ·))
     (hout2 : ∀ o ∈ out₀, Visible p pts q o)
     (hout : P → ∀ o is, CCWChain p pts i q (o::is) → o ∈ out ∨ is.length < m)
     (hlmap : P → ∀ i j, Visible p pts i j → q < j → LMapWF p pts lmap r i j) :
     ∃ out' m', finish out' m' = some lmap' ∧ m ≤ m' ∧ out' <+ out₀ ∧
-      (if MaybeHoles.holes then
-        ∀ o ∈ out, σ (pts i) (pts q) (pts o) ≠ .ccw → o ∈ out' else out' = out₀) ∧
+      (∀ o ∈ out, σ (pts i) (pts q) (pts o) ≠ .ccw → o ∈ out') ∧
       (P → ∀ o is, CCWChain p pts i q (o::is) → is.length < m') := by
-  clear hole
   match out with
   | [] =>
-    simp [maxChain.loop.inner] at H
-    refine ⟨_, _, H, le_rfl, ?_, ?_, fun hp o is h => (hout hp o is h).resolve_left (fun.)⟩
-    · split <;> [exact outss; rfl]
-    · by_cases hole : MaybeHoles.holes <;> simp [hole]
+    simp [maxChainCoreOrdered.loop.inner] at H
+    exact ⟨_, _, H, le_rfl, outss, by simp, fun hp o is h => (hout hp o is h).resolve_left (fun.)⟩
   | o::out =>
     have hout1' := pairwise_cons.1 (hout1.sublist outss)
-    simp [maxChain.loop.inner] at H; split at H <;> rename_i hccw <;> rw [ccw_iff] at hccw
+    simp [maxChainCoreOrdered.loop.inner] at H; split at H <;> rename_i hccw <;> rw [ccw_iff] at hccw
     · obtain ⟨out', m', h1, h2, h3, h4, h5⟩ := by
-        refine of_maxChain_inner H (sublist_of_cons_sublist outss) hout1 hout2
+        refine of_maxChainCoreOrdered_inner H (sublist_of_cons_sublist outss) hout1 hout2
           (fun hp o is h => ?_) hlmap
         obtain (⟨⟩ | _) | _ := hout hp _ _ h
         · refine .inr <| lt_max_of_lt_right ?_
@@ -498,28 +494,44 @@ theorem of_maxChain_inner
           exact Nat.lt_succ_of_le (h3 _ h)
         · exact .inl ‹_›
         · exact .inr <| lt_max_of_lt_left ‹_›
-      refine ⟨out', m', h1, (le_max_left ..).trans h2, h3, ?_, h5⟩; revert h4; split
-      · exact fun h4 => forall_mem_cons.2 ⟨fun h => (h hccw).elim, h4⟩
-      · exact id
-    · split at H <;> rename_i hole
-      · refine ⟨_, _, H, le_rfl, outss, by split <;> exact fun _ h _ => h, fun hp o' is h => ?_⟩
-        refine (hout hp o' is h).resolve_left fun hn => ?_
-        have .cons iq ccw' qo' := h
-        obtain _ | ⟨_, hn⟩ := hn <;> [exact hccw ccw'; skip]
-        have o'o := hout1'.1 _ hn
-        exact hccw <| wf.σ_prop₁' iq.1 qo'.head.1 o'o ccw' <|
-          wf.of_visible hole qo'.head.1 o'o (hout2 _ <| outss.subset (.head _))
-      · obtain ⟨out', m', h1, h2, h3, h4, h5⟩ := by
-          refine of_maxChain_inner H (sublist_of_cons_sublist outss) hout1 hout2
-            (fun hp o is h => ?_) hlmap
-          obtain (⟨⟩ | _) | _ := hout hp _ _ h
-          · have .cons .. := h; contradiction
-          · exact .inl ‹_›
-          · exact .inr ‹_›
-        exact ⟨out', m', h1, h2, h3, by simpa [hole] using h4, h5⟩
+      refine ⟨out', m', h1, (le_max_left ..).trans h2, h3,
+        forall_mem_cons.2 ⟨fun h => (h hccw).elim, h4⟩, h5⟩
+    · refine ⟨_, _, H, le_rfl, outss, fun _ h _ => h, fun hp o' is h => ?_⟩
+      refine (hout hp o' is h).resolve_left fun hn => ?_
+      have .cons iq ccw' qo' := h
+      obtain _ | ⟨_, hn⟩ := hn <;> [exact hccw ccw'; skip]
+      have o'o := hout1'.1 _ hn
+      exact hccw <| wf.σ_prop₁' iq.1 qo'.head.1 o'o ccw' <|
+        wf.of_visible hole qo'.head.1 o'o (hout2 _ <| outss.subset (.head _))
 
-theorem of_maxChain_loop
-    {lmap} (H : maxChain.loop pts r q lmap in_ out m = some lmap')
+theorem of_maxChainCoreUnordered_inner
+    {lmap} (H : maxChainCoreUnordered.inner pts q lmap i finish out m = some lmap')
+    (outss : out <+ out₀)
+    (hout1 : out₀.Pairwise (· > ·))
+    (hout2 : ∀ o ∈ out₀, Visible p pts q o)
+    (hout : ∀ o is, CCWChain p pts i q (o::is) → o ∈ out ∨ is.length < m)
+    (hlmap : ∀ i j, Visible p pts i j → q < j → LMapWF p pts lmap r i j) :
+    ∃ m', finish m' = some lmap' ∧ ∀ o is, CCWChain p pts i q (o::is) → is.length < m' := by
+  match out with
+  | [] =>
+    simp [maxChainCoreUnordered.inner] at H
+    exact ⟨_, H, fun o is h => (hout o is h).resolve_left (fun.)⟩
+  | o::out =>
+    simp [maxChainCoreUnordered.inner] at H
+    refine of_maxChainCoreUnordered_inner H (sublist_of_cons_sublist outss) hout1 hout2
+      (fun o is h => ?_) hlmap
+    obtain (⟨⟩ | _) | _ := hout _ _ h
+    · have .cons _ hccw h := h
+      refine .inr <| if_pos ((ccw_iff ..).2 hccw) ▸ lt_max_of_lt_right ?_
+      have qo := h.head
+      have ⟨k, h1, _, h3⟩ := hlmap _ _ qo qo.1
+      simp [Std.RBMap.find!, h1]
+      exact Nat.lt_succ_of_le (h3 _ h)
+    · exact .inl ‹_›
+    · right; split <;> [exact lt_max_of_lt_left ‹_›; assumption]
+
+theorem of_maxChainCoreOrdered_loop
+    {lmap} (H : maxChainCoreOrdered.loop pts r q lmap in_ out m = some lmap')
     (hin1 : in_.Pairwise (· > ·))
     (hin2 : ∀ i ∈ in_, Visible p pts i q)
     (hout1 : out.Pairwise (· > ·))
@@ -530,27 +542,26 @@ theorem of_maxChain_loop
     m < r ∧ ∀ i j, Visible p pts i j → q ≤ j → LMapWF p pts lmap' r i j := by
   match in_ with
   | [] =>
-    simp [maxChain.loop] at H; obtain ⟨H, rfl⟩ := H
+    simp [maxChainCoreOrdered.loop] at H; obtain ⟨H, rfl⟩ := H
     exact ⟨H, fun i j v qj => hlmap H i j v <| qj.lt_or_eq.imp_right (⟨·, fun.⟩)⟩
   | i::in_ =>
     have hin1' := pairwise_cons.1 hin1
     have hin2' := forall_mem_cons.1 hin2
-    simp [maxChain.loop] at H
-    have ⟨out', m', H, mm, ss, h1, h2⟩ := of_maxChain_inner p pts wf H (.refl _) hout1 hout2
-      (fun mr o is h => (vis mr _ _ _ h).imp_left (·.2))
-      (fun mr i j v h => hlmap mr i j v (.inl h))
-    refine of_maxChain_loop H hin1'.2 hin2'.2 (hout1.sublist ss)
+    simp [maxChainCoreOrdered.loop] at H
+    have ⟨out', m', H, mm, ss, h1, h2⟩ :=
+      of_maxChainCoreOrdered_inner p pts hole wf H (.refl _) hout1 hout2
+        (fun mr o is h => (vis mr _ _ _ h).imp_left (·.2))
+        (fun mr i j v h => hlmap mr i j v (.inl h))
+    refine of_maxChainCoreOrdered_loop H hin1'.2 hin2'.2 (hout1.sublist ss)
       (fun _ h => hout2 _ (ss.subset h)) ?_ ?_ |>.imp_left (mm.trans_lt)
     · intro m'r i' o is h
       have mr := mm.trans_lt m'r
       obtain ⟨_ | ⟨_, hi⟩, ho⟩ | h := vis mr _ _ _ h
       · exact .inr (h2 mr _ _ h)
       · refine or_iff_not_imp_right.2 fun hl => ⟨hi, ?_⟩
-        by_cases hole : MaybeHoles.holes <;> simp [hole] at h1
-        · refine h1 _ ho fun hn => ?_
-          let .cons _ _ h := h
-          exact hl <| h2 mr _ _ <| .cons hin2'.1 hn h
-        · exact h1 ▸ ho
+        refine h1 _ ho fun hn => ?_
+        let .cons _ _ h := h
+        exact hl <| h2 mr _ _ <| .cons hin2'.1 hn h
       · exact .inr (h.trans_le mm)
     · intro m'r i' j' v qj
       have mr := mm.trans_lt m'r
@@ -567,11 +578,47 @@ theorem of_maxChain_loop
           | [] => exact Nat.zero_le _
           | o :: is => exact h2 mr o is pw
 
+theorem of_maxChainCoreUnordered
+    {lmap} (H : maxChainCoreUnordered pts r q lmap in_ out = some lmap')
+    (hin1 : in_.Pairwise (· > ·))
+    (hin2 : ∀ i ∈ in_, Visible p pts i q)
+    (hout1 : out.Pairwise (· > ·))
+    (hout2 : ∀ o, o ∈ out ↔ Visible p pts q o)
+    (hlmap : ∀ i j, Visible p pts i j → q < j ∨ q = j ∧ i ∉ in_ → LMapWF p pts lmap r i j) :
+    ∀ i j, Visible p pts i j → q ≤ j → LMapWF p pts lmap' r i j := by
+  match in_ with
+  | [] =>
+    simp [maxChainCoreUnordered] at H; obtain ⟨H, rfl⟩ := H
+    exact fun i j v qj => hlmap i j v <| qj.lt_or_eq.imp_right (⟨·, fun.⟩)
+  | i::in_ =>
+    have hin1' := pairwise_cons.1 hin1
+    have hin2' := forall_mem_cons.1 hin2
+    simp [maxChainCoreUnordered] at H
+    have ⟨m', H, h1⟩ :=
+      of_maxChainCoreUnordered_inner p pts H (.refl _) hout1 (fun _ => (hout2 _).1)
+        (fun o is h => have .cons _ _ h := h; .inl <| (hout2 _).2 h.head)
+        (fun i j v h => hlmap i j v (.inl h))
+    simp at H; let ⟨m'r, H⟩ := H
+    refine of_maxChainCoreUnordered H hin1'.2 hin2'.2 hout1 hout2 fun i' j' v qj =>
+      if qj' : _ then let ⟨k, h1, h2⟩ := hlmap i' j' v qj'; ⟨k, ?_, h2⟩ else ?_
+    · rw [Std.RBMap.find?_insert, if_neg, h1]
+      rw [lex_compare_eq_iff]; rintro ⟨⟩
+      exact (qj'.resolve_left (lt_irrefl _)).2 (.head _)
+    · obtain ⟨rfl, hi⟩ := qj.resolve_left (mt .inl qj')
+      if eq : i' = i then ?_ else simp [eq, hi] at qj'
+      subst i'
+      refine ⟨_, ?_, m'r, fun is pw => ?_⟩
+      · rw [Std.RBMap.find?_insert, if_pos]; rw [lex_compare_eq_iff]
+      · match is with
+        | [] => exact Nat.zero_le _
+        | o :: is => exact h1 o is pw
+
 variable {graph : MaybeHoles.graph n} (g_wf : graph.WF (Visible p pts)) in
 theorem of_maxChain
     {lmap hq} (H : maxChain pts r graph lmap q hq = some ())
     (hlmap : ∀ i j, Visible p pts i j → q ≤ j → LMapWF p pts lmap r i j) :
     ∀ a b is, CCWChain p pts a b is → is.length < r := by
+  clear hole
   match q with
   | 0 =>
     intro a b is his
@@ -581,16 +628,19 @@ theorem of_maxChain
   | q+1 =>
     rw [maxChain] at H; split at H; rename_i in_ out eq; simp at H
     have ⟨hin2, hout2, hin1, hout1⟩ := g_wf ⟨q, hq⟩ _ _ eq
-    split at H
-    · refine of_maxChain H fun i j v qj => hlmap i j v <| lt_of_le_of_ne qj fun qj => ?_
-      subst q; simpa using (hin2 _).2 v
-    · simp at H; let ⟨lmap', H1, H2⟩ := H
-      refine of_maxChain H2 (of_maxChain_loop p pts wf H1 hin1
-          (fun j => (hin2 j).1) hout1 (fun j => (hout2 j).1) ?_ ?_).2
-      · refine fun _ i o is h => .inl ?_
-        have .cons h1 _ h3 := h
-        exact ⟨(hin2 _).2 h1, (hout2 _).2 h3.head⟩
-      · exact fun _ i j v qj => hlmap i j v (qj.resolve_right fun ⟨rfl, h2⟩ => h2 ((hin2 _).2 v))
+    split at H <;> rename_i hole <;>
+      simp at H <;> refine let ⟨lmap', H1, H2⟩ := H; of_maxChain H2 ?_
+    · simp [maxChainCoreOrdered] at H1; split at H1
+      · cases H1; refine fun i j v qj => hlmap i j v <| lt_of_le_of_ne qj fun qj => ?_
+        subst q; simpa using (hin2 _).2 v
+      · refine (of_maxChainCoreOrdered_loop p pts hole wf H1 hin1
+              (fun j => (hin2 j).1) hout1 (fun j => (hout2 j).1) ?_ ?_).2
+        · refine fun _ i o is h => .inl ?_
+          have .cons h1 _ h3 := h
+          exact ⟨(hin2 _).2 h1, (hout2 _).2 h3.head⟩
+        · exact fun _ i j v qj => hlmap i j v (qj.resolve_right fun ⟨rfl, h2⟩ => h2 ((hin2 _).2 v))
+    · exact of_maxChainCoreUnordered p pts H1 hin1 (fun j => (hin2 j).1) hout1 hout2 fun i j v qj =>
+        hlmap i j v (qj.resolve_right fun ⟨rfl, h2⟩ => h2 ((hin2 _).2 v))
 
 end
 
@@ -776,14 +826,14 @@ info: 'Geo.HoleChecker.hole_6_lower_bound' depends on axioms: [propext,
 -/
 #guard_msgs in #print axioms hole_6_lower_bound
 
--- theorem gon_6_lower_bound : ∃ (pts : List Point),
---     Point.ListInGenPos pts ∧ pts.length = 16 ∧ ¬HasConvexKGon 6 pts.toFinset :=
---   gon_lower_bound [
---     (1900, 19500), (9192, 24327), (11000, 47800), (11617, 28370),
---     (11702, 35174), (22864, 21402), (24537, 23468), (25091, 27350),
---     (25400, 2100), (25627, 9363), (27243, 14013), (40100, 47500),
---     (40512, 37842), (40752, 33640), (41349, 31973), (49000, 19600)
---   ]
+theorem gon_6_lower_bound : ∃ (pts : List Point),
+    Point.ListInGenPos pts ∧ pts.length = 16 ∧ ¬HasConvexKGon 6 pts.toFinset :=
+  gon_lower_bound [
+    (1900, 19500), (9192, 24327), (11000, 47800), (11617, 28370),
+    (11702, 35174), (22864, 21402), (24537, 23468), (25091, 27350),
+    (25400, 2100), (25627, 9363), (27243, 14013), (40100, 47500),
+    (40512, 37842), (40752, 33640), (41349, 31973), (49000, 19600)
+  ]
 
 theorem gon_5_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 8 ∧ ¬HasConvexKGon 5 pts.toFinset :=

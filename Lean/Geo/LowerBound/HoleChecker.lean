@@ -109,33 +109,56 @@ class MaybeHoles where
   mkGraph : (pts : Fin n → NPoint) → graph n
   edges : graph n → (p : Fin n) → List (Fin n) × List (Fin n)
 
+def maxChainCoreOrdered [MaybeHoles] (pts : Fin n → NPoint) (r : ℕ) (p : Fin n)
+    (lmap : Std.RBMap (Lex (Fin n × Fin n)) ℕ compare) (in_ out : List (Fin n)) :
+    Option (Std.RBMap (Lex (Fin n × Fin n)) ℕ compare) := do
+  if let [] := in_ then
+    pure lmap
+  else
+    let rec loop lmap
+    | [], _, m => do
+      guard <| m < r
+      pure lmap
+    | i::in_, out, m => do
+      let finish out m := do
+        loop (lmap.insert (i, p) (m+1)) in_ out m
+      let rec inner
+      | [], m => finish [] m
+      | o::out, m => do
+        if ccw (pts i) (pts p) (pts o) then
+          inner out <| max m (lmap.find! (p, o))
+        else finish (o::out) m
+      inner out m
+    loop lmap in_ out 0
+
+def maxChainCoreUnordered [MaybeHoles] (pts : Fin n → NPoint) (r : ℕ) (p : Fin n)
+    (lmap : Std.RBMap (Lex (Fin n × Fin n)) ℕ compare) (in_ out : List (Fin n)) :
+    Option (Std.RBMap (Lex (Fin n × Fin n)) ℕ compare) := do
+  match in_ with
+  | [] => pure lmap
+  | i::in_ => do
+    let finish m := do
+      guard <| m < r
+      maxChainCoreUnordered pts r p (lmap.insert (i, p) (m+1)) in_ out
+    let rec inner
+    | [], m => finish m
+    | o::out, m =>
+      inner out <|
+        if ccw (pts i) (pts p) (pts o) then
+          max m (lmap.find! (p, o))
+        else
+          m
+    inner out 0
+
 def maxChain [MaybeHoles] (pts : Fin n → NPoint) (r : Nat) (graph : MaybeHoles.graph n)
     (lmap : Std.RBMap (Fin n ×ₗ Fin n) Nat compare) : ∀ i, i ≤ n → Option Unit
   | 0, _ => pure ()
   | p+1, hp => do
     let (in_, out) := MaybeHoles.edges graph ⟨p, hp⟩
-    let lmap ← if let [] := in_ then
-      pure lmap
+    let lmap ← if MaybeHoles.holes then
+      maxChainCoreOrdered pts r ⟨p, hp⟩ lmap in_ out
     else
-      let p : Fin n := ⟨p, hp⟩
-      let rec loop lmap
-      | [], _, m => do
-        guard <| m < r
-        pure lmap
-      | i::in_, out, m => do
-        let finish out m :=
-          loop (lmap.insert (i, p) (m+1)) in_ out m
-        let rec inner
-        | [], m => finish (if MaybeHoles.holes then [] else out) m
-        | o::out, m => do
-          if ccw (pts i) (pts p) (pts o) then
-            inner out <| max m (lmap.find! (p, o))
-          else if MaybeHoles.holes then
-            finish (o::out) m
-          else
-            inner out m
-        inner out m
-      loop lmap in_ out 0
+      maxChainCoreUnordered pts r ⟨p, hp⟩ lmap in_ out
     maxChain pts r graph lmap p (Nat.le_of_lt hp)
 
 def holeCheck [holes : MaybeHoles] (r : Nat) (points : List NPoint) (lo : Nat) : Option Unit :=
@@ -163,3 +186,8 @@ def MaybeHoles.no : MaybeHoles where
   graph _ := Unit
   mkGraph _ := ()
   edges {n} _ p := let (a, b) := (List.finRange n).splitAt p; (a.reverse, b.tail.reverse)
+
+-- #guard Option.isSome <| holeCheck (holes := .no) (6-3) [
+--   (11617, 28370), (11702, 35174), (25091, 27350), (27243, 14013),
+--   (40752, 33640), (41349, 31973), (49000, 19600)
+-- ] 0
