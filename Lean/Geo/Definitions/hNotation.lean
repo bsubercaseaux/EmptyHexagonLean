@@ -25,6 +25,14 @@ lemma ForcedKHoleMono {n m : ENat} {k : Nat} (h : n ≤ m) :
     apply ge_trans h2 h
   exact h1 pts length_h h3
 
+lemma ForcedKGonMono {n m : ENat} {k : Nat} (h : n ≤ m) :
+  ForcedKGon n k → ForcedKGon m k := by
+  unfold ForcedKGon
+  intro h1 pts h2 h3
+  have length_h : ↑(pts.length) ≥ n := by
+    apply ge_trans h2 h
+  exact h1 pts length_h h3
+
 noncomputable def h (k : Nat) : ENat :=
   sInf { n | ForcedKHole n k }
 
@@ -43,35 +51,64 @@ lemma NoForced6Hole29 : ¬ ForcedKHole 29 6 := by
     use pts
     exact ⟨by aesop, gp, no6hole⟩
 
+lemma NoForced6Gon16 : ¬ ForcedKGon 16 6 := by
+    unfold ForcedKGon
+    push_neg
+    have ⟨pts, gp, length29, no6hole⟩ := HoleChecker.gon_6_lower_bound
+    use pts
+    exact ⟨by aesop, gp, no6hole⟩
+
 lemma Forced6Gon17 : ForcedKGon 17 6 := by
     unfold ForcedKGon
     intro pts h1 h2
     apply Geo.gon_6_theorem pts h2 (by aesop)
 
-lemma lowerBound_h6 : h 6 ≥ 30 := by
+lemma h_lowerBound (N k: Nat) (unforced: ¬ (ForcedKHole N k)) : h k ≥ (N + 1) := by
   unfold h
   apply le_sInf
   by_contra H
-  push_neg at H
-  simp at H
-  have ⟨a, fa, a_lt_30⟩ := H
-  have a_le_29 : a ≤ 29 := by
+  push_neg at H; simp at H
+  have ⟨a, fa, a_lt_N⟩ := H
+  have a_le_N : a ≤ N := by
     apply ENat.le_of_lt_add_one
-    exact a_lt_30
-  have := ForcedKHoleMono a_le_29 fa
-  have x := NoForced6Hole29
-  aesop
+    exact a_lt_N
+  have := ForcedKHoleMono a_le_N fa
+  exact unforced this
+
+lemma g_lowerBound (N k: Nat) (unforced: ¬ (ForcedKGon N k)) : g k ≥ (N + 1) := by
+  unfold g
+  apply le_sInf
+  by_contra H
+  push_neg at H; simp at H
+  have ⟨a, fa, a_lt_N⟩ := H
+  have a_le_N : a ≤ N := by
+    apply ENat.le_of_lt_add_one
+    exact a_lt_N
+  have := ForcedKGonMono a_le_N fa
+  exact unforced this
+
+lemma lowerBound_h6 : h 6 ≥ 30 := by
+  exact h_lowerBound 29 6 NoForced6Hole29
+
 
 lemma upperBound_h6 : h 6 ≤ 30 := by
   unfold h
   apply sInf_le
   exact Forced6Hole30
 
+lemma lowerBound_g6 : g 6 ≥ 17 := by
+  exact g_lowerBound 16 6 NoForced6Gon16
+
 lemma upperBound_g6 : g 6 ≤ 17 := by
   unfold g
   apply sInf_le
   exact Forced6Gon17
 
-
 theorem empty_hexagon_number: h 6 = 30 := by
-  exact le_antisymm upperBound_h6 lowerBound_h6 
+  exact le_antisymm upperBound_h6 lowerBound_h6
+
+theorem convex_hexagon_number: g 6 = 17 := by
+  exact le_antisymm upperBound_g6 lowerBound_g6
+
+end HoleChecker
+
