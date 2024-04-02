@@ -804,14 +804,11 @@ theorem hole_6_lower_bound : ∃ (pts : List Point),
 
 theorem hole_5_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 9 ∧ ¬HasEmptyKGon 5 pts.toFinset :=
-  hole_lower_bound [
-    (232, 685), (629, 532), (781, 340), (846, 383), (861, 481), (877, 102), (895, 262),
-    (943, 341), (1125, 532),
-  ]
+  hole_lower_bound [(1, 9), (9, 7), (14, 3), (15, 4), (16, 6), (17, 0), (18, 1), (21, 3), (28, 7)]
 
 theorem hole_4_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 4 ∧ ¬HasEmptyKGon 4 pts.toFinset :=
-  hole_lower_bound [(1, 0), (3, 4), (4, 2), (5, 1)]
+  hole_lower_bound [(1, 0), (2, 4), (3, 2), (4, 1)]
 
 theorem hole_3_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 2 ∧ ¬HasEmptyKGon 3 pts.toFinset :=
@@ -829,32 +826,26 @@ info: 'Geo.HoleChecker.hole_6_lower_bound' depends on axioms: [propext,
 theorem gon_6_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 16 ∧ ¬HasConvexKGon 6 pts.toFinset :=
   gon_lower_bound [
-    (1900, 19500), (9192, 24327), (11000, 47800), (11617, 28370),
-    (11702, 35174), (22864, 21402), (24537, 23468), (25091, 27350),
-    (25400, 2100), (25627, 9363), (27243, 14013), (40100, 47500),
-    (40512, 37842), (40752, 33640), (41349, 31973), (49000, 19600)
-  ]
+    (1, 7), (4, 9), (5, 19), (6, 11), (7, 14), (20, 8), (22, 9), (23, 10),
+    (24, 0), (25, 3), (26, 5), (34, 19), (35, 15), (36, 13), (37, 12), (43, 7)]
 
 theorem gon_5_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 8 ∧ ¬HasConvexKGon 5 pts.toFinset :=
-  gon_lower_bound [
-    (625, 532), (632, 199), (652, 486), (669, 247),
-    (958, 510), (978, 232), (989, 554), (1022, 177)
-  ]
+  gon_lower_bound [(1, 3), (2, 0), (3, 2), (4, 1), (6, 3), (7, 1), (8, 4), (9, 0)]
 
 theorem gon_4_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 4 ∧ ¬HasConvexKGon 4 pts.toFinset :=
-  gon_lower_bound [(1, 0), (3, 4), (4, 2), (5, 1)]
+  gon_lower_bound [(1, 0), (2, 4), (3, 2), (4, 1)]
 
 theorem gon_3_lower_bound : ∃ (pts : List Point),
     Point.ListInGenPos pts ∧ pts.length = 2 ∧ ¬HasConvexKGon 3 pts.toFinset :=
   gon_lower_bound [(1, 0), (2, 1)]
 
 /--
-info: 'Geo.HoleChecker.gon_5_lower_bound' depends on axioms: [propext,
+info: 'Geo.HoleChecker.gon_6_lower_bound' depends on axioms: [propext,
  Classical.choice,
  Quot.sound,
  mathlibSorry,
  Lean.ofReduceBool]
 -/
-#guard_msgs in #print axioms gon_5_lower_bound
+#guard_msgs in #print axioms gon_6_lower_bound
