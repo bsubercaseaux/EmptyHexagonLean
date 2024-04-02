@@ -146,16 +146,16 @@ theorem symmetry_breaking : ∃ w : CanonicalPoints, Nonempty (l ≼σ w.points)
   }, ⟨σ5⟩⟩
 
 -- WN: I put this here since it uses some σEmbed lemmas.
-theorem HasEmptyKGon_extension :
-    (∀ l : List Point, Point.ListInGenPos l → l.length = n → HasEmptyKGon k l.toFinset) →
-    3 ≤ n → n ≤ l.length → HasEmptyKGon k l.toFinset := by
-  intro H threen llength
+theorem HasEmptyKGon_extension' :
+    (∀ l : List Point, l.length = n → l.Nodup → Point.ListInGenPos l → HasEmptyKGon k l.toFinset) →
+    l.Nodup → n ≤ l.length → HasEmptyKGon k l.toFinset := by
+  intro H nodup llength
   rw [← σHasEmptyKGon_iff_HasEmptyKGon gp]
 
-  have ⟨l₁, σ₁, distinct⟩ := σEmbed_rotate l (gp.nodup <| threen.trans llength)
+  have ⟨l₁, σ₁, distinct⟩ := σEmbed_rotate l nodup
   replace gp := (OrientationProperty'.gp σ₁).mp gp
   replace llength := σ₁.length_eq ▸ llength
-  replace σ₁ := σ₁.toEquiv (gp.nodup <| threen.trans llength)
+  replace σ₁ := σ₁.toEquiv <| distinct.imp (mt (congrArg _))
   suffices σHasEmptyKGon k l₁.toFinset from
     OrientationProperty_σHasEmptyKGon σ₁.symm this
 
@@ -177,7 +177,8 @@ theorem HasEmptyKGon_extension :
   let right := l₂.drop n
   have leftl₂ : left <+ l₂ := List.take_sublist ..
   have leftlength := List.length_take_of_le llength
-  have := H left (gp.mono_sublist leftl₂) leftlength
+  have nd := (distinct.imp (mt (congrArg _))).sublist leftl₂
+  have := H left leftlength nd (gp.mono_sublist leftl₂)
 
   unfold HasEmptyKGon at this ⊢
   have ⟨s, scard, sleft, ⟨convex, empty⟩⟩ := this
@@ -204,11 +205,17 @@ theorem HasEmptyKGon_extension :
     apply List.pairwise_iff_get.mp l₂sorted
     simp; omega
 
+theorem HasEmptyKGon_extension
+    (H : ∀ l : List Point, l.length = n → l.Nodup → Point.ListInGenPos l → HasEmptyKGon k l.toFinset)
+    (threen : 3 ≤ n) (llength : n ≤ l.length) : HasEmptyKGon k l.toFinset :=
+  HasEmptyKGon_extension' gp H (gp.nodup <| threen.trans llength) llength
+
 theorem HasConvexKGon_extension :
-    (∀ l : List Point, Point.ListInGenPos l → l.length = n → HasConvexKGon k l.toFinset) →
-    n ≤ l.length → HasConvexKGon k l.toFinset := by
-  intro H llength
+    (∀ l : List Point, l.length = n → l.Nodup → Point.ListInGenPos l → HasConvexKGon k l.toFinset) →
+    l.Nodup → n ≤ l.length → HasConvexKGon k l.toFinset := by
+  intro H nd llength
   let left := l.take n
   have leftl : left <+ l := List.take_sublist ..
-  have ⟨s, scard, sleft, convex⟩ := H left (gp.mono_sublist leftl) (List.length_take_of_le llength)
+  have ⟨s, scard, sleft, convex⟩ := H left (List.length_take_of_le llength)
+    (nd.sublist leftl) (gp.mono_sublist leftl)
   use s, scard, sleft.trans leftl.toFinset_subset, convex

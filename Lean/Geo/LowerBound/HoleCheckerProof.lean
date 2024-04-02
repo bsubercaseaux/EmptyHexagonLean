@@ -1,5 +1,6 @@
 import Geo.Definitions.Structures
 import Geo.Definitions.OrientationProperties
+import Geo.Definitions.hNotation
 import Geo.LowerBound.HoleChecker
 import Geo.Canonicalization.Projective
 
@@ -750,6 +751,14 @@ theorem of_holeCheck {pts} (H : holeCheck r pts lo = some ()) :
         (fun _ j _ h => nomatch h.not_lt j.2) _ _ _ iss').ne ?_
       · simpa using hl2
 
+theorem of_holeCheck' {pts} (H : holeCheck r pts lo = some ()) :
+    (↑'pts).Nodup ∧ Point.ListInGenPos (↑'pts) ∧
+    ¬σHasEmptyKGonIf (r+3) MaybeHoles.holes (↑'pts).toFinset := by
+  let ⟨H1, H2, H3⟩ := of_holeCheck hwf H
+  have := pairwise_map.1 <| chain'_iff_pairwise.1 (List.chain'_cons'.1 H1).2
+  refine ⟨pairwise_map.2 <| this.imp fun h1 h2 => ?_, H2, by convert H3 using 2; ext; simp⟩
+  cases toPoint_inj h2; exact lt_irrefl _ h1
+
 end
 
 theorem MaybeHoles.yes_wf : MaybeHoles.yes.WF where
@@ -773,79 +782,17 @@ theorem MaybeHoles.no_wf : MaybeHoles.no.WF where
     · exact pairwise_reverse.2 <| (List.pairwise_lt_finRange _).sublist (take_sublist ..)
     · exact pairwise_reverse.2 <| (List.pairwise_lt_finRange _).sublist (drop_sublist ..)
 
-theorem hole_lower_bound {r : Nat} (points : List NPoint)
-    (checkIt : (holeCheck r points 0).isSome = true := by native_decide) :
-    ∃ (pts : List Point), Point.ListInGenPos pts ∧
-      pts.length = points.length ∧ ¬HasEmptyKGon (r+3) pts.toFinset :=
-  let ⟨(), eq⟩ := Option.isSome_iff_exists.1 checkIt
-  let ⟨_, H1, H2⟩ := of_holeCheck MaybeHoles.yes_wf eq
-  ⟨↑'points, H1, by simp,
-    mt (σHasEmptyKGon_iff_HasEmptyKGon H1).2 (by convert H2 using 2; ext; simp)⟩
-
 attribute [local instance] MaybeHoles.no in
 theorem gon_lower_bound {r : Nat} (points : List NPoint)
     (checkIt : (holeCheck r points 0).isSome = true := by native_decide) :
-    ∃ (pts : List Point), Point.ListInGenPos pts ∧
-      pts.length = points.length ∧ ¬HasConvexKGon (r+3) pts.toFinset :=
+    points.length + 1 ≤ gonNumber (r+3) := by
   let ⟨(), eq⟩ := Option.isSome_iff_exists.1 checkIt
-  let ⟨_, H1, H2⟩ := of_holeCheck MaybeHoles.no_wf eq
-  ⟨↑'points, H1, by simp,
-    mt (σHasConvexKGon_iff_HasConvexKGon H1).2 (by convert H2 using 2; ext; simp)⟩
+  let ⟨H1, H2, H3⟩ := of_holeCheck' MaybeHoles.no_wf eq
+  simpa using gonNumber_lower_bound (↑'points) H1 H2 (mt (σHasConvexKGon_iff_HasConvexKGon H2).2 H3)
 
-theorem hole_6_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 29 ∧ ¬HasEmptyKGon 6 pts.toFinset :=
-  hole_lower_bound [
-    (1, 1260), (16, 743), (22, 531), (37, 0), (306, 592), (310, 531), (366, 552),
-    (371, 487), (374, 525), (392, 575), (396, 613), (410, 539), (416, 550), (426, 526),
-    (434, 552), (436, 535), (446, 565), (449, 518), (450, 498), (453, 542), (458, 526),
-    (489, 537), (492, 502), (496, 579), (516, 467), (552, 502), (754, 697), (777, 194),
-    (1259, 320),
-  ]
-
-theorem hole_5_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 9 ∧ ¬HasEmptyKGon 5 pts.toFinset :=
-  hole_lower_bound [(1, 9), (9, 7), (14, 3), (15, 4), (16, 6), (17, 0), (18, 1), (21, 3), (28, 7)]
-
-theorem hole_4_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 4 ∧ ¬HasEmptyKGon 4 pts.toFinset :=
-  hole_lower_bound [(1, 0), (2, 4), (3, 2), (4, 1)]
-
-theorem hole_3_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 2 ∧ ¬HasEmptyKGon 3 pts.toFinset :=
-  hole_lower_bound [(1, 0), (2, 1)]
-
-/--
-info: 'Geo.HoleChecker.hole_6_lower_bound' depends on axioms: [propext,
- Classical.choice,
- Quot.sound,
- mathlibSorry,
- Lean.ofReduceBool]
--/
-#guard_msgs in #print axioms hole_6_lower_bound
-
-theorem gon_6_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 16 ∧ ¬HasConvexKGon 6 pts.toFinset :=
-  gon_lower_bound [
-    (1, 7), (4, 9), (5, 19), (6, 11), (7, 14), (20, 8), (22, 9), (23, 10),
-    (24, 0), (25, 3), (26, 5), (34, 19), (35, 15), (36, 13), (37, 12), (43, 7)]
-
-theorem gon_5_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 8 ∧ ¬HasConvexKGon 5 pts.toFinset :=
-  gon_lower_bound [(1, 3), (2, 0), (3, 2), (4, 1), (6, 3), (7, 1), (8, 4), (9, 0)]
-
-theorem gon_4_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 4 ∧ ¬HasConvexKGon 4 pts.toFinset :=
-  gon_lower_bound [(1, 0), (2, 4), (3, 2), (4, 1)]
-
-theorem gon_3_lower_bound : ∃ (pts : List Point),
-    Point.ListInGenPos pts ∧ pts.length = 2 ∧ ¬HasConvexKGon 3 pts.toFinset :=
-  gon_lower_bound [(1, 0), (2, 1)]
-
-/--
-info: 'Geo.HoleChecker.gon_6_lower_bound' depends on axioms: [propext,
- Classical.choice,
- Quot.sound,
- mathlibSorry,
- Lean.ofReduceBool]
--/
-#guard_msgs in #print axioms gon_6_lower_bound
+theorem hole_lower_bound {r : Nat} (points : List NPoint)
+    (checkIt : (holeCheck r points 0).isSome = true := by native_decide) :
+    points.length + 1 ≤ holeNumber (r+3) := by
+  let ⟨(), eq⟩ := Option.isSome_iff_exists.1 checkIt
+  let ⟨H1, H2, H3⟩ := of_holeCheck' MaybeHoles.yes_wf eq
+  simpa using holeNumber_lower_bound (↑'points) H1 H2 (mt (σHasEmptyKGon_iff_HasEmptyKGon H2).2 H3)

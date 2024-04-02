@@ -1,4 +1,5 @@
 import Geo.Canonicalization.SymmetryBreaking
+import Geo.Definitions.hNotation
 import Geo.Hexagon.Assn
 import Geo.Hexagon.Encoding
 
@@ -23,13 +24,9 @@ open Classical LeanSAT Model
 --     rw [rlen_eq] at this
 --     rwa [hexagonCNF]
 
-/-- This asserts that the CNF produced by `lake exe encode hole 6 30` is UNSAT -/
-axiom unsat_6hole_cnf : (Geo.hexagonCNF (rlen := 30-1) (holes := true)).isUnsat
-
-theorem hole_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
-    (h : pts.length ≥ 30) : HasEmptyKGon 6 pts.toFinset := by
-  refine HasEmptyKGon_extension gp (fun pts gp h => ?_) (by decide) h
-  by_contra h'
+variable (unsat_6hole_cnf : (Geo.hexagonCNF (rlen := 30-1) (holes := true)).isUnsat) in
+theorem hole_6_theorem : holeNumber 6 ≤ 30 := by
+  refine holeNumber_le.2 fun pts h _ gp => by_contra fun h' => ?_
   have noσtri : ¬σHasEmptyKGon 6 pts.toFinset := mt (σHasEmptyKGon_iff_HasEmptyKGon gp).1 h'
   have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ by decide) gp
   have noσtri' : ¬σHasEmptyKGonIf 6 (holes := true) w.toFinset :=
@@ -40,15 +37,3 @@ theorem hole_6_theorem (pts : List Point) (gp : Point.ListInGenPos pts)
     have := (PropForm.toICnf_sat _).2 ⟨w.toPropAssn, w.satisfies_hexagonEncoding noσtri'⟩
     rw [rlen29] at this
     rwa [hexagonCNF]
-
--- /--
--- info: 'Geo.gon_6_theorem' depends on axioms:
--- [propext, Classical.choice, Quot.sound, Geo.unsat_6gon_cnf, mathlibSorry]
--- -/
--- #guard_msgs in #print axioms gon_6_theorem
-
-/--
-info: 'Geo.hole_6_theorem' depends on axioms:
-[propext, Classical.choice, Quot.sound, Geo.unsat_6hole_cnf, mathlibSorry]
--/
-#guard_msgs in #print axioms hole_6_theorem

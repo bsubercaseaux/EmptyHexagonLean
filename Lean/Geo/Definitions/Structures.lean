@@ -22,7 +22,7 @@ theorem emptyShapeIn_congr_right {S : Set Point} (h : ∀ p ∉ S, p ∈ P₁ �
   forall_congr' fun _ => imp_congr_left <| and_congr_left (h _)
 
 /-- `ConvexPoints S` means that `S` consists of extremal points of its convex hull,
-i.e. the point set encloses a convex polygon. -/
+i.e. the point set encloses a convex polygon. Also known as a "convex-independent set". -/
 def ConvexPoints (S : Set Point) : Prop :=
   ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
