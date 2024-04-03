@@ -54,12 +54,67 @@
   urlcolor = blue
 }
 
-\newcommand{\orvar}{\mathsf{o}}
-\newcommand{\uvar}{\mathsf{u}^4}
-\newcommand{\ufvar}{\mathsf{u}^5}
-\newcommand{\vvar}{\mathsf{v}^4}
-\newcommand{\hvar}{\mathsf{h}}
-\newcommand{\cvar}{\mathsf{c}}
+\newcommand{\myCustomUSymbol}{%
+\tikz[baseline=-0.75ex]{
+  \draw[thick, -] (0,-0.75ex) -- (0.5ex, 0.5ex) -- (1.4ex, 0.5ex) -- (1.9ex, -0.75ex) -- cycle; 
+}}
+
+\newsavebox{\myUSymbolBox}
+\savebox{\myUSymbolBox}{\myCustomUSymbol}
+
+\newcommand{\mathMyUSymbol}{\ensuremath{\usebox{\myUSymbolBox}}}
+
+\newcommand{\myCustomVSymbol}{%
+\tikz[baseline=-0.75ex]{
+  \draw[thick, -] (0,0.5ex) -- (0.5ex, -0.75ex) -- (1.4ex, -0.75ex) -- (1.9ex, 0.5ex) -- cycle; 
+}}
+
+\newsavebox{\myVSymbolBox}
+\savebox{\myVSymbolBox}{\myCustomVSymbol}
+
+\newcommand{\mathMyVSymbol}{\ensuremath{\usebox{\myVSymbolBox}}}
+
+
+\newcommand{\myCustomHSymbol}{%
+\tikz[baseline=-0.75ex]{
+  \draw[thick, -] (0,-0.75ex) -- (0.7ex, 0.6ex) -- (1.4ex, -0.75ex) -- cycle; 
+}}
+
+\newsavebox{\myHSymbolBox}
+\savebox{\myHSymbolBox}{\myCustomHSymbol}
+
+\newcommand{\mathMyHSymbol}{\ensuremath{\usebox{\myHSymbolBox}}}
+
+
+\newcommand{\myCustomCSymbol}{%
+\tikz[baseline=-0.75ex]{
+  \draw[thick, -] (0,-0.75ex) -- (0.7ex, 0.6ex) -- (1.4ex, -0.75ex) -- cycle; 
+  \node[circle, fill=black, inner sep=0pt, minimum size=0.3ex] at (0.7ex, -0.3ex) {}; 
+}}
+
+\newsavebox{\myCSymbolBox}
+\savebox{\myCSymbolBox}{\myCustomCSymbol}
+
+\newcommand{\mathMyCSymbol}{\ensuremath{\usebox{\myCSymbolBox}}}
+
+
+\newcommand{\myCustomUFSymbol}{%
+\tikz[baseline=-0.75ex]{
+  \draw[thick, -] (0,-0.75ex) -- (0.2ex, -0.1ex) -- (0.9ex,0.5ex) -- (1.7ex, -0.1ex) -- (1.9ex, -0.75ex) -- cycle; 
+
+}}
+
+\newsavebox{\myUFSymbolBox}
+\savebox{\myUFSymbolBox}{\myCustomUFSymbol}
+
+\newcommand{\mathMyUFSymbol}{\ensuremath{\usebox{\myUFSymbolBox}}}
+
+\newcommand{\orvar}{\circlearrowleft}
+\newcommand{\uvar}{\mathMyUSymbol}
+\newcommand{\ufvar}{\mathMyUFSymbol}
+\newcommand{\vvar}{\mathMyVSymbol}
+\newcommand{\hvar}{\mathMyHSymbol}
+\newcommand{\cvar}{\mathMyCSymbol}
 \newcommand{\ov}[1]{\overline{#1}}
 
 \usepackage{color}
