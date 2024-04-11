@@ -16,10 +16,10 @@ instance : ToArray [:n] Nat where
 instance : LawfulToArray [:n] Nat (· < n) where
   base := Array.range n
   toArray_eq {_ _} := by
-    apply Array.ext'; simp [ToArray.toArray, Array.range, Array.map_data, flip]
+    apply Array.ext'; simp [ToArray.toArray, Array.range, Array.map_data, Function.flip_def]
     induction n <;> simp [Nat.fold, *]
   mem_base {i} := by
-    simp [Array.range, flip, Array.mem_def]
+    simp [Array.range, Function.flip_def, Array.mem_def]
     induction n <;> simp [Nat.fold, *, Nat.lt_succ_iff_lt_or_eq]
 
 instance : ToArray (Fin n) (Fin n) where

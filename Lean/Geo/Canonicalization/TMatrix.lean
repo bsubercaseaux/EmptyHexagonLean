@@ -20,8 +20,8 @@ def ptTransform (M : Matrix (Fin 3) (Fin 3) Real) (p : Point) : Point :=
 theorem ptTransform_eq (M : Matrix (Fin 3) (Fin 3) Real) (p : Point) :
     ptTransform M p = ![M 0 0 * p.x + M 0 1 * p.y + M 0 2, M 1 0 * p.x + M 1 1 * p.y + M 1 2] := by
   simp [ptTransform, ptToVec, vecToPt, Matrix.mul_apply, Finset.univ, Fintype.elems, List.finRange, add_assoc]
-  rfl
-lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real)  (last1 : v 2 0 = 1 ): ptToVec (vecToPt v) = v := by
+
+lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real) (last1 : v 2 0 = 1) : ptToVec (vecToPt v) = v := by
   simp [ptToVec, vecToPt]
   apply Matrix.ext ; intro i j
   fin_cases i
@@ -30,7 +30,6 @@ lemma pt_to_vec_inv_vec_to_pt (v : Matrix (Fin 3) (Fin 1) Real)  (last1 : v 2 0 
   simp ; fin_cases j ; simp
   exact Eq.symm last1
 
-
 lemma ptTransform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
   (third_row: M₂ ⟨2, by trivial⟩ = ![0, 0, 1]) :
   ptTransform (M₁ * M₂) p = ptTransform M₁ (ptTransform M₂ p) := by
@@ -38,7 +37,7 @@ lemma ptTransform_by_prod (p : Point) (M₁ M₂ : Matrix (Fin 3) (Fin 3) Real)
   simp [Matrix.mul_assoc]
   let v := M₂ * ptToVec p
   have t : v 2 0 = 1 := by
-    dsimp
+    dsimp [v]
     unfold ptToVec
     rw [Matrix.mul_apply]
     rw [Fin.sum_univ_three]
@@ -73,6 +72,8 @@ noncomputable def toAffineMap (T : TMatrix M) : Point →ᵃ[ℝ] Point where
     show _ = Matrix.mulVec !![M 0 0, M 0 1 ; M 1 0 , M 1 1] p2 + _
     simp [Matrix.mulVec, Matrix.vecHead, Matrix.vecTail, mul_add]
     ring_nf
+
+attribute [-simp] Fin.reduceFinMk
 
 theorem Point.toMatrix_ptTransform (p q r : Point) {M : Matrix (Fin 3) (Fin 3) Real} (T : TMatrix M) :
     Point.toMatrix (ptTransform M p) (ptTransform M q) (ptTransform M r) = M * Point.toMatrix p q r := by

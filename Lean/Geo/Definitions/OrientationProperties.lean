@@ -158,7 +158,7 @@ theorem σIsEmptyTriangleFor_exists (gp : Point.ListInGenPos S)
   have nd := gp.nodup abc.length_le
   have gp' := Point.ListInGenPos.subperm.1 gp
   have ss := abc.subset; simp at ss
-  let _ : Preorder Point := {
+  let preord : Preorder Point := {
     le := fun x y => PtInTriangle x a y c
     le_refl := fun z => subset_convexHull _ _ <| by simp
     le_trans := fun u v w uv vw => by
@@ -167,9 +167,8 @@ theorem σIsEmptyTriangleFor_exists (gp : Point.ListInGenPos S)
       simp [Set.subset_def, *]; constructor <;> apply subset_convexHull <;> simp
   }
   have ⟨b', hb1, hb2⟩ := Finset.exists_minimal
-    (S.toFinset.filter fun x => σ a x c = σ a b c ∧ x ≤ b)
-    ⟨b, by simp [ss]; apply subset_convexHull; simp⟩
-  simp at hb1 hb2
+    (S.toFinset.filter fun x => σ a x c = σ a b c ∧ x ≤ b) ⟨b, by simp [ss]⟩
+  simp [preord] at hb1 hb2
   have abc' : Point.InGenPos₃ a b' c := by
     rw [Point.InGenPos₃.iff_ne_collinear, hb1.2.1,
       ← Point.InGenPos₃.iff_ne_collinear]; exact gp' abc

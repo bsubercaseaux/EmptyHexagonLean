@@ -242,7 +242,8 @@ theorem split_convexHull (cvx : ConvexPoints S) :
     (by rw [this, mem_convexJoin]; exact ⟨_, hu, _, hv, hz1⟩)
     (by simpa [Point.InGenPos₃] using hz2)
   if hp' : Point.InGenPos₃ a b p then ?_ else
-    right; exact convexHull_mono (by simp [Set.subset_def, ha, hb, σ_self₁, σ_self₂]) (hcvx hn hp')
+    right; refine convexHull_mono ?_ (hcvx hn hp')
+    simp [S2, Set.subset_def, ha, hb, σ_self₁, σ_self₂]
   have : p ∈ segment ℝ v z := by
     simp [mem_segment_iff_wbtw] at hp2 hz1 ⊢
     refine (hp2.trans_left_right <| (hz1.wbtw_or_wbtw hp2).resolve_right fun h => ?_).symm
@@ -251,7 +252,7 @@ theorem split_convexHull (cvx : ConvexPoints S) :
     simp [σ_eq_cw] at hp this
     exact hp' <| this.antisymm hp
   right; refine (convex_convexHull ..).segment_subset hv ?_ this
-  simp at zab; refine segment_subset_convexHull ?_ ?_ zab <;> simp [ha, hb, σ_self₁, σ_self₂]
+  simp at zab; refine segment_subset_convexHull ?_ ?_ zab <;> simp [S2, ha, hb, σ_self₁, σ_self₂]
 
 theorem EmptyShapeIn.split (cvx : ConvexPoints S) (ha : a ∈ S) (hb : b ∈ S)
     (H1 : EmptyShapeIn {x ∈ S | σ a b x ≠ .ccw} P)

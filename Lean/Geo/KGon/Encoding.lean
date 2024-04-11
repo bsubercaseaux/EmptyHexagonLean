@@ -96,7 +96,7 @@ def revLexClausesCore (F : Fin n → PropForm α) (a b : Fin n) (acc : PropForm 
 def revLexClauses (n : Nat) : PropForm (Var n) :=
   .impP (4 ≤ n) fun _ =>
   revLexClausesCore (n := n-2) ⟨0, by omega⟩ ⟨n - 3, by omega⟩ .true
-    (F := fun ⟨a, _⟩ => Var.sigma ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
+    (F := fun ⟨a, _⟩ => Var.sigma (n := n) ⟨a, by omega⟩ ⟨a+1, by omega⟩ ⟨a+2, by omega⟩)
 
 def baseEncoding (n : Nat) (holes : Bool) : PropForm (Var n) :=
   .all #[signotopeClauses1 n, revLexClauses n,

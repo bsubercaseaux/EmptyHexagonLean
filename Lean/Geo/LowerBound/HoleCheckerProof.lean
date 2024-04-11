@@ -309,7 +309,7 @@ theorem Queues.Ordered.not_visible
     let ⟨hσ1, hσ2⟩ := forall_mem_cons.1 hσ
     refine ih2 ij hσ2 (Nat.lt_of_le_of_ne (ih1 (v.1.trans ij) ?_ loa) fun ab => ?_)
     · exact fun d hd => wf.σ_prop₃' (h2.mem_bdd hd).2 v.1 ij (h1 _ hd) hσ1
-    · cases Fin.eq_of_veq ab; exact hσ1 <| wf.of_visible hole v.1 ij vis
+    · cases Fin.eq_of_val_eq ab; exact hσ1 <| wf.of_visible hole v.1 ij vis
 
 def MaybeHoles.graph.WF (g : MaybeHoles.graph n) (P : Fin n → Fin n → Prop) : Prop :=
   ∀ i in_ out, MaybeHoles.edges g i = (in_, out) →
@@ -329,10 +329,10 @@ theorem VisibilityGraph.WF.add (vis : Visible p pts i j)
   intro k in_ out eq
   simp [VisibilityGraph.add, MaybeHoles.edges] at eq
   have := H k (g.edges[k.1]'(g.sz.symm ▸ k.2)).1 (g.edges[k.1]'(g.sz.symm ▸ k.2)).2 rfl
-  iterate 2 rw [Array.get_modify (hj := by simp [g.sz, *])] at eq
+  iterate 2 rw [Array.getElem_modify (hj := by simp [g.sz, *])] at eq
   split at eq <;> split at eq <;> rename_i jk ik
   · cases Nat.ne_of_gt vis.1 (jk.trans ik.symm)
-  · cases Fin.eq_of_veq jk
+  · cases Fin.eq_of_val_eq jk
     cases eq; simp [this]; refine ⟨fun i' => ?_, fun j' => ?_, fun i' v => ?_⟩
     · by_cases hi : i' = i <;> simp [hi]
       · refine ⟨vis, .inr ⟨rfl, Nat.lt_succ_self _⟩⟩
@@ -341,13 +341,13 @@ theorem VisibilityGraph.WF.add (vis : Visible p pts i j)
     · refine and_congr_right fun _ => or_congr_right <| and_congr_right fun _ => ?_
       exact (Nat.lt_succ_iff_lt_or_eq.trans <| or_iff_left (Ne.symm ik)).symm
     · exact (v.2.resolve_left (lt_irrefl _)).2
-  · cases Fin.eq_of_veq ik
+  · cases Fin.eq_of_val_eq ik
     cases eq; simp [this]; refine ⟨fun i' => ?_, fun j' => ?_, fun i' v => ?_⟩
     · exact and_congr_right fun _ => or_congr_right <| and_congr_right (Ne.symm jk · |>.elim)
     · by_cases hj : j' = j <;> simp [hj]
       · refine ⟨vis, .inr ⟨rfl, Nat.lt_succ_self _⟩⟩
       · exact and_congr_right fun _ => or_congr_right <|
-          and_congr_right (hj.elim <| Fin.eq_of_veq ·)
+          and_congr_right (hj.elim <| Fin.eq_of_val_eq ·)
     · have := v.2
       exact v.2.resolve_right (lt_irrefl _ ·.2)
   · simp [eq] at this; simp [this]; refine ⟨fun i' => ?_, fun j' => ?_⟩
@@ -380,7 +380,7 @@ theorem of_proceed_loop
       (∀ (k : Fin n) (h : k < j), ¬(lo ≤ k ∧ k < a) → Q₁.q[k.1]'(Q₁.sz ▸ h) = Q.q[k.1]'(Q.sz ▸ h)) ∧
       Queues.OrderedTail p pts a j (fun k h => Q₁.q[k.1]'(Q₁.sz ▸ h)) Q_j₁.1 := by
   cases ord with
-  | nil _ => subst lo; refine ⟨_, _, _, _, eq, g_wf, fun., le_rfl, .nil rfl, fun _ _ _ => rfl, Hj⟩
+  | nil _ => subst lo; refine ⟨_, _, _, _, eq, g_wf, nofun, le_rfl, .nil rfl, fun _ _ _ => rfl, Hj⟩
   | @cons _ _ _ l a ai hσ hQi hl =>
     let ⟨_, hl'⟩ := ha
     simp (config := {iota := false}) [proceed.loop] at eq
@@ -403,7 +403,7 @@ theorem of_proceed_loop
       convert g_wf using 1; ext i' j'
       refine and_congr_right fun ij' => or_congr_right <| and_congr_right fun jj =>
         ⟨fun ii => not_le.1 fun loi => ?_, (·.trans_le <| hQi.le.trans (Nat.le_of_lt hl.le))⟩
-      cases Fin.eq_of_veq jj
+      cases Fin.eq_of_val_eq jj
       exact (hQ'.not_visible hole wf ij.1 hσ' loi ij').not_lt ii
 
 theorem of_proceed {i j : Fin n} (ij : Visible p pts i j) :
@@ -421,7 +421,7 @@ theorem of_proceed {i j : Fin n} (ij : Visible p pts i j) :
     · intro k hk hn
       rw [this hk, if_neg (mt (fun ik => ?_) hn),
         hQQ _ hk (mt (.imp_right (·.le.trans hQi₁.le)) hn)]
-      cases Fin.eq_of_veq ik; exact ⟨ord.le, le_rfl⟩
+      cases Fin.eq_of_val_eq ik; exact ⟨ord.le, le_rfl⟩
     · refine .cons ij ?_ (this ij.1 ▸ if_pos rfl ▸ hQi₁.congr ?_) (hQj₁.congr ?_)
       · rwa [this ij.1, if_pos rfl]
       · intro x xj xa; rw [this xj, if_neg (xa.trans_le hQi₁.le).ne']
@@ -479,7 +479,7 @@ theorem of_maxChainCoreOrdered_inner
   match out with
   | [] =>
     simp [maxChainCoreOrdered.loop.inner] at H
-    exact ⟨_, _, H, le_rfl, outss, by simp, fun hp o is h => (hout hp o is h).resolve_left (fun.)⟩
+    exact ⟨_, _, H, le_rfl, outss, by simp, fun hp o is h => (hout hp o is h).resolve_left nofun⟩
   | o::out =>
     have hout1' := pairwise_cons.1 (hout1.sublist outss)
     simp [maxChainCoreOrdered.loop.inner] at H; split at H <;> rename_i hccw <;> rw [ccw_iff] at hccw
@@ -516,7 +516,7 @@ theorem of_maxChainCoreUnordered_inner
   match out with
   | [] =>
     simp [maxChainCoreUnordered.inner] at H
-    exact ⟨_, H, fun o is h => (hout o is h).resolve_left (fun.)⟩
+    exact ⟨_, H, fun o is h => (hout o is h).resolve_left nofun⟩
   | o::out =>
     simp [maxChainCoreUnordered.inner] at H
     refine of_maxChainCoreUnordered_inner H (sublist_of_cons_sublist outss) hout1 hout2
@@ -544,7 +544,7 @@ theorem of_maxChainCoreOrdered_loop
   match in_ with
   | [] =>
     simp [maxChainCoreOrdered.loop] at H; obtain ⟨H, rfl⟩ := H
-    exact ⟨H, fun i j v qj => hlmap H i j v <| qj.lt_or_eq.imp_right (⟨·, fun.⟩)⟩
+    exact ⟨H, fun i j v qj => hlmap H i j v <| qj.lt_or_eq.imp_right (⟨·, nofun⟩)⟩
   | i::in_ =>
     have hin1' := pairwise_cons.1 hin1
     have hin2' := forall_mem_cons.1 hin2
@@ -590,7 +590,7 @@ theorem of_maxChainCoreUnordered
   match in_ with
   | [] =>
     simp [maxChainCoreUnordered] at H; obtain ⟨H, rfl⟩ := H
-    exact fun i j v qj => hlmap i j v <| qj.lt_or_eq.imp_right (⟨·, fun.⟩)
+    exact fun i j v qj => hlmap i j v <| qj.lt_or_eq.imp_right (⟨·, nofun⟩)
   | i::in_ =>
     have hin1' := pairwise_cons.1 hin1
     have hin2' := forall_mem_cons.1 hin2
@@ -767,7 +767,7 @@ theorem MaybeHoles.yes_wf : MaybeHoles.yes.WF where
 attribute [local instance] MaybeHoles.no in
 theorem MaybeHoles.no_wf : MaybeHoles.no.WF where
   mkGraph_wf {p n pts} _ k in_ out eq := by
-    simp [edges, mkGraph] at eq; simp [← eq]
+    simp [edges, mkGraph, tail_drop] at eq; simp [← eq]
     refine ⟨fun j' => ?_, fun j' => ?_,  ?_, ?_⟩
     · simp [mem_iff_get?, Visible]
       refine ⟨fun ⟨a, ha⟩ => ?_, fun h => ⟨j', ?_⟩⟩
@@ -778,7 +778,7 @@ theorem MaybeHoles.no_wf : MaybeHoles.no.WF where
     · simp [mem_iff_get?, get?_drop, get?_eq_some, Visible]
       refine ⟨fun ⟨a, _, h⟩ => h ▸ Nat.le_add_right .., fun h : k.1 + 1 ≤ j' => ?_⟩
       have := Nat.add_sub_cancel' h
-      exact ⟨j'-(k+1), this.symm ▸ j'.2, Fin.eq_of_veq this⟩
+      exact ⟨j'-(k+1), this.symm ▸ j'.2, Fin.eq_of_val_eq this⟩
     · exact pairwise_reverse.2 <| (List.pairwise_lt_finRange _).sublist (take_sublist ..)
     · exact pairwise_reverse.2 <| (List.pairwise_lt_finRange _).sublist (drop_sublist ..)
 

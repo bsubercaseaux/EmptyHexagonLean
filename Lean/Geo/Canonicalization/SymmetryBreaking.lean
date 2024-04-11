@@ -58,7 +58,7 @@ theorem symmetry_breaking : ∃ w : CanonicalPoints, Nonempty (l ≼σ w.points)
     let l1' := l1.erase a
     have p1 : l1 ~ a :: l1' := List.perm_cons_erase (List.argmin_mem e)
     let f := (· - a)
-    have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp), σ_eq := ?σ_eq }
+    have σ2 : l1 ≼σ 0 :: l1'.map f := { f, perm := (p1.map _).trans (by simp [f]), σ_eq := ?σ_eq }
     case σ_eq =>
       have eq (p) : ptTransform (translationMatrix (-a.x) (-a.y)) p = p - a := by
         ext <;> simp [translation_translates] <;> rfl
@@ -66,7 +66,7 @@ theorem symmetry_breaking : ∃ w : CanonicalPoints, Nonempty (l ≼σ w.points)
       simpa [eq] using (translationTransform (-a.x) (-a.y)).ptTransform_preserves_sigma p q r
     have ⟨ha, _hl1'⟩ := List.pairwise_cons.1 (hl1.perm p1 Ne.symm)
     refine ⟨_, σ1.trans σ2, ?_ /- , hl1'.map _ fun _ _ => mt sub_left_inj.1 -/⟩
-    simp; intro a h'
+    simp [f]; intro a h'
     exact lt_of_le_of_ne (List.le_of_mem_argmin (List.mem_of_mem_erase h') e) (ha _ h')
   clear l1 σ1 hl1
 

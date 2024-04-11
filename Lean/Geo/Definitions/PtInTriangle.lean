@@ -52,7 +52,7 @@ lemma xBounded_of_PtInTriangle' {x a b c : Point} :
   have abcS : {a, b, c} ⊆ S := by
     intro x hx
     simp only [Set.mem_insert_iff, Set.mem_singleton_iff] at hx
-    simp only [Set.mem_inter_iff, Set.mem_setOf_eq]
+    simp only [S, Set.mem_inter_iff, Set.mem_setOf_eq]
     rcases hx with rfl | rfl | rfl
     . exact ⟨le_rfl, le_of_lt <| sorted.h₁.trans sorted.h₂⟩
     . exact ⟨le_of_lt sorted.h₁, le_of_lt sorted.h₂⟩
@@ -125,7 +125,7 @@ theorem PtInTriangle_of_σPtInTriangle {a p q r : Point}
   simp [Fin.forall_fin_succ, le_of_lt, div_pos, H, symm, Finset.sum_fin_eq_sum_range,
     Finset.sum_range_succ, ← add_div] at this
   convert ← this ?_ using 1
-  · rw [← smul_right_inj (ne_of_gt symm)]; simp [smul_smul, mul_div_cancel' _ (ne_of_gt symm)]
+  · rw [← smul_right_inj (ne_of_gt symm)]; simp [smul_smul, mul_div_cancel₀ _ (ne_of_gt symm)]
     ext <;> simp [det_eq, x, y] <;> ring
   · rw [det_add_det, det_perm₁ a, add_neg_cancel_right, div_self (ne_of_gt symm)]
 

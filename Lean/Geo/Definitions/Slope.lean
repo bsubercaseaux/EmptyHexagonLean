@@ -24,9 +24,9 @@ theorem slope_lt_iff_lt {a b c : Point} (hS : Sorted₃ a b c) :
   have decompose_dy_ac : dy_ac = dy_bc + dy_ab := by ring_nf
   have decompose_dx_ac : dx_ac = dx_bc + dx_ab := by ring_nf
 
-  have dx_ab_pos : 0 < dx_ab := by simp; linarith
-  have dx_bc_pos : 0 < dx_bc := by simp; linarith
-  have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by simp; linarith
+  have dx_ab_pos : 0 < dx_ab := by simp [dx_ab]; linarith
+  have dx_bc_pos : 0 < dx_bc := by simp [dx_bc]; linarith
+  have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by linarith
 
   calc
     _ ↔ dy_ab / dx_ab < (dy_bc + dy_ab) / (dx_bc + dx_ab) := by rw [decompose_dy_ac, decompose_dx_ac]
@@ -53,9 +53,9 @@ theorem slope_lt_iff_lt' {a b c : Point} (hS : Sorted₃ a b c) :
     have decompose_dy_ac : dy_ac = dy_bc + dy_ab := by ring_nf
     have decompose_dx_ac : dx_ac = dx_bc + dx_ab := by ring_nf
 
-    have dx_ab_pos : 0 < dx_ab := by simp; linarith
-    have dx_bc_pos : 0 < dx_bc := by simp; linarith
-    have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by simp; linarith
+    have dx_ab_pos : 0 < dx_ab := by simp [dx_ab]; linarith
+    have dx_bc_pos : 0 < dx_bc := by simp [dx_bc]; linarith
+    have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by linarith
     calc
       _ ↔ (dy_bc + dy_ab) / (dx_bc + dx_ab) < dy_bc / dx_bc := by rw [decompose_dy_ac, decompose_dx_ac]
       _ ↔ (dy_bc + dy_ab) * dx_bc < dy_bc * (dx_bc + dx_ab) := by rw [div_lt_div_iff  dx_ab_dx_bc_pos dx_bc_pos]
@@ -78,9 +78,9 @@ theorem slope_lt_iff_lt' {a b c : Point} (hS : Sorted₃ a b c) :
       have decompose_dy_ac : dy_ac = dy_bc + dy_ab := by ring_nf
       have decompose_dx_ac : dx_ac = dx_bc + dx_ab := by ring_nf
 
-      have dx_ab_pos : 0 < dx_ab := by simp; linarith
-      have dx_bc_pos : 0 < dx_bc := by simp; linarith
-      have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by simp; linarith
+      have dx_ab_pos : 0 < dx_ab := by simp [dx_ab]; linarith
+      have dx_bc_pos : 0 < dx_bc := by simp [dx_bc]; linarith
+      have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by linarith
 
       calc
         _ ↔ dy_ab / dx_ab > (dy_bc + dy_ab) / (dx_bc + dx_ab) := by rw [decompose_dy_ac, decompose_dx_ac]
@@ -103,9 +103,9 @@ theorem slope_lt_iff_lt' {a b c : Point} (hS : Sorted₃ a b c) :
     have decompose_dy_ac : dy_ac = dy_bc + dy_ab := by ring_nf
     have decompose_dx_ac : dx_ac = dx_bc + dx_ab := by ring_nf
 
-    have dx_ab_pos : 0 < dx_ab := by simp; linarith
-    have dx_bc_pos : 0 < dx_bc := by simp; linarith
-    have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by simp; linarith
+    have dx_ab_pos : 0 < dx_ab := by simp [dx_ab]; linarith
+    have dx_bc_pos : 0 < dx_bc := by simp [dx_bc]; linarith
+    have dx_ab_dx_bc_pos : 0 < dx_bc + dx_ab := by linarith
     calc
       _ ↔ (dy_bc + dy_ab) / (dx_bc + dx_ab) > dy_bc / dx_bc := by rw [decompose_dy_ac, decompose_dx_ac]
       _ ↔ (dy_bc + dy_ab) * dx_bc > dy_bc * (dx_bc + dx_ab) := by rw [div_gt_div_iff  dx_ab_dx_bc_pos dx_bc_pos]

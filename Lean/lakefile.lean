@@ -10,7 +10,7 @@ package «geo» where
   -- add any additional package configuration options here
 
 require «lean-sat» from git
-  "https://github.com/JamesGallicchio/LeanSAT.git" @ "main"
+  "https://github.com/digama0/LeanSAT.git" @ "v4.7.0"
 
 @[default_target]
 lean_lib «Geo» where

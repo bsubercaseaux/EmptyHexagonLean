@@ -158,12 +158,13 @@ theorem satisfies_revLexClausesCore {F : Fin n → _} {F' : Fin m → _}
     simp [hF _ _ ha, hF _ _ hb]
     exact .imp_right <| .imp_right hacc
   · exact hacc
+termination_by b
 
 theorem satisfies_revLexClauses (w : CanonicalPoints) :
     (revLexClauses w.rlen).eval (w.toPropAssn holes) := by
   simp [revLexClauses, length, points]
   intro h4w
-  have := w.lex (by omega)
+  have := w.lex (by rw [rlen] at h4w; omega)
   simp [σRevLex, RevLexMid3] at this
   refine satisfies_revLexClausesCore ?_ rfl rfl (by simp) this
   rintro ⟨a, ha⟩ ⟨_, ha'⟩ ⟨⟩; simp [getElem, points]

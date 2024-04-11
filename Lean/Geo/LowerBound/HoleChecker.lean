@@ -1,4 +1,3 @@
-import Std.Tactic.GuardExpr
 import Std.Data.Rat
 import Mathlib.Data.List.Sort
 import Mathlib.Data.List.Range

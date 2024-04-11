@@ -95,11 +95,9 @@ theorem distinct_rotate_finset (A : Set Point) (h : Set.Countable A) :
     rw [Set.InjOn]
     intro P hP Q hQ rotEq
     dsimp at rotEq
-    by_cases hEq : P = Q
-    . assumption
-    . exfalso
-      apply hArctan P hP Q hQ
-      rw [rotationMap_angle_unique P Q hEq θ hInt rotEq]
+    by_contra hEq
+    refine hArctan ⟨P, hP, Q, hQ, ?_⟩
+    rw [rotationMap_angle_unique P Q hEq θ hInt rotEq]
   have cBad : Set.Countable badAngles := Set.Countable.image2 h h _
   have uInt : #(Set.Ioo (-(π/2)) (π/2)) = 𝔠 := mk_Ioo_real (neg_lt_self (by positivity))
   have uInt : ¬Set.Countable (Set.Ioo (-(π/2)) (π/2)) := by

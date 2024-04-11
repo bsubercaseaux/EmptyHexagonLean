@@ -125,7 +125,7 @@ theorem binSearch_wf (sorted : vars.1.Sorted (· < ·)) (h : i < vars.size) :
     unfold binSearch.go; rw [if_pos (hlo.trans hhi)]; lift_lets; intro x m a
     have mhi : (lo + hi) / 2 ≤ hi := by omega
     have mhi' : m < vars.size := mhi.trans_lt hhi'
-    simp [Array.getElem?_eq_getElem _ _ mhi']
+    simp [a, Array.getElem?_eq_getElem _ _ mhi']
     split <;> rename_i eq <;> simp [compare_eq_iff_eq, compare_lt_iff_lt, compare_gt_iff_gt] at eq
     · rw [getElem_lt_iff sorted] at eq
       exact go (m + 1) hi eq hhi hhi'
@@ -251,7 +251,7 @@ theorem getAny.wf (as : Array ILit) (s F)
     s'.f = s.f ∧ s'.Evaluates F (· i) := by
   unfold getAny; lift_lets; intro as' jp
   replace hcl : s.Evaluates (v := v) F (∃ l ∈ as', Literal.eval · l) := by
-    simpa [Array.mem_sortAndDeduplicate] using hcl
+    simpa [as', Array.mem_sortAndDeduplicate] using hcl
   clear_value as'; clear as
   change ∃ s' i, M.evalsTo c
     (match HashMap.find? s.s.definitions as' with
@@ -576,9 +576,9 @@ theorem PropForm.toICnf_sat [LinearOrder v] (f : PropForm v) :
   unfold toICnf; lift_lets; intro vars
   have allMem : f.onVars (· ∈ vars) := by
     refine (of_mem_toList_collectVars f (acc := ∅) fun x hx => ?_).1
-    simpa [Std.RBSet.toArray_eq, Array.mem_def] using hx
+    simpa [vars, Std.RBSet.toArray_eq, Array.mem_def] using hx
   have sorted : vars.1.Sorted (· < ·) := by
-    simp [Std.RBSet.toArray_eq]
+    simp [vars, Std.RBSet.toArray_eq]
     exact RBSet.toList_sorted.imp (by simp [RBNode.cmpLT_iff, compare_lt_iff_lt])
   clear_value vars; split; rename_i s _ clauses var next eq
   obtain ⟨⟨s', F, _, wf₁, wf₂, _⟩, ⟨eq', -⟩, val⟩ :=
