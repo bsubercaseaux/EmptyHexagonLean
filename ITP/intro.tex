@@ -29,14 +29,15 @@ They constructed (and solved) a formula $\phi$ whose unsatisfiability implies th
 However, as is common with such results, their reduction argument was only sketched, relied heavily on intuition,
 and left several gaps to be filled in.
 
-
 % result from Heule and Scheucher~\cite{emptyHexagonNumber} falls into this category.
 % They resolve a variant of the Happy Ending Problem,
 % in particular that every set of 30 points in general position contains an empty convex hexagon.
 % Their proof relies on a complicated reduction to SAT
 % involving numerous nontrivial geometric optimizations and symmetry-breaking arguments.
 
-In this paper we complete and formalize the reduction of Heule and Scheucher in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}. We do so by connecting existing geometric definitions
+In this paper we complete and formalize the reduction of Heule and Scheucher~\cite{emptyHexagonNumber}
+in the Lean theorem prover~\cite{demouraLeanTheoremProver2015}.
+We do so by connecting existing geometric definitions
 in the mathematical proof library \textsf{mathlib}~\cite{The_mathlib_Community_2020}
 to the unsatisfiability of a particular SAT instance, thus setting a new standard for verifying results which rely on extensive computation.
 Our formalization is publicly available at \url{https://github.com/bsubercaseaux/EmptyHexagonLean/tree/itp2024}.
@@ -46,15 +47,19 @@ Our formalization is publicly available at \url{https://github.com/bsubercaseaux
 Formal verification plays a crucial role in certifying the \emph{solving} step of SAT-based results.
 For example, theorem provers and formal methods tools have been used to verify solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
 and proof checkers~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
-However, the \emph{reduction} step has not received similar scrutiny.
-Some work has been done to verify the reductions to SAT underlying these kinds of mathematical results.
-The solution to the Pythagorean triples problem
-was verified in the \textsf{Coq} proof assistant
-by Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}.
-More generally,
-Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} provide a \textsf{CakeML} library
-of verified SAT encodings,
-which they used to write verified reductions from different puzzles
+The \emph{reduction} step has also received scrutiny,
+but seemingly not as much.
+Cruz-Filipe and coauthors~\cite{formalPythagoreanTriples,LPAR-21:Formally_Proving_Boolean_Pythagorean}
+verified the reduction of the Pythagorean triples problem to SAT
+in the \textsf{Coq} proof assistant.
+Using \textsf{Isabelle/HOL},
+Delemazure and colleagues~\cite{23delemazure_strategyproofness_proportionality_party_approval_multiwinner_elections}
+verified SAT-based results in social choice theory
+for which minimal unsatisfiable sets of clauses
+were too large to extract human-readable proofs.
+Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} provide a general \textsf{CakeML} library
+of verified SAT encodings
+which they use to write verified reductions of different puzzles
 (e.g., Sudoku, Kakuro, the \emph{N-queens} problem).
 The reduction verification techniques we use in this paper
 are based on that of Codel, Avigad, and Heule~\cite{Cayden} in the Lean theorem prover.
