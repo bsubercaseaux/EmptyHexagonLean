@@ -39,11 +39,13 @@ On a personal laptop,
 we found that it takes negligible time (below 1s)
 for our verified Lean encoder to output the full CNF.
 In contrast,
-Marić's encoder, extracted from Isabelle/HOL code,
-took 437s to output a CNF
-(this was compiled on Isabelle/HOL 2016,
-the latest version that accepts the codebase without broader changes).
-To circumvent the encoder slowness,
+Marić's encoder, extracted from Isabelle/HOL code,\footnote{
+  We used Isabelle/HOL 2016.
+  Porting the encoder to more recent versions of the prover
+  would require broader adaptations
+  due to breaking changes in the HOL theories.}
+took 437s to output a CNF.
+To improve encoding performance,
 Marić wrote a C++ encoder
 whose code was manually compared against the Isabelle/HOL specification.
 We do not need to resort to an unverified implementation.
@@ -51,7 +53,7 @@ We do not need to resort to an unverified implementation.
 As for the encodings,
 ours took 28s to solve,
 while the Marić encoding took 787s (both using \textsf{cadical}).
-This difference is likely accounted for in the relative size of the encodings,
+This difference is likely accounted for by the relative size of the encodings,
 in particular their symmetry breaking strategies.
 For $k=6$ and $n$ points,
 the encoding of Heule and Scheucher uses $O(n^4)$ clauses,
