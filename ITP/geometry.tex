@@ -49,5 +49,6 @@ theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}
     %  Indeed, assume $s$ is not empty w.r.t. $S$, there is a point $p \in S \setminus s$ that lies inside the convex hull of $s$. Because $P$ is a partition of the convex hull of $s$, point $p$ must be inside some $t \in P \subseteq T$.
     %  To see convexity, we can reason contrapositively again. If $s$ is not convex, then there is a point $p \in s$ that lies inside the convex hull of $s$, and thus lies inside a triangle $t \in P$.
 \end{proof}
-    
-The next section shows how boolean variables can be used to encode which triangles are empty w.r.t.~a pointset, which as the previous theorem shows, can be used to encode the presence or absence of $k$-holes.
+
+In the next section,
+we show how to encode which triangles (and, by the above theorem, which $k$-holes) are empty in a pointset with boolean variables.
