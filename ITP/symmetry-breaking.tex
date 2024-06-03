@@ -30,18 +30,19 @@ the $x$-order does more than break symmetry:
 in our encoding, clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12} rely on the points being sorted.
 Second, the CCW-order property breaks symmetry due to \emph{rotation} by fixing the orientations involving the leftmost point~$p_1$.
 
+\input{fig-sigma-equiv}
+
 Third, the lex-order property breaks symmetry due to \emph{reflection}.
 Reflecting a set of points~$S$ through a line (e.g., with the map $(x, y) \mapsto (-x, y)$)
 preserves the presence of $k$-holes and convex $k$-gons.
 Such reflected point sets are almost $\sigma$-equivalent to $S$,
 but their orientations have all changed sign.
-\input{fig-sigma-equiv}
 Consider the point sets in \Cref{fig:sigma-equiv}.
 As a result,
 we included the \emph{parity} flag in our definition of $\sigma$-equivalence above
 to capture changes in orientations due to reflection,
 where \lstinline|parity := true| changes sign of all orientations.
-The lex-order property ensures that the point set is the lexicographically-smaller reflection.
+The lex-order property ensures that the point set is the lexicographically-larger reflection.
 
 We can always transform a point set into canonical position while preserving orientations.
 
