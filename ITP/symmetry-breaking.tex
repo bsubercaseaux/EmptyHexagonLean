@@ -1,4 +1,4 @@
-\emph{Symmetry breaking} plays a key role in SAT solving by reducing the search space of assignments that can satisfy a formula~\cite{biereHandbookSatisfiabilityVolume2009,Crawford},
+\emph{Symmetry breaking} plays a key role in SAT solving by reducing the search space of satisfying assignments for a formula~\cite{biereHandbookSatisfiabilityVolume2009,Crawford},
 thus making a wider range of formulas practical to solve.
 For example, if one proves that all satisfying assignments to a formula $\phi$ have either (i) $x_1 = 0, x_2 = 1$, or  (ii) $x_1 = 1, x_2 = 0$, and there is a bijection between satisfying assignments of forms (i) and (ii),
 then one can assume, \emph{without loss of generality}, that $x_1 = 0, x_2 = 1$, and thus add unit clauses $\ov{x_1}$ and $x_2$ to the formula $\phi$ while preserving its satisfiability.
@@ -6,33 +6,44 @@ There are several techniques that can automatically find symmetry-breaking claus
 such as structured bounded variable addition~\cite{sbva},
 but it is accepted wisdom in the SAT-solving community that problem-specific symmetry breaking is more effective.
 
-In the context of the Empty Hexagon Number,
-the symmetry breaking done by Heule and Scheucher consists in assuming
-that in order to search for a list of $30$ points in general position without a $6$-hole,
-it suffices to can search only amongst lists of $30$ points in \emph{canonical} position.
-These are defined as follows.
+The symmetry breaking performed by Heule and Scheucher for the Empty Hexagon Number places the points in \emph{canonical position},
+which enforces several notions of order.
+By proving that for any list of points in general position,
+there exists a list of points in canonical position with the same orientations,
+we can work with the latter when encoding the problem into SAT.
+Canonical position is defined as follows.
 \begin{definition}[Canonical Position]
-A list $L = (p_1,\ldots, p_{n})$ of points is said to be in canonical position if it satisfies all the following properties:
+A list of points~$L = (p_1,\ldots, p_{n})$ is said to be in \emph{canonical position} if it satisfies all the following properties:
 \begin{itemize}
-    \item \textbf{($x$-order)} The points are sorted with respect to their $x$-coordinates, i.e., $x(p_i) < x(p_j)$ for all $1 \leq i < j \leq n$.
     \item \textbf{(General Position)} No three points are collinear, i.e., for all $1 \leq i < j < k \leq n$, we have $\sigma(p_i, p_j, p_k) \neq 0$.
+    \item \textbf{($x$-order)} The points are sorted with respect to their $x$-coordinates, i.e., $x(p_i) < x(p_j)$ for all $1 \leq i < j \leq n$.
     \item \textbf{(CCW-order)} All orientations $\sigma(p_1, p_i, p_j)$, with $1 < i < j \leq n$, are counterclockwise.
-    \item \textbf{(Lex order)} The list of orientations \( \left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)\) is not lexicographically smaller than the list \(\left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right).\)
+    \item \textbf{(Lex-order)} The list of orientations \( \left(\sigma\left(p_{\lceil \frac{n}{2} \rceil -1}, p_{\lceil \frac{n}{2} \rceil},p_{\lceil \frac{n}{2} \rceil+1}\right), \ldots, \sigma\left(p_2, p_3, p_4\right) \right)\) is not lexicographically smaller than the list \(\left(\sigma\left(p_{\lfloor \frac{n}{2} \rfloor  + 1}, p_{\lfloor \frac{n}{2} \rfloor+2},p_{\lfloor \frac{n}{2} \rfloor+3}\right), \ldots, \sigma\left(p_{n-2}, p_{n-1}, p_{n}\right) \right).\)
     % Given the general position condition, all orientations are in $\{-1, 1\}$, and thus the lexicographic condition is equivalent to stating that there is an index $i$ such that $\forall j < i$, $\textsf{Left}[j] = \textsf{Right}[j]$, and $\textsf{Left}[i] = -1$ but $\textsf{Right}[i] = 1$.
 \end{itemize}
 \end{definition}
 
-This symmetry breaking assumption not only reduces the search space of the SAT solver, but it is required for the correctness of the encoding,
-as clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12} rely on points being sorted from left to right.
-Before discussing the proof of correctness of symmetry breaking,
-let us first focus on the last condition, expressed explicitly in clause~\labelcref{eq:revLexClauses} of the encoding.
-The main idea behind this condition is that \emph{reflecting} a pointset, i.e., applying the map $(x, y) \mapsto (-x, y)$,
-preserves the presence of $k$-holes, or convex $k$-gons.
-This is the reason for incorporating the \emph{parity} flag in the definition of $\sigma$-equivalence.
-\input{fig-sigma-equiv.tex}
-As illustrated in~\Cref{fig:sigma-equiv}, there are pointsets that are only $\sigma$-equivalent to their reflections
-with \lstinline|parity := true|.
-We are now ready to state the main symmetry breaking theorem and sketch its proof.
+The three ordering properties each break a different symmetry.
+First, the $x$-order property breaks symmetry due to how we label the points by ensuring that the points are labeled from left to right.
+Plus,
+the $x$-order does more than break symmetry:
+in our encoding, clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12} rely on the points being sorted.
+Second, the CCW-order property breaks symmetry due to \emph{rotation} by fixing the orientations involving the leftmost point~$p_1$.
+
+Third, the lex-order property breaks symmetry due to \emph{reflection}.
+Reflecting a set of points~$S$ through a line (e.g., with the map $(x, y) \mapsto (-x, y)$)
+preserves the presence of $k$-holes and convex $k$-gons.
+Such reflected point sets are almost $\sigma$-equivalent to $S$,
+but their orientations have all changed sign.
+\input{fig-sigma-equiv}
+Consider the point sets in \Cref{fig:sigma-equiv}.
+As a result,
+we included the \emph{parity} flag in our definition of $\sigma$-equivalence above
+to capture changes in orientations due to reflection,
+where \lstinline|parity := true| changes sign of all orientations.
+The lex-order property ensures that the point set is the lexicographically-smaller reflection.
+
+We can always transform a point set into canonical position while preserving orientations.
 
 %     While the first 3 conditions are now arguably standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
 %     Interestingly, in the process of verifying the correctness of this symmetry-breaking assumption, we found a small error in the proof presented in~\cite{scheucherTwoDisjoint5holes2020} for the first $3$ conditions.
@@ -72,7 +83,8 @@ we need to define an extension
 We then show that $\sigma((0, 0), q, r) = \sigma_{(0, \infty)}(f(q), f(r))$ for all points $q, r \in L_2$. 
 In step 4, we sort the list $L_2$ by $x$-coordinate in increasing order, thus obtaining a list $L_3$.
 This can be done while preserving $\sigma$-equivalence because sorting corresponds to a permutation, and all permutations of a list are $\sigma$-equivalent by definition.
-In step 5, we check whether the \textsf{Lex order} condition above is satisfied in $L_3$, and if it is not, we reflect the pointset, which as explained above, preserves $\sigma$-equivalence by leveraging the parity option in the definition. Note that in such a case we need to relabel the points from left to right again.
+In step 5, we check whether the \textsf{Lex order} condition above is satisfied in $L_3$, and if it is not, we reflect the pointset, which preserves $\sigma$-equivalence with \lstinline|parity := true|.
+Note that in such a case we need to relabel the points from left to right again.
 In step 6, we bring point $(0, \infty)$ back into the range by first finding a constant $c$ such that all points in $L_3$ are to the right of the line $y=c$, and then finding a large enough value $M$ such that $(c, M)$ has the same orientation with respect to the other points as $(0, \infty)$ did, meaning that 
 \(\sigma((c, M), q, r) = \sigma_{(0, \infty)}(q, r)\) for every $q, r \in L_3$.
 Finally, we note that the list of points obtained in step 6 satisfies the \text{CCW-order} property by the following reasoning:
