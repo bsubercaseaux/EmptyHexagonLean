@@ -1,3 +1,42 @@
+An essential step for obtaining computational proofs of geometric results is \emph{discretization}:
+problems concerning the existence of an object~$\mathcal{O}$ in a continuous search space like $\mathbb{R}^2$
+must be reformulated in terms of the existence of a discrete, finitely-representable object~$\mathcal{O}'$
+that a computer can search for.
+It is especially challenging to discretize problems in which the desired geometric object $\mathcal{O}$ is characterized by very specific coordinates of points,
+thus requiring the computer to use floating-point arithmetic,
+which suffers from numerical instability.
+Fortunately,
+this is not the case for Erd\H{o}s-Szekeres-type problems such as determining the value of $h(k)$,
+as their properties of interest (e.g., convexity and emptiness)
+can be described in terms of axiomatizable relationships between points and lines
+(e.g., point $p$ is above the line $\overrightarrow{qr}$, lines $\overrightarrow{qr}$ and $\overrightarrow{st}$ intersect, etc.)
+that are invariant under rotation, translation, and even small perturbations of the coordinates.
+%which makes them naturally well-suited for computation.
+We can discretize these relationships with boolean variables,
+thus making us agnostic to the specific coordinates of the points.
+The combinatorial abstraction that has been most widely used in Erd\H{o}s-Szekeres-type problems is that of \emph{triple orientations}~\cite{emptyHexagonNumber, scheucherTwoDisjoint5holes2020},
+also known as \emph{signotopes}~\cite{felsnerSweepsArrangementsSignotopes2001,subercaseaux2023minimizing}, 
+Knuth's \emph{counterclockwise relation}~\cite{knuthAxiomsHulls1992},
+or \emph{signatures}~\cite{szekeres_peters_2006}.
+Given points $p, q, r$, their \emph{triple-orientation} is defined as:
+\iffalse
+This poses a particular challenge for problems in which the desired geometric object $\mathcal{O}$ is characterized by very specific coordinates of points,
+requiring to deal with floating point arithmetic or numerical instability.
+Fortunately,
+this is not the case for Erd\H{o}s-Szekeres-type problems such as determining the value of $h(k)$, 
+which are naturally well-suited for computation.
+This is so because the properties of interest (e.g., convexity, emptiness) can be described in terms of axiomatizable relationships between points and lines
+(e.g., point $p$ is above the line $\overrightarrow{qr}$, lines $\overrightarrow{qr}$ and $\overrightarrow{st}$ intersect, etc.),
+which are invariant under rotations, translations, and even small perturbations of the coordinates. 
+This suggests the problems can be discretized in terms of boolean variables representing these relationships,
+forgetting the specific coordinates of the points.
+The combinatorial abstraction that has been most widely used in Erd\H{o}s-Szekeres-type problems is that of \emph{triple orientations}~\cite{emptyHexagonNumber, scheucherTwoDisjoint5holes2020},
+also known as \emph{signotopes}~\cite{felsnerSweepsArrangementsSignotopes2001,subercaseaux2023minimizing}, 
+Knuth's \emph{counterclockwise} relation~\cite{knuthAxiomsHulls1992},
+or \emph{signatures}~\cite{szekeres_peters_2006}.
+Given points $p, q, r$, their \emph{triple-orientation} is defined as:
+
+
 To use computers to solve geometry problems,
 we often need to \emph{discretize} the search space first.
 In many cases,
@@ -19,6 +58,7 @@ Knuth's \emph{counterclockwise} relation~\cite{knuthAxiomsHulls1992},
 or \emph{signatures}~\cite{szekeres_peters_2006}.
 An example is illustrated in~\Cref{fig:triple-orientation}.
 Given points $p, q, r$, their \emph{triple-orientation} is defined as:
+\fi
 \newcommand{\sign}{\operatorname{sign}}
 \[
   \sigma(p, q, r) = \sign \det \begin{pmatrix} p_x & q_x & r_x \\ p_y & q_y & r_y \\ 1 & 1 & 1 \end{pmatrix} = \begin{cases}
@@ -158,20 +198,23 @@ theorem OrientationProperty_HasEmptyKGon : OrientationProperty (HasEmptyKGon n)
 \end{lstlisting}
 
 The previous theorem is important for two reasons.
-First, if $\sigma$ is invariant under certain point transformations (e.g., rotations, translations, etc.), then any orientation property is invariant under the same transformations.
-Identifying these transformations allows us to perform symmetry breaking to simplify the search space while preserving the property of interest (see~\Cref{sec:symmetry-breaking}).
+First, if $\sigma$ is invariant under certain point transformations (e.g., rotations, translations, etc.),
+then any orientation property is invariant under the same transformations.
+This is a powerful tool for performing symmetry breaking (see~\Cref{sec:symmetry-breaking}).
 For a concrete example, consider a proof of an Erd\H{o}s-Szekeres-type result that starts by saying ``\emph{we assume without loss of generality that points $p_1, \ldots, p_n$ all have positive $y$-coordinates}.''
 Since $\sigma$ is invariant under translation, we can see that this assumption indeed does not impact the validity of the proof.
 
 Second,
 as introduced at the beginning of this section,
-SAT encodings for Erd\H{o}s-Szekeres-type problems use triple orientations to capture properties like convexity or emptiness,
+SAT encodings for Erd\H{o}s-Szekeres-type problems use triple orientations to capture properties like convexity and emptiness,
 thus discretizing the problem.
 Because we have proved that $\pi_k(S)$ is an orientation property,
-we find that the values of $\sigma$ for all triples of points in $S$ contain enough information to determine whether $\pi_k(S)$.
-Therefore,
-we may analyze the values of $\sigma$ for the point triples in $S$, a discrete space with at most $2^{n^3}$ possibilities,
-instead of grappling with a continuous search space on $n$ points, $\left(\mathbb{R}^2\right)^n$.
+the values of $\sigma$ on the points in $S$ contain enough information to determine whether $\pi_k(S)$.
+Therefore, we have proved that given $n$ points,
+it is enough to analyze the values of $\sigma$ over these points,
+a discrete space with at most $2^{n^3}$ possibilities,
+instead of grappling with a continuous search space on $n$ points,
+$\left(\mathbb{R}^2\right)^n$.
 This is the key idea that will allow us to transition from the finitely-verifiable statement ``\emph{no set of triple orientations over $n$ points satisfies property $\pi_k$}'' to the desired statement ``\emph{no set of $n$ points satisfies property $\pi_k$}.''
 
 \subsection{Properties of orientations}\label{sec:sigma-props}
