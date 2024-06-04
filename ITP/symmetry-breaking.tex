@@ -1,16 +1,14 @@
 \emph{Symmetry breaking} plays a key role in SAT solving by reducing the search space of satisfying assignments for a formula~\cite{biereHandbookSatisfiabilityVolume2009,Crawford},
 thus making a wider range of formulas practical to solve.
-For example, if one proves that all satisfying assignments to a formula $\phi$ have either (i) $x_1 = 0, x_2 = 1$, or  (ii) $x_1 = 1, x_2 = 0$, and there is a bijection between satisfying assignments of forms (i) and (ii),
+For example, if one proves that all satisfying assignments to a formula $\phi$ have either (i) $x_1 = 0, x_2 = 1$, or  (ii) $x_1 = 1, x_2 = 0$, and that there is a bijection between satisfying assignments of forms (i) and (ii),
 then one can assume, \emph{without loss of generality}, that $x_1 = 0, x_2 = 1$, and thus add unit clauses $\ov{x_1}$ and $x_2$ to the formula $\phi$ while preserving its satisfiability.
 There are several techniques that can automatically find symmetry-breaking clauses,
 such as structured bounded variable addition~\cite{sbva},
 but it is accepted wisdom in the SAT-solving community that problem-specific symmetry breaking is more effective.
 
-The symmetry breaking performed by Heule and Scheucher for the Empty Hexagon Number places the points in \emph{canonical position},
-which enforces several notions of order.
-By proving that for any list of points in general position,
-there exists a list of points in canonical position with the same orientations,
-we can work with the latter when encoding the problem into SAT.
+In their proof of the Empty Hexagon Number,
+Heule and Scheucher showed that for any list of points in general position,
+there exists a list of points in \emph{canonical position} with the same triple-orientations.
 Canonical position is defined as follows.
 \begin{definition}[Canonical Position]
 A list of points~$L = (p_1,\ldots, p_{n})$ is said to be in \emph{canonical position} if it satisfies all the following properties:
@@ -25,9 +23,8 @@ A list of points~$L = (p_1,\ldots, p_{n})$ is said to be in \emph{canonical posi
 
 The three ordering properties each break a different symmetry.
 First, the $x$-order property breaks symmetry due to how we label the points by ensuring that the points are labeled from left to right.
-Plus,
-the $x$-order does more than break symmetry:
-in our encoding, clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12} rely on the points being sorted.
+The $x$-order property also simplifies the encoding of clauses~\labelcref{eq:insideClauses1,eq:insideClauses2,eq:holeDefClauses1,eq:signotopeClauses11,eq:signotopeClauses12},
+as they rely on the points being sorted.
 Second, the CCW-order property breaks symmetry due to \emph{rotation} by fixing the orientations involving the leftmost point~$p_1$.
 
 \input{fig-sigma-equiv}
@@ -39,12 +36,12 @@ Such reflected point sets are almost $\sigma$-equivalent to $S$,
 but their orientations have all changed sign.
 Consider the point sets in \Cref{fig:sigma-equiv}.
 As a result,
-we included the \emph{parity} flag in our definition of $\sigma$-equivalence above
+we included the \emph{parity} flag in our Lean definition of $\sigma$-equivalence
 to capture changes in orientations due to reflection,
 where \lstinline|parity := true| changes sign of all orientations.
 The lex-order property ensures that the point set is the lexicographically-larger reflection.
 
-We can always transform a point set into canonical position while preserving orientations.
+We prove that there always exists a $\sigma$-equivalent point set in canonical position.
 
 %     While the first 3 conditions are now arguably standard in computational results regarding Erd\H{o}s-Szekeres type problems~\cite{scheucherTwoDisjoint5holes2020}, the last condition is a novelty introduced by Heule and Scheucher.
 %     Interestingly, in the process of verifying the correctness of this symmetry-breaking assumption, we found a small error in the proof presented in~\cite{scheucherTwoDisjoint5holes2020} for the first $3$ conditions.
