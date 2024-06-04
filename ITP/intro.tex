@@ -45,16 +45,6 @@ Our formalization is publicly available at \url{https://github.com/bsubercaseaux
 Formal verification makes the SAT \emph{solving} step trustworthy.
 For example, theorem provers and formal methods tools have been used to verify solvers~\cite{10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol,oeVersatVerifiedModern2012,skotam_creusat_2022}
 and proof checkers~\cite{lammichEfficientVerifiedSAT2020,tanVerifiedPropagationRedundancy2023}.
-
-
-The \emph{reduction} step has also received scrutiny,
-but seemingly not as much.
-
-Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} provide a general \textsf{CakeML} library
-of verified SAT encodings
-which they use to write verified reductions of different puzzles
-
-
 However, the \emph{reduction} step has not received similar scrutiny,
 with only a few reductions having been verified.
 For instance,
@@ -69,8 +59,8 @@ were too large to extract human-readable proofs.
 More generally,
 Giljeg\r{a}rd and Wennerbreck~\cite{GilAndWennerbeck} built a \textsf{CakeML} library
 of verified SAT encodings,
-which they used to write verified SAT reductions for different problems
-(e.g., Sudoku, Kakuro, the \emph{N-queens} problem).
+which they used to write verified SAT reductions for different puzzles,
+such as the \emph{N-queens} problem. 
 In this paper,
 we use reduction verification techniques based on those of Codel, Avigad, and Heule~\cite{Cayden},
 which they developed in Lean.
