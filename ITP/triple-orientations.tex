@@ -48,9 +48,9 @@ An example is illustrated in~\Cref{fig:triple-orientation}. We directly use \tex
 % @[pp_dot] abbrev y (p : Point) : ℝ := p 1
 \begin{lstlisting}
 inductive Orientation : Type where
-  | cw -- clockwise :=  -
-  | ccw -- counter clockwise := +
-  | collinear -- := 0
+  | cw
+  | ccw
+  | collinear
 
 noncomputable def σ (p q r : Point) : Orientation :=
   let det := Matrix.det !![p.x, q.x, r.x ; p.y, q.y, r.y ; 1, 1, 1]

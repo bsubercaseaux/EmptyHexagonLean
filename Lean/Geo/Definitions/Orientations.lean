@@ -12,9 +12,9 @@ noncomputable section
 open Classical
 
 inductive Orientation : Type where
-  | cw -- clockwise :=  -
-  | ccw -- counter clockwise := +
-  | collinear -- := 0
+  | cw
+  | ccw
+  | collinear
   deriving DecidableEq, Repr
 
 def Orientation.neg : Orientation → Orientation
