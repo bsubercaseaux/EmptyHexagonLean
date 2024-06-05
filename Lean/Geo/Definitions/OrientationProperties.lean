@@ -81,7 +81,7 @@ theorem σHasConvexKGon_iff_HasConvexKGon (gp : Point.ListInGenPos pts) :
   unfold σHasConvexKGon HasConvexKGon
   refine exists_congr fun s => and_congr_right' <| and_congr_right fun spts => ?_
   have gp' := gp.toFinset
-  rw [ConvexPoints.iff_triangles'' (gp'.mono spts)]
+  rw [ConvexIndep.iff_triangles'' (gp'.mono spts)]
   iterate 9 refine forall_congr' fun _ => ?_
   rw [σIsEmptyTriangleFor_iff'' (gp'.mono spts)] <;> simp [EmptyShapeIn, PtInTriangle, *]
 
@@ -227,7 +227,7 @@ theorem σCCWPoints.cycle (H : σCCWPoints (l₁ ++ l₂)) : σCCWPoints (l₂ +
     fun c hc => (H4 c hc).imp <| Eq.trans (by rw [σ_perm₁, ← σ_perm₂]),
     fun a ha => (H3 a ha).imp <| Eq.trans (by rw [σ_perm₂, ← σ_perm₁])⟩
 
-theorem σCCWPoints.convex (H : σCCWPoints l) : ConvexPoints l.toFinset := by
+theorem σCCWPoints.convex (H : σCCWPoints l) : ConvexIndep l.toFinset := by
   refine ((ConvexEmptyIn.iff_triangles'' subset_rfl H.gp).2 ?_).1
   simp only [mem_toFinset, Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton,
     not_or, and_imp]
