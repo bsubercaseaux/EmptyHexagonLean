@@ -178,7 +178,7 @@ theorem collinear_iff : σ p q r = .collinear ↔ Collinear ℝ {p, q, r} := by
       (⟪r - q, p - q⟫_ℝ / ⟪r - q, r - q⟫_ℝ) _ _ using 1
     simp only [AffineMap.lineMap_apply_module']; rw [det_eq] at H
     rw [← sub_eq_iff_eq_add, ← sub_eq_zero, ← smul_eq_zero_iff_right this,
-      smul_sub, smul_smul, mul_div_cancel' _ this]
+      smul_sub, smul_smul, mul_div_cancel₀ _ this]
     ext <;> simp [norm_sq_eq_inner]
     · linear_combination H * (q 1 - r 1)
     · linear_combination H * (r 0 - q 0)
