@@ -12,9 +12,11 @@ i.e., the point set encloses a convex polygon. -/
 def ConvexIndep (S : Set Point) : Prop :=
     ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
+/-- `ConvexEmptyIn S P' means that `S' forms a convex empty polygon in `P' -/
 def ConvexEmptyIn (S P : Set Point) : Prop :=
     ConvexIndep S ∧ EmptyShapeIn S P
 
+/-- `HasEmptyKGon k P' means that `P' has a convex `k'-gon in `P' -/
 def HasEmptyKGon (k : Nat) (S : Set Point) : Prop :=
     ∃ s : Finset Point, s.card = k ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 \end{lstlisting}
