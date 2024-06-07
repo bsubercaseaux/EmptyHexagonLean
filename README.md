@@ -54,9 +54,24 @@ the CNFs produced can be shown UNSAT instantly.
 
 For `k = 6`, `n = 30`, the CNF takes on the order of 17,000 CPU hours to show UNSAT when parallelized using cube&conquer.
 
-The script in `utils/6hole-cube.c` outputs the list of cubes we used to solve `k = 6`, `n = 30`.
-We will add scripts soon for reproducing the entire parallel computation.
+# Cube and Conquer verification
 
+In order to verify that the resulting formula $F$ is indeed UNSAT, two things ought to be checked:
+1) The formula $F$ is UNSAT iff $F \land C_i$ is UNSAT for every $i$.
+2) For each cube $C_i$, the formula $F \land C_i$ is UNSAT.
+
+
+Note that step 1) is implied by checking that $F \land (\bigwedge_i \neg C_i)$ is UNSAT; a "tautology proof", as per Section 7.3 of Heule and Scheucher.
+Step 1) can be verified by running
+```
+cd cube_checking
+sh check_tautology.sh
+kissat cube_taut_check.cnf tautology_proof.drat
+drat-trim cube_taut_check.cnf tautology_proof.drat -f -l proof.lrat
+
+```
+Note that this requires the SAT solver [kissat](https://github.com/arminbiere/kissat) be in the path, and also [DRAT-trim](https://github.com/marijnheule/drat-trim).
+The LRAT proof should be checkable with the verified checker [cake_lpr](https://github.com/tanyongkiam/cake_lpr).
 
 ## Authors
 - [Bernardo Subercaseaux](https://bsubercaseaux.github.io/) (Carnegie Mellon University)
