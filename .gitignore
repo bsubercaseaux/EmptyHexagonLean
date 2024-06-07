@@ -3,6 +3,8 @@
 *.cnf
 .direnv/
 utils/HoleComputation.js
+*.drat
+*.lrat
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
