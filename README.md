@@ -57,21 +57,45 @@ For `k = 6`, `n = 30`, the CNF takes on the order of 17,000 CPU hours to show UN
 # Cube and Conquer verification
 
 In order to verify that the resulting formula $F$ is indeed UNSAT, two things ought to be checked:
-1) The formula $F$ is UNSAT iff $F \land C_i$ is UNSAT for every $i$.
-2) For each cube $C_i$, the formula $F \land C_i$ is UNSAT.
 
+ 1) **(Tautology proof)** The formula $F$ is UNSAT iff $F \land C_i$ is UNSAT for every $i$.
+ 2) **(UNSAT proof)** For each cube $C_i$, the formula $F \land C_i$ is UNSAT.
 
-Note that step 1) is implied by checking that $F \land (\bigwedge_i \neg C_i)$ is UNSAT; a "tautology proof", as per Section 7.3 of Heule and Scheucher.
-Step 1) can be verified by running
+The **tautology proof** is implied by checking that $F \land (\bigwedge_i \neg C_i)$ is UNSAT, as per Section 7.3 of [Heule and Scheucher](https://arxiv.org/abs/2403.00737).
+
+As a first step, we will generate the main CNF by running:
 ```
-cd cube_checking
-sh check_tautology.sh
-kissat cube_taut_check.cnf tautology_proof.drat
-drat-trim cube_taut_check.cnf tautology_proof.drat -f -l proof.lrat
+lake exe encode hole 6 30 cube_checking/vars.out > cube_checking/6-30.cnf
+```
+
+Then, inside the `cube_checking` folder, the **tautology proof** can be verified by:
+```
+gcc 6hole-cube.c -o cube_gen
+./cube_gen 0 vars.out > cubes.icnf
+python3 cube_join.py -f 6-30.cnf -c cubes.icnf --tautcheck -o taut_if_unsat.cnf
+cadical taut_if_unsat.cnf tautology_proof.lrat --lrat
+cake_lpr taut_if_unsat.cnf tautology_proof.lrat
+```
+Note that this requires the SAT solver [cadical](https://github.com/arminbiere/cadical) to be in the path, and also the verified checker [cake_lpr](https://github.com/tanyongkiam/cake_lpr). As an end result, one sees:
 
 ```
-Note that this requires the SAT solver [kissat](https://github.com/arminbiere/kissat) be in the path, and also [DRAT-trim](https://github.com/marijnheule/drat-trim).
-The LRAT proof should be checkable with the verified checker [cake_lpr](https://github.com/tanyongkiam/cake_lpr).
+s VERIFIED UNSAT
+```
+
+For the **UNSAT proof**, given the total amount of computation required to run all cubes is probably unfeasible for any verifier, we provide a simple way to verify any given cube to be UNSAT. To generate the formula + cube number $i$ (assuming the steps for the **tautology proof** have been followed), run:
+```
+./cube_gen <i> vars.out > .tmp_cube_<i>
+python3 cube_join.py -f 6-30.cnf -c .tmp_cube_<i> -o with_cube_<i>.cnf
+cadical with_cube_<i>.cnf proof_cube_<i>.lrat --lrat
+cake_lpr with_cube_<i>.cnf proof_cube_<i>.lrat
+```
+To simplify the process, we have added a bash script `solve_cube.sh`, which can be simply run as (for example, for cube number 42):
+
+```
+sh solve_cube.sh 42
+```
+
+
 
 ## Authors
 - [Bernardo Subercaseaux](https://bsubercaseaux.github.io/) (Carnegie Mellon University)
