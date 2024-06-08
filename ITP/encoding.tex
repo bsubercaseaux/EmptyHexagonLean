@@ -133,7 +133,7 @@ the convex hull of $S$ is contained in the convex hulls
 of points on either side of $\overleftrightarrow{ab}$.
 That is:
 \begin{lstlisting}
-theorem split_convexHull (cvx : ConvexPoints S) :
+theorem split_convexHull (cvx : ConvexIndep S) :
   ∀ {a b}, a ∈ S → b ∈ S →
     convexHull ℝ S ⊆ convexHull ℝ {x ∈ S | σ a b x ≠ ccw}
                     ∪ convexHull ℝ {x ∈ S | σ a b x ≠ cw}

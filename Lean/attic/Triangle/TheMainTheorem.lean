@@ -19,12 +19,12 @@ theorem HasEmptyTriangle.iff (S : Set Point) :
     match s, s.exists_mk with | _, ⟨[a,b,c], h1, rfl⟩ => ?_
     have s_eq : (Finset.mk (Multiset.ofList [a,b,c]) h1 : Set _) = {a, b, c} := by ext; simp
     simp [not_or, Set.subset_def] at h1 h2 h3 ⊢
-    refine ⟨a, h2.1, b, h2.2.1, c, h2.2.2, ConvexPoints.triangle_iff.1 h3, ?_⟩
+    refine ⟨a, h2.1, b, h2.2.1, c, h2.2.2, ConvexIndep.triangle_iff.1 h3, ?_⟩
     simpa [not_or, EmptyShapeIn, s_eq] using h4
   · intro ⟨a, ha, b, hb, c, hc, h1, h2⟩
     let s : Finset Point := ⟨[a,b,c], by simp [h1.ne₁, h1.ne₂, h1.ne₃]⟩
     have s_eq : s = {a,b,c} := by ext; simp
-    refine ⟨s, rfl, ?_, ConvexPoints.triangle_iff.2 h1, ?_⟩
+    refine ⟨s, rfl, ?_, ConvexIndep.triangle_iff.2 h1, ?_⟩
     · simp [Set.subset_def, ha, hb, hc]
     · simpa [s_eq, EmptyShapeIn] using h2
 
