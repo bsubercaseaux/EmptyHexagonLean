@@ -12,8 +12,11 @@ noncomputable section
 open Classical
 
 inductive Orientation : Type where
+  /-- Clockwise turn; `det x y z < 0` -/
   | cw
+  /-- Counter-clockwise turn; `det x y z > 0` -/
   | ccw
+  /-- Collinear; `det x y z = 0` -/
   | collinear
   deriving DecidableEq, Repr
 
