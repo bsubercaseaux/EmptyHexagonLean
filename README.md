@@ -68,7 +68,7 @@ As a first step, we will generate the main CNF by running:
 lake exe encode hole 6 30 cube_checking/vars.out > cube_checking/6-30.cnf
 ```
 
-Then, inside the `cube_checking` folder, the **tautology proof** can be verified by:
+Then, inside the `cube_checking` folder, the **tautology proof** can be verified by running `sh verify_tautology`, which boils down to:
 ```
 gcc 6hole-cube.c -o cube_gen
 ./cube_gen 0 vars.out > cubes.icnf
