@@ -1,6 +1,7 @@
 .DS_Store/
 .DS_Store
 *.cnf
+*.icnf
 .direnv/
 utils/HoleComputation.js
 *.drat
