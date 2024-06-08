@@ -76,7 +76,10 @@ python3 cube_join.py -f 6-30.cnf -c cubes.icnf --tautcheck -o taut_if_unsat.cnf
 cadical taut_if_unsat.cnf tautology_proof.lrat --lrat
 cake_lpr taut_if_unsat.cnf tautology_proof.lrat
 ```
-Note that this requires the SAT solver [cadical](https://github.com/arminbiere/cadical) to be in the path, and also the verified checker [cake_lpr](https://github.com/tanyongkiam/cake_lpr). As an end result, one sees:
+Note that this requires:
+1) The `eznf` python library, which can be installed with `pip install eznf`.
+2) the SAT solver [cadical](https://github.com/arminbiere/cadical) to be in the path,
+3) the verified checker [cake_lpr](https://github.com/tanyongkiam/cake_lpr). As an end result, one sees:
 
 ```
 s VERIFIED UNSAT
