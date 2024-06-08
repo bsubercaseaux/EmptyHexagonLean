@@ -16,7 +16,7 @@ def ConvexIndep (S : Set Point) : Prop :=
 def ConvexEmptyIn (S P : Set Point) : Prop :=
     ConvexIndep S ∧ EmptyShapeIn S P
 
-/-- `HasEmptyKGon k P' means that `P' has a convex `k'-gon in `P' -/
+/-- `HasEmptyKGon k P' means that `P' has a convex, empty `k'-gon -/
 def HasEmptyKGon (k : Nat) (P : Set Point) : Prop :=
     ∃ S : Finset Point, S.card = k ∧ ↑S ⊆ P ∧ ConvexEmptyIn S P
 \end{lstlisting}
