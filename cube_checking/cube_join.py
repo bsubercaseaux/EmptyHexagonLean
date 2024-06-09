@@ -6,10 +6,11 @@ argparser.add_argument(
     "-f", "--formula", required=True, type=str, help="CNF Formula file"
 )
 argparser.add_argument("-c", "--cubes", required=True, type=str, help="Cube file")
+argparser.add_argument("-o", "--output", required=False, type=str, help="Output file")
 argparser.add_argument(
     "--tautcheck", action="store_true", help="Checks for a tautology"
 )
-argparser.add_argument("-o", "--output", required=False, type=str, help="Output file")
+argparser.add_argument('--inccnf', action="store_true", help="Creates a .icnf file with the formula + cubes")
 
 
 args = argparser.parse_args()
@@ -18,6 +19,7 @@ formula_file = args.formula
 cube_file = args.cubes
 output_file = args.output
 tautcheck = args.tautcheck
+icnf = args.inccnf
 
 encoding = modeler.Modeler()
 
@@ -25,7 +27,6 @@ def itokenize(line):
     """
     takes a line as a string, coming from either a `p cnf` or a `p inccnf` file
     returns array of ints without 0
-    
     ignores lines starting with c or p
     """
     if len(line) == 0:
@@ -66,10 +67,11 @@ with open(cube_file, 'r', encoding='utf-8') as cb_file:
 
 if tautcheck:
     encoding.serialize(output_file)
+elif icnf:
+    encoding.cube_and_conquer(lambda: cubes, output_file)
 else:
     assert len(cubes) == 1
     cube = cubes[0]
     for lit in cube:
         encoding.add_clause([lit])
     encoding.serialize(output_file)
-    

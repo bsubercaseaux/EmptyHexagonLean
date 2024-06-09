@@ -34,7 +34,7 @@ Overall structure:
 
 ## Generating CNFs
 
-The project includes scripts for generating the CNFs we formalized against.
+The project includes scripts for generating the CNFs we formalized against. These must be run inside the `Lean` subfolder.
 
 #### Convex 6-gon
 For `n` points:
@@ -66,7 +66,7 @@ The **tautology proof** is implied by checking that $F \land (\bigwedge_i \neg C
 As a first step, we will generate the main CNF by running:
 ```
 cd Lean
-lake exe encode hole 6 30 cube_checking/vars.out > cube_checking/6-30.cnf
+lake exe encode hole 6 30 ../cube_checking/vars.out > ../cube_checking/6-30.cnf
 ```
 
 Then, inside the `cube_checking` folder, the **tautology proof** can be verified by running `sh verify_tautology`, which boils down to:
@@ -74,7 +74,7 @@ Then, inside the `cube_checking` folder, the **tautology proof** can be verified
 gcc 6hole-cube.c -o cube_gen
 ./cube_gen 0 vars.out > cubes.icnf
 python3 cube_join.py -f 6-30.cnf -c cubes.icnf --tautcheck -o taut_if_unsat.cnf
-cadical taut_if_unsat.cnf tautology_proof.lrat --lrat
+cadical taut_if_unsat.cnf tautology_proof.lrat --lrat # this should take around 30 seconds
 cake_lpr taut_if_unsat.cnf tautology_proof.lrat
 ```
 Note that this requires:
@@ -90,7 +90,7 @@ For the **UNSAT proof**, given the total amount of computation required to run a
 ```
 ./cube_gen <i> vars.out > .tmp_cube_<i>
 python3 cube_join.py -f 6-30.cnf -c .tmp_cube_<i> -o with_cube_<i>.cnf
-cadical with_cube_<i>.cnf proof_cube_<i>.lrat --lrat
+cadical with_cube_<i>.cnf proof_cube_<i>.lrat --lrat # this should take a few seconds
 cake_lpr with_cube_<i>.cnf proof_cube_<i>.lrat
 ```
 To simplify the process, we have added a bash script `solve_cube.sh`, which can be simply run as (for example, for cube number 42):
@@ -98,8 +98,14 @@ To simplify the process, we have added a bash script `solve_cube.sh`, which can 
 ```
 sh solve_cube.sh 42
 ```
+The cubes are indexed from 1 to 312418.
 
-
+To generate the formula + the totality of the cubes for incremental solving, run:
+```
+./cube_gen 0 vars.out > cubes.icnf
+python3 cube_join.py -f 6-30.cnf -c cubes.icnf --inccnf -o full_computation.icnf
+cadical full_computation.icnf # this should take a while :P
+```
 
 ## Authors
 - [Bernardo Subercaseaux](https://bsubercaseaux.github.io/) (Carnegie Mellon University)
