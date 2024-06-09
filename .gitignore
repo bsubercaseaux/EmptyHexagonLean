@@ -6,6 +6,7 @@
 utils/HoleComputation.js
 *.drat
 *.lrat
+cube_checking/cube_gen
 
 ## Nix flake uses .venv directory to set up python stuff
 .venv
