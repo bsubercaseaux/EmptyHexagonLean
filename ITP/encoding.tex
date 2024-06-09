@@ -105,7 +105,7 @@ to obtain empty triangles $ap'e$, $ed'c$, and $cb'a$,
 which can be assembled into a $6$-hole $ap'ed'cb'$.
 
 Justifying this formally turned out to be complex,
-requring a fair bit of reasoning about point \lstinline|Arc|s
+requiring a fair bit of reasoning about point \lstinline|Arc|s
 and \lstinline|σCCWPoints|: lists of points winding around a convex polygon.
 Luckily, the main argument can be summarized in terms of two facts:
 (a) any triangle $abc$ contains an empty triangle $ab'c$; and
@@ -164,14 +164,15 @@ Following Heule and Scheucher,
 we partition the problem into 312\,418 subproblems.
 Each of these subproblems was
 solved using {\tt CaDiCaL} version 1.9.5.
-The solver produced an LRAT proof for each execution,
+{\tt CaDiCaL} produced an LRAT proof for each execution,
 which was validated using the {\tt cake\_lpr} verified checker on-the-fly
 in order to avoid writing/storing/reading large files.
 The total runtime was 25\,876.5 CPU hours, or roughly 3 CPU years.
 The difference in runtime relative to Heule and Scheucher's original run
 is purely due to the difference in hardware.
 Additionally,
-we validated that the subproblems cover the entire search space as Heule and Scheucher did~\cite[Section 7.3]{emptyHexagonNumber}.
+we validated that the subproblems cover the entire search space
+as Heule and Scheucher did~\cite[Section 7.3]{emptyHexagonNumber}.
 This was done by verifying the unsatisfiability
 of another formula that took 20 seconds to solve.
 
