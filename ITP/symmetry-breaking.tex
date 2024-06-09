@@ -30,16 +30,20 @@ Second, the CCW-order property breaks symmetry due to \emph{rotation} by fixing 
 \input{fig-sigma-equiv}
 
 Third, the lex-order property breaks symmetry due to \emph{reflection}.
-Reflecting a set of points~$S$ through a line (e.g., with the map $(x, y) \mapsto (-x, y)$)
+Reflecting a set of points~$S$ over a line (e.g., with the map $(x, y) \mapsto (-x, y)$)
 preserves the presence of $k$-holes and convex $k$-gons.
-Such reflected point sets are almost $\sigma$-equivalent to $S$,
-but their orientations have all changed sign.
-Consider the point sets in \Cref{fig:sigma-equiv}.
-As a result,
-we included the \emph{parity} flag in our Lean definition of $\sigma$-equivalence
-to capture changes in orientations due to reflection,
-where \lstinline|parity := true| changes sign of all orientations.
-The lex-order property ensures that the point set is the lexicographically-larger reflection.
+This operation does not quite preserve orientations, but rather flips them
+(clockwise orientations become counterclockwise and vice versa).
+Our definition of $\sigma$-equivalence includes a \emph{parity} flag for this purpose:
+\lstinline|parity := false| corresponds to the case that orientations are the same,
+and \lstinline|parity := true| corresponds to the case that all orientations have been flipped.
+See the point sets in \Cref{fig:sigma-equiv} for an example.
+
+The lex-order property, then, picks between a set of points and its reflection over \(x=0\).
+The vector of consecutive orientations from the middle to the left
+is assumed to be at least as big as the vector of consecutive orientations from the middle to the right.
+This constraint is not geometrically meaningful,
+but is easy to implement in the SAT encoding.
 
 We prove that there always exists a $\sigma$-equivalent point set in canonical position.
 
