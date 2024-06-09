@@ -795,4 +795,4 @@ theorem hole_lower_bound {r : Nat} (points : List NPoint)
     points.length + 1 ≤ holeNumber (r+3) := by
   let ⟨(), eq⟩ := Option.isSome_iff_exists.1 checkIt
   let ⟨H1, H2, H3⟩ := of_holeCheck' MaybeHoles.yes_wf eq
-  simpa using holeNumber_lower_bound (↑'points) H1 H2 (mt (σHasEmptyKGon_iff_HasEmptyKGon H2).2 H3)
+  simpa using holeNumber_lower_bound (↑'points) H1 H2 (mt (σHasEmptyKGon_iff_HasEmptyKGon H2.toFinset).2 H3)

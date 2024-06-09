@@ -67,14 +67,14 @@ theorem σIsEmptyTriangleFor_iff' {a b c : Point} (gp : Point.ListInGenPos S)
   have ss := hs.subset; have nd := hs.nodup (gp.nodup hs.length_le); simp [not_or] at ss nd
   rw [σIsEmptyTriangleFor_iff] <;> simp [*]
 
-theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : Point.ListInGenPos pts) :
-    σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset := by
+theorem σHasEmptyKGon_iff_HasEmptyKGon {pts : Finset Point} (gp : Point.SetInGenPos ↑pts) :
+    σHasEmptyKGon n pts ↔ HasEmptyKGon n pts := by
   unfold σHasEmptyKGon HasEmptyKGon
   refine exists_congr fun s => and_congr_right' <| and_congr_right fun spts => ?_
   rw [ConvexEmptyIn.iff_triangles'' spts gp]
   simp [Set.subset_def] at spts
   iterate 9 refine forall_congr' fun _ => ?_
-  rw [σIsEmptyTriangleFor_iff gp] <;> simp [EmptyShapeIn, PtInTriangle, *]
+  rw [σIsEmptyTriangleFor_iff'' gp] <;> simp [EmptyShapeIn, PtInTriangle, *]
 
 theorem σHasConvexKGon_iff_HasConvexKGon (gp : Point.ListInGenPos pts) :
     σHasConvexKGon n pts.toFinset ↔ HasConvexKGon n pts.toFinset := by
@@ -228,7 +228,7 @@ theorem σCCWPoints.cycle (H : σCCWPoints (l₁ ++ l₂)) : σCCWPoints (l₂ +
     fun a ha => (H3 a ha).imp <| Eq.trans (by rw [σ_perm₂, ← σ_perm₁])⟩
 
 theorem σCCWPoints.convex (H : σCCWPoints l) : ConvexIndep l.toFinset := by
-  refine ((ConvexEmptyIn.iff_triangles'' subset_rfl H.gp).2 ?_).1
+  refine ((ConvexEmptyIn.iff_triangles'' subset_rfl H.gp.toFinset).2 ?_).1
   simp only [mem_toFinset, Finset.mem_sdiff, Finset.mem_insert, Finset.mem_singleton,
     not_or, and_imp]
   intro a ha b hb c hc ab ac bc p hp pa pb pc hn
@@ -353,7 +353,7 @@ theorem σCCWPoints.emptyHexagon
     gp ((@perm_append_comm _ [c,d,e,f] [a, b']).subperm.trans sp)
   have ⟨f', sp, H, efa⟩ := σCCWPoints.flatten (H.cycle (l₁ := [c, d']) (l₂ := [e,f,a,b']))
     gp ((@perm_append_comm _ [e,f,a,b'] [c, d']).subperm.trans sp)
-  refine (σHasEmptyKGon_iff_HasEmptyKGon gp).2
+  refine (σHasEmptyKGon_iff_HasEmptyKGon gp.toFinset).2
     ⟨[e, f', a, b', c, d'].toFinset, ?_, by simpa [Set.subset_def] using sp.subset, H.convex, ?_⟩
   · exact congrArg length (dedup_eq_self.2 (H.gp.nodup (by show 3 ≤ 6; decide)))
   · refine σCCWPoints.split_emptyShapeIn e [f'] a [b', c, d'] H efa ?_

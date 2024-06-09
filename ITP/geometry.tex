@@ -19,15 +19,20 @@ def HasEmptyKGon (k : Nat) (S : Set Point) : Prop :=
     ∃ s : Finset Point, s.card = k ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
 \end{lstlisting}
 
-Let \lstinline|ListInGenPos| be a predicate that states that a list of points is in \emph{general position}, i.e., no three points lie on a common line (made precise in~\Cref{sec:triple-orientations}).
-With this we can already state the main theorem of our paper.
+Let \lstinline|SetInGenPos| be a predicate that states that a set of points is in \emph{general position}, i.e., no three points lie on a common line (made precise in~\Cref{sec:triple-orientations}).
+With this we can already state the core theorem.
 
 \begin{lstlisting}
-theorem hole_6_theorem (pts : List Point) (gp : ListInGenPos pts)
-    (h : pts.length ≥ 30) : HasEmptyKGon 6 pts.toFinset
+theorem hole_6_theorem : ∀ (pts : Finset Point),
+    Point.SetInGenPos pts → pts.card = 30 → HasEmptyKGon 6 pts
 \end{lstlisting}
 
-At the root  of the encoding of Heule and Scheucher is the idea that the~\lstinline|ConvexEmptyIn| predicate can be determined by analyzing only triangles. In particular, that a set $s$ of $k$ points in a pointset $S$ form an empty convex $k$-gon if and only if all the ${k \choose 3}$ triangles induced by vertices in $s$ are empty with respect to $S$. This is discussed informally in~\cite[Section 3, Eq.~4]{emptyHexagonNumber}.
+At the root  of the encoding of Heule and Scheucher is the idea that
+the~\lstinline|ConvexEmptyIn| predicate can be determined by analyzing only triangles.
+In particular, that a set $s$ of $k$ points in a pointset $S$ form an empty convex $k$-gon
+if and only if all the ${k \choose 3}$ triangles induced by vertices in $s$
+are empty with respect to $S$.
+This is discussed informally in~\cite[Section 3, Eq.~4]{emptyHexagonNumber}.
 Concretely, we prove the following theorem:
 \begin{lstlisting}
 theorem ConvexEmptyIn.iff_triangles {s : Finset Point} {S : Set Point}

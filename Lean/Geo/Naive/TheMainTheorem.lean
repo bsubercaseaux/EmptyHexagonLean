@@ -8,7 +8,7 @@ open Classical LeanSAT Model
 
 theorem empty_kgon_naive (unsat : (Geo.naiveCNF k (r+2)).isUnsat) : holeNumber k ≤ r + 3 := by
   refine holeNumber_le.2 fun pts h _ gp => by_contra fun h' => ?_
-  have noσtri : ¬σHasEmptyKGon k pts.toFinset := mt (σHasEmptyKGon_iff_HasEmptyKGon gp).1 h'
+  have noσtri : ¬σHasEmptyKGon k pts.toFinset := mt (σHasEmptyKGon_iff_HasEmptyKGon gp.toFinset).1 h'
   have ⟨w, ⟨hw⟩⟩ := @symmetry_breaking pts (h ▸ Nat.le_add_left ..) gp
   have noσtri' : ¬σHasEmptyKGon k w.toFinset :=
     OrientationProperty_σHasEmptyKGon.not (hw.toEquiv w.nodup) noσtri

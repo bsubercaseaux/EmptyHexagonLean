@@ -98,7 +98,7 @@ axiom unsat_6hole_cnf : (Geo.hexagonCNF (rlen := 30-1) (holes := true)).isUnsat
 (and no fewer) contains an empty hexagon.
 -/
 theorem holeNumber_6 : holeNumber 6 = 30 :=
-  le_antisymm (hole_6_theorem unsat_6hole_cnf) (hole_lower_bound [
+  le_antisymm (hole_6_theorem' unsat_6hole_cnf) (hole_lower_bound [
     (1, 1260), (16, 743), (22, 531), (37, 0), (306, 592), (310, 531), (366, 552), (371, 487),
     (374, 525), (392, 575), (396, 613), (410, 539), (416, 550), (426, 526), (434, 552), (436, 535),
     (446, 565), (449, 518), (450, 498), (453, 542), (458, 526), (489, 537), (492, 502), (496, 579),
