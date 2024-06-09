@@ -7,6 +7,9 @@ utils/HoleComputation.js
 *.drat
 *.lrat
 
+## Nix flake uses .venv directory to set up python stuff
+.venv
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
