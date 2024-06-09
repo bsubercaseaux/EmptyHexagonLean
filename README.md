@@ -65,6 +65,7 @@ The **tautology proof** is implied by checking that $F \land (\bigwedge_i \neg C
 
 As a first step, we will generate the main CNF by running:
 ```
+cd Lean
 lake exe encode hole 6 30 cube_checking/vars.out > cube_checking/6-30.cnf
 ```
 
