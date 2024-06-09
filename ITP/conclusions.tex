@@ -35,12 +35,14 @@ Similarly, we found a typo in the statement of the \textsf{Lex order} condition
 that did not match the (correct) code of Heule and Scheucher.
 Our formalization corrects this.
 
-In terms of future work,
-we hope to formally verify the result $h(7) = \infty$ due to Horton~\cite{hortonSetsNoEmpty1983},
+\subsection*{Future Work}
+We hope to formally verify the result $h(7) = \infty$ due to Horton~\cite{hortonSetsNoEmpty1983},
 and other results in Erd\H{o}s-Szekeres style problems.
-A key challenge for the community
-is to improve the connection between verified SAT tools and ITPs.
+
+We also see a key challenge for the community,
+to improve trust when importing ``cube and conquer'' style results to an ITP.
 This presents a significant engineering task
-for proofs that are hundreds of terabytes long (as in this result).
+when the proof certificate is hundreds of terabytes,
+as in this result (see \Cref{sec:running_cnf}).
 Although we are confident that our results are correct,
 the trust story at this connection point has room for improvement.
