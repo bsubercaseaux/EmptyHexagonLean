@@ -176,6 +176,17 @@ as Heule and Scheucher did~\cite[Section 7.3]{emptyHexagonNumber}.
 This was done by verifying the unsatisfiability
 of another formula that took 20 seconds to solve.
 
+The artifact for this paper includes scripts to validate any individual subproblem,
+as well as the summary proof that the subproblems cover the search space.
+However, the unsatisfiability of $\phi_{30}$ depends on
+the unsatisfiability of \textit{all} (hundreds of thousands of) subproblems.
+A skeptical reader might wish to examine the proof files for all subproblems,
+but we estimated the total proof size to be tens or hundreds of terabytes,
+far too much to reasonably store and distribute.
+So, the skeptical reader must run the entire 3 CPU year computation.
+We believe this trust story can be somewhat improved,
+but leave such a challenge as future work.
+
 % file-local attic:
 
 % By using the triangulation lemma repeatedly,
