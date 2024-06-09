@@ -59,9 +59,9 @@ theorem symmetry_breaking : ListInGenPos l →
 
 \begin{proof}[Proof Sketch]
 The proof proceeds in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}.
-In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one,
-and the last one will be in canonical position.
-\footnote{Even though we defined $\sigma$-equivalence for sets of points,
+In each of the steps, we construct a new list of points that is $\sigma$-equivalent to the previous one,
+with the last one being in canonical position.\footnote{
+Even though we defined $\sigma$-equivalence for sets of points,
 our formalization goes back and forth between sets and lists.
 Given that symmetry breaking distinguishes between the order of the points
 e.g., $x$-order, this proof proceeds over lists.
@@ -77,10 +77,11 @@ then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved
 \textbf{Step 1}: we transform the list of points so that no two points share the same $x$-coordinate.
 This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix.
 Rotations always have determinant $1$.
-\textbf{Step 2}: we translate all points by a constant vector $t$, by multiplying by a translation matrix,
-so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate.
+\textbf{Step 2}: we translate all points by a constant vector $t$, which corresponds to multiplying by a translation matrix,
+to bring the leftmost point~$p_1$ to position $(0, 0)$.
+As a result, every other point has a positive $x$-coordinate.
 
-Let $L_2$ be the list of points after Step 2, excluding $(0,0)$ which we will denote by $p_1$.
+Let $L_2$ be the list of points excluding $p_1$ after Step 2.
 \textbf{Step 3}: we apply the projective transformation $f: (x, y) \mapsto (y/x, 1/x)$ to every point in $L_2$,
 showing that this preserves orientations within $L_2$.
 To see that this mapping is a $\sigma$-equivalence consider that
@@ -103,8 +104,8 @@ we need to define an extension
 \)
 We then show that $\sigma((0, 0), q, r) = \sigma_{(0, \infty)}(f(q), f(r))$ for all points $q, r \in L_2$. 
 
-\textbf{Step 4}: we sort the list $L_2$ by $x$-coordinate in increasing order,
-thus obtaining a list $L_3$.
+\textbf{Step 4}: we sort the list~$L_2$ by $x$-coordinate in increasing order,
+thus obtaining a list~$L_3$.
 This can be done while preserving $\sigma$-equivalence because sorting corresponds to a permutation,
 and all permutations of a list are $\sigma$-equivalent by definition.
 \textbf{Step 5}: we check whether the \textsf{Lex order} condition above is satisfied in $L_3$,
