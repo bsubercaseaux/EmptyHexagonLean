@@ -96,6 +96,11 @@ If proof checking succeeds, you should see the following output:
 s VERIFIED UNSAT
 ```
 
+Moreover, if you do not have the `cadical` and `cake_lpr` executables on your path, you can pass them to the script as:
+```
+env CADICAL=<path to cadical> CAKELPR=<path to cake_lpr> ./verify_tautology.sh 
+```
+
 Because verifying the **UNSAT proof** requires many thousands of CPU hours,
 we provide a simple way to verify that any single cube is UNSAT.
 To generate the formula + cube number $i$ (assuming the steps for the **tautology proof** have been followed), run `./solve_cube.sh` script in the `cube_checking/` directory, which essentially runs:
