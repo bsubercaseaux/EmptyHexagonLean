@@ -189,17 +189,17 @@ def σHasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
   ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ∀ (a ∈ s) (b ∈ s) (c ∈ s), 
   a ≠ b → a ≠ c → b ≠ c → σIsEmptyTriangleFor a b c S
 
-theorem σHasEmptyKGon_iff_HasEmptyKGon (gp : ListInGenPos pts) :
-      σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset
+theorem σHasEmptyKGon_iff_HasEmptyKGon {n : Nat} (gp : ListInGenPos pts) :
+    σHasEmptyKGon n pts.toFinset ↔ HasEmptyKGon n pts.toFinset
 \end{lstlisting}
 
 Then, because \lstinline|σHasEmptyKGon| is ultimately defined in terms of $\sigma$, we can prove
 \begin{lstlisting}
-lemma OrientationProperty_σHasEmptyKGon : OrientationProperty (σHasEmptyKGon n)
+lemma OrientationProperty_σHasEmptyKGon {n : Nat} : OrientationProperty (σHasEmptyKGon n)
 \end{lstlisting}
 Which in combination with \lstinline|theorem σHasEmptyKGon_iff_HasEmptyKGon|, provides
 \begin{lstlisting}
-theorem OrientationProperty_HasEmptyKGon : OrientationProperty (HasEmptyKGon n)
+theorem OrientationProperty_HasEmptyKGon {n : Nat} : OrientationProperty (HasEmptyKGon n)
 \end{lstlisting}
 
 The previous theorem is important for two reasons.
@@ -244,15 +244,25 @@ theorem σ_prop₃ (h : Sorted₄ p q r s) (gp : InGenPos₄ p q r s) :
     σ p q r = cw → σ q r s = cw → σ p r s = cw
 \end{lstlisting}
 
-They will be used in justifying the addition of clauses~\labelcref{eq:signotopeClauses11,eq:signotopeClauses12};
-clauses like these or the one below are easily added,
-and are commonly used to reduce the search space in SAT encodings~\cite{emptyHexagonNumber,scheucherTwoDisjoint5holes2020,subercaseaux2023minimizing, szekeres_peters_2006}.
+Our proofs of these properties are based on an equivalence between
+the orientation of a triple of points
+and the \emph{slopes} of the lines that connect them.
+Namely, if $p, q, r$  are sorted from left to right,
+then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pq}) < \textsf{slope}(\overrightarrow{pr})$
+and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pr}) < \textsf{slope}(\overrightarrow{qr})$.
+By first proving these \emph{slope-orientation} equivalences
+we can then easily prove \lstinline|σ_prop₁| and others,
+as illustrated in~\Cref{fig:orientation-implication}.
 
-\begin{align}
-  &\left(\neg \orvar_{a, b, c} \lor \neg \orvar_{a, c, d} \lor \orvar_{a, b, d}\right) \land \left(\orvar_{a, b, c} \lor \orvar_{a, c, d} \lor  \neg \orvar_{a, b, d}\right)
-\end{align}
+These properties will be used in~\Cref{sec:encoding}
+to justify clauses~\labelcref{eq:signotopeClauses11,eq:signotopeClauses12} of the SAT encoding;
+these clauses are commonly added in orientation-based SAT encodings
+to reduce the search space by removing some ``unrealizable'' orientations~\cite{emptyHexagonNumber,scheucherTwoDisjoint5holes2020,subercaseaux2023minimizing, szekeres_peters_2006}.
+\[
+  \left(\neg \orvar_{a, b, c} \lor \neg \orvar_{a, c, d} \lor \orvar_{a, b, d}\right) \land
+  \left(\orvar_{a, b, c} \lor \orvar_{a, c, d} \lor  \neg \orvar_{a, b, d}\right)
+\]
 
-Our proofs of these properties are based on an equivalence between the orientation of a triple of points and the \emph{slopes} of the lines that connect them. Namely, if $p, q, r$  are sorted from left to right, then (i) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pq}) < \textsf{slope}(\overrightarrow{pr})$  and (ii) $\sigma(p,q,r)=1 \iff \textsf{slope}(\overrightarrow{pr}) < \textsf{slope}(\overrightarrow{qr})$. By first proving these \emph{slope-orientation} equivalences we can then easily prove \lstinline|σ_prop₁| and others, as illustrated in~\Cref{fig:orientation-implication}.
 
 \begin{figure}
   \centering
