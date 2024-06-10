@@ -104,9 +104,9 @@ We define $\sigma$ in Lean using \textsf{mathlib}'s definition of the determinan
 % @[pp_dot] abbrev y (p : Point) : ℝ := p 1
 \begin{lstlisting}
 inductive Orientation : Type where
-  | cw -- clockwise :=  -
-  | ccw -- counter clockwise := +
-  | collinear -- := 0
+  | cw          -- Clockwise turn
+  | ccw         -- Counter-clockwise turn
+  | collinear   -- Collinear
 
 noncomputable def σ (p q r : Point) : Orientation :=
   let det := Matrix.det !![p.x, q.x, r.x ; p.y, q.y, r.y ; 1, 1, 1]
