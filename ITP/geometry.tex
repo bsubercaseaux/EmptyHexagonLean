@@ -12,11 +12,13 @@ i.e., the point set encloses a convex polygon. -/
 def ConvexIndep (S : Set Point) : Prop :=
     ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
+/-- `ConvexEmptyIn S P' means that `S' forms a convex empty polygon in `P' -/
 def ConvexEmptyIn (S P : Set Point) : Prop :=
     ConvexIndep S ∧ EmptyShapeIn S P
 
-def HasEmptyKGon (k : Nat) (S : Set Point) : Prop :=
-    ∃ s : Finset Point, s.card = k ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
+/-- `HasEmptyKGon k P' means that `P' has a convex, empty `k'-gon -/
+def HasEmptyKGon (k : Nat) (P : Set Point) : Prop :=
+    ∃ S : Finset Point, S.card = k ∧ ↑S ⊆ P ∧ ConvexEmptyIn S P
 \end{lstlisting}
 
 Let \lstinline|SetInGenPos| be a predicate that states that a set of points is in \emph{general position}, i.e., no three points lie on a common line (made precise in~\Cref{sec:triple-orientations}).
@@ -24,7 +26,7 @@ With this we can already state the core theorem.
 
 \begin{lstlisting}
 theorem hole_6_theorem : ∀ (pts : Finset Point),
-    Point.SetInGenPos pts → pts.card = 30 → HasEmptyKGon 6 pts
+    SetInGenPos pts → pts.card = 30 → HasEmptyKGon 6 pts
 \end{lstlisting}
 
 At the root  of the encoding of Heule and Scheucher is the idea that

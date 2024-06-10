@@ -257,10 +257,10 @@ theorem EmptyShapeIn.split (cvx : ConvexIndep S) (ha : a ∈ S) (hb : b ∈ S)
     (H2 : EmptyShapeIn {x ∈ S | σ a b x ≠ .cw} P) : EmptyShapeIn S P := fun _ ⟨pP, pS⟩ hn =>
   (split_convexHull cvx ha hb hn).elim (H1 _ ⟨pP, mt And.left pS⟩) (H2 _ ⟨pP, mt And.left pS⟩)
 
-def HasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexEmptyIn s S
+def HasEmptyKGon (n : Nat) (P : Set Point) : Prop :=
+  ∃ S : Finset Point, S.card = n ∧ ↑S ⊆ P ∧ ConvexEmptyIn S P
 
-def HasConvexKGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexIndep s
+def HasConvexKGon (n : Nat) (P : Set Point) : Prop :=
+  ∃ S : Finset Point, S.card = n ∧ ↑S ⊆ P ∧ ConvexIndep S
 
 end Geo

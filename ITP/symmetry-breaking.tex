@@ -30,16 +30,20 @@ Second, the CCW-order property breaks symmetry due to \emph{rotation} by fixing 
 \input{fig-sigma-equiv}
 
 Third, the lex-order property breaks symmetry due to \emph{reflection}.
-Reflecting a set of points~$S$ through a line (e.g., with the map $(x, y) \mapsto (-x, y)$)
+Reflecting a set of points~$S$ over a line (e.g., with the map $(x, y) \mapsto (-x, y)$)
 preserves the presence of $k$-holes and convex $k$-gons.
-Such reflected point sets are almost $\sigma$-equivalent to $S$,
-but their orientations have all changed sign.
-Consider the point sets in \Cref{fig:sigma-equiv}.
-As a result,
-we included the \emph{parity} flag in our Lean definition of $\sigma$-equivalence
-to capture changes in orientations due to reflection,
-where \lstinline|parity := true| changes sign of all orientations.
-The lex-order property ensures that the point set is the lexicographically-larger reflection.
+This operation does not quite preserve orientations, but rather flips them
+(clockwise orientations become counterclockwise and vice versa).
+Our definition of $\sigma$-equivalence includes a \emph{parity} flag for this purpose:
+\lstinline|parity := false| corresponds to the case that orientations are the same,
+and \lstinline|parity := true| corresponds to the case that all orientations have been flipped.
+See the point sets in \Cref{fig:sigma-equiv} for an example.
+
+The lex-order property, then, picks between a set of points and its reflection over \(x=0\).
+The vector of consecutive orientations from the middle to the left
+is assumed to be at least as big as the vector of consecutive orientations from the middle to the right.
+This constraint is not geometrically meaningful,
+but is easy to implement in the SAT encoding.
 
 We prove that there always exists a $\sigma$-equivalent point set in canonical position.
 
@@ -54,14 +58,33 @@ theorem symmetry_breaking : ListInGenPos l →
 
 
 \begin{proof}[Proof Sketch]
-The proof proceeds in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}. In each of the steps, we will construct a new list of points that is $\sigma$-equivalent to the previous one, and the last one will be in canonical position.\footnote{Even though we defined $\sigma$-equivalence for sets of points, our formalization goes back and forth between sets and lists. Given that symmetry breaking distinguishes between the order of the points e.g., $x$-order, this proof proceeds over lists. All permutations of a list are immediately $\sigma$-equivalent.}
-The main justification for each step is that, given that the function $\sigma$ is defined as a sign of the determinant, applying transformations that preserve (or, when \lstinline|parity := true|, uniformly reverse) the sign of the determinant will preserve (or uniformly reverse) the values of $\sigma$. In particular, given the identity $\det(AB) = \det(A)\det(B)$, if we apply a transformation to the points that corresponds to multiplying by a matrix $B$ such that $\det(B) > 0$, then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved.
-In step 1, we transform the list of points so that no two points share the same $x$-coordinate. This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix.
-Rotations always have determinant $1$. 
-In step 2, we translate all points by a constant vector $t$, by multiplying by a translation matrix, so that the left most point gets position $(0, 0)$, and naturally every other point will have a positive $x$-coordinate.
-Let $L_2$ be the list of points after this transformation, excluding $(0,0)$ which we will denote by $p_1$.
-Then, in step 3, we  apply the projective transformation $f: (x, y) \mapsto (y/x, 1/x)$ to every point in $L_2$, showing that this preserves orientations within $L_2$.
-To see that this mapping is a $\sigma$-equivalence consider that 
+The proof proceeds in 6 steps, illustrated in~\Cref{fig:symmetry-breaking}.
+In each of the steps, we construct a new list of points that is $\sigma$-equivalent to the previous one,
+with the last one being in canonical position.\footnote{
+Even though we defined $\sigma$-equivalence for sets of points,
+our formalization goes back and forth between sets and lists.
+Given that symmetry breaking distinguishes between the order of the points
+e.g., $x$-order, this proof proceeds over lists.
+All permutations of a list are immediately $\sigma$-equivalent.}
+The main justification for each step is that,
+given that the function $\sigma$ is defined as a sign of the determinant,
+applying transformations that preserve (or, when \lstinline|parity := true|, uniformly reverse)
+the sign of the determinant will preserve (or uniformly reverse) the values of $\sigma$.
+
+For example, given the identity $\det(AB) = \det(A)\det(B)$,
+if we apply a transformation to the points that corresponds to multiplying by a matrix $B$ such that $\det(B) > 0$,
+then $\sign(\det(A)) = \sign(\det(AB))$, and thus orientations will be preserved.
+\textbf{Step 1}: we transform the list of points so that no two points share the same $x$-coordinate.
+This can be done by applying a rotation to the list of points, which corresponds to multiplying by a rotation matrix.
+Rotations always have determinant $1$.
+\textbf{Step 2}: we translate all points by a constant vector $t$, which corresponds to multiplying by a translation matrix,
+to bring the leftmost point~$p_1$ to position $(0, 0)$.
+As a result, every other point has a positive $x$-coordinate.
+
+Let $L_2$ be the list of points excluding $p_1$ after Step 2.
+\textbf{Step 3}: we apply the projective transformation $f: (x, y) \mapsto (y/x, 1/x)$ to every point in $L_2$,
+showing that this preserves orientations within $L_2$.
+To see that this mapping is a $\sigma$-equivalence consider that
 \[
 \begin{multlined}
  \sign \det \begin{pmatrix} p_x & q_x & r_x \\ p_y & q_y & r_y \\ 1 & 1 & 1 \end{pmatrix} =  \sign \det \left( \begin{pmatrix} 0 & 0 & 1 \\ 1 & 0 & 0\\ 0 & 1 & 0 \end{pmatrix}  \begin{pmatrix} \nicefrac{p_y}{p_x} & \nicefrac{q_y}{q_x} & \nicefrac{r_y}{r_x} \\ \nicefrac{1}{p_x} & \nicefrac{1}{q_x} & \nicefrac{1}{r_x} \\ 1 & 1 & 1 \end{pmatrix}  \begin{pmatrix} p_x & 0 & 0 \\ 0 & q_x & 0\\ 0 & 0 & r_x \end{pmatrix} \right)\\
@@ -69,7 +92,8 @@ To see that this mapping is a $\sigma$-equivalence consider that
                         %  \tag{As $p_x q_x r_x > 0$ by step 2}
 \end{multlined}
 \]
-To preserve orientations with respect to the leftmost point $(0, 0)$, we set $f( (0, 0)) = (0, \infty)$, a special point that is treated separately as follows.
+To preserve orientations with respect to the leftmost point $(0, 0)$, we set $f( (0, 0)) = (0, \infty)$,
+a special point that is treated separately as follows.
 As the function $\sigma$ takes points in $\mathbb{R}^2$ as arguments,
 we need to define an extension
 \(
@@ -79,13 +103,25 @@ we need to define an extension
   \end{cases},
 \)
 We then show that $\sigma((0, 0), q, r) = \sigma_{(0, \infty)}(f(q), f(r))$ for all points $q, r \in L_2$. 
-In step 4, we sort the list $L_2$ by $x$-coordinate in increasing order, thus obtaining a list $L_3$.
-This can be done while preserving $\sigma$-equivalence because sorting corresponds to a permutation, and all permutations of a list are $\sigma$-equivalent by definition.
-In step 5, we check whether the \textsf{Lex order} condition above is satisfied in $L_3$, and if it is not, we reflect the pointset, which preserves $\sigma$-equivalence with \lstinline|parity := true|.
+
+\textbf{Step 4}: we sort the list~$L_2$ by $x$-coordinate in increasing order,
+thus obtaining a list~$L_3$.
+This can be done while preserving $\sigma$-equivalence because sorting corresponds to a permutation,
+and all permutations of a list are $\sigma$-equivalent by definition.
+\textbf{Step 5}: we check whether the \textsf{Lex order} condition above is satisfied in $L_3$,
+and if it is not, we reflect the pointset,
+which preserves $\sigma$-equivalence with \lstinline|parity := true|.
 Note that in such a case we need to relabel the points from left to right again.
-In step 6, we bring point $(0, \infty)$ back into the range by first finding a constant $c$ such that all points in $L_3$ are to the right of the line $y=c$, and then finding a large enough value $M$ such that $(c, M)$ has the same orientation with respect to the other points as $(0, \infty)$ did, meaning that 
+
+\textbf{Step 6}: we bring point $(0, \infty)$ back into the range
+by first finding a constant $c$ such that all points in $L_3$ are to the right of the line $y=c$,
+and then finding a large enough value $M$ such that $(c, M)$ has the same orientation
+with respect to the other points as $(0, \infty)$ did,
+meaning that 
 \(\sigma((c, M), q, r) = \sigma_{(0, \infty)}(q, r)\) for every $q, r \in L_3$.
-Finally, we note that the list of points obtained in step 6 satisfies the \text{CCW-order} property by the following reasoning:
+
+Finally, we note that the list of points obtained in step 6
+satisfies the \text{CCW-order} property by the following reasoning:
 if $1 < i < j \leq n$ are indices, then 
 \begin{align*}
   \sigma(p_1, p_i, p_j) = 1 &\iff \sigma((c, M), p_i, p_j) = 1\\
@@ -95,4 +131,3 @@ if $1 < i < j \leq n$ are indices, then
 \end{align*}
 This concludes the proof.
 \end{proof}
-

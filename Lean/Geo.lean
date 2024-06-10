@@ -19,11 +19,11 @@ i.e. the point set encloses a convex polygon. Also known as a "convex-independen
 recall Geo.ConvexIndep (S : Set Point) : Prop :=
   ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
-recall Geo.HasConvexKGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexIndep s
+recall Geo.HasConvexKGon (n : Nat) (P : Set Point) : Prop :=
+  ∃ S : Finset Point, S.card = n ∧ ↑S ⊆ P ∧ ConvexIndep S
 
-recall Geo.HasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexIndep s ∧ EmptyShapeIn s S
+recall Geo.HasEmptyKGon (n : Nat) (P : Set Point) : Prop :=
+  ∃ S : Finset Point, S.card = n ∧ ↑S ⊆ P ∧ ConvexIndep S ∧ EmptyShapeIn S P
 
 /- `gonNumber k` is the smallest number `n` such that every set of `n` or more points
 in general position contains a convex-independent set of size `k`. -/
