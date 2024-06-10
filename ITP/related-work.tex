@@ -13,7 +13,7 @@ of determining $k$-hole numbers $h(k)$.
 Rather than devise a new SAT encoding,
 we use essentially the same encoding presented by Heule and Scheucher~\cite{emptyHexagonNumber}.
 Interestingly,
-a (verified) proof of $g(6) \leq 17$ can be obtained
+a formal proof of $g(6) \leq 17$ can be obtained
 as a corollary of our development.
 We can assert the hole variables $\hvar_{a,b,c}$ as true
 while leaving the remainder of the encoding in~\Cref{fig:full-encoding} unchanged,
@@ -29,8 +29,8 @@ with no convex $6$-gon.
 We checked this formula to be unsatisfiable for $n = 17$,
 giving the same result as Marić:
 \begin{lstlisting}
-theorem gon_6_theorem (pts : List Point) (gp : ListInGenPos pts)
-    (h : pts.length ≥ 17) : HasConvexKGon 6 pts.toFinset
+theorem gon_6_theorem : ∀ (pts : Finset Point),
+  SetInGenPos pts → pts.card = 17 → HasConvexKGon 6 pts
 \end{lstlisting}
 
 Since both formalizations can be executed,

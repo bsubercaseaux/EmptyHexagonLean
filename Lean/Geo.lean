@@ -19,11 +19,11 @@ i.e. the point set encloses a convex polygon. Also known as a "convex-independen
 recall Geo.ConvexIndep (S : Set Point) : Prop :=
   ∀ a ∈ S, a ∉ convexHull ℝ (S \ {a})
 
-recall Geo.HasConvexKGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexIndep s
+recall Geo.HasConvexKGon (n : Nat) (P : Set Point) : Prop :=
+  ∃ S : Finset Point, S.card = n ∧ ↑S ⊆ P ∧ ConvexIndep S
 
-recall Geo.HasEmptyKGon (n : Nat) (S : Set Point) : Prop :=
-  ∃ s : Finset Point, s.card = n ∧ ↑s ⊆ S ∧ ConvexIndep s ∧ EmptyShapeIn s S
+recall Geo.HasEmptyKGon (n : Nat) (P : Set Point) : Prop :=
+  ∃ S : Finset Point, S.card = n ∧ ↑S ⊆ P ∧ ConvexIndep S ∧ EmptyShapeIn S P
 
 /- `gonNumber k` is the smallest number `n` such that every set of `n` or more points
 in general position contains a convex-independent set of size `k`. -/
@@ -98,7 +98,7 @@ axiom unsat_6hole_cnf : (Geo.hexagonCNF (rlen := 30-1) (holes := true)).isUnsat
 (and no fewer) contains an empty hexagon.
 -/
 theorem holeNumber_6 : holeNumber 6 = 30 :=
-  le_antisymm (hole_6_theorem unsat_6hole_cnf) (hole_lower_bound [
+  le_antisymm (hole_6_theorem' unsat_6hole_cnf) (hole_lower_bound [
     (1, 1260), (16, 743), (22, 531), (37, 0), (306, 592), (310, 531), (366, 552), (371, 487),
     (374, 525), (392, 575), (396, 613), (410, 539), (416, 550), (426, 526), (434, 552), (436, 535),
     (446, 565), (449, 518), (450, 498), (453, 542), (458, 526), (489, 537), (492, 502), (496, 579),

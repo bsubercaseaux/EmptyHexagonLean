@@ -150,7 +150,7 @@ theorem HasEmptyKGon_extension' :
     (∀ l : List Point, l.length = n → l.Nodup → Point.ListInGenPos l → HasEmptyKGon k l.toFinset) →
     l.Nodup → n ≤ l.length → HasEmptyKGon k l.toFinset := by
   intro H nodup llength
-  rw [← σHasEmptyKGon_iff_HasEmptyKGon gp]
+  rw [← σHasEmptyKGon_iff_HasEmptyKGon gp.toFinset]
 
   have ⟨l₁, σ₁, distinct⟩ := σEmbed_rotate l nodup
   replace gp := (OrientationProperty'.gp σ₁).mp gp
@@ -172,7 +172,7 @@ theorem HasEmptyKGon_extension' :
   suffices σHasEmptyKGon k l₂.toFinset by
     rwa [List.toFinset_eq_of_perm _ _ l₂l₁] at this
 
-  rw [σHasEmptyKGon_iff_HasEmptyKGon gp]
+  rw [σHasEmptyKGon_iff_HasEmptyKGon gp.toFinset]
   let left := l₂.take n
   let right := l₂.drop n
   have leftl₂ : left <+ l₂ := List.take_sublist ..
