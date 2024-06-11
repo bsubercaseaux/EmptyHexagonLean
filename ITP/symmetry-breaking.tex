@@ -131,3 +131,10 @@ if $1 < i < j \leq n$ are indices, then
 \end{align*}
 This concludes the proof.
 \end{proof}
+
+Compared to the symmetry-breaking transformation described by Heule and Scheucher,
+our transformation is simpler.
+Nonetheless, proving the above theorem in Lean was tedious,
+as we had to show that the properties from the previous steps were preserved at each new step,
+which carried substantial proof burden.
+In particular, steps 3 through 6 required careful bookkeeping and special handling of the distinguished point~$p_1$.

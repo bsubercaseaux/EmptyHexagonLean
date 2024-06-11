@@ -105,7 +105,7 @@ to obtain empty triangles $ap'e$, $ed'c$, and $cb'a$,
 which can be assembled into a $6$-hole $ap'ed'cb'$.
 
 Justifying this formally turned out to be complex,
-requring a fair bit of reasoning about point \lstinline|Arc|s
+requiring a fair bit of reasoning about point \lstinline|Arc|s
 and \lstinline|σCCWPoints|: lists of points winding around a convex polygon.
 Luckily, the main argument can be summarized in terms of two facts:
 (a) any triangle $abc$ contains an empty triangle $ab'c$; and
@@ -154,7 +154,8 @@ if $\{x \in S \mid \sigma(a,b,x) \neq +1\}$ and $\{x \in S \mid \sigma(a,b,x) \n
 are both empty shapes in $P$,
 then $S$ is an empty shape in $P$.
 
-\subparagraph*{Running the CNF.}
+\subsection{Running the CNF.}
+\label{sec:running_cnf}
 Having now shown that our main result follows if $\phi_{30}$ is unsatisfiable,
 we run a distributed computation to check its unsatisfiability.
 We solve the SAT formula~$\phi_{30}$ produced by Lean using the same setup as
@@ -164,16 +165,28 @@ Following Heule and Scheucher,
 we partition the problem into 312\,418 subproblems.
 Each of these subproblems was
 solved using {\tt CaDiCaL} version 1.9.5.
-The solver produced an LRAT proof for each execution,
+{\tt CaDiCaL} produced an LRAT proof for each execution,
 which was validated using the {\tt cake\_lpr} verified checker on-the-fly
 in order to avoid writing/storing/reading large files.
 The total runtime was 25\,876.5 CPU hours, or roughly 3 CPU years.
 The difference in runtime relative to Heule and Scheucher's original run
 is purely due to the difference in hardware.
 Additionally,
-we validated that the subproblems cover the entire search space as Heule and Scheucher did~\cite[Section 7.3]{emptyHexagonNumber}.
+we validated that the subproblems cover the entire search space
+as Heule and Scheucher did~\cite[Section 7.3]{emptyHexagonNumber}.
 This was done by verifying the unsatisfiability
 of another formula that took 20 seconds to solve.
+
+The artifact for this paper includes scripts to validate any individual subproblem,
+as well as the summary proof that the subproblems cover the search space.
+However, the unsatisfiability of $\phi_{30}$ depends on
+the unsatisfiability of \textit{all} (hundreds of thousands of) subproblems.
+A skeptical reader might wish to examine the proof files for all subproblems,
+but we estimated the total proof size to be tens or hundreds of terabytes,
+far too much to reasonably store and distribute.
+Instead, the skeptical reader must run the entire 3 CPU year computation.
+We believe this trust story can be somewhat improved,
+but we leave such a challenge to future work.
 
 % file-local attic:
 
