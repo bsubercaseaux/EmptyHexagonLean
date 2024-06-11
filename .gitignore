@@ -1,8 +1,15 @@
 .DS_Store/
 .DS_Store
 *.cnf
+*.icnf
 .direnv/
 utils/HoleComputation.js
+*.drat
+*.lrat
+cube_checking/cube_gen
+
+## Nix flake uses .venv directory to set up python stuff
+.venv
 
 ## Core latex/pdflatex auxiliary files:
 *.aux

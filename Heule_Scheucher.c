@@ -1,3 +1,8 @@
+/*
+ * Encoding used by Heule and Scheucher.
+ *  We sourced this C file directly from them.
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>

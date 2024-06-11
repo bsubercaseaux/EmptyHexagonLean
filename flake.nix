@@ -14,6 +14,8 @@
           texlive.combined.scheme-full
           texlab
           fontconfig
+          gcc
+          python3
         ];
 
         FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [
@@ -23,6 +25,18 @@
             pkgs.iosevka
           ];
         };
+
+        # Create a python virtual environment with eznf and lark
+        venvDir = "./.venv";
+        buildInputs = with pkgs.python3Packages; [
+          python
+          venvShellHook
+        ];
+
+        postVenvCreation = ''
+          unset SOURCE_DATE_EPOCH
+          pip install eznf lark
+        '';
       };
     });
 }
