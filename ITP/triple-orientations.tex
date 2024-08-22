@@ -2,7 +2,7 @@ An essential step for obtaining computational proofs of geometric results is \em
 problems concerning the existence of an object~$\mathcal{O}$ in a continuous search space like $\mathbb{R}^2$
 must be reformulated in terms of the existence of a discrete, finitely-representable object~$\mathcal{O}'$
 that a computer can search for.
-It is especially challenging to discretize problems in which the desired geometric object $\mathcal{O}$ is characterized by very specific coordinates of points,
+It is especially challenging to discretize problems for which the desired geometric object~$\mathcal{O}$ is characterized by very specific coordinates of points,
 thus requiring the computer to use floating-point arithmetic,
 which suffers from numerical instability.
 Fortunately,
@@ -177,7 +177,7 @@ theorem σPtInTriangle_iff {a p q r : Point} (gp : InGenPos₄ a p q r) :
 
 
 % Let us now discuss the previous steps. First,~\lstinline|(PtInTriangle a p q r)| presents a \emph{ground-truth}  definition for membership in a triangle, in terms of~\textsf{mathlib}'s \lstinline|ConvexHull| definition,  whereas~\lstinline|(σPtInTriangle a p q r)| is based on orientations.
-Heule and Scheucher used the orientation-based definition~\cite{emptyHexagonNumber}, and as it is common in the area, its equivalence to the \emph{ground-truth} mathematical definition was left implicit.
+Heule and Scheucher used the orientation-based definition~\cite{emptyHexagonNumber}, and, as is common in the area, its equivalence to the \emph{ground-truth} mathematical definition was left implicit.
 This equivalence, formalized in~\lstinline|theorem σPtInTriangle_iff| is not trivial to prove:
 the forward direction in particular requires reasoning about convex combinations and determinants.
 Using the previous theorem, we can generalize to $k$-gons as follows.
@@ -214,7 +214,7 @@ as introduced at the beginning of this section,
 SAT encodings for Erd\H{o}s-Szekeres-type problems use triple orientations to capture properties like convexity and emptiness,
 thus discretizing the problem.
 Because we have proved that $\pi_k(S)$ is an orientation property,
-the values of $\sigma$ on the points in $S$ contain enough information to determine whether $\pi_k(S)$.
+the values of $\sigma$ on the points in $S$ contain enough information to determine whether $\pi_k(S)$ holds.
 Therefore, we have proved that given $n$ points,
 it is enough to analyze the values of $\sigma$ over these points,
 a discrete space with at most $2^{n^3}$ possibilities,
