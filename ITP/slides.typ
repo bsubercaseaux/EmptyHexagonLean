@@ -222,13 +222,13 @@ We just showed $h(4) ≤ 5$ and $9 < h(5)$. #pause
 
 *Theorem* @35erdos_combinatorial_problem_geometry.
 For a fixed $k$, every _sufficiently large_ set of points contains a convex $k$-gon.
-So $g(k)$ is finite. #pause
+So all $g(k)$ are finite. #pause
 
 *Theorem* @hortonSetsNoEmpty1983.
 For any $k ≥ 7$, there exist arbitrarily large sets of points containing no $k$-holes.
 So $h(7) = h(8) = … = ∞$.
 
-== The complete story
+== Known tight bounds
 
 #table(
   columns: (auto, auto),
