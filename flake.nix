@@ -16,6 +16,7 @@
           fontconfig
           gcc
           python3
+          typst
         ];
 
         FONTCONFIG_FILE = pkgs.makeFontsConf { fontDirectories = [
