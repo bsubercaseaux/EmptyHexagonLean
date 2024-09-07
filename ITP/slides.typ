@@ -330,6 +330,7 @@ We verified it, and used it to check the lower bounds.
 
 == Final theorem
 
+#[
 #set text(size: 24pt)
 ```lean
 axiom unsat_6hole_cnf : (Geo.hexagonCNF 30).isUnsat
@@ -344,6 +345,7 @@ theorem holeNumber_6 : holeNumber 6 = 30 :=
     (552, 502), (754, 697), (777, 194), (1259, 320)
   ])
 ```
+]
 
 == Bibliography
 
