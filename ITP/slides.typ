@@ -510,7 +510,7 @@ structure CanonicalPoints where
 CNF formula produced directly from executable #lean definition. #pause
 
 To verify $h(6) ≤ 30$:\ #pause
-▸ CNF with 444215 clauses\ #pause
+▸ CNF with 65092 variables and 436523 clauses\ #pause
 ▸ partitioned into 312 418 subproblems\ #pause
 ▸ each subproblem solved by CaDiCaL 1.9.5\ #pause
 ▸ unsatisfiability proofs checked on-the-fly by `cake_lpr`\ #pause
