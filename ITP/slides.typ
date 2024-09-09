@@ -524,43 +524,59 @@ To verify $h(6) ≤ 30$:\ #pause
 
 == Lower bounds
 
-// TODO(Bernardo): draw pictures of the algorithm <-----
-
-For $… < h(k)$, we verified algorithm to look for all $k$-holes.
+To prove theorems of the form $n <= h(k)$, we must show that there is a set of $n-1$ points with no $k$-holes.
 
 Naive solution is $cal(O)(n^(k+1)log k)$ time.
 
-We verified an $cal(O)(n^3)$ algorithm from @90dobkin_searching_empty_convex_polygons.
+We verified an $cal(O)(n^3)$ algorithm from\ @90dobkin_searching_empty_convex_polygons.
 
-#align(center, cetz.canvas({
+#slide(align: center+horizon, repeat: 7, self => cetz.canvas({
   import cetz.draw: *
-  
-  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.2))
-  circle((0, 0), name: "p")
-  content((0, 0), [$p$])
-  
-  let pts = (
-    // TODO not collinear
-    (-3, 0), (-4, 2),
 
-  // TODO sort ccw around p
-    (1, 0),
-    (5, 1),
-    (5, 2), 
-    (6, 3),
-    (7, 5),
-    (4, 3.5), 
-    (3, 4),  
+  let radius = 0.2
+  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: radius))
+  set-style(line: (stroke: (thickness: 3pt)))
+  let pts = (
+    ((-9, -2), (-5, 7)),
+    ((2, 4), (9, 5), (17, 8), (12, 3), (23, 3), (12, 1), (16, 0), (18, -3), (7, -4))
   )
-  for (n, (x, y)) in pts.enumerate() {
-    circle((x, y), name: str(n))
-    if n > 1 {
-    line((0, 0), (x, y), stroke: config.colors.neutral-darkest)
-      if n + 1 < pts.len() {
-        let (nx, ny) = pts.at(n + 1)
-        line((x,y), (nx, ny), stroke: config.colors.neutral-darkest)
+  let (left, right) = pts.map(pts => pts.map(((x, y)) => (x/2,y)))
+  let chain = (0, 1, 3, 5, 8).map(i => right.at(i))
+  for (x, y) in left {
+    circle((x, y), radius: if self.subslide > 1 { 0.15 } else { radius })
+  }
+  if self.subslide == 7 {
+    line(..((0,0), ..chain), fill: aqua.transparentize(30%), stroke: none)
+  }
+  if self.subslide > 1 {
+    line((0, -4), (0, 8), stroke: (dash: "dashed", paint: config.colors.neutral-darkest))
+  }
+  if self.subslide == 5 {
+    line(right.at(0), right.at(3), stroke: (dash: "dashed", paint: aqua, thickness: 4pt))
+    line(right.at(1), right.at(4), stroke: (dash: "dashed", paint: red, thickness: 4pt))
+  }
+  if self.subslide == 6 {
+    line(..chain, stroke: (dash: "dashed", paint: aqua, thickness: 4pt))
+  }
+  for (n, (x, y)) in ((0,0), ..right).enumerate() {
+    if self.subslide > 3 {
+      let (nx, ny) = if n < right.len() { right.at(n) } else { (0, 0) }
+      let thick = if self.subslide == 6 and n == 1 { 1pt } else { 4pt }
+      line((x, y), (nx, ny), stroke: (paint: config.colors.neutral-darkest, thickness: thick))
+    }
+    if n != 0 {
+      if self.subslide == 3 {
+        line((x, y), (0, 0), stroke: (paint: config.colors.neutral-darkest))
+      }
+      circle((x, y), name: str(n), radius: if self.subslide > 1 { 0.3 } else { radius })
+      if self.subslide > 2 {
+        content((x, y), [#set text(fill: config.colors.neutral-lightest, size: 20pt); #str(n)])
       }
     }
+  }
+  circle((0, 0), name: "p", radius: if self.subslide > 1 { 0.4 } else { radius })
+  if self.subslide > 1 {
+    content((0, .13 /* HACK */), [#set text(fill: config.colors.neutral-lightest, size: 20pt); $p$])
   }
 }))
 
