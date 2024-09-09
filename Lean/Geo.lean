@@ -86,7 +86,7 @@ axiom unsat_5hole_cnf : (Geo.naiveCNF (k := 5) (rlen := 10-1)).isUnsat
 
 theorem holeNumber_5 : holeNumber 5 = 10 :=
   le_antisymm (empty_kgon_naive unsat_5hole_cnf) (hole_lower_bound
-    [(1, 9), (9, 7), (14, 3), (15, 4), (16, 6), (17, 0), (18, 1), (21, 3), (28, 7)])
+    [(1, 0), (6, 4), (9, 7), (11, 2), (12, 3), (13, 1), (14, 2), (17, 4), (28, 0)])
 
 /-! ## The main theorem -/
 
