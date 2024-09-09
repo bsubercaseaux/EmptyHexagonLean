@@ -524,12 +524,46 @@ To verify $h(6) ≤ 30$:\ #pause
 
 == Lower bounds
 
-// TODO(MARIO): put someting in this slide, without describing the algorithm
-// TODO(Bernardo): draw pictures of the algorithm
+// TODO(Bernardo): draw pictures of the algorithm <-----
 
-$cal(O)("sth")$ time, $cal(O)("sth")$ space algorithm @90dobkin_searching_empty_convex_polygons
+For $… < h(k)$, we verified algorithm to look for all $k$-holes.
 
-We verified it, and used it to check the lower bounds.
+Naive solution is $cal(O)(n^(k+1)log k)$ time.
+
+We verified an $cal(O)(n^3)$ algorithm from @90dobkin_searching_empty_convex_polygons.
+
+#align(center, cetz.canvas({
+  import cetz.draw: *
+  
+  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.2))
+  circle((0, 0), name: "p")
+  content((0, 0), [$p$])
+  
+  let pts = (
+    // TODO not collinear
+    (-3, 0), (-4, 2),
+
+  // TODO sort ccw around p
+    (1, 0),
+    (5, 1),
+    (5, 2), 
+    (6, 3),
+    (7, 5),
+    (4, 3.5), 
+    (3, 4),  
+  )
+  for (n, (x, y)) in pts.enumerate() {
+    circle((x, y), name: str(n))
+    if n > 1 {
+    line((0, 0), (x, y), stroke: config.colors.neutral-darkest)
+      if n + 1 < pts.len() {
+        let (nx, ny) = pts.at(n + 1)
+        line((x,y), (nx, ny), stroke: config.colors.neutral-darkest)
+      }
+    }
+  }
+}))
+
 
 == Final theorem
 
@@ -558,7 +592,8 @@ theorem holeNumber_6 : holeNumber 6 = 30 :=
     repeat: 2,
     self => cetz.canvas({
   import cetz.draw: *
-  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 1.2))
+  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 1.2),
+  line: (stroke: config.colors.neutral-darkest))
   scale(.1)
   let pts = (
     (1.2, ((1-10, 1260+10), (37-10, 0-10), (1259+10, 320))),
