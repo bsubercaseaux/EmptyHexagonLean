@@ -538,7 +538,7 @@ We verified an $cal(O)(n^3)$ algorithm from\ @90dobkin_searching_empty_convex_po
   set-style(line: (stroke: (thickness: 3pt)))
   let pts = (
     ((-9, -2), (-5, 7)),
-    ((2, 4), (9, 5), (17, 8), (12, 3), (23, 3), (12, 1), (16, 0), (18, -3), (7, -4))
+    ((2, 4), (9, 5), (17, 8), (11, 3), (23, 3), (12, 1), (16, 0), (18, -3), (7, -4))
   )
   let (left, right) = pts.map(pts => pts.map(((x, y)) => (x/2,y)))
   let chain = (0, 1, 3, 5, 8).map(i => right.at(i))
