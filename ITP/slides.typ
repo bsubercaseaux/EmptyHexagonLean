@@ -25,7 +25,7 @@
     line((x, fly), (x, tly), ..style)
     x += step
   }
-  
+
   let y = fy
   while y <= ty + eps {
     line((flx, y), (tlx, y), ..style)
@@ -34,6 +34,7 @@
 }
 
 #let lean = "Lean"
+#let thin = h(3em/18)
 
 // Many slides adapted from https://www.cs.cmu.edu/~mheule/talks/6hole-TACAS.pdf
 
@@ -44,7 +45,7 @@
     title: [Formal Verification of the Empty Hexagon Number],
     author: [
       Bernardo Subercaseaux¹, Wojciech Nawrocki¹, James Gallicchio¹,\
-      Cayden Codel¹, *Mario Carneiro*#h(0em)¹, Marijn J. H. Heule¹
+      Cayden Codel¹, #underline[Mario Carneiro]#h(0em)¹, Marijn J. H. Heule¹
     ],
     date: [
       _Interactive Theorem Proving_ | September 9th, 2024\
@@ -130,7 +131,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
   #let (uncover,) = utils.methods(self)
 
   *Theorem* (Klein 1932). // WN: I don't think a citation exists for this
-  Every 5 points in the plane contain a 4-hole. #pause
+  Every set of 5 points in the plane contains a 4-hole. #pause
 
   _Proof._ By cases on the size of the convex hull.
 
@@ -348,7 +349,7 @@ _focus of our work_.
   import cetz.draw: *
   set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.1))
   scale(3.2)
-  
+
   on-layer(1, {
     let pts = (
       (0, 0, "p"), (1, 1, "s"), (2, 1, "q"), (1.2, 2, "r"), (1.8, 1.8, "t")
@@ -358,7 +359,7 @@ _focus of our work_.
       content((x, y+0.015), [#set text(fill: config.colors.neutral-lightest, size: 20pt); $#n$])
     }
   })
-  
+
   let (cg, cb, cr) = (green, blue, red).map(c => c.desaturate(20%))
   line("p", "r", "q", stroke: cg, mark: (end: "stealth", fill: cg))
   line("p", "s", "t", stroke: cb, mark: (end: "stealth", fill: cb))
@@ -412,7 +413,7 @@ _focus of our work_.
     )
 
     scale(3.2)
-    
+
     // Grid and axes
     let ((efx, efy), (etx, ety)) = extents.at(self.subslide - 1)
     on-layer(-1, {
@@ -464,7 +465,7 @@ _focus of our work_.
         line(..r, fill: c)
       }
     })
-    
+
     // Equal-x marker lines
     if self.subslide == 1 {
       let ((_, yf), (_, yt)) = extents.at(0)
@@ -475,7 +476,7 @@ _focus of our work_.
       line((x6, yf), (x6, yt))
     }
   })
-  
+
   #let captions = (
     [Starting set of points.],
     [Rotation ensures distinct $x$.],
@@ -515,11 +516,11 @@ structure CanonicalPoints where
 CNF formula produced directly from executable #lean definition. #pause
 
 To verify $h(6) ≤ 30$:\ #pause
-▸ CNF with 65092 variables and 436523 clauses\ #pause
-▸ partitioned into 312 418 subproblems\ #pause
+▸ CNF with 65#(thin)092 variables and 436#(thin)523 clauses\ #pause
+▸ partitioned into 312#(thin)418 subproblems\ #pause
 ▸ each subproblem solved by CaDiCaL 1.9.5\ #pause
 ▸ unsatisfiability proofs checked on-the-fly by `cake_lpr`\ #pause
-▸ 25 876.5 CPU hours on Bridges 2 cluster of Pittsburgh Supercomputing Center
+▸ 25#(thin)876.5 CPU hours on Bridges 2 cluster of Pittsburgh Supercomputing Center
 
 == Lower bounds
 
@@ -538,14 +539,15 @@ We verified it, and used it to check the lower bounds.
 axiom unsat_6hole_cnf : (Geo.hexagonCNF 30).isUnsat
 
 theorem holeNumber_6 : holeNumber 6 = 30 :=
-  le_antisymm (hole_6_theorem' unsat_6hole_cnf) (hole_lower_bound [
+  le_antisymm
+   (hole_6_theorem' unsat_6hole_cnf)
+   (hole_lower_bound [
     (1, 1260),  (16, 743),  (22, 531),  (37, 0),    (306, 592),
     (310, 531), (366, 552), (371, 487), (374, 525), (392, 575),
     (396, 613), (410, 539), (416, 550), (426, 526), (434, 552),
     (436, 535), (446, 565), (449, 518), (450, 498), (453, 542),
     (458, 526), (489, 537), (492, 502), (496, 579), (516, 467),
-    (552, 502), (754, 697), (777, 194), (1259, 320)
-  ])
+    (552, 502), (754, 697), (777, 194), (1259, 320)])
 ```
 ]
 
