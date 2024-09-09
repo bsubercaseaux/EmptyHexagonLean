@@ -33,7 +33,7 @@
   }
 }
 
-#let lean = $"L∃∀N"$
+#let lean = "Lean"
 
 // Many slides adapted from https://www.cs.cmu.edu/~mheule/talks/6hole-TACAS.pdf
 
@@ -53,16 +53,17 @@
     institution: [¹ Carnegie Mellon University, USA]
   ),
   ..config-colors(
-    primary: rgb("#eb811b"),
+    primary: rgb("#fb912b"),
     primary-light: rgb("#d6c6b7"),
-    secondary: rgb("#23373b"),
-    neutral-lightest: rgb("#fafafa"),
-    neutral-dark: rgb("#23373b"),
-    neutral-darkest: rgb("#23373b"),
+    secondary: rgb("#fafafa"),
+    neutral-lightest: rgb("#13272b"),
+    neutral-dark: rgb("#fafafa"),
+    neutral-darkest: rgb("#fafafa"),
   )
 )
 #show: metropolis-theme.with(config)
 #set text(size: 23pt)
+#set raw(theme: "Monokai Dark.tmTheme")
 
 #title-slide()
 
@@ -88,7 +89,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
       circle((angle: 30deg, radius: 1.5))
       circle((angle: 240deg, radius: 1.5))
     })
-    line("a", "b", "c", "d", "e", "a", fill: config.colors.primary.transparentize(20%))
+    line("a", "b", "c", "d", "e", "a", fill: config.colors.primary.transparentize(20%), stroke: config.colors.primary)
     content((0, -1.5), "5-hole ✔")
     content((0, -2.0), "convex 5-gon ✔")
   }),
@@ -102,7 +103,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
       circle((angle: 240deg, radius: 1), name: "d")
       circle((angle: 200deg, radius: 1.2))
     })
-    line("a", "b", "c", "d", "a", fill: config.colors.primary-light.transparentize(20%))
+    line("a", "b", "c", "d", "a", fill: config.colors.primary-light.transparentize(20%), stroke: config.colors.primary-light)
     content((0, -1.5), "4-hole ✘")
     content((0, -2.0), "convex 4-gon ✘")
   }),
@@ -115,7 +116,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
       circle((angle: 240deg, radius: 1), name: "c")
       circle((angle: 30deg, radius: 0.2))
     })
-    line("a", "b", "c", "a", fill: config.colors.primary-light.transparentize(20%))
+    line("a", "b", "c", "a", fill: config.colors.primary-light.transparentize(20%), stroke: config.colors.primary-light)
     content((0, -1.5), "3-hole ✘")
     content((0, -2.0), "convex 3-gon ✔")
   }),
@@ -137,7 +138,8 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
     uncover("3-", align(center, cetz.canvas(length: 33%, {
       import cetz.draw: *
 
-      set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.05))
+      set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.05),
+      line: (stroke: config.colors.neutral-darkest))
       on-layer(1, {
         circle((angle: 0deg, radius: 1), name: "a")
         circle((angle: 72deg, radius: 1), name: "b")
@@ -153,7 +155,8 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
     uncover("5-", align(center, cetz.canvas(length: 33%, {
       import cetz.draw: *
 
-      set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.05))
+      set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.05),
+      line: (stroke: config.colors.neutral-darkest))
       on-layer(1, {
         circle((angle: 0deg, radius: 1), name: "a")
         circle((angle: 90deg, radius: 1), name: "b")
@@ -166,13 +169,14 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
         line("a", "d", "c", "x", "a", fill: config.colors.primary.transparentize(20%))
       }
       if 6 <= self.subslide {
-        line((angle: 0deg, radius: 1.5), (angle: 180deg, radius: 1.5), stroke: config.colors.primary)
+        line((angle: 0deg, radius: 1.5), (angle: 180deg, radius: 1.5), stroke: (paint: config.colors.primary, thickness: 2pt))
       }
     }))),
     uncover("8-10", align(center, cetz.canvas(length: 33%, {
       import cetz.draw: *
 
-      set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.05))
+      set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 0.05),
+      line: (stroke: config.colors.neutral-darkest))
       let xθ = 20deg
       let yθ = xθ + 180deg
       on-layer(1, {
@@ -184,7 +188,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
       })
       line("a", "b", "c", "a")
       if 9 <= self.subslide {
-        line((angle: xθ, radius: 1.5), (angle: yθ, radius: 1.5), stroke: config.colors.primary)
+        line((angle: xθ, radius: 1.5), (angle: yθ, radius: 1.5), stroke: (paint: config.colors.primary, thickness: 2pt))
       }
       if 10 <= self.subslide {
         line("a", "x", "y", "c", "a", fill: config.colors.primary.transparentize(20%))
@@ -202,7 +206,8 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
     repeat: 4,
     self => cetz.canvas({
   import cetz.draw: *
-  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 1.2))
+  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 1.2),
+  line: (stroke: config.colors.neutral-darkest))
   scale(.1)
   on-layer(1, {
     let pts = (
@@ -354,7 +359,7 @@ _focus of our work_.
     }
   })
   
-  let (cg, cb, cr) = (green, blue, red).map(c => c.desaturate(50%))
+  let (cg, cb, cr) = (green, blue, red).map(c => c.desaturate(20%))
   line("p", "r", "q", stroke: cg, mark: (end: "stealth", fill: cg))
   line("p", "s", "t", stroke: cb, mark: (end: "stealth", fill: cb))
   line("r", "s", "q", stroke: cr, mark: (end: "stealth", fill: cr))
@@ -414,7 +419,7 @@ _focus of our work_.
       grid2(
         (calc.ceil(efx), calc.ceil(efy)), (calc.floor(etx), calc.floor(ety)),
         (efx, efy), (etx, ety),
-        stroke: (thickness: 0.2pt, paint: gray, dash: "dashed"))
+        stroke: (thickness: 0.2pt, paint: config.colors.secondary.transparentize(50%), dash: "dashed"))
     })
     set-style(line: (stroke: (paint: config.colors.neutral-darkest, thickness: 1.5pt)))
     line((efx, 0), (etx, 0), mark: (end: "stealth", fill: config.colors.neutral-darkest))
@@ -439,7 +444,7 @@ _focus of our work_.
     // Convex regions
     on-layer(-1, {
       set-style(line: (stroke: none))
-      let colors = (red, orange, blue, green).map(c => c.transparentize(70%))
+      let colors = (red, orange, blue, green).map(c => c.transparentize(30%))
       // Extra convex regions at infinity
       if self.subslide == 4 {
         circle((-1.00000032679495, 2.7), name: "a", radius: 0)
@@ -465,7 +470,7 @@ _focus of our work_.
       let ((_, yf), (_, yt)) = extents.at(0)
       let (x4, _) = pts.at(0).at(3)
       let (x6, _) = pts.at(0).at(5)
-      set-style(line: (stroke: (thickness: 1pt, dash: "dashed", paint: red)))
+      set-style(line: (stroke: (thickness: 2pt, dash: "dashed", paint: red)))
       line((x4, yf), (x4, yt))
       line((x6, yf), (x6, yt))
     }
