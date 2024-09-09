@@ -169,7 +169,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
         line("a", "d", "c", "x", "a", fill: config.colors.primary.transparentize(20%))
       }
       if 6 <= self.subslide {
-        line((angle: 0deg, radius: 1.5), (angle: 180deg, radius: 1.5), stroke: (paint: config.colors.primary, thickness: 2pt))
+        line((angle: 0deg, radius: 1.5), (angle: 180deg, radius: 1.5), stroke: (paint: config.colors.primary, thickness: 1.5pt, dash: "dashed"))
       }
     }))),
     uncover("8-10", align(center, cetz.canvas(length: 33%, {
@@ -188,7 +188,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
       })
       line("a", "b", "c", "a")
       if 9 <= self.subslide {
-        line((angle: xθ, radius: 1.5), (angle: yθ, radius: 1.5), stroke: (paint: config.colors.primary, thickness: 2pt))
+        line((angle: xθ, radius: 1.5), (angle: yθ, radius: 1.5), stroke: (paint: config.colors.primary, thickness: 1.5pt, dash: "dashed"))
       }
       if 10 <= self.subslide {
         line("a", "x", "y", "c", "a", fill: config.colors.primary.transparentize(20%))
