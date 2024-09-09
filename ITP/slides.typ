@@ -551,6 +551,39 @@ theorem holeNumber_6 : holeNumber 6 = 30 :=
 ```
 ]
 
+#slide(
+    // Hide header by making it background-coloured
+    // config: config-colors(secondary: config.colors.neutral-lightest),
+    align: center+horizon,
+    repeat: 2,
+    self => cetz.canvas({
+  import cetz.draw: *
+  set-style(circle: (fill: config.colors.neutral-darkest, stroke: none, radius: 1.2))
+  scale(.1)
+  let pts = (
+    (1.2, ((1-10, 1260+10), (37-10, 0-10), (1259+10, 320))),
+    (1.2, ((16, 743), (22, 531), (777, 194), (754, 697))),
+    (1.2, ((306, 592), (310, 531), (371, 487), (516, 467), (552, 502), (496, 579), (396, 613))),
+    (1.0, ((366, 552), (374, 525), (450, 498), (492, 502), (489, 537), (446, 565), (392, 575))),
+    (0.8, ((410, 539), (426, 526), (449, 518), (458, 526), (453, 542), (434, 552), (416, 550))),
+    (0.9, ((436, 535),)),
+  )
+  on-layer(1, {
+    for (i, (radius, cycle)) in pts.enumerate() {
+      for (j, (x, y)) in cycle.enumerate() {
+        circle(((y+x/4)/5, x/11), radius: radius, name: str(i)+"-"+str(j))
+      }
+    }
+  })
+  if self.subslide > 1 {
+    for (i, (_, cycle)) in pts.enumerate() {
+      let cycle = range(cycle.len())
+      cycle.push(0)
+      line(..cycle.map(x => str(i)+"-"+str(x)))
+    }
+  }
+}))
+
 == Bibliography
 
 #bibliography("main.bib", style: "chicago-author-date", title: none)
