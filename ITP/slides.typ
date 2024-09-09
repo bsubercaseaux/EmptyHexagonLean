@@ -538,10 +538,10 @@ We verified an $cal(O)(n^3)$ algorithm from\ @90dobkin_searching_empty_convex_po
   set-style(line: (stroke: (thickness: 3pt)))
   let pts = (
     ((-9, -2), (-5, 7)),
-    ((2, 4), (9, 5), (17, 8), (11, 3), (23, 3), (12, 1), (16, 0), (18, -3), (7, -4))
+    ((7, -4), (18, -3), (16, 0), (12, 1), (23, 3), (11, 3), (17, 8), (9, 5), (2, 4))
   )
   let (left, right) = pts.map(pts => pts.map(((x, y)) => (x/2,y)))
-  let chain = (0, 1, 3, 5, 8).map(i => right.at(i))
+  let chain = (0, 3, 5, 7, 8).map(i => right.at(i))
   for (x, y) in left {
     circle((x, y), radius: if self.subslide > 1 { 0.15 } else { radius })
   }
@@ -553,7 +553,7 @@ We verified an $cal(O)(n^3)$ algorithm from\ @90dobkin_searching_empty_convex_po
   }
   if self.subslide == 5 {
     line(right.at(0), right.at(3), stroke: (dash: "dashed", paint: aqua, thickness: 4pt))
-    line(right.at(1), right.at(4), stroke: (dash: "dashed", paint: red, thickness: 4pt))
+    line(right.at(4), right.at(7), stroke: (dash: "dashed", paint: red, thickness: 4pt))
   }
   if self.subslide == 6 {
     line(..chain, stroke: (dash: "dashed", paint: aqua, thickness: 4pt))
@@ -561,7 +561,7 @@ We verified an $cal(O)(n^3)$ algorithm from\ @90dobkin_searching_empty_convex_po
   for (n, (x, y)) in ((0,0), ..right).enumerate() {
     if self.subslide > 3 {
       let (nx, ny) = if n < right.len() { right.at(n) } else { (0, 0) }
-      let thick = if self.subslide == 6 and n == 1 { 1pt } else { 4pt }
+      let thick = if self.subslide == 6 and n == 8 { 1pt } else { 4pt }
       line((x, y), (nx, ny), stroke: (paint: config.colors.neutral-darkest, thickness: thick))
     }
     if n != 0 {
