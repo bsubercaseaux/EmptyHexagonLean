@@ -524,11 +524,15 @@ To verify $h(6) ≤ 30$:\ #pause
 
 == Lower bounds
 
-To prove theorems of the form $n <= h(k)$, we must show that there is a set of $n-1$ points with no $k$-holes.
+To prove $n < h(k)$,
+find a set of $n$ points with no $k$-holes. #pause
 
-Naive solution is $cal(O)(n^(k+1)log k)$ time.
+Naive checker algorithm is $cal(O)(n^(k+1)log k)$ time. #pause
 
-We verified an $cal(O)(n^3)$ algorithm from\ @90dobkin_searching_empty_convex_polygons.
+We verified an $cal(O)(n^3)$ solution\
+from #cite(<90dobkin_searching_empty_convex_polygons>, form: "prose").
+
+== Hole-finding algorithm
 
 #slide(align: center+horizon, repeat: 7, self => cetz.canvas({
   import cetz.draw: *
@@ -600,6 +604,8 @@ theorem holeNumber_6 : holeNumber 6 = 30 :=
     (552, 502), (754, 697), (777, 194), (1259, 320)])
 ```
 ]
+
+== Lower bound: 29 points with no 6-holes
 
 #slide(
     // Hide header by making it background-coloured
