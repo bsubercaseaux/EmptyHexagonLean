@@ -349,10 +349,10 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
   repeat: 1,
   self => [
     #set text(size: 23pt)
-    #uncover(if step == 1 { "1 "} else { "2" }, [
+    #uncover(if step == 1 { "1" } else { "2" }, [
       1. Discretize from continuous coordinates in $ℝ²$ to boolean variables.
     ])
-    #uncover(if step == 2 { "1 "} else { "2" }, [
+    #uncover(if step == 2 { "1" } else { "2" }, [
       2. Points can be put in _canonical form_
          without removing $k$-holes.
          ```lean
@@ -361,7 +361,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
            ∃ w : CanonicalPoints, l ≼σ w.points
          ```
     ])
-    #uncover(if step == 3 { "1 "} else { "2" }, [
+    #uncover(if step == 3 { "1" } else { "2" }, [
       3. $n$ points in canonical form with no $6$-holes
          induce a propositional assignment that satisfies $φ_n$.
          ```lean
@@ -420,6 +420,19 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
 #reduction-slide(2)
 
 == Symmetry breaking
+
+#[
+  #set text(size: 22pt)
+  *Lemma*. WLOG we can assume that the points $(p_1, ..., p_n)$ satisfy the following properties:
+
+  ▸ *($x$-order)* The points are sorted with respect to their $x$-coordinates,\ i.e., $(p_i)_x < (p_j)_x$ for all $1 ≤ i < j ≤ n$.
+
+  ▸ *(CCW-order)* All orientations $σ(p_1, p_i, p_j)$, with $1 < i < j ≤ n$, are counterclockwise.
+
+  ▸ *(Lex order)* The first half of list of adj. orientations is lex-below the second half:
+  $ [σ(p_(⌈n/2⌉+1), p_(⌈n/2⌉+2), p_(⌈n/2⌉+3)), ..., σ(p_(n-2), p_(n-1), p_n)] succ.eq \
+    [σ(p_(⌈n/2⌉−1), p_(⌈n/2⌉), p_(⌈n/2⌉+1)), ..., σ(p_2, p_3, p_4)] $
+]
 
 #slide(repeat: 6, align: center+horizon, self => [
   #let fig = cetz.canvas({
@@ -649,27 +662,7 @@ theorem of_proceed_loop
 ]
 ])
 
-== Final theorem
-
-#[
-#set text(size: 24pt)
-```lean
-axiom unsat_6hole_cnf : (Geo.hexagonCNF 30).isUnsat
-
-theorem holeNumber_6 : holeNumber 6 = 30 :=
-  le_antisymm
-   (hole_6_theorem' unsat_6hole_cnf)
-   (hole_lower_bound [
-    (1, 1260),  (16, 743),  (22, 531),  (37, 0),    (306, 592),
-    (310, 531), (366, 552), (371, 487), (374, 525), (392, 575),
-    (396, 613), (410, 539), (416, 550), (426, 526), (434, 552),
-    (436, 535), (446, 565), (449, 518), (450, 498), (453, 542),
-    (458, 526), (489, 537), (492, 502), (496, 579), (516, 467),
-    (552, 502), (754, 697), (777, 194), (1259, 320)])
-```
-]
-
-== Lower bound: 29 points with no 6-holes
+== Lower bound: 29 points with no 6-holes @03overmars_finding_sets_points_empty_convex_6_gons
 
 #slide(
     // Hide header by making it background-coloured
@@ -705,6 +698,26 @@ theorem holeNumber_6 : holeNumber 6 = 30 :=
   }
 }))
 
+== Final theorem
+
+#[
+#set text(size: 24pt)
+```lean
+axiom unsat_6hole_cnf : (Geo.hexagonCNF 30).isUnsat
+
+theorem holeNumber_6 : holeNumber 6 = 30 :=
+  le_antisymm
+   (hole_6_theorem' unsat_6hole_cnf)
+   (hole_lower_bound [
+    (1, 1260),  (16, 743),  (22, 531),  (37, 0),    (306, 592),
+    (310, 531), (366, 552), (371, 487), (374, 525), (392, 575),
+    (396, 613), (410, 539), (416, 550), (426, 526), (434, 552),
+    (436, 535), (446, 565), (449, 518), (450, 498), (453, 542),
+    (458, 526), (489, 537), (492, 502), (496, 579), (516, 467),
+    (552, 502), (754, 697), (777, 194), (1259, 320)])
+```
+]
+
 == Conclusion
 
 We used Lean to fully verify a recent result in combinatorial geometry
@@ -715,9 +728,9 @@ followed with additional effort. #pause
 
 Open problems remain:
 
-▸ Horton's construction for $h(7) = h(8) = … = ∞$ hasn't been verified. #pause
+▸ Horton's construction of $h(k) = ∞$ for $7 ≤ k$ hasn't been verified. #pause
 
-▸ Exact values of $g(k)$ for $7 ≤ k$ aren't known. #pause
+▸ Exact values of $g(k) < ∞$ for $7 ≤ k$ aren't known. #pause
 
 ▸ Trust story for large SAT proofs could be improved.
 
