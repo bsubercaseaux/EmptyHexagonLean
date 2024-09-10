@@ -635,6 +635,22 @@ theorem holeNumber_6 : holeNumber 6 = 30 :=
   }
 }))
 
+== Conclusion
+
+We used Lean to fully verify a recent result in combinatorial geometry
+based on a sophisticated reduction to SAT. #pause
+
+Upper and lower bounds for all finite _hole numbers_ $h(k)$
+followed with some additional effort. #pause
+
+Open problems remain:
+
+▸ Horton's construction for $h(7) = h(8) = … = ∞$ has not been verified. #pause
+
+▸ Exact values of $g(k)$ for $7 ≤ k$ aren't known. #pause
+
+▸ Trust story for large SAT proofs could be improved.
+
 == Bibliography
 
 #bibliography("main.bib", style: "chicago-author-date", title: none)
