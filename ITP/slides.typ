@@ -296,7 +296,7 @@ Upper bounds by combinatorial reduction to SAT. #pause
 #[
 #set par(first-line-indent: 1em, hanging-indent: 1em)
 ▸ We focused on $h(6)$.\ #pause
-▸ $g(6)$ previously verified in Isabelle/HOL @10maric_formal_verification_modern_sat_solver_shallow_embedding_isabelle_hol.\ #pause
+▸ $g(6)$ previously verified in Isabelle/HOL @19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points.\ #pause
 ▸ Efficient SAT encoding of Heule & Scheucher speeds up $g(6)$ verification. #pause
 ]
 
