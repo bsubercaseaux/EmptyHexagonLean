@@ -423,7 +423,7 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
 
 #[
   #set text(size: 22pt)
-  *Lemma*. WLOG we can assume that the points $(p_1, ..., p_n)$ satisfy the following properties:
+  *Lemma*. WLOG we can assume that the points $(p_1, ..., p_n)$ are in _canonical form_, meaning that they satisfy the following properties:
 
   ▸ *($x$-order)* The points are sorted with respect to their $x$-coordinates,\ i.e., $(p_i)_x < (p_j)_x$ for all $1 ≤ i < j ≤ n$.
 
