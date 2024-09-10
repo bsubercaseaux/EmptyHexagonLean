@@ -531,7 +531,8 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
   )
 ])
 
-// TODO: Maybe rm this slide? It's not adding much
+// WN: Hid this slide, it doesn't add much
+/*
 == Symmetry breaking: result
 
 Points now in normal form. #pause
@@ -547,6 +548,7 @@ structure CanonicalPoints where
   oriented : rest.Pairwise (σ leftmost · · = .ccw)
   lex : σRevLex rest
 ```
+*/
 
 #reduction-slide(3)
 
@@ -623,6 +625,29 @@ from #cite(<90dobkin_searching_empty_convex_polygons>, form: "prose").
   }
 }))
 
+== Hole-finding algorithm: verification
+
+#align(center, [
+#image("./proof.png") #pause
+expands to #pause
+#[#set text(size: 15pt)
+```lean
+theorem of_proceed_loop
+    {i j : Fin n} (ij : Visible p pts i j) {Q : Queues n j} {Q_j : BelowList n j} {Q_i} (ha)
+    {IH} (hIH : ∀ a (ha : a < i), Visible p pts a j → ProceedIH p pts (ha.trans ij.1) (IH a ha))
+    (Hj : Queues.OrderedTail p pts lo j (fun k h => Q.q[k.1]'(Q.sz ▸ h)) Q_j.1)
+    (ord : Queues.Ordered p pts lo i (fun k h => Q.q[k.1]'(Q.sz ▸ h.trans ij.1)) Q_i)
+    (g_wf : Q.graph.WF (VisibleLT p pts lo j))
+    {Q' Q_j'} (eq : proceed.loop pts i j ij.1 IH Q Q_j Q_i ha = (Q', Q_j')) :
+    ∃ a Q₁ Q_i₁ Q_j₁, proceed.finish i j ij.1 Q₁ Q_i₁ Q_j₁ = (Q', Q_j') ∧
+      Q₁.graph.WF (VisibleLT p pts i j) ∧
+      (∀ k ∈ Q_i₁.1, σ (pts k) (pts i) (pts j) ≠ .ccw) ∧
+      lo ≤ a ∧ Queues.Ordered p pts a i (fun k h => Q.q[k.1]'(Q.sz ▸ h.trans ij.1)) Q_i₁.1 ∧
+      (∀ (k : Fin n) (h : k < j), ¬(lo ≤ k ∧ k < a) → Q₁.q[k.1]'(Q₁.sz ▸ h) = Q.q[k.1]'(Q.sz ▸ h)) ∧
+      Queues.OrderedTail p pts a j (fun k h => Q₁.q[k.1]'(Q₁.sz ▸ h)) Q_j₁.1 := by
+```
+]
+])
 
 == Final theorem
 
