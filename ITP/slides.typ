@@ -273,75 +273,110 @@ A *$bold(k)$-hole* is a convex $k$-gon with no point of $S$ in its interior.
 
 == Known tight bounds
 
-// TODO: This slide is too wordy
+#slide(
+  config: config-methods(cover: utils.semi-transparent-cover.with(alpha: 85%)),
+  repeat: 6,
+  self => [
+    #let (uncover, only, alternatives) = utils.methods(self)
+    #let mkalt(s, k, n) = alternatives(
+      $#s (#k) = #n$,
+      $#s (#k) ≤ #n$, $#s (#k) ≤ #n$, $#s (#k) ≤ #n$,
+      $#(n -1) < #s (#k)$,
+      $#s (#k) = #n$
+      )
+    #let mkbnd(s, k, n, c) = [#mkalt(s, k, n) #set text(size: 15pt);#c]
+    #table(
+      columns: (1.3fr, 1fr),
+      inset: 6pt,
+      stroke: none,
+      mkbnd("h", 3, 3, [(trivial)]),
+      mkbnd("g", 3, 3, [(trivial)]),
+      mkbnd("h", 4, 5, [(Klein 1932)]),
+      mkbnd("g", 4, 5, [(Klein 1932)]),
+      mkbnd("h", 5, 10, [@Harborth1978]),
+      mkbnd("g", 5, 9, [(Makai 1930s)]),
+      [*#mkbnd("h", 6, 30, [@03overmars_finding_sets_points_empty_convex_6_gons @24heule_happy_ending_empty_hexagon_every_set_30_points])*],
+      mkbnd("g", 6, 17, [@szekeres_peters_2006]),
+    )
 
-#table(
-  columns: (auto, auto),
-  inset: 5pt,
-  stroke: none,
-  [$h(3) = 3$ (trivial)],
-  [$g(3) = 3$ (trivial)],
-  [$h(4) = 5$ (Klein 1932)],
-  [$g(4) = 5$ (Klein 1932)],
-  [$h(5) = 10$ @Harborth1978],
-  [$g(5) = 9$ (Makai 1930s)],
-  [*$bold(h(6) = 30)$ @03overmars_finding_sets_points_empty_convex_6_gons @24heule_happy_ending_empty_hexagon_every_set_30_points*],
-  [$g(6) = 17$ @szekeres_peters_2006],
-) #pause
+    #uncover("1, 6", [We formally verified all the above in #lean.])
 
-We formally verified all the above in #lean. #pause
+    #uncover("2-4, 6", [Upper bounds by combinatorial reduction to SAT.])
+    #[
+    #set par(first-line-indent: 1em, hanging-indent: 1em)
+    #uncover("2, 6", [▸ We focused on $h(6)$, established this year.])\
+    #uncover("3, 6", [▸ $g(6)$ previously verified in Isabelle/HOL @19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points.])\
+    #uncover("4, 6", [▸ Efficient SAT encoding of Heule & Scheucher speeds up $g(6)$ verification.])
+    ]
 
-Upper bounds by combinatorial reduction to SAT. #pause
-
-#[
-#set par(first-line-indent: 1em, hanging-indent: 1em)
-▸ We focused on $h(6)$.\ #pause
-▸ $g(6)$ previously verified in Isabelle/HOL @19maric_fast_formal_proof_erdos_szekeres_conjecture_convex_polygons_most_six_points.\ #pause
-▸ Efficient SAT encoding of Heule & Scheucher speeds up $g(6)$ verification. #pause
-]
-
-Lower bounds by checking explicit sets of points.
-  // TODO: Is this the first verification of the hole-tester algo?
+    #uncover("5, 6", [Lower bounds by checking concrete sets of points.])
+  ]
+)
 
 == SAT-solving mathematics
 
-*Reduction.* Show that a mathematical theorem is true
-if a propositional formula φ is unsatisfiable.
-
-*Solving.* Show that φ is indeed unsatisfiable using a SAT solver. #pause
-
-▸ Solving is reliable, reproducible, and trustworthy:
-formal proof systems (DRAT) and verified proof checkers (`cake_lpr`). #pause
-
-▸ But reduction is problem-specific, and involves complex transformations:
-_focus of our work_.
-
-== Reduction from geometry to SAT
-
 #slide(
-  config: config-methods(cover: (self: none, body) => box(scale(x: 0%, body))),
+  config: config-methods(cover: utils.semi-transparent-cover.with(alpha: 85%)),
+  repeat: 4,
   self => [
-    #set text(size: 23pt)
-    1. Discretize from continuous coordinates in $ℝ²$ to boolean variables. #pause
-    2. Points can be put in _canonical form_
-       without removing $k$-holes.
-       ```lean
-       theorem symmetry_breaking {l : List Point} :
-         3 ≤ l.length → PointsInGenPos l →
-         ∃ w : CanonicalPoints, l ≼σ w.points
-       ``` #pause
-    3. $n$ points in canonical form with no $6$-holes
-       induce a propositional assignment that satisfies $φ_n$.
-       ```lean
-       theorem satisfies_hexagonEncoding {w : CanonicalPoints} :
-         ¬σHasEmptyKGon 6 w → w.toPropAssn ⊨ Geo.hexagonCNF w.len
-       ``` #pause
-    4. But $φ_30$ is unsatisfiable.
-       ```lean
-       axiom unsat_6hole_cnf : (Geo.hexagonCNF 30).isUnsat
-       ```
+    #let (uncover, only,) = utils.methods(self)
+
+    #uncover("1, 3, 4", [
+      *Reduction.* Show that a mathematical theorem is true
+      if a propositional formula φ is unsatisfiable.
+    ])
+
+    #uncover("1, 2, 4", [
+      *Solving.* Show that φ is indeed unsatisfiable using a SAT solver.
+    ])
+
+    #uncover("2, 4", [
+      ▸ Solving is reliable, reproducible, and trustworthy:
+      formal proof systems (DRAT) and verified proof checkers (`cake_lpr`).
+    ])
+
+    #uncover("3, 4", [
+      ▸ But reduction is problem-specific, and involves complex transformations:
+      _focus of our work_.
+    ])
   ]
 )
+
+#let reduction-slide(step) = [
+== Reduction from geometry to SAT
+#slide(
+  config: config-methods(cover: utils.semi-transparent-cover.with(alpha: 85%)),
+  repeat: 1,
+  self => [
+    #set text(size: 23pt)
+    #uncover(if step == 1 { "1 "} else { "2" }, [
+      1. Discretize from continuous coordinates in $ℝ²$ to boolean variables.
+    ])
+    #uncover(if step == 2 { "1 "} else { "2" }, [
+      2. Points can be put in _canonical form_
+         without removing $k$-holes.
+         ```lean
+         theorem symmetry_breaking {l : List Point} :
+           3 ≤ l.length → PointsInGenPos l →
+           ∃ w : CanonicalPoints, l ≼σ w.points
+         ```
+    ])
+    #uncover(if step == 3 { "1 "} else { "2" }, [
+      3. $n$ points in canonical form with no $6$-holes
+         induce a propositional assignment that satisfies $φ_n$.
+         ```lean
+         theorem satisfies_hexagonEncoding {w : CanonicalPoints} :
+           ¬σHasEmptyKGon 6 w → w.toPropAssn ⊨ Geo.hexagonCNF w.len
+         ```
+      4. But $φ_30$ is unsatisfiable.
+         ```lean
+         axiom unsat_6hole_cnf : (Geo.hexagonCNF 30).isUnsat
+         ```
+    ])
+  ]
+)]
+
+#reduction-slide(1)
 
 == Discretization with triple-orientations
 
@@ -381,6 +416,8 @@ _focus of our work_.
 ])
 
 // WN: I think cap-cup here would be too deep into the weeds
+
+#reduction-slide(2)
 
 == Symmetry breaking
 
@@ -510,6 +547,8 @@ structure CanonicalPoints where
   oriented : rest.Pairwise (σ leftmost · · = .ccw)
   lex : σRevLex rest
 ```
+
+#reduction-slide(3)
 
 == Running the SAT solver
 
@@ -647,11 +686,11 @@ We used Lean to fully verify a recent result in combinatorial geometry
 based on a sophisticated reduction to SAT. #pause
 
 Upper and lower bounds for all finite _hole numbers_ $h(k)$
-followed with some additional effort. #pause
+followed with additional effort. #pause
 
 Open problems remain:
 
-▸ Horton's construction for $h(7) = h(8) = … = ∞$ has not been verified. #pause
+▸ Horton's construction for $h(7) = h(8) = … = ∞$ hasn't been verified. #pause
 
 ▸ Exact values of $g(k)$ for $7 ≤ k$ aren't known. #pause
 
