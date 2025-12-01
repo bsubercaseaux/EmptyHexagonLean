@@ -23,11 +23,23 @@ def noKGon2Arc (n sz1 sz2 : Nat) : PropForm (Var n) :=
   .impP (a.1+sz1+sz2 < b.1) fun _ =>
   .not <| .and (arc2 .ccw sz1 a b) (arc2 .cw sz2 a b)
 
+-- for k = 4:
+--
+-- 1          ..
+--  a   b   a    b
+--    ·
+--
+-- for k = 5:
+--
+-- 1           .·.       ..
+--  a    b   a     b   a    b
+--    ··                 ·
+--
 -- for k = 6:
 --
--- 1            ..       ...       ....
+-- 1            ..       .·.       .··.
 --  a     b   a    b   a     b   a      b
---    ...       ..       .
+--    ·.·       ··        ·
 def noGonClauses (k n : Nat) : PropForm (Var n) :=
   .impP (3 ≤ k) fun _ =>
   .and (noKGon2Arc n (k-3) 0) <|
